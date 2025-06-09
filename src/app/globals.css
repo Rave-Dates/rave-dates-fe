@@ -6,5 +6,11 @@
   --color-primary-white: #FFFFFF;
   --color-container: #151515;
   --color-inactive: #3B3B3B;
-  --color-text-inactive: #3B3B3B;
+  --color-text-inactive: #636363;
+  --color-input: #1A1A1A;
+
+  --text-title: 2.25rem;
+  --text-subtitle: 1.5rem;
+  --text-small-title: 1rem;
+  --text-body: 0.875rem;
 }
