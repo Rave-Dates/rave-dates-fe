@@ -18,9 +18,9 @@ const Navbar: React.FC = () => {
                 className="w-full bg-input placeholder:text-inactive outline-none text-body pl-4 pr-4 py-3.5 rounded-2xl"
               />
             </div>
-            <div className="bg-primary px-3.5 content-center mx-2 rounded-2xl">
+            <button className="bg-primary hover:bg-primary/70 transition-colors px-3.5 content-center mx-2 rounded-2xl">
               <Image src="/icons/filter.svg" width={24} height={24} alt="filter icon" />
-            </div>
+            </button>
           </div>
           <a href="#" className="text-text-inactive ms-2 hover:text-primary-white transition-colors">
             Mis tickets
@@ -34,9 +34,15 @@ const Navbar: React.FC = () => {
         <div className="flex items-center space-x-6">
           {/* Social Icons */}
           <div className="flex items-center gap-4">
-            <Image src="/icons/whatsapp.svg" width={32} height={32} alt="whatsapp icon" />
-            <Image src="/icons/instagram.svg" width={32} height={32} alt="twitter icon" />
-            <Image src="/icons/facebook.svg" width={32} height={32} alt="facebook icon" />
+            <button className="hover:brightness-150 transition-all">
+              <Image src="/icons/whatsapp.svg" width={32} height={32} alt="whatsapp icon" />
+            </button>
+            <button className="hover:brightness-150 transition-all">
+              <Image src="/icons/instagram.svg" width={32} height={32} alt="twitter icon" />
+            </button>
+            <button className="hover:brightness-150 transition-all">
+              <Image src="/icons/facebook.svg" width={32} height={32} alt="facebook icon" />
+            </button>
           </div>
         </div>
       </div>
