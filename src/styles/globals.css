@@ -4,13 +4,19 @@
   --color-primary: #B2FF00;
   --color-primary-black: #050505;
   --color-primary-white: #FFFFFF;
-  --color-container: #151515;
+  --color-cards-container: #151515;
+  --color-main-container: #0E0E0E;
   --color-inactive: #3B3B3B;
   --color-text-inactive: #636363;
   --color-input: #1A1A1A;
+  --color-divider: #262626;
 
   --text-title: 2.25rem;
   --text-subtitle: 1.5rem;
   --text-small-title: 1rem;
   --text-body: 0.875rem;
+}
+
+* {
+  scrollbar-width: none;
 }
