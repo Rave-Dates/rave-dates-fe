@@ -94,11 +94,11 @@ const EventCard: React.FC<IEventCard> = ({
         </div>
 
         {/* Buy Button and Price */}
-        <div className="flex items-center gap-2 justify-between">
-          <button className="bg-primary text-black font-medium text-body py-3 px-8 rounded-md hover:bg-primary/80 transition-all flex-1 mr-4">
+        <div className="flex items-center gap-6 justify-between">
+          <button className="bg-primary text-black font-medium text-body py-3 px-8 rounded-md hover:bg-primary/80 transition-all flex-1">
             Comprar tickets
           </button>
-          <div className="text-white">
+          <div className="text-white sm:block hidden">
             <span className='text-xl font-semibold'>
               {currency}
               {price}

@@ -3,11 +3,11 @@ import React from 'react';
 
 const Navbar: React.FC = () => {
   return (
-    <nav className="bg-main-container fixed z-50 w-full text-white px-20 h-[96px]">
-      <div className="h-full flex items-center gap-40">
-        <div className="flex items-center justify-start space-x-10 w-[70%] ms-28">
+    <nav className="bg-main-container fixed z-50 w-full text-white px-5 sm:px-10 lg:px-20 h-[180px] sm:h-[96px]">
+      <div className="h-full flex items-center justify-center gap-8 xl:gap-40">
+        <div className="flex flex-col sm:flex-row items-center justify-start gap-6 xl:gap-12 w-full md:w-[70%]">
           <Image src="/icons/logo.svg" width={56} height={56} alt="logo" />
-          <div className='flex w-[54%]'>
+          <div className='flex w-full md:w-[54%]'>
             <div className="relative w-full">
               <i className='absolute right-4 content-center h-full'>
                 <Image src="/icons/search.svg" width={24} height={24} alt="search icon" />
@@ -22,16 +22,16 @@ const Navbar: React.FC = () => {
               <Image src="/icons/filter.svg" width={24} height={24} alt="filter icon" />
             </button>
           </div>
-          <a href="#" className="text-text-inactive ms-2 hover:text-primary-white transition-colors">
+          <a href="#" className="text-text-inactive md:block hidden min-w-[81px] hover:text-primary-white transition-colors">
             Mis tickets
           </a>
-          <a href="#" className="text-text-inactive ms-8 hover:text-primary-white transition-colors">
+          <a href="#" className="text-text-inactive md:block hidden min-w-[75px] hover:text-primary-white transition-colors">
             Mis datos
           </a>
         </div>
 
         {/* Navigation Links and Icons */}
-        <div className="flex items-center space-x-6">
+        <div className="items-center space-x-6 md:flex hidden">
           {/* Social Icons */}
           <div className="flex items-center gap-4">
             <button className="hover:brightness-150 transition-all">
