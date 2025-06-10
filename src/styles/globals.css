@@ -24,3 +24,12 @@
 button {
   cursor: pointer;
 }
+
+.swiper-pagination-bullet {
+  background-color: #727272 !important;
+  opacity: 1 !important;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #FFFFFF !important;
+}
