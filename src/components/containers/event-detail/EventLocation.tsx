@@ -1,0 +1,39 @@
+import React from 'react';
+
+const EventLocation = ({ event } : { event: IEventCard }) => {
+  const { date, location, venue } = event;
+  return (
+    <div className="space-y-6">
+      {/* Date */}
+      <div>
+        <h3 className="text-lg mb-2">Fecha</h3>
+         <p className="text-body bg-cards-container px-4 py-3 rounded-lg">
+          {date}
+        </p>
+      </div>
+
+      {/* Location */}
+      <h3 className="text-lg text-white mb-2">Ubicación</h3>
+
+      <div className='bg-cards-container rounded-lg px-2 font-light'>
+        <h2 className="text-body px-2 py-3">
+          {location} • {venue}
+        </h2>
+        
+        {/* Map */}
+        <div className="relative h-[256px] bg-neutral-800 rounded-lg overflow-hidden">
+          <div className="inset-0 flex items-center justify-center">
+              map
+          </div>
+        </div>
+
+        {/* View on Google Maps */}
+        <button className="text-center w-full text-body px-4 pt-4 pb-5 underline underline-offset-4 decoration-primary-white/70"> 
+          Ver en Google Maps
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default EventLocation;
