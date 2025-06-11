@@ -66,8 +66,6 @@ const EventDetails = ({ eventName } : { eventName: IEventCard['name'] }) => {
             <EventInfo artist={selectedEvent.artist} labels={selectedEvent.labels} genres={selectedEvent.genres} />
           </div>
         </div>
-       
-        
       </div>
     </div>
   );
