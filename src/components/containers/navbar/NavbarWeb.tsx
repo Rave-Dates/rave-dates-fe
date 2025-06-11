@@ -8,6 +8,7 @@ import WhatsappSvg from '@/components/svg/WhatsappSvg';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
+import FilterModal from './FilterModal';
 
 const NavbarWeb: React.FC = () => {
   const pathname = usePathname();
@@ -36,9 +37,7 @@ const NavbarWeb: React.FC = () => {
                 className="w-full bg-input placeholder:text-inactive outline-none text-body pl-4 pr-4 py-3.5 rounded-2xl"
               />
             </div>
-            <button className="bg-primary text-primary-black hover:bg-primary/70 transition-colors px-3.5 content-center mx-2 rounded-2xl">
-              <FilterSvg />
-            </button>
+            <FilterModal />
           </div>
           <a href="#" className="text-text-inactive md:block hidden min-w-[81px] hover:text-primary-white transition-colors">
             Mis tickets
