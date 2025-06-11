@@ -8,6 +8,7 @@ import Image from 'next/image';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import ArrowSvg from '@/components/svg/ArrowSvg';
 
 export default function ImagesSwiper({ images, className }: { images: IEventCard['images'], className: string }) {
   const prevRef = useRef(null);
@@ -17,10 +18,10 @@ export default function ImagesSwiper({ images, className }: { images: IEventCard
     <div className="relative w-full">
       {/* Botones custom */}
       <button ref={prevRef} className="absolute z-10 top-1/2 left-3 sm:left-6 -translate-y-1/2 bg-primary-white hover:opacity-75 active:scale-95 p-3 rounded-xl shadow transition-all">
-        <Image src="/icons/arrow.svg" width={24} height={24} alt="arrow icon" />
+        <ArrowSvg />
       </button>
       <button ref={nextRef} className="absolute z-10 top-1/2 right-3 sm:right-6 -translate-y-1/2 bg-primary-white hover:opacity-75 active:scale-95 p-3 rounded-xl shadow transition-all rotate-180">
-        <Image src="/icons/arrow.svg" width={24} height={24} alt="arrow icon" />
+        <ArrowSvg />
       </button>
 
       <Swiper

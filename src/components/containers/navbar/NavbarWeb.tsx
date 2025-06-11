@@ -1,6 +1,10 @@
 "use client"
 
-import Image from 'next/image';
+import FacebookSvg from '@/components/svg/FacebookSvg';
+import FilterSvg from '@/components/svg/FilterSvg';
+import InstagramSvg from '@/components/svg/InstagramSvg';
+import SearchSvg from '@/components/svg/SearchSvg';
+import WhatsappSvg from '@/components/svg/WhatsappSvg';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
@@ -19,12 +23,12 @@ const NavbarWeb: React.FC = () => {
       <div className="h-full flex items-center justify-center gap-8 xl:gap-40">
         <div className="flex flex-col sm:flex-row items-center justify-start gap-6 xl:gap-12 w-full md:w-[70%]">
           <Link href="/">
-            <Image src="/icons/logo.svg" width={56} height={56} alt="logo" />
+            <img className='w-14 h-14' src="/logo.svg" alt="logo" />
           </Link>
           <div className='flex w-full md:w-[54%]'>
             <div className="relative w-full">
               <i className='absolute right-4 content-center h-full'>
-                <Image src="/icons/search.svg" width={24} height={24} alt="search icon" />
+                <SearchSvg />
               </i>
               <input
                 type="text"
@@ -32,8 +36,8 @@ const NavbarWeb: React.FC = () => {
                 className="w-full bg-input placeholder:text-inactive outline-none text-body pl-4 pr-4 py-3.5 rounded-2xl"
               />
             </div>
-            <button className="bg-primary hover:bg-primary/70 transition-colors px-3.5 content-center mx-2 rounded-2xl">
-              <Image src="/icons/filter.svg" width={24} height={24} alt="filter icon" />
+            <button className="bg-primary text-primary-black hover:bg-primary/70 transition-colors px-3.5 content-center mx-2 rounded-2xl">
+              <FilterSvg />
             </button>
           </div>
           <a href="#" className="text-text-inactive md:block hidden min-w-[81px] hover:text-primary-white transition-colors">
@@ -49,13 +53,13 @@ const NavbarWeb: React.FC = () => {
           {/* Social Icons */}
           <div className="flex items-center gap-4">
             <button className="hover:brightness-150 transition-all">
-              <Image src="/icons/whatsapp.svg" width={32} height={32} alt="whatsapp icon" />
+              <WhatsappSvg className='w-8 h-8 text-text-inactive' />
             </button>
             <button className="hover:brightness-150 transition-all">
-              <Image src="/icons/instagram.svg" width={32} height={32} alt="twitter icon" />
+              <InstagramSvg className='w-8 h-8 text-text-inactive' />
             </button>
             <button className="hover:brightness-150 transition-all">
-              <Image src="/icons/facebook.svg" width={32} height={32} alt="facebook icon" />
+              <FacebookSvg className='w-8 h-8 text-text-inactive' />
             </button>
           </div>
         </div>

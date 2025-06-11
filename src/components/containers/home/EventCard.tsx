@@ -1,7 +1,9 @@
-import Image from 'next/image';
 import React from 'react';
 import ImagesSwiper from './ImagesSwiper';
 import Link from 'next/link';
+import CalendarSvg from '@/components/svg/CalendarSvg';
+import LocationSvg from '@/components/svg/LocationSvg';
+import BankSvg from '@/components/svg/BankSvg';
 
 const EventCard: React.FC<IEventCard> = ({
   artist,
@@ -26,23 +28,23 @@ const EventCard: React.FC<IEventCard> = ({
         
         <div className="space-y-2 mb-4 text-text-inactive text-body">
           <div className="flex items-center gap-2">
-            <Image className='text-amber-300' src="/icons/calendar.svg" width={24} height={24} alt="logo" />
+            <CalendarSvg className='w-6 h-6' />
             {date}
           </div>
           
           <div className="flex items-center gap-2">
-            <Image src="/icons/location.svg" width={24} height={24} alt="logo" />
+            <LocationSvg className='w-6 h-6' />
             {location} • {venue}
           </div>
           
           {hasPaymentOptions ? (
             <div className="flex items-center gap-2">
-              <Image src="/icons/bank.svg" width={24} height={24} alt="logo" />
+              <BankSvg className='w-6 h-6' />
               Pago con alcancía disponible
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Image src="/icons/calendar.svg" width={24} height={24} alt="logo" />
+              <BankSvg className='w-6 h-6' />
               Pago con alcancía no disponible
             </div>
           )}

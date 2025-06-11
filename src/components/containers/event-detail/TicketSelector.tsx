@@ -1,6 +1,6 @@
+import AddSvg from '@/components/svg/AddSvg';
+import SubtractSvg from '@/components/svg/SubtractSvg';
 import React, { useState } from 'react';
-import AddIcon from '@/assets/icons/add.svg';
-import SubtractIcon from '@/assets/icons/subtract.svg';
 
 interface TicketType {
   id: string;
@@ -47,10 +47,10 @@ const TicketSelector: React.FC = () => {
             <div className="flex items-center font-light text-subtitle">
               <button
                 onClick={() => updateQuantity(ticket.id, false)}
-                className="p-3 bg-inactive hover:bg-inactive/70 rounded-l-xl flex items-center justify-center text-white transition-colors"
+                className={`${ticket.quantity > 0 && "bg-primary-white"} p-3 bg-inactive hover:opacity-85 rounded-l-xl flex items-center justify-center text-white transition-opacity`}
                 disabled={ticket.quantity === 0}
               >
-                <SubtractIcon alt="subtract icon" />
+                <SubtractSvg />
               </button>
               
               <span className="px-4 h-12 tabular-nums w-[76px] py-2 bg-text-inactive/70 text-center">{ticket.quantity}</span>
@@ -59,7 +59,7 @@ const TicketSelector: React.FC = () => {
                 onClick={() => updateQuantity(ticket.id, true)}
                 className="p-3 bg-primary hover:bg-primary/70 rounded-r-xl flex items-center justify-center text-black transition-colors"
               >
-                <AddIcon alt="subtract icon" />
+                <AddSvg />
               </button>
             </div>
           </div>
