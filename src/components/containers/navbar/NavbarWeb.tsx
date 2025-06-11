@@ -1,12 +1,26 @@
+"use client"
+
 import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import React from 'react';
 
-const Navbar: React.FC = () => {
+const NavbarWeb: React.FC = () => {
+  const pathname = usePathname();
+
+  const isHome = pathname === '/';
+
   return (
-    <nav className="bg-main-container fixed z-50 w-full text-white px-5 sm:px-10 lg:px-20 h-[180px] sm:h-[96px]">
+    <nav 
+      className={`
+        bg-main-container fixed z-50 w-full text-white px-5 sm:px-10 lg:px-20 h-[180px] sm:h-[96px]
+        ${isHome ? 'block' : 'hidden'} sm:block
+      `}>
       <div className="h-full flex items-center justify-center gap-8 xl:gap-40">
         <div className="flex flex-col sm:flex-row items-center justify-start gap-6 xl:gap-12 w-full md:w-[70%]">
-          <Image src="/icons/logo.svg" width={56} height={56} alt="logo" />
+          <Link href="/">
+            <Image src="/icons/logo.svg" width={56} height={56} alt="logo" />
+          </Link>
           <div className='flex w-full md:w-[54%]'>
             <div className="relative w-full">
               <i className='absolute right-4 content-center h-full'>
@@ -50,4 +64,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar;
+export default NavbarWeb;

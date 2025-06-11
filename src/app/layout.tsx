@@ -1,4 +1,4 @@
-import Navbar from "@/components/containers/navbar/Navbar";
+import NavbarWeb from "@/components/containers/navbar/NavbarWeb";
 import "@/styles/globals.css";
 import { mainFont } from '@/fonts/index';
 
@@ -10,7 +10,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${mainFont.className} bg-main-container`}>
-        <Navbar />
+        <NavbarWeb />
         {children}
       </body>
     </html>
