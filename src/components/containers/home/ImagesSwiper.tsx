@@ -9,7 +9,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
-export default function CustomSwiper({ images }: { images: IEventCard['images'] }) {
+export default function ImagesSwiper({ images, className }: { images: IEventCard['images'], className: string }) {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
 
@@ -51,7 +51,7 @@ export default function CustomSwiper({ images }: { images: IEventCard['images'] 
               height={1000}
               src={image}
               alt={`event ${index + 1}`}
-              className="w-full aspect-square object-cover h-[36rem]"
+              className={`${className}`}
             />
           </SwiperSlide>
         ))}
