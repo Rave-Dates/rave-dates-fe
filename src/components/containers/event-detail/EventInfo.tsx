@@ -20,7 +20,7 @@ const EventInfo= ({ labels, genres, artist } : { labels: IEventCard['labels'], g
         <h3 className="text-small-title font-semibold text-white mb-3">Información adicional</h3>
         <div className="flex flex-wrap gap-2">
           {labels.map((label, index) => (
-            <span key={index} className="bg-primary text-black px-3 py-1.5 rounded-xl text-sm font-medium">
+            <span key={index} className="bg-primary text-black px-3 py-1.5 rounded-xl text-sm">
               {label}
             </span>
           ))}
@@ -40,7 +40,7 @@ const EventInfo= ({ labels, genres, artist } : { labels: IEventCard['labels'], g
         <h3 className="text-small-title font-semibold text-white mb-3">Géneros</h3>
         <div className="flex gap-2">
           {genres.map((genre, index) => (
-            <span key={index} className="bg-primary text-black px-3 py-1.5 rounded-xl text-sm font-medium">
+            <span key={index} className="bg-primary text-black px-3 py-1.5 rounded-xl text-sm">
               {genre}
             </span>
           ))}

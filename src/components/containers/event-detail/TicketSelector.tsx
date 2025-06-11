@@ -1,5 +1,6 @@
-import Image from 'next/image';
 import React, { useState } from 'react';
+import AddIcon from '@/assets/icons/add.svg';
+import SubtractIcon from '@/assets/icons/subtract.svg';
 
 interface TicketType {
   id: string;
@@ -23,8 +24,13 @@ const TicketSelector: React.FC = () => {
     ));
   };
 
-  const total = tickets.reduce((sum, ticket) => sum + (ticket.price * ticket.quantity), 0);
-  const totalTickets = tickets.reduce((sum, ticket) => sum + ticket.quantity, 0);
+  let total = 0;
+  let totalTickets = 0;
+
+  tickets.forEach(ticket => {
+    total += ticket.price * ticket.quantity;
+    totalTickets += ticket.quantity;
+  });
 
   return (
     <div className="">
@@ -44,7 +50,7 @@ const TicketSelector: React.FC = () => {
                 className="p-3 bg-inactive hover:bg-inactive/70 rounded-l-xl flex items-center justify-center text-white transition-colors"
                 disabled={ticket.quantity === 0}
               >
-                <Image src="/icons/subtract.svg" width={24} height={24} alt="subtract icon" />
+                <SubtractIcon alt="subtract icon" />
               </button>
               
               <span className="px-4 h-12 tabular-nums w-[76px] py-2 bg-text-inactive/70 text-center">{ticket.quantity}</span>
@@ -53,7 +59,7 @@ const TicketSelector: React.FC = () => {
                 onClick={() => updateQuantity(ticket.id, true)}
                 className="p-3 bg-primary hover:bg-primary/70 rounded-r-xl flex items-center justify-center text-black transition-colors"
               >
-                <Image src="/icons/add.svg" width={24} height={24} alt="subtract icon" />
+                <AddIcon alt="subtract icon" />
               </button>
             </div>
           </div>

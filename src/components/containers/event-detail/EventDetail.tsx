@@ -13,7 +13,7 @@ const EventDetails = ({ eventName } : { eventName: IEventCard['name'] }) => {
   if (!selectedEvent) return redirect("/")
   
   return (
-    <div className="min-h-screen bg-primary-black text-white pt-50 pb-20 sm:pt-[7rem]">
+    <div className="min-h-screen bg-primary-black text-white pb-20 sm:pt-[6.7rem]">
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Title */}
         <div className="mb-4">

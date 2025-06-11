@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React from 'react';
 
 const EventLocation = ({ event } : { event: IEventCard }) => {
@@ -22,9 +23,7 @@ const EventLocation = ({ event } : { event: IEventCard }) => {
         
         {/* Map */}
         <div className="relative h-[256px] bg-neutral-800 rounded-lg overflow-hidden">
-          <div className="inset-0 flex items-center justify-center">
-              map
-          </div>
+          <Image src="/images/map-example.png" alt="map" fill className="absolute inset-0 w-full h-full object-cover" />
         </div>
 
         {/* View on Google Maps */}
