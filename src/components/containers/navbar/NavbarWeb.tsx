@@ -1,7 +1,6 @@
 "use client"
 
 import FacebookSvg from '@/components/svg/FacebookSvg';
-import FilterSvg from '@/components/svg/FilterSvg';
 import InstagramSvg from '@/components/svg/InstagramSvg';
 import SearchSvg from '@/components/svg/SearchSvg';
 import WhatsappSvg from '@/components/svg/WhatsappSvg';
