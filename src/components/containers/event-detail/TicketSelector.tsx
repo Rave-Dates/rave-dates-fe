@@ -38,10 +38,10 @@ const TicketSelector: React.FC = () => {
       
       <div className="space-y-2 mb-6">
         {tickets.map((ticket) => (
-          <div key={ticket.id} className="flex bg-cards-container px-4 py-3 rounded-lg items-center justify-between">
+          <div key={ticket.id} className="flex flex-wrap gap-x-10 gap-y-4 bg-cards-container px-4 py-3 rounded-lg items-center justify-between">
             <div>
               <div className="font-semibold text-body">{ticket.name}</div>
-              <div className="text-body sm:text-subtitle text-primary-white/50">${ticket.price.toLocaleString()} COP</div>
+              <div className="text-body lg:text-subtitle text-primary-white/50">${ticket.price.toLocaleString()} COP</div>
             </div>
             
             <div className="flex items-center font-light text-subtitle">
@@ -68,7 +68,7 @@ const TicketSelector: React.FC = () => {
 
       {/* Total */}
       <div className="w-full flex flex-col items-end mb-7 md:mb-0">
-        <div className="w-1/2 mb-3 md:block hidden">
+        <div className="w-full sm:w-1/2 mb-3">
           <div className="flex justify-between items-center text-white font-bold text-">
             <span>TOTAL</span>
             <span className='font-light tabular-nums'>{totalTickets > 0 ? `$${total.toLocaleString()} COP` : '0'}</span>
