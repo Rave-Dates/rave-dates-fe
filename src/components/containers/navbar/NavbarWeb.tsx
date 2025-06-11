@@ -17,8 +17,8 @@ const NavbarWeb: React.FC = () => {
   return (
     <nav 
       className={`
-        bg-main-container fixed z-50 w-full text-white px-5 sm:px-10 lg:px-20 h-[180px] sm:h-[96px]
-        ${isHome ? 'block' : 'hidden'} sm:block
+        bg-main-container z-50 w-full text-white px-5 sm:px-10 lg:px-20 h-[180px] sm:h-[96px]
+        ${isHome ? 'block' : 'hidden'} sm:block sm:fixed
       `}>
       <div className="h-full flex items-center justify-center gap-8 xl:gap-40">
         <div className="flex flex-col sm:flex-row items-center justify-start gap-6 xl:gap-12 w-full md:w-[70%]">

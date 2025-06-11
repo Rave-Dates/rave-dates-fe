@@ -17,10 +17,10 @@ export default function ImagesSwiper({ images, className }: { images: IEventCard
   return (
     <div className="relative w-full">
       {/* Botones custom */}
-      <button ref={prevRef} className="absolute z-10 top-1/2 left-3 sm:left-6 -translate-y-1/2 bg-primary-white hover:opacity-75 active:scale-95 p-3 rounded-xl shadow transition-all">
+      <button ref={prevRef} className="absolute hidden md:block text-primary-black z-10 top-1/2 left-3 sm:left-6 -translate-y-1/2 bg-primary-white hover:opacity-75 active:scale-95 p-3 rounded-xl shadow transition-all">
         <ArrowSvg />
       </button>
-      <button ref={nextRef} className="absolute z-10 top-1/2 right-3 sm:right-6 -translate-y-1/2 bg-primary-white hover:opacity-75 active:scale-95 p-3 rounded-xl shadow transition-all rotate-180">
+      <button ref={nextRef} className="absolute hidden md:block text-primary-black z-10 top-1/2 right-3 sm:right-6 -translate-y-1/2 bg-primary-white hover:opacity-75 active:scale-95 p-3 rounded-xl shadow transition-all rotate-180">
         <ArrowSvg />
       </button>
 

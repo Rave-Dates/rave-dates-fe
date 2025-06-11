@@ -1,52 +1,58 @@
+"use client"
 
-import Image from 'next/image';
+import HomeSvg from '@/components/svg/HomeSvg';
+import TicketSvg from '@/components/svg/TicketSvg';
+import UserSvg from '@/components/svg/UserSvg';
+import WhatsappMobileSvg from '@/components/svg/WhatsappMobileSvg';
 import React from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 const NavbarMobile: React.FC = () => {
+  const pathname = usePathname();
 
   const navItems = [
     {
-      id: 'inicio',
+      id: '/',
+      href: "/",
       label: 'Inicio',
-      icon: "/icons/home.svg",
+      icon: <HomeSvg className='w-6 h-6' />,
     },
     {
       id: 'tickets',
+      href: "/",
       label: 'Mis tickets',
-      icon: "/icons/ticket.svg",
+      icon: <TicketSvg className='w-6 h-6' />,
     },
     {
       id: 'datos',
+      href: "/",
       label: 'Mis datos',
-      icon: "/icons/user.svg",
+      icon: <UserSvg className='w-6 h-6' />,
     },
     {
       id: 'contacto',
+      href: "/",
       label: 'Contacto',
-      icon: "/icons/contact.svg",
+      icon: <WhatsappMobileSvg className='w-6 h-6' />,
     },
   ];
 
   return (
-    <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-700 px-2 py-2">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 rounded-t-[35px] bg-main-container px-2 py-2 z-20">
       <div className="flex justify-around items-center max-w-md mx-auto">
         {navItems.map((item) => {
           return (
-            <button
+            <Link
               key={item.id}
-              className="flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 hover:bg-gray-800 active:scale-95"
+              href={item.href}
+              className={`${pathname === item.id ? "text-primary" : "text-text-inactive"} flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 hover:bg-gray-800 active:scale-95`}
             >
-              <Image
-                src={item.icon}
-                width={24}
-                height={24}
-                alt={item.label}
-                className="mb-1 transition-transform duration-200"
-              />
-              <span className="text-xs font-medium leading-tight">
+              {item.icon}
+              <span className="text-xs">
                 {item.label}
               </span>
-            </button>
+            </Link>
           );
         })}
       </div>

@@ -4,9 +4,9 @@ import React from 'react';
 const EventLocation = ({ event } : { event: IEventCard }) => {
   const { date, location, venue } = event;
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mb-5 md:mb-0">
       {/* Date */}
-      <div>
+      <div className='md:block hidden'>
         <h3 className="text-lg mb-2">Fecha</h3>
          <p className="text-body bg-cards-container px-4 py-3 rounded-lg">
           {date}

@@ -41,19 +41,19 @@ const TicketSelector: React.FC = () => {
           <div key={ticket.id} className="flex bg-cards-container px-4 py-3 rounded-lg items-center justify-between">
             <div>
               <div className="font-semibold text-body">{ticket.name}</div>
-              <div className="text-subtitle text-primary-white/50">${ticket.price.toLocaleString()} COP</div>
+              <div className="text-body sm:text-subtitle text-primary-white/50">${ticket.price.toLocaleString()} COP</div>
             </div>
             
             <div className="flex items-center font-light text-subtitle">
               <button
                 onClick={() => updateQuantity(ticket.id, false)}
-                className={`${ticket.quantity > 0 && "bg-primary-white"} p-3 bg-inactive hover:opacity-85 rounded-l-xl flex items-center justify-center text-white transition-opacity`}
+                className={`${ticket.quantity > 0 && "bg-primary-white"} p-3 bg-inactive text-text-inactive hover:opacity-85 rounded-l-xl flex items-center justify-center transition-opacity`}
                 disabled={ticket.quantity === 0}
               >
                 <SubtractSvg />
               </button>
               
-              <span className="px-4 h-12 tabular-nums w-[76px] py-2 bg-text-inactive/70 text-center">{ticket.quantity}</span>
+              <span className="px-4 h-12 tabular-nums w-[76px] content-center bg-text-inactive/70 text-center">{ticket.quantity}</span>
               
               <button
                 onClick={() => updateQuantity(ticket.id, true)}
@@ -67,8 +67,8 @@ const TicketSelector: React.FC = () => {
       </div>
 
       {/* Total */}
-      <div className="w-full flex flex-col items-end">
-        <div className="w-1/2 mb-3">
+      <div className="w-full flex flex-col items-end mb-7 md:mb-0">
+        <div className="w-1/2 mb-3 md:block hidden">
           <div className="flex justify-between items-center text-white font-bold text-">
             <span>TOTAL</span>
             <span className='font-light tabular-nums'>{totalTickets > 0 ? `$${total.toLocaleString()} COP` : '0'}</span>
@@ -77,7 +77,7 @@ const TicketSelector: React.FC = () => {
 
         {/* Buy Button */}
         <button 
-          className={`w-1/2 py-3 rounded-lg transition-colors ${
+          className={`w-full md:w-1/2 py-3 rounded-lg transition-colors ${
             totalTickets > 0 
               ? 'bg-primary hover:bg-primary/70 text-black' 
               : 'bg-inactive text-text-inactive cursor-not-allowed'
