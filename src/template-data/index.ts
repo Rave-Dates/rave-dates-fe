@@ -1,12 +1,15 @@
 export const events: IEventCard[] = [
   {
     id: 1,
+    name: "dyen",
     artist: "Pawloski",
     date: "Sábado, 02 de mayo",
     location: "Bogotá, CO",
     venue: "Movistar Arena",
     price: 45,
     currency: "$",
+    labels: ["Estacionamiento", "Bar/DJ", " Alcancia", "+21", "Al aire libre"],
+    genres: ["Hard Techno", "Hardcore"],
     images: [
       "https://images.unsplash.com/photo-1629276299414-a6f6d6403fd2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://plus.unsplash.com/premium_photo-1681503974118-bc4e8f010d40?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -16,12 +19,15 @@ export const events: IEventCard[] = [
   },
   {
     id: 2,
+    name: "feuer",
     artist: "Electronic Vibes",
     date: "Viernes, 08 de mayo",
     location: "Medellín, CO",
     venue: "Coliseo Cubierto",
     price: 35,
     currency: "$",
+    labels: ["Estacionamiento", "Barra libre", " Alcancia", "+25", "Cerrado"],
+    genres: ["Electronica", "House"],
     images: [
       "https://images.unsplash.com/photo-1629276299414-a6f6d6403fd2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://plus.unsplash.com/premium_photo-1681503974118-bc4e8f010d40?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -31,12 +37,21 @@ export const events: IEventCard[] = [
   },
   {
     id: 3,
+    name: "alison",
     artist: "Night Beats",
     date: "Domingo, 10 de mayo",
     location: "Cali, CO",
     venue: "Teatro Municipal",
     price: 50,
     currency: "$",
+    labels: [
+      "Sin estacionamiento",
+      "Bar/DJ",
+      " Alcancia",
+      "+16",
+      "Al aire libre",
+    ],
+    genres: ["Trap", "Hardcore"],
     images: [
       "https://images.unsplash.com/photo-1629276299414-a6f6d6403fd2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://plus.unsplash.com/premium_photo-1681503974118-bc4e8f010d40?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -46,12 +61,15 @@ export const events: IEventCard[] = [
   },
   {
     id: 4,
+    name: "algo",
     artist: "Techno Masters",
     date: "Jueves, 14 de mayo",
     location: "Cartagena, CO",
     venue: "Centro de Convenciones",
     price: 40,
     currency: "$",
+    labels: ["Estacionamiento", "Bar/DJ", " Alcancia", "+21", "Al aire libre"],
+    genres: ["Hard Techno", "Hardcore"],
     images: [
       "https://images.unsplash.com/photo-1629276299414-a6f6d6403fd2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://plus.unsplash.com/premium_photo-1681503974118-bc4e8f010d40?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -61,12 +79,15 @@ export const events: IEventCard[] = [
   },
   {
     id: 5,
+    name: "night",
     artist: "Bass Revolution",
     date: "Sábado, 16 de mayo",
     location: "Barranquilla, CO",
     venue: "Estadio Metropolitano",
     price: 55,
     currency: "$",
+    labels: ["Estacionamiento", "Bar/DJ", " Alcancia", "+21", "Al aire libre"],
+    genres: ["Hard Techno", "Hardcore"],
     images: [
       "https://images.unsplash.com/photo-1629276299414-a6f6d6403fd2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://plus.unsplash.com/premium_photo-1681503974118-bc4e8f010d40?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -76,12 +97,15 @@ export const events: IEventCard[] = [
   },
   {
     id: 6,
+    name: "show",
     artist: "Underground Collective",
     date: "Viernes, 22 de mayo",
     location: "Bucaramanga, CO",
     venue: "Palacio de Deportes",
     price: 38,
     currency: "$",
+    labels: ["Estacionamiento", "Bar/DJ", " Alcancia", "+21", "Al aire libre"],
+    genres: ["Hard Techno", "Hardcore"],
     images: [
       "https://images.unsplash.com/photo-1629276299414-a6f6d6403fd2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://plus.unsplash.com/premium_photo-1681503974118-bc4e8f010d40?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
