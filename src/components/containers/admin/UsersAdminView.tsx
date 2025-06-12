@@ -44,7 +44,7 @@ export default function UserManagement() {
   }
 
   return (
-    <div className="w-full bg-black text-white min-h-screen p-4 pb-28 sm:pt-32">
+    <div className="w-full bg-primary-black text-primary-white min-h-screen p-4 pb-28 sm:pt-32">
       <div className="max-w-md mx-auto animate-fade-in">
         {/* Search and Add User Section */}
         <div className="flex items-center gap-2 mb-4">
@@ -55,7 +55,7 @@ export default function UserManagement() {
           />
           <button
             onClick={handleAddUser}
-            className="bg-[#c1ff00] text-black p-2 rounded-lg flex items-center justify-center"
+            className="bg-primary text-primary-black p-2 rounded-lg flex items-center justify-center"
             aria-label="Añadir usuario"
           >
             <AddSvg />
@@ -80,7 +80,7 @@ export default function UserManagement() {
                 <div className="flex justify-center">
                   <button
                     onClick={() => handleViewUser(user.id)}
-                    className="bg-[#c1ff00] text-black p-1.5 rounded-md flex items-center justify-center"
+                    className="bg-primary text-primary-black p-1.5 rounded-md flex items-center justify-center"
                     aria-label={`Ver ${user.name}`}
                   >
                     <EyeSvg />
