@@ -7,8 +7,7 @@ import EventLocation from './EventLocation';
 import TicketSelector from './TicketSelector';
 import { events } from '@/template-data';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import ArrowSvg from '@/components/svg/ArrowSvg';
+import GoBackButton from '@/components/buttons/GoBackButton';
 
 const EventDetails = ({ eventName } : { eventName: IEventCard['name'] }) => {
   const selectedEvent = events.find(event => event.name === eventName);
@@ -39,9 +38,7 @@ const EventDetails = ({ eventName } : { eventName: IEventCard['name'] }) => {
 
         {/* Mobile view */}
         <div className="grid md:hidden grid-cols-1 gap-x-8 relative">
-          <Link className='absolute z-30 top-20 left-5 bg-primary text-primary-black px-2 py-2 rounded-xl' href="/">
-            <ArrowSvg />
-          </Link>
+          <GoBackButton className="absolute z-30 top-20 left-5 px-2 py-2" />
           <EventHero eventImages={selectedEvent.images} />
 
           {/* Title */}
