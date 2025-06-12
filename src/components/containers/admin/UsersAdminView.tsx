@@ -44,7 +44,7 @@ export default function UserManagement() {
   }
 
   return (
-    <div className="w-full bg-black text-white min-h-screen p-4 sm:pt-32">
+    <div className="w-full bg-black text-white min-h-screen p-4 pb-28 sm:pt-32">
       <div className="max-w-md mx-auto animate-fade-in">
         {/* Search and Add User Section */}
         <div className="flex items-center gap-2 mb-4">
