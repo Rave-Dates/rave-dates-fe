@@ -20,19 +20,19 @@ const NavbarMobile: React.FC = () => {
     },
     {
       id: 'tickets',
-      href: "/",
+      href: "/tickets",
       label: 'Mis tickets',
       icon: <TicketSvg className='w-6 h-6' />,
     },
     {
-      id: 'datos',
-      href: "/",
+      id: 'personal-data',
+      href: "/personal-data",
       label: 'Mis datos',
       icon: <UserSvg className='w-6 h-6' />,
     },
     {
       id: 'contacto',
-      href: "/",
+      href: "/contacto",
       label: 'Contacto',
       icon: <WhatsappMobileSvg className='w-6 h-6' />,
     },
@@ -46,7 +46,7 @@ const NavbarMobile: React.FC = () => {
             <Link
               key={item.id}
               href={item.href}
-              className={`${pathname === item.id ? "text-primary" : "text-text-inactive"} flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 hover:bg-gray-800 active:scale-95`}
+              className={`${pathname === item.href ? "text-primary" : "text-text-inactive"} flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 hover:bg-gray-800 active:scale-95`}
             >
               {item.icon}
               <span className="text-xs">
