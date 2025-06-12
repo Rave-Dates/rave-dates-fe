@@ -79,7 +79,7 @@ const TicketSelector: React.FC = () => {
         <Link 
           tabIndex={totalTickets === 0 ? -1 : undefined}
           aria-disabled={totalTickets === 0} 
-          href="/personal-data"
+          href="/datos-personales"
           className={`w-full md:w-1/2 text-center py-3 rounded-lg transition-colors ${
             totalTickets > 0 
               ? 'bg-primary hover:bg-primary/70 text-black' 
