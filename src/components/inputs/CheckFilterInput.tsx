@@ -1,7 +1,7 @@
 import React from "react";
 import { FilterState } from "../containers/navbar/FilterModal";
 
-const CheckInput = ({ items, type, handleFunc, filters, title }: { items: string[], type: "location" | "eventType", handleFunc: (item: string) => void, filters: FilterState, title: string }) => {
+const CheckFilterInput = ({ items, type, handleFunc, filters, title }: { items: string[], type: "location" | "eventType", handleFunc: (item: string) => void, filters: FilterState, title: string }) => {
   return (
     <div>
       <h3 className="text-white text-sm font-medium mb-4">
@@ -43,4 +43,4 @@ const CheckInput = ({ items, type, handleFunc, filters, title }: { items: string
   );
 };
 
-export default CheckInput;
+export default CheckFilterInput;

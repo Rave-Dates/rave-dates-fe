@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import FilterSvg from '@/components/svg/FilterSvg';
-import CheckInput from '@/components/inputs/CheckInput';
+import CheckFilterInput from '@/components/inputs/CheckFilterInput';
 import FilterButton from '@/components/buttons/FilterButton';
 import AddSvg from '@/components/svg/AddSvg';
 
@@ -88,54 +88,57 @@ function FilterModal() {
       </button>
       {isModalOpen && (
         <div onClick={() => setIsModalOpen(false)} className="animate-fade-in fixed inset-0 bg-black/60 bg-opacity-75 flex items-center justify-center md:py-8 z-50">
-          <div onClick={(e) => e.stopPropagation()}  className="bg-[#050505] flex flex-col rounded-2xl w-full md:h-fit max-h-full md:max-w-md overflow-hidden shadow-2xl">
+          <div onClick={(e) => e.stopPropagation()} className="bg-[#050505] flex flex-col justify-between rounded-2xl w-full md:h-fit max-h-full md:max-w-md overflow-hidden shadow-2xl">
             {/* Header */}
-            <div className="flex flex-row-reverse md:flex-row justify-end gap-5 items-center md:justify-between pt-8 px-6"> 
-              <h2 className="text-title">Filtros</h2>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="bg-primary text-primary-black transition-colors rounded-xl p-1.5"
-              >
-                <AddSvg className='rotate-45 w-7 h-7' />
-              </button>
-            </div>
+            <div className='flex flex-col justify-between items-start overflow-y-scroll'>
+              <div className="flex flex-row-reverse md:flex-row justify-end gap-5 items-center md:justify-between pt-8 px-6"> 
+                <h2 className="text-title">Filtros</h2>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="bg-primary text-primary-black transition-colors rounded-xl p-1.5"
+                >
+                  <AddSvg className='rotate-45 w-7 h-7' />
+                </button>
+              </div>
 
-            <div className="py-6 space-y-8 overflow-y-scroll font-light px-6">
-              {/* Location Filter */}
-              <CheckInput
-                items={locations}
-                type="location"
-                handleFunc={handleLocationChange}
-                filters={filters}
-                title="Ubicación"
-              />
+              {/* Body */}
+              <div className="py-6 space-y-8 font-light px-6">
+                {/* Location Filter */}
+                <CheckFilterInput
+                  items={locations}
+                  type="location"
+                  handleFunc={handleLocationChange}
+                  filters={filters}
+                  title="Ubicación"
+                />
 
-              {/* Event Type Filter */}
-              <CheckInput
-                items={eventTypes}
-                type="eventType"
-                handleFunc={handleEventTypeChange}
-                filters={filters}
-                title="Tipo de evento"
-              />
+                {/* Event Type Filter */}
+                <CheckFilterInput
+                  items={eventTypes}
+                  type="eventType"
+                  handleFunc={handleEventTypeChange}
+                  filters={filters}
+                  title="Tipo de evento"
+                />
 
-              {/* Organizer Filter */}
-              <FilterButton
-                items={organizers}
-                type="organizers"
-                handleFunc={handleOrganizerToggle}
-                filters={filters}
-                title="Organizador"
-              />
+                {/* Organizer Filter */}
+                <FilterButton
+                  items={organizers}
+                  type="organizers"
+                  handleFunc={handleOrganizerToggle}
+                  filters={filters}
+                  title="Organizador"
+                />
 
-              {/* Genre Filter */}
-              <FilterButton
-                items={genres}
-                type="genres"
-                handleFunc={handleGenreToggle}
-                filters={filters}
-                title="Género"
-              />
+                {/* Genre Filter */}
+                <FilterButton
+                  items={genres}
+                  type="genres"
+                  handleFunc={handleGenreToggle}
+                  filters={filters}
+                  title="Género"
+                />
+              </div>
             </div>
 
             {/* Footer */}

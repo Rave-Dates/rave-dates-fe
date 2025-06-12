@@ -41,7 +41,7 @@ const NavbarWeb: React.FC = () => {
           <Link href="/" className="text-text-inactive md:block hidden min-w-[81px] hover:text-primary-white transition-colors">
             Mis tickets
           </Link>
-          <Link href="/personal-data" className="text-text-inactive md:block hidden min-w-[75px] hover:text-primary-white transition-colors">
+          <Link href="/iniciar-sesion" className="text-text-inactive md:block hidden min-w-[75px] hover:text-primary-white transition-colors">
             Mis datos
           </Link>
         </div>
