@@ -33,13 +33,12 @@ const TicketSelector: React.FC = () => {
   });
 
   return (
-    <div className="">
+    <div>
       <h3 className="text-lg font-semibold text-white mb-2">Entradas disponibles</h3>
-      
       <div className="space-y-2 mb-6">
         {tickets.map((ticket) => (
-          <div key={ticket.id} className="flex flex-wrap gap-x-10 gap-y-4 bg-cards-container px-4 py-3 rounded-lg items-center justify-between">
-            <div>
+          <div key={ticket.id} className="flex flex-wrap gap-x-5 gap-y-4 bg-cards-container px-3.5 py-3 rounded-lg items-center justify-between">
+            <div className='w-[100px] sm:w-[170px]'>
               <div className="font-semibold text-body">{ticket.name}</div>
               <div className="text-body lg:text-subtitle text-primary-white/50">${ticket.price.toLocaleString()} COP</div>
             </div>

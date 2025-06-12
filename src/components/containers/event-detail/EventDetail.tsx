@@ -45,7 +45,7 @@ const EventDetails = ({ eventName } : { eventName: IEventCard['name'] }) => {
           <EventHero eventImages={selectedEvent.images} />
 
           {/* Title */}
-          <div className='px-7'>
+          <div className='px-6'>
             <div className="mb-4 text-center">
               <h1 className="text-4xl font-semibold text-white mb-0.5 uppercase">{selectedEvent.name}</h1>
               <p className="text-text-inactive">Extended set</p>
