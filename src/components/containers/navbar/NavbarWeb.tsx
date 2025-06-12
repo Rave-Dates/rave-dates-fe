@@ -38,12 +38,12 @@ const NavbarWeb: React.FC = () => {
             </div>
             <FilterModal />
           </div>
-          <a href="/" className="text-text-inactive md:block hidden min-w-[81px] hover:text-primary-white transition-colors">
+          <Link href="/" className="text-text-inactive md:block hidden min-w-[81px] hover:text-primary-white transition-colors">
             Mis tickets
-          </a>
-          <a href="/personal-data" className="text-text-inactive md:block hidden min-w-[75px] hover:text-primary-white transition-colors">
+          </Link>
+          <Link href="/personal-data" className="text-text-inactive md:block hidden min-w-[75px] hover:text-primary-white transition-colors">
             Mis datos
-          </a>
+          </Link>
         </div>
 
         {/* Navigation Links and Icons */}
