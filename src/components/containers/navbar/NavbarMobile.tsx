@@ -25,14 +25,14 @@ const NavbarMobile: React.FC = () => {
       icon: <TicketSvg className='w-6 h-6' />,
     },
     {
-      id: 'iniciar-sesion',
-      href: "/iniciar-sesion",
+      id: 'auth',
+      href: "/auth",
       label: 'Mis datos',
       icon: <UserSvg className='w-6 h-6' />,
     },
     {
-      id: 'contacto',
-      href: "/contacto",
+      id: 'contact',
+      href: "/contact",
       label: 'Contacto',
       icon: <WhatsappMobileSvg className='w-6 h-6' />,
     },
