@@ -2,7 +2,6 @@
 
 import FacebookSvg from '@/components/svg/FacebookSvg';
 import InstagramSvg from '@/components/svg/InstagramSvg';
-import SearchSvg from '@/components/svg/SearchSvg';
 import WhatsappSvg from '@/components/svg/WhatsappSvg';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
