@@ -33,8 +33,8 @@ export default function DataForm() {
 
   return (
     <div className="min-h-screen pt-24 bg-primary-black text-white flex items-center justify-center px-6 pb-32 sm:pb-5">
-      <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3" />
-      <div className="w-full max-w-2xl">
+      <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
+      <div className="w-full max-w-2xl animate-fade-in">
         <h1 className="text-title font-bold mb-6">Ingresa tus datos</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">

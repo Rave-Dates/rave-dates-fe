@@ -15,7 +15,7 @@ const EventDetails = ({ eventName } : { eventName: IEventCard['name'] }) => {
   
   return (
     <div className="min-h-screen bg-primary-black text-white pb-20 sm:pt-[6.7rem]">
-      <div className="max-w-7xl mx-auto pt-0 pb-20 md:px-6 md:py-8">
+      <div className="max-w-7xl mx-auto pt-0 pb-20 md:px-6 md:py-8 animate-fade-in">
         {/* Web view */}
         <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-x-8">
           {/* Title */}

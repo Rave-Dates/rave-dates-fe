@@ -15,6 +15,27 @@
   --text-subtitle: 1.5rem;
   --text-small-title: 1rem;
   --text-body: 0.875rem;
+
+  --animate-fade-in: fade-in 0.4s ease-in;
+  --animate-fade-out: fade-out 0.4s ease-in;
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0
+    },
+    100% {
+      opacity: 1
+    }
+  }
+
+  @keyframes fade-out {
+    0% {
+      opacity: 1
+    },
+    100% {
+      opacity: 0
+    }
+  }
 }
 
 * {
