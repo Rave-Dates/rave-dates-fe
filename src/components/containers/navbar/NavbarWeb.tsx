@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import FilterModal from './FilterModal';
+import SearchInput from '@/components/inputs/SearchInput';
 
 const NavbarWeb: React.FC = () => {
   const pathname = usePathname();
@@ -26,16 +27,7 @@ const NavbarWeb: React.FC = () => {
             <img className='w-14 h-14' src="/logo.svg" alt="logo" />
           </Link>
           <div className='flex w-full md:w-[54%]'>
-            <div className="relative w-full">
-              <i className='absolute right-4 content-center h-full'>
-                <SearchSvg />
-              </i>
-              <input
-                type="text"
-                placeholder="Busca un evento"
-                className="w-full bg-input placeholder:text-inactive outline-none text-body pl-4 pr-4 py-3.5 rounded-2xl"
-              />
-            </div>
+            <SearchInput placeholder="Busca un evento" />
             <FilterModal />
           </div>
           <Link href="/" className="text-text-inactive md:block hidden min-w-[81px] hover:text-primary-white transition-colors">
