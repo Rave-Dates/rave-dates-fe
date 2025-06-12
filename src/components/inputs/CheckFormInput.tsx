@@ -23,7 +23,7 @@ const CheckFormInput = ({
       {/* Visual representation */}
       <div
         onClick={() => handleFunc(!inputData)}
-        className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors cursor-pointer border
+        className={`w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors cursor-pointer border
         ${inputData ? "bg-primary text-primary-black border-primary" : "border-inactive text-transparent"}`}
       >
         <CheckSvg />
