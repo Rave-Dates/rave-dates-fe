@@ -1,5 +1,6 @@
 import AddSvg from '@/components/svg/AddSvg';
 import SubtractSvg from '@/components/svg/SubtractSvg';
+import Link from 'next/link';
 import React, { useState } from 'react';
 
 interface TicketType {
@@ -75,16 +76,18 @@ const TicketSelector: React.FC = () => {
         </div>
 
         {/* Buy Button */}
-        <button 
-          className={`w-full md:w-1/2 py-3 rounded-lg transition-colors ${
+        <Link 
+          tabIndex={totalTickets === 0 ? -1 : undefined}
+          aria-disabled={totalTickets === 0} 
+          href="/personal-data"
+          className={`w-full md:w-1/2 text-center py-3 rounded-lg transition-colors ${
             totalTickets > 0 
               ? 'bg-primary hover:bg-primary/70 text-black' 
-              : 'bg-inactive text-text-inactive cursor-not-allowed'
+              : 'bg-inactive text-text-inactive pointer-events-none'
           }`}
-          disabled={totalTickets === 0}
         >
           {totalTickets > 0 ? "Comprar tickets" : "Selecciona tickets"}
-        </button>
+        </Link>
       </div>
     </div>
   );
