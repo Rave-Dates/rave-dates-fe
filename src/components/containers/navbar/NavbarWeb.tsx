@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import FilterModal from './FilterModal';
-import SearchInput from '@/components/inputs/SearchInput';
+import SearchInput from '@/components/ui/inputs/SearchInput';
 
 const NavbarWeb: React.FC = () => {
   const pathname = usePathname();

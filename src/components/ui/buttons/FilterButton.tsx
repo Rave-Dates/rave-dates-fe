@@ -1,5 +1,5 @@
 import React from "react";
-import { FilterState } from "../containers/navbar/FilterModal";
+import { FilterState } from "../../containers/navbar/FilterModal";
 
 const FilterButton = ({
   items,

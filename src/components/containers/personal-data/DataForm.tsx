@@ -1,8 +1,8 @@
 "use client";
 
-import DefaultForm from "@/components/forms/DefaultForm";
-import CheckFormInput from "@/components/inputs/CheckFormInput";
-import FormInput from "@/components/inputs/FormInput";
+import DefaultForm from "@/components/ui/forms/DefaultForm";
+import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
+import FormInput from "@/components/ui/inputs/FormInput";
 import type React from "react";
 import { useState } from "react";
 

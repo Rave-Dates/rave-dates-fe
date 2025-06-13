@@ -1,4 +1,4 @@
-import GoBackButton from "@/components/buttons/GoBackButton";
+import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import type React from "react";
 
 export default function DefaultForm({

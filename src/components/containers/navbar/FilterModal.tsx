@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import FilterSvg from '@/components/svg/FilterSvg';
-import CheckFilterInput from '@/components/inputs/CheckFilterInput';
-import FilterButton from '@/components/buttons/FilterButton';
+import CheckFilterInput from '@/components/ui/inputs/CheckFilterInput';
+import FilterButton from '@/components/ui/buttons/FilterButton';
 import AddSvg from '@/components/svg/AddSvg';
 
 export interface FilterState {

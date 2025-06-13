@@ -7,7 +7,7 @@ import EventLocation from './EventLocation';
 import TicketSelector from './TicketSelector';
 import { events } from '@/template-data';
 import { redirect } from 'next/navigation';
-import GoBackButton from '@/components/buttons/GoBackButton';
+import GoBackButton from '@/components/ui/buttons/GoBackButton';
 
 const EventDetails = ({ eventName } : { eventName: IEventCard['name'] }) => {
   const selectedEvent = events.find(event => event.name === eventName);

@@ -1,5 +1,5 @@
 import React from "react";
-import CheckSvg from "../svg/CheckSvg";
+import CheckSvg from "../../svg/CheckSvg";
 
 const CheckFormInput = ({
   handleFunc,

@@ -12,6 +12,7 @@ const EventCardList: React.FC = () => {
         <div>
           <Link className='bg-primary py-1 px-2 rounded-xl' href="admin/users">admin/users</Link>
           <Link className='bg-primary py-1 px-2 rounded-xl ms-4' href="admin/auth">admin/auth</Link>
+          <Link className='bg-primary py-1 px-2 rounded-xl ms-4' href="admin/users/create-user">admin/users/create-user</Link>
         </div>
       </div>
       <div className="space-y-4 animate-fade-in">
