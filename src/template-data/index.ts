@@ -114,3 +114,25 @@ export const events: IEventCard[] = [
     hasPaymentOptions: false,
   },
 ];
+
+interface User {
+  id: number
+  name: string
+  role: string
+}
+
+export const users: User[] = [
+  { id: 1, name: "Juan Gimenez", role: "Org." },
+  { id: 2, name: "Juan Gimenez", role: "Prom." },
+  { id: 3, name: "Juan Gimenez", role: "Prom." },
+  { id: 4, name: "Juan Gimenez", role: "Prom." },
+  { id: 5, name: "Juan Gimenez", role: "Prom." },
+  { id: 6, name: "Juan Gimenez", role: "Prom." },
+  { id: 7, name: "Juan Gimenez", role: "Prom." },
+  { id: 8, name: "Juan Gimenez", role: "Prom." },
+  { id: 9, name: "Juan Gimenez", role: "Prom." },
+  { id: 10, name: "Juan Gimenez", role: "Prom." },
+  { id: 11, name: "Juan Gimenez", role: "Prom." },
+  { id: 12, name: "Juan Gimenez", role: "Prom." },
+  { id: 13, name: "Juan Gimenez", role: "Prom." },
+]

@@ -5,39 +5,12 @@ import AddSvg from "@/components/svg/AddSvg"
 import EyeSvg from "@/components/svg/EyeSvg"
 import Link from "next/link"
 import { useState } from "react"
-
-interface User {
-  id: number
-  name: string
-  role: string
-}
+import { users } from "@/template-data"
 
 export default function UserManagement() {
   const [searchQuery, setSearchQuery] = useState("")
 
-  // Sample user data
-  const users: User[] = [
-    { id: 1, name: "Juan Gimenez", role: "Org." },
-    { id: 2, name: "Juan Gimenez", role: "Prom." },
-    { id: 3, name: "Juan Gimenez", role: "Prom." },
-    { id: 4, name: "Juan Gimenez", role: "Prom." },
-    { id: 5, name: "Juan Gimenez", role: "Prom." },
-    { id: 6, name: "Juan Gimenez", role: "Prom." },
-    { id: 7, name: "Juan Gimenez", role: "Prom." },
-    { id: 8, name: "Juan Gimenez", role: "Prom." },
-    { id: 9, name: "Juan Gimenez", role: "Prom." },
-    { id: 10, name: "Juan Gimenez", role: "Prom." },
-    { id: 11, name: "Juan Gimenez", role: "Prom." },
-    { id: 12, name: "Juan Gimenez", role: "Prom." },
-    { id: 13, name: "Juan Gimenez", role: "Prom." },
-  ]
-
   const filteredUsers = users.filter((user) => user.name.toLowerCase().includes(searchQuery.toLowerCase()))
-
-  const handleViewUser = (id: number) => {
-    console.log(`View user with ID: ${id}`)
-    // Implement view user functionality
-  }
 
   return (
     <div className="w-full bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
@@ -74,13 +47,13 @@ export default function UserManagement() {
                 <h2 className="text-sm">{user.name}</h2>
                 <h2 className="text-sm">{user.role}</h2>
                 <div className="flex justify-center">
-                  <button
-                    onClick={() => handleViewUser(user.id)}
+                  <Link
+                    href={`users/edit-user/${user.id}`}
                     className="bg-primary text-primary-black p-1.5 rounded-md flex items-center justify-center"
                     aria-label={`Ver ${user.name}`}
                   >
                     <EyeSvg />
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}
