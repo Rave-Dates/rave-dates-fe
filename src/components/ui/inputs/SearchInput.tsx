@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from "react";
-import SearchSvg from "../svg/SearchSvg";
+import SearchSvg from "../../svg/SearchSvg";
 
 const SearchInput = ({
   handleFunc = undefined,

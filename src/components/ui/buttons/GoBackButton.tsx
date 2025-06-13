@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import ArrowSvg from "../svg/ArrowSvg";
+import ArrowSvg from "../../svg/ArrowSvg";
 
 const GoBackButton = ({ className }: { className?: string }) => {
   return (

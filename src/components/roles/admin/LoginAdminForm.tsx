@@ -4,12 +4,11 @@ import DefaultForm from "@/components/ui/forms/DefaultForm";
 import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
 import FormInput from "@/components/ui/inputs/FormInput";
 import type React from "react";
+
 import { useState } from "react";
 
-export default function DataForm() {
+export default function LoginForm() {
   const [formData, setFormData] = useState({
-    name: "",
-    idNumber: "",
     email: "",
     whatsapp: "",
     receiveInfo: false,
@@ -30,30 +29,17 @@ export default function DataForm() {
   };
 
   return (
-    <DefaultForm handleSubmit={handleSubmit} title="Ingresa tus datos">
+    <DefaultForm handleSubmit={handleSubmit} title="Iniciar sesión - Admin">
       <FormInput
         handleFunc={handleChange}
-        title="Nombre y apellido*"
-        formName={formData.name}
-        inputName="name"
-      />
-      <FormInput
-        handleFunc={handleChange}
-        title="Cédula o Pasaporte*"
-        formName={formData.idNumber}
-        inputName="idNumber"
-      />
-      <FormInput
-        type="email"
-        handleFunc={handleChange}
-        title="Email*"
+        title="Usuario*"
         formName={formData.email}
         inputName="email"
       />
       <FormInput
-        type="tel"
+        type="password"
         handleFunc={handleChange}
-        title="Celular con WhatsApp*"
+        title="Contraseña*"
         formName={formData.whatsapp}
         inputName="whatsapp"
       />
@@ -76,7 +62,7 @@ export default function DataForm() {
             : "bg-inactive text-text-inactive pointer-events-none"
         } input-button`}
       >
-        Continuar
+        Iniciar sesión
       </button>
     </DefaultForm>
   );

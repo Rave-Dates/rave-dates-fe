@@ -39,7 +39,7 @@ const NavbarMobile: React.FC = () => {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 rounded-t-[35px] bg-main-container px-2 py-2 z-20">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 rounded-t-[35px] bg-main-container px-2 py-2 pb-7 z-20">
       <div className="flex justify-around items-center max-w-md mx-auto">
         {navItems.map((item) => {
           return (
