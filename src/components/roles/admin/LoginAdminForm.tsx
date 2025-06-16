@@ -44,10 +44,6 @@ export default function LoginForm() {
         inputName="whatsapp"
       />
 
-      <p className="text-sm">
-        Te enviaremos los tickets vía email y/o WhatsApp
-      </p>
-
       <CheckFormInput
         handleFunc={handleCheckboxChange}
         inputData={formData.receiveInfo}

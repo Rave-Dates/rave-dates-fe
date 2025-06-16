@@ -71,19 +71,19 @@ const NavbarMobile: React.FC = () => {
     "organizer": [
       {
         id: '/',
-        href: "/",
+        href: "/organizer/promoters",
         label: 'Promotores',
         icon: <UserSvg className='w-6 h-6' />,
       },
       {
-        id: 'tickets',
-        href: "/tickets",
+        id: 'events',
+        href: "/organizer/events",
         label: 'Eventos',
         icon: <CalendarSvg type='thin' className='w-6 h-6' />,
       },
       {
-        id: 'auth',
-        href: "/auth",
+        id: 'balance',
+        href: "/organizer/balance",
         label: 'Saldo',
         icon: <DollarSvg className='w-6 h-6' />,
       },
@@ -99,8 +99,6 @@ const NavbarMobile: React.FC = () => {
       return navItems["/"];
     }
   }
-
-  console.log(getNavItems(pathname));
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 rounded-t-[35px] bg-main-container px-2 py-2 pb-7 z-20">
