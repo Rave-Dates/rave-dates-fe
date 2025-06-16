@@ -115,24 +115,19 @@ export const events: IEventCard[] = [
   },
 ];
 
-interface User {
-  id: number
-  name: string
-  role: string
-}
+export const users: IUser[] = [
+  { id: 1, name: "Juan Gimenez", email: "juan1@example.com", whatsapp: "+5491111110001", cedula: "12345678", role: "Org." },
+  { id: 2, name: "Ana Martínez", email: "ana@example.com", whatsapp: "+5491111110002", cedula: "22345678", role: "Prom." },
+  { id: 3, name: "Carlos Ruiz", email: "carlos@example.com", whatsapp: "+5491111110003", cedula: "32345678", role: "Prom." },
+  { id: 4, name: "Laura Gómez", email: "laura@example.com", whatsapp: "+5491111110004", cedula: "42345678", role: "Prom." },
+  { id: 5, name: "Marcos Díaz", email: "marcos@example.com", whatsapp: "+5491111110005", cedula: "52345678", role: "Prom." },
+  { id: 6, name: "Lucía Fernández", email: "lucia@example.com", whatsapp: "+5491111110006", cedula: "62345678", role: "Prom." },
+  { id: 7, name: "Diego López", email: "diego@example.com", whatsapp: "+5491111110007", cedula: "72345678", role: "Prom." },
+  { id: 8, name: "Valentina Castro", email: "valentina@example.com", whatsapp: "+5491111110008", cedula: "82345678", role: "Prom." },
+  { id: 9, name: "Emiliano Torres", email: "emi@example.com", whatsapp: "+5491111110009", cedula: "92345678", role: "Prom." },
+  { id: 10, name: "Sofía Herrera", email: "sofia@example.com", whatsapp: "+5491111110010", cedula: "10345678", role: "Prom." },
+  { id: 11, name: "Nicolás Ríos", email: "nico@example.com", whatsapp: "+5491111110011", cedula: "11345678", role: "Prom." },
+  { id: 12, name: "Camila Vega", email: "camila@example.com", whatsapp: "+5491111110012", cedula: "12345679", role: "Prom." },
+  { id: 13, name: "Agustín Morales", email: "agustin@example.com", whatsapp: "+5491111110013", cedula: "13345678", role: "Prom." },
+];
 
-export const users: User[] = [
-  { id: 1, name: "Juan Gimenez", role: "Org." },
-  { id: 2, name: "Juan Gimenez", role: "Prom." },
-  { id: 3, name: "Juan Gimenez", role: "Prom." },
-  { id: 4, name: "Juan Gimenez", role: "Prom." },
-  { id: 5, name: "Juan Gimenez", role: "Prom." },
-  { id: 6, name: "Juan Gimenez", role: "Prom." },
-  { id: 7, name: "Juan Gimenez", role: "Prom." },
-  { id: 8, name: "Juan Gimenez", role: "Prom." },
-  { id: 9, name: "Juan Gimenez", role: "Prom." },
-  { id: 10, name: "Juan Gimenez", role: "Prom." },
-  { id: 11, name: "Juan Gimenez", role: "Prom." },
-  { id: 12, name: "Juan Gimenez", role: "Prom." },
-  { id: 13, name: "Juan Gimenez", role: "Prom." },
-]
