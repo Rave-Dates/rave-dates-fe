@@ -18,7 +18,7 @@ const NavbarMobile: React.FC = () => {
   const navItems = {
     "/": [
       {
-        id: '/',
+        id: 'home',
         href: "/",
         label: 'Inicio',
         icon: <HomeSvg className='w-6 h-6' />,
@@ -44,7 +44,7 @@ const NavbarMobile: React.FC = () => {
     ],
     "admin": [
       {
-        id: '/',
+        id: 'users',
         href: "/admin/users",
         label: 'Usuarios',
         icon: <UserSvg className='w-6 h-6' />,
@@ -70,7 +70,7 @@ const NavbarMobile: React.FC = () => {
     ],
     "organizer": [
       {
-        id: '/',
+        id: 'promoters',
         href: "/organizer/promoters",
         label: 'Promotores',
         icon: <UserSvg className='w-6 h-6' />,
@@ -108,7 +108,7 @@ const NavbarMobile: React.FC = () => {
             <Link
               key={item.id}
               href={item.href}
-              className={`${pathname === item.href ? "text-primary" : "text-text-inactive"} flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 active:scale-95`}
+              className={`${(item.href !== "/" && pathname.startsWith(item.href)) || pathname === item.href ? "text-primary" : "text-text-inactive"} flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 active:scale-95 hover:text-primary-white`}
             >
               {item.icon}
               <span className="text-xs">

@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import React from 'react';
 import FilterModal from './FilterModal';
 import SearchInput from '@/components/ui/inputs/SearchInput';
+import Image from 'next/image';
 
 const NavbarWeb: React.FC = () => {
   const pathname = usePathname();
@@ -23,16 +24,16 @@ const NavbarWeb: React.FC = () => {
       <div className="h-full flex items-center justify-center gap-8 xl:gap-40">
         <div className="flex flex-col sm:flex-row items-center justify-start gap-6 xl:gap-12 w-full md:w-[70%]">
           <Link href="/">
-            <img className='w-14 h-14' src="/logo.svg" alt="logo" />
+            <Image className='w-14 h-14' src="/logo.svg" width={1000} height={1000} alt="logo" />
           </Link>
           <div className='flex w-full md:w-[54%]'>
             <SearchInput placeholder="Busca un evento" />
             <FilterModal />
           </div>
-          <Link href="/" className="text-text-inactive md:block hidden min-w-[81px] hover:text-primary-white transition-colors">
+          <Link href="/tickets" className={`${pathname.includes("/tickets") ? "text-primary" : "text-text-inactive"} md:block hidden min-w-[81px] hover:text-primary-white transition-colors`}>
             Mis tickets
           </Link>
-          <Link href="/auth" className="text-text-inactive md:block hidden min-w-[75px] hover:text-primary-white transition-colors">
+          <Link href="/auth" className={`${pathname === "/auth" ? "text-primary" : "text-text-inactive"} md:block hidden min-w-[75px] hover:text-primary-white transition-colors`}>
             Mis datos
           </Link>
         </div>
