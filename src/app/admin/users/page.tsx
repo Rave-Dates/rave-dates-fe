@@ -3,7 +3,7 @@
 import { users } from "@/template-data";
 import UsersList from "@/components/containers/users-list/UsersList";
 import { useState } from "react";
-import EyeButton from "@/components/ui/buttons/EyeButton";
+import DefaultButton from "@/components/ui/buttons/DefaultButton";
 
 export default function UserManagement() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,7 +37,7 @@ export default function UserManagement() {
               <div className="text-start">{user.name}</div>
               <div className="text-center">{user.role}</div>
               <div className="flex justify-end">
-                <EyeButton userId={user.id} href="users/edit-user" />
+                <DefaultButton href={`users/edit-user/${user.id}`} />
               </div>
             </div>
           ))}
