@@ -131,3 +131,10 @@ export const users: IUser[] = [
   { id: 13, name: "Agustín Morales", email: "agustin@example.com", whatsapp: "+5491111110013", cedula: "13345678", role: "Prom." },
 ];
 
+export const myTickets: Ticket[] = [
+  { id: 1, type: "GENERAL", userName: "Juan Gómez", actions: ["send", "download", "view"], transferred: false },
+  { id: 2, type: "VIP", userName: "Juan Gómez", actions: ["send", "download", "view"], transferred: false },
+  { id: 3, type: "GENERAL", userName: "Paula López", actions: ["view"], transferred: true },
+  { id: 4, type: "VIP", userName: "Facundo Ruiz", actions: ["view"], transferred: true },
+]
+
