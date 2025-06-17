@@ -15,15 +15,15 @@ export default function UserManagement() {
   return (
     <UsersList
       filteredUsers={filteredUsers}
-      createHref="users/create-user"
+      createHref="promoters/create-promoter"
       setSearchQuery={setSearchQuery}
       searchQuery={searchQuery}
     >
       <div className="rounded-md overflow-hidden">
         {/* Table Header */}
-        <div className="grid grid-cols-[2fr_1fr_1fr] border-b border-divider text-text-inactive gap-x-2 text-sm py-2 px-3">
-          <div className="text-start">Nombre y apellido</div>
-          <div className="text-center">Rol</div>
+        <div className="grid grid-cols-[1fr_1fr_1fr] border-b border-divider text-text-inactive gap-x-2 text-sm py-2 px-3">
+          <div className="text-start">Nombre</div>
+          <div className="text-center">Apellido</div>
           <div className="text-end">Acciones</div>
         </div>
 
@@ -32,12 +32,14 @@ export default function UserManagement() {
           {filteredUsers.map((user) => (
             <div
               key={user.id}
-              className="grid grid-cols-[2fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
+              className="grid grid-cols-[1fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
             >
-              <div className="text-start">{user.name}</div>
-              <div className="text-center">{user.role}</div>
+              <div className="text-start">{user.name.split(" ")[0]}</div>
+              <div className="text-center">
+                {user.name.split(" ").slice(1).join(" ")}
+              </div>
               <div className="flex justify-end">
-                <EyeButton userId={user.id} href="users/edit-user" />
+                <EyeButton userId={user.id} href="promoters/edit-promoter" />
               </div>
             </div>
           ))}
