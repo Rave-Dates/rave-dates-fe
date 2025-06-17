@@ -31,8 +31,6 @@ const TicketTransferForm = ({ ticketId } : { ticketId: number }) => {
   };
 
   return (
-    <>
-      <h1>{selectedTicket.userName}</h1>
       <DefaultForm ticketButtons={true} handleSubmit={handleSubmit} title="Tickets propios">
         <div className="flex flex-col w-full gap-y-2">
           <div className="bg-cards-container flex gap-x-4 px-4 py-3 rounded-xl">
@@ -83,7 +81,6 @@ const TicketTransferForm = ({ ticketId } : { ticketId: number }) => {
           Transferir
         </button>
       </DefaultForm>
-    </>
   );
 }
 

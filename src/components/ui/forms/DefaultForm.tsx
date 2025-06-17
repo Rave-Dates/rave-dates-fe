@@ -26,7 +26,7 @@ export default function DefaultForm({
         {ticketButtons ? (
           <div className="flex w-full justify-between items-center">
             <h1 className="text-title font-bold mb-6">{title}</h1>
-            <div className="absolute -top-10 right-0 sm:static flex items-center justify-center gap-x-2">
+            <div className="absolute -top-4 right-0 sm:static flex items-center justify-center gap-x-2">
               <DefaultTitledButton className="h-12">
                 <SendSvg />
                 <h2 className="text-[10px]">Enviar</h2>
