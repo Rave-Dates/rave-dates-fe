@@ -7,11 +7,12 @@ const EventCardList: React.FC = () => {
 
   return (
     <div className="py-8 pb-32 sm:pb-8 sm:pt-[7.5rem] bg-primary-black mx-auto px-6">
-      <div className='flex flex-col justify-cente items-center gap-5 mb-4 text-sm'>
+      <div className='flex flex-wrap justify-center items-center gap-3 mb-4 text-sm'>
         <h3 className='text-white text-xs'>Links de prueba</h3>
         <Link className='bg-primary py-1 px-2 rounded-xl' href="admin/users">admin/users</Link>
         <Link className='bg-primary py-1 px-2 rounded-xl' href="admin/auth">admin/auth</Link>
-        <Link className='bg-primary py-1 px-2 rounded-xl' href="admin/users/create-user">admin/users/create-user</Link>
+        <Link className='bg-primary py-1 px-2 rounded-xl' href="organizer/promoters">organizer/promoters</Link>
+        <Link className='bg-primary py-1 px-2 rounded-xl' href="organizer/auth">organizer/auth</Link>
       </div>
       <div className="space-y-4 animate-fade-in">
         {events.map((event) => (
