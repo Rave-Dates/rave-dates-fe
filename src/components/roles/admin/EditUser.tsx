@@ -7,6 +7,9 @@ import FormInput from '@/components/ui/inputs/FormInput';
 import { redirect } from 'next/navigation';
 import FormDropDown from '@/components/ui/inputs/FormDropDown';
 import Link from 'next/link';
+import GoBackButton from '@/components/ui/buttons/GoBackButton';
+import TrashButton from '@/components/ui/buttons/TrashButton';
+import DefaultButton from '@/components/ui/buttons/DefaultButton';
 
 const EditUser = ({ userId } : { userId: number }) => {
   const selectedUser = users.find(user => user.id === userId);
@@ -36,62 +39,71 @@ const EditUser = ({ userId } : { userId: number }) => {
   };
 
   return (
-    <DefaultForm handleSubmit={handleSubmit} title={`${selectedUser?.name} - ${selectedUser?.role}`}>
-      <FormInput
-        handleFunc={handleChange}
-        title="Nombre completo*"
-        formName={formData.name}
-        inputName="name"
-      />
-      <FormInput
-        handleFunc={handleChange}
-        title="Número de cédula*"
-        formName={formData.idNumber}
-        inputName="idNumber"
-      />
-      <FormInput
-        type="email"
-        handleFunc={handleChange}
-        title="Mail*"
-        formName={formData.email}
-        inputName="email"
-      />
-      <FormDropDown
-        title="Rol*"
-        handleFunc={handleChange}
-      >
-        <option value="organizador">Organizador</option>
-        <option value="promotor">Promotor</option>
-        <option value="controlador">Controlador</option>
-      </FormDropDown>
-      <FormInput
-        type="number"
-        handleFunc={handleChange}
-        title="Comisión (%)*"
-        formName={formData.commission}
-        inputName="commission"
-      />
-      <FormInput
-        type="number"
-        handleFunc={handleChange}
-        title="Entradas cortesia (una cada)*" 
-        formName={formData.tickets}
-        inputName="tickets"
-      />
+    <div>
+      <div className='absolute flex w-full px-4 gap-x-2 pt-8 items-center justify-between top-0 sm:top-20'>
+        <GoBackButton className="px-3 rounded-xl py-3 sm:opacity-0" />
+        <div className='flex items-center gap-x-2'>
+          <DefaultButton className="px-12 rounded-xl py-3" text='Cuenta' href={`balance/${userId}`} />
+          <TrashButton className='p-3' />
+        </div>
+      </div>
+      <DefaultForm goBackButton={false} handleSubmit={handleSubmit} title={`${selectedUser?.name} - ${selectedUser?.role}`}>
+        <FormInput
+          handleFunc={handleChange}
+          title="Nombre completo*"
+          formName={formData.name}
+          inputName="name"
+        />
+        <FormInput
+          handleFunc={handleChange}
+          title="Número de cédula*"
+          formName={formData.idNumber}
+          inputName="idNumber"
+        />
+        <FormInput
+          type="email"
+          handleFunc={handleChange}
+          title="Mail*"
+          formName={formData.email}
+          inputName="email"
+        />
+        <FormDropDown
+          title="Rol*"
+          handleFunc={handleChange}
+        >
+          <option value="organizador">Organizador</option>
+          <option value="promotor">Promotor</option>
+          <option value="controlador">Controlador</option>
+        </FormDropDown>
+        <FormInput
+          type="number"
+          handleFunc={handleChange}
+          title="Comisión (%)*"
+          formName={formData.commission}
+          inputName="commission"
+        />
+        <FormInput
+          type="number"
+          handleFunc={handleChange}
+          title="Entradas cortesia (una cada)*" 
+          formName={formData.tickets}
+          inputName="tickets"
+        />
 
-      <Link
-        href="/"
-        className="text-primary-white mb-0 py-5 text-center w-full block"
-      >
-        Ver eventos asignados
-      </Link>
-      <button
-        type="submit"
-        className="bg-primary text-black input-button"
-      >
-        Editar
-      </button>
-    </DefaultForm>
+        <Link
+          href="/"
+          className="text-primary-white mb-0 py-5 text-center w-full block"
+        >
+          Ver eventos asignados
+        </Link>
+        <button
+          type="submit"
+          className="bg-primary text-black input-button"
+        >
+          Editar
+        </button>
+      </DefaultForm>
+    </div>
   );
 }
 
