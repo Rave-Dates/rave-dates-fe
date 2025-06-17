@@ -9,7 +9,7 @@ import { events } from '@/template-data';
 import { redirect } from 'next/navigation';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
 
-const EventDetails = ({ eventName } : { eventName: IEventCard['name'] }) => {
+const EventDetails = ({ eventName, isTicketList = false } : { eventName: IEventCard['name'], isTicketList?: boolean }) => {
   const selectedEvent = events.find(event => event.name === eventName);
   if (!selectedEvent) return redirect("/")
   
@@ -32,7 +32,7 @@ const EventDetails = ({ eventName } : { eventName: IEventCard['name'] }) => {
           {/* Right Column */}
           <div className="space-y-8">
             <EventLocation event={selectedEvent} />
-            <TicketSelector />
+            <TicketSelector isTicketList={isTicketList} />
           </div>
         </div>
 
@@ -56,11 +56,17 @@ const EventDetails = ({ eventName } : { eventName: IEventCard['name'] }) => {
               </p>
             </div>
 
-            <TicketSelector />
+            {
+              !isTicketList && <TicketSelector />
+            }
 
             <EventLocation event={selectedEvent} />
 
             <EventInfo artist={selectedEvent.artist} labels={selectedEvent.labels} genres={selectedEvent.genres} />
+          
+            {
+              isTicketList && <TicketSelector isTicketList={isTicketList} />
+            }
           </div>
         </div>
       </div>

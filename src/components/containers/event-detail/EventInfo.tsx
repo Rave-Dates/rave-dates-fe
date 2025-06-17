@@ -2,7 +2,7 @@ import React from 'react';
 
 const EventInfo= ({ labels, genres, artist } : { labels: IEventCard['labels'], genres: IEventCard['genres'], artist: IEventCard['artist'] }) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mb-8">
       {/* About Event */}
       <div>
         <h2 className="text-small-title font-bold text-white mb-3">Acerca del evento</h2>
