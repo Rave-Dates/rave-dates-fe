@@ -1,15 +1,19 @@
+"use client"
+
 import React from "react";
-import Link from "next/link";
 import ArrowSvg from "../../svg/ArrowSvg";
+import { useRouter } from "next/navigation";
 
 const GoBackButton = ({ className }: { className?: string }) => {
+  const router = useRouter()
+
   return (
-    <Link
+    <button
       className={`${className} bg-primary text-primary-black rounded-xl`}
-      href="/"
+      onClick={() => router.back()}
     >
       <ArrowSvg />
-    </Link>
+    </button>
   );
 };
 
