@@ -11,4 +11,5 @@ interface IEventCard {
   genres: string[];
   images: string[];
   hasPaymentOptions?: boolean;
+  status: "paid" | "pending";
 }

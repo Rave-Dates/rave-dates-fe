@@ -6,5 +6,4 @@ interface Ticket {
   transferred: boolean
   price: number;
   quantity: number;
-  status: "paid" | "pending";
 }
