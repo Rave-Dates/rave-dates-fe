@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { myTickets } from '@/template-data';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
 
-const ChangeTicketsView = ({isTicketList = false} : { isTicketList?: boolean }) => {
+const ChangeTicketsView = () => {
   const [tickets, setTickets] = useState<Ticket[]>(myTickets)
 
   const updateQuantity = (type: string, increment: boolean) => {
@@ -30,7 +30,7 @@ const ChangeTicketsView = ({isTicketList = false} : { isTicketList?: boolean }) 
       <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
       <div className="w-full sm:h-full px-6 sm:pt-32 pt-28 pb-20 flex flex-col items-center justify-between sm:justify-center max-w-2xl relative animate-fade-in overflow-y-scroll">
         <div className='w-full pb-5'>
-          <h3 className={`${isTicketList && "hidden"} text-subtitle font-semibold mb-2`}>
+          <h3 className="text-subtitle font-semibold mb-2">
             Entradas disponibles
           </h3>
           <TicketButtons tickets={tickets} updateQuantity={updateQuantity} />
