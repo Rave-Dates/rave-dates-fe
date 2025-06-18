@@ -41,22 +41,20 @@ const TicketsEventList: React.FC = () => {
             Finalizados
           </button>
         </div>
-        <div className={`transition-opacity duration-200 ${fade ? "opacity-100" : "opacity-0"}`}>
+        <div className={`transition-opacity duration-200 mt-5 ${fade ? "opacity-100" : "opacity-0"}`}>
           {currentView === "upcoming" ? (
             <div className="space-y-4 animate-fade-in">
-              <h1 className='mx-auto w-full text-center mt-2'>Renderizar próximos</h1>
               {events.map((event) => (
                 <div key={event.id} className="flex justify-center">
-                  <EventCard text="Detalles" href="/tickets/event-ticket" {...event} />
+                  <EventCard isTicketList={true} text="Detalles" href="/tickets/event-ticket" {...event} />
                 </div>
               ))}
             </div>
           ) : (
             <div className="space-y-4 animate-fade-in">
-              <h1 className='mx-auto w-full text-center mt-2'>Renderizar finalizados</h1>
               {events.map((event) => (
                 <div key={event.id} className="flex justify-center">
-                  <EventCard text="Detalles" href="/tickets/event-ticket" {...event} />
+                  <EventCard isTicketList={true} text="Finalizado" href="/tickets/event-ticket" {...event} />
                 </div>
               ))}
             </div>

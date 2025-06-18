@@ -6,8 +6,10 @@ import Link from "next/link"
 import { usePathname } from "next/navigation";
 
 
-export default function TicketsChanger() {
+export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid" | "pending" }) {
   const pathname = usePathname();
+
+  console.log(ticketStatus === "pending")
   
   const nonTransferredTickets: Ticket[] = myTickets.filter(ticket => !ticket.transferred)
   const transferredTickets: Ticket[] = myTickets.filter(ticket => ticket.transferred)
@@ -67,12 +69,30 @@ export default function TicketsChanger() {
         </div>
 
         {/* Change Tickets Button */}
+        {ticketStatus === "pending" && (
+          <>
+            <h2 className="text-lg font-medium mb-4">
+              Saldo pendiente
+            </h2>
+            <div className="bg-cards-container rounded-lg p-4 gap-x-5 text-sm flex items-center justify-between">
+              Tienes hasta el 18/5 para pagar el saldo pendiente
+            </div>
+          </>
+        )}
         <Link
           href={`${pathname}/change-tickets`}
-          className="block text-center w-full bg-primary text-black font-medium py-3 rounded-lg mt-6 hover:opacity-80 transition-opacity"
-        >
+          className="block text-center w-full bg-primary text-black font-medium py-3 rounded-lg mb-3 hover:opacity-80 transition-opacity"
+          >
           Cambiar tickets
         </Link>
+        {ticketStatus === "pending" && (
+          <Link
+            href="/checkout"
+            className="block text-center w-full text-system-error border border-system-error font-medium py-3 rounded-lg mb-3 hover:opacity-80 transition-opacity"
+          >
+            Completar alcancía
+          </Link>
+        )}
       </div>
     </div>
   )

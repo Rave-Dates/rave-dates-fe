@@ -4,10 +4,13 @@ import Link from 'next/link';
 import CalendarSvg from '@/components/svg/CalendarSvg';
 import LocationSvg from '@/components/svg/LocationSvg';
 import BankSvg from '@/components/svg/BankSvg';
+import DollarSvg from '@/components/svg/DollarSvg';
 
-const EventCard: React.FC<IEventCard & { href?: string, text?: string }> = ({
+const EventCard: React.FC<IEventCard & { href?: string, text?: string, isTicketList?: boolean}> = ({
   href = "/event/",
   text = "Comprar tickets",
+  isTicketList = false,
+  status,
   artist,
   name,
   date,
@@ -37,21 +40,30 @@ const EventCard: React.FC<IEventCard & { href?: string, text?: string }> = ({
             {location} • {venue}
           </div>
           
-          {hasPaymentOptions ? (
-            <div className="flex items-center gap-2">
-              <BankSvg className='w-6 h-6' />
-              Pago con alcancía disponible
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <BankSvg className='w-6 h-6' />
-              Pago con alcancía no disponible
-            </div>
-          )}
+          {
+            status === "pending" && isTicketList ?
+              <div className="flex items-center text-system-error gap-2">
+                <DollarSvg className='w-6 h-6' />
+                Saldo pendiente
+              </div>
+              :
+              hasPaymentOptions ? (
+                <div className="flex items-center gap-2">
+                  <BankSvg className='w-6 h-6' />
+                  Pago con alcancía disponible
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <BankSvg className='w-6 h-6' />
+                  Pago con alcancía no disponible
+                </div>
+              )
+          }
+
         </div>
 
         {/* Buy Button and Price */}
-        <div className="flex items-center gap-6 justify-between">
+        <div className={`${text === "Finalizado" && "hidden"} flex items-center gap-6 justify-between`}>
           <Link href={`${href}/${name}`} className="bg-primary text-center text-black font-medium text-body py-3 px-8 rounded-md hover:bg-primary/80 transition-all flex-1">
             {text}
           </Link>

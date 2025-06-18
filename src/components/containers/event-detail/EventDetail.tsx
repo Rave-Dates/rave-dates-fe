@@ -32,7 +32,7 @@ const EventDetails = ({ eventName, isTicketList = false } : { eventName: IEventC
           {/* Right Column */}
           <div className="space-y-8">
             <EventLocation event={selectedEvent} />
-            <TicketSelector isTicketList={isTicketList} />
+            <TicketSelector ticketStatus={selectedEvent.status} isTicketList={isTicketList} />
           </div>
         </div>
 
@@ -65,7 +65,7 @@ const EventDetails = ({ eventName, isTicketList = false } : { eventName: IEventC
             <EventInfo artist={selectedEvent.artist} labels={selectedEvent.labels} genres={selectedEvent.genres} />
           
             {
-              isTicketList && <TicketSelector isTicketList={isTicketList} />
+              isTicketList && <TicketSelector ticketStatus={selectedEvent.status} isTicketList={isTicketList} />
             }
           </div>
         </div>

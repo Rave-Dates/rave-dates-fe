@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import TicketsChanger from '../tickets/TicketsChanger';
 import { myTickets } from '@/template-data';
 
-const TicketSelector = ({isTicketList = false} : { isTicketList?: boolean }) => {
+const TicketSelector = ({isTicketList = false, ticketStatus} : { isTicketList?: boolean, ticketStatus?: "paid" | "pending" }) => {
   const [tickets, setTickets] = useState<Ticket[]>(myTickets)
 
   const updateQuantity = (type: string, increment: boolean) => {
@@ -30,7 +30,7 @@ const TicketSelector = ({isTicketList = false} : { isTicketList?: boolean }) => 
       </h3>
       {
         isTicketList ? 
-        <TicketsChanger />
+        <TicketsChanger ticketStatus={ticketStatus} />
         :
         <>
           <TicketButtons tickets={tickets} updateQuantity={updateQuantity} />

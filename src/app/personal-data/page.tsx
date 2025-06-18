@@ -3,6 +3,7 @@
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
 import FormInput from "@/components/ui/inputs/FormInput";
+import { redirect } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
 
@@ -27,6 +28,7 @@ export default function DataForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
+    redirect("/checkout")
   };
 
   return (
@@ -68,13 +70,8 @@ export default function DataForm() {
       />
 
       <button
-        disabled={!formData.receiveInfo}
         type="submit"
-        className={`${
-          formData.receiveInfo
-            ? "bg-primary text-black"
-            : "bg-inactive text-text-inactive pointer-events-none"
-        } input-button`}
+        className="bg-primary text-black input-button"
       >
         Continuar
       </button>
