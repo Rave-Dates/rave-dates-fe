@@ -2,9 +2,13 @@
 
 import { myTickets } from "@/template-data"
 import { TicketRow } from "./TicketRow"
+import Link from "next/link"
+import { usePathname } from "next/navigation";
 
 
 export default function TicketsChanger() {
+  const pathname = usePathname();
+  
   const nonTransferredTickets: Ticket[] = myTickets.filter(ticket => !ticket.transferred)
   const transferredTickets: Ticket[] = myTickets.filter(ticket => ticket.transferred)
 
@@ -16,11 +20,6 @@ export default function TicketsChanger() {
   const handleDownloadAll = () => {
     console.log("Download all tickets")
     // Implement download all logic
-  }
-
-  const handleChangeTickets = () => {
-    console.log("Change tickets")
-    // Implement change tickets logic
   }
 
   return (
@@ -68,12 +67,12 @@ export default function TicketsChanger() {
         </div>
 
         {/* Change Tickets Button */}
-        <button
-          onClick={handleChangeTickets}
-          className="w-full bg-primary text-black font-medium py-3 rounded-lg mt-6 hover:opacity-80 transition-opacity"
+        <Link
+          href={`${pathname}/change-tickets`}
+          className="block text-center w-full bg-primary text-black font-medium py-3 rounded-lg mt-6 hover:opacity-80 transition-opacity"
         >
           Cambiar tickets
-        </button>
+        </Link>
       </div>
     </div>
   )
