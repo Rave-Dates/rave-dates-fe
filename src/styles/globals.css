@@ -20,6 +20,8 @@
   --animate-fade-in: fade-in 0.4s ease-in;
   --animate-fade-out: fade-out 0.4s ease-in;
 
+  --breakpoint-xs: 22rem;
+
   @keyframes fade-in {
     0% {
       opacity: 0

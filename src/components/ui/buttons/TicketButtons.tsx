@@ -6,9 +6,9 @@ const TicketButtons = ({ tickets, updateQuantity }: { tickets: Ticket[], updateQ
   return (
     <div className="space-y-2 mb-6">
         {tickets.map((ticket) => (
-          <div key={ticket.id} className="flex flex-wrap gap-x-5 gap-y-4 bg-cards-container px-3.5 py-3 rounded-lg items-center justify-between">
+          <div key={ticket.id} className="flex flex-wrap gap-x-5 gap-y-4 bg-cards-container px-3.5 py-3 rounded-lg items-center justify-center xs:justify-between">
             <div className='w-[100px] sm:w-[170px]'>
-              <div className="font-semibold text-body">{ticket.type}</div>
+              <div className="font-semibold text-center xs:text-start text-body">{ticket.type}</div>
               <div className="text-body lg:text-subtitle text-primary-white/50">${ticket.price.toLocaleString()} COP</div>
             </div>
             
