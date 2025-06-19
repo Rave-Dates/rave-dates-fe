@@ -69,7 +69,7 @@ export default function Verification() {
   return (
     <div className="min-h-screen pb-40 pt-28 sm:pb-24 sm:pt-36 bg-primary-black sm:justify-center sm:items-center text-white flex px-6">
       <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
-      <div className="max-w-md mx-auto space-y-3">
+      <div className="max-w-md animate-fade-in mx-auto space-y-3">
         <h1 className="text-3xl font-bold">Valida tus datos</h1>
 
         {/* Verification Status */}

@@ -36,7 +36,7 @@ export default function Contact() {
               rel="noopener noreferrer"
               key={item.id}
               href={item.href}
-              className="flex w-full border border-primary gap-x-10 items-center justify-center px-3 py-5 rounded-lg transition-all duration-200 active:opacity-60 hover:text-primary-white"
+              className="flex animate-fade-in w-full border border-primary gap-x-10 items-center justify-center px-3 py-5 rounded-lg transition-all duration-200 active:opacity-60 hover:text-primary-white"
             >
               <i className="absolute left-10 sm:left-28">
                 {item.icon}
