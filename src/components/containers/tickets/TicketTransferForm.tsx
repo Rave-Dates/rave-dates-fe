@@ -6,7 +6,7 @@ import type React from "react";
 import { redirect } from 'next/navigation';
 import { useState } from "react";
 import { myTickets } from "@/template-data";
-import TitleCard from "../common/TitleCard";
+import TitleCard from "../../common/TitleCard";
 
 const TicketTransferForm = ({ ticketId } : { ticketId: number }) => {
   const selectedTicket = myTickets.find(event => event.id === ticketId);

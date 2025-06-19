@@ -1,7 +1,7 @@
 "use client"
 
 import EventDetails from "@/components/containers/checkout/EventDetails"
-import TitleCard from "@/components/containers/common/TitleCard"
+import TitleCard from "@/components/common/TitleCard"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import Link from "next/link"
 import type React from "react"

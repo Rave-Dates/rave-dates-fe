@@ -1,4 +1,4 @@
-import TitleCard from "../common/TitleCard";
+import TitleCard from "../../common/TitleCard";
 
 export default function EventDetails({className}: {className?: string}) {
   return (
