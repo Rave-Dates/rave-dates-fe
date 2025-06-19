@@ -13,7 +13,7 @@ export default function Verification() {
           Podrás realizar esta acción más adelante en caso de que no quieras hacerlo ahora.
         </h2> 
 
-        <div className="flex w-full border-b border-divider">
+        <Link href="/transfer-confirm/success" className="flex w-full border-b border-divider">
           <div
             className="w-full flex font-light justify-center flex-col items-start bg-cards-container outline-none rounded-t-lg ps-4"
             >
@@ -22,7 +22,7 @@ export default function Verification() {
           <div className="bg-cards-container pe-4 py-3 rounded-b-lg">
             <ArrowSvg className="rotate-180" />
           </div>
-        </div>
+        </Link>
 
         <Link href="/transfer-confirm/transfer" className="flex w-full">
           <div

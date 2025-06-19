@@ -4,8 +4,8 @@ import type React from "react"
 export default function Page() {
   return (
     <SuccessView
-      title="Has transferido el ticket correctamente"
-      link1={{ href: "/transfer-confirm/transfer", text: "Transferir otro ticket" }}
+      gap="gap-8 sm:gap-5"
+      title="Ticket adquirido con éxito"
       link2={{ href: "/tickets", text: "Ir a mis tickets" }}
     />
   )
