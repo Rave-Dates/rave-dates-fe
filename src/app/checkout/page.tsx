@@ -5,6 +5,7 @@ import PaymentMethodSelector from "@/components/containers/checkout/PaymentMetho
 import PaymentTypeSelector from "@/components/containers/checkout/PaymentTypeSelector";
 import PricingDetails from "@/components/containers/checkout/PricingDetails";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function Checkout() {
@@ -31,14 +32,14 @@ export default function Checkout() {
         <div className="space-y-4 order-first">
           <EventDetails />
           <PricingDetails />
-          <button className="w-full lg:block hidden bg-[#c1ff00] text-black font-medium py-3 rounded-lg text-lg">
+          <Link href="/otp" className="w-full lg:block hidden text-center bg-primary text-black font-medium py-3 rounded-lg text-lg">
             Continuar
-          </button>
+          </Link>
         </div>
 
-        <button className="w-full lg:hidden block order-last bg-[#c1ff00] text-black font-medium py-3 rounded-lg text-lg">
+        <Link href="/otp" className="w-full lg:hidden block text-center order-last bg-primary text-black font-medium py-3 rounded-lg text-lg">
           Continuar
-        </button>
+        </Link>
       </div>
     </div>
   );
