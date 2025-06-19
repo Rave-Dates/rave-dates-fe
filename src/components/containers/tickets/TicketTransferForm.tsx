@@ -6,7 +6,7 @@ import type React from "react";
 import { redirect } from 'next/navigation';
 import { useState } from "react";
 import { myTickets } from "@/template-data";
-import Image from "next/image";
+import TitleCard from "../common/TitleCard";
 
 const TicketTransferForm = ({ ticketId } : { ticketId: number }) => {
   const selectedTicket = myTickets.find(event => event.id === ticketId);
@@ -33,13 +33,7 @@ const TicketTransferForm = ({ ticketId } : { ticketId: number }) => {
   return (
       <DefaultForm ticketButtons={true} handleSubmit={handleSubmit} title="Tickets propios">
         <div className="flex flex-col w-full gap-y-2">
-          <div className="bg-cards-container flex gap-x-4 px-4 py-3 rounded-xl">
-            <Image className="w-14 h-14" src="/logo.svg" width={1000} height={1000} alt="logo" />
-            <div className="flex flex-col items-start justify-center">
-              <h2 className="text-xl font-medium">DYEN</h2>
-              <h3 className="text-text-inactive">Extended set</h3>
-            </div>
-          </div>
+          <TitleCard title="DYEN" description="Extended set" />
           <h3 className="bg-cards-container px-4 py-3 font-light rounded-xl">Entrada general</h3>
         </div>
         
