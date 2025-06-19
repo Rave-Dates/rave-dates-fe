@@ -15,6 +15,7 @@ const EventCardList: React.FC = () => {
         <Link className='bg-primary py-1 px-2 rounded-xl' href="organizer/auth">organizer/auth</Link>
         <Link className='bg-primary py-1 px-2 rounded-xl' href="tickets/event-ticket/dyen/change-tickets">/change-tickets</Link>
         <Link className='bg-primary py-1 px-2 rounded-xl' href="/checkout">/checkout</Link>
+        <Link className='bg-primary py-1 px-2 rounded-xl' href="/otp">/otp</Link>
       </div>
       <div className="space-y-4 animate-fade-in">
         {events.map((event) => (

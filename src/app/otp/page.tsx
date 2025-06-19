@@ -2,14 +2,13 @@
 
 import VerificationTypeSelector from "@/components/containers/otp/VerificationTypeSelector"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
+import Link from "next/link"
 import type React from "react"
 
 import { useState, useRef } from "react"
 
 export default function Verification() {
   const [code, setCode] = useState(["", "", "", ""])
-  const [isEmailVerified] = useState(true)
-  const [isWhatsAppVerified] = useState(true)
   const [selectedVerification, setSelectedVerification] = useState("Email");
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
@@ -97,7 +96,9 @@ export default function Verification() {
             {code.map((digit, index) => (
               <input
                 key={index}
-                ref={(el) => (inputRefs.current[index] = el)}
+                ref={(el) => {
+                  inputRefs.current[index] = el;
+                }}
                 type="number"
                 inputMode="numeric"
                 pattern="[0-9]"
@@ -113,13 +114,13 @@ export default function Verification() {
         </div>
 
         {/* Continue Button */}
-        <button
+        <Link
+          href="/transfer-confirm"
           onClick={handleContinue}
-          disabled={!isCodeComplete}
-          className="w-full bg-primary text-black font-medium py-3 rounded-lg hover:bg-[#b8f000] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className={`${!isCodeComplete && "opacity-80 pointer-events-none"} block text-center w-full bg-primary text-black font-medium py-3 rounded-lg hover:bg-[#b8f000] transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           Continuar
-        </button>
+        </Link>
 
         {/* Disclaimer */}
         <p className="text-xs text-neutral-400 text-center">
