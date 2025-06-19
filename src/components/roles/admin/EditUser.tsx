@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { users } from '@/template-data';
 import DefaultForm from '@/components/ui/forms/DefaultForm';
 import FormInput from '@/components/ui/inputs/FormInput';
-import { redirect } from 'next/navigation';
+import { redirect, usePathname } from 'next/navigation';
 import FormDropDown from '@/components/ui/inputs/FormDropDown';
 import Link from 'next/link';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
@@ -13,6 +13,7 @@ import DefaultButton from '@/components/ui/buttons/DefaultButton';
 
 const EditUser = ({ userId } : { userId: number }) => {
   const selectedUser = users.find(user => user.id === userId);
+  const pathname = usePathname();
   
   if (!selectedUser) {
     alert("No se encontró el usuario")
@@ -40,10 +41,10 @@ const EditUser = ({ userId } : { userId: number }) => {
 
   return (
     <div>
-      <div className='absolute flex w-full px-4 gap-x-2 pt-8 items-center justify-between top-0 sm:top-20'>
+      <div className='absolute flex w-full px-5 gap-x-2 pt-10 items-center justify-between top-0 sm:top-20 z-20'>
         <GoBackButton className="px-3 rounded-xl py-3 sm:opacity-0" />
         <div className='flex items-center gap-x-2'>
-          <DefaultButton className="px-12 rounded-xl py-3" text='Cuenta' href={`balance/${userId}`} />
+          <DefaultButton className="px-12 rounded-xl py-3" text='Cuenta' href={`${pathname}/balance`} />
           <TrashButton className='p-3' />
         </div>
       </div>
