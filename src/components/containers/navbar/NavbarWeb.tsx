@@ -11,6 +11,27 @@ import SearchInput from '@/components/ui/inputs/SearchInput';
 import Image from 'next/image';
 
 const NavbarWeb: React.FC = () => {
+  const contactItems = [
+    {
+      id: 'whatsapp',
+      href: "https://api.whatsapp.com/",
+      label: 'WhatsApp',
+      icon: <WhatsappSvg className='w-8 h-8' />,
+    },
+    {
+      id: 'instagram',
+      href: "https://www.instagram.com",
+      label: 'Instagram',
+      icon: <InstagramSvg className='w-8 h-8' />,
+    },
+    {
+      id: 'facebook',
+      href: "https://www.facebook.com",
+      label: 'Facebook',
+      icon: <FacebookSvg className='w-8 h-8' />,
+    }
+  ]
+
   const pathname = usePathname();
 
   const isHome = pathname === '/';
@@ -42,15 +63,21 @@ const NavbarWeb: React.FC = () => {
         <div className="items-center space-x-6 md:flex hidden">
           {/* Social Icons */}
           <div className="flex items-center gap-4">
-            <button className="hover:brightness-150 transition-all">
-              <WhatsappSvg className='w-8 h-8 text-text-inactive' />
-            </button>
-            <button className="hover:brightness-150 transition-all">
-              <InstagramSvg className='w-8 h-8 text-text-inactive' />
-            </button>
-            <button className="hover:brightness-150 transition-all">
-              <FacebookSvg className='w-8 h-8 text-text-inactive' />
-            </button>
+            {
+              contactItems.map((item) => {
+                return (
+                  <a
+                    key={item.id}
+                    href={item.href}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-primary text-text-inactive transition-all"
+                  >
+                    {item.icon}
+                  </a>
+                );
+              })
+            }
           </div>
         </div>
       </div>

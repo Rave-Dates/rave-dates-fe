@@ -18,7 +18,7 @@ export default function DefaultForm({
   ticketButtons?: boolean;
 }) {
   return (
-    <div className="min-h-screen pb-40 pt-14 sm:py-32 bg-primary-black sm:justify-center sm:items-center text-white flex px-6">
+    <div className="min-h-screen pb-40 pt-14 sm:pb-32 sm:pt-44 bg-primary-black sm:justify-center sm:items-center text-white flex px-6">
       {goBackButton && (
         <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
       )}
