@@ -10,15 +10,17 @@ export default function DefaultForm({
   title,
   goBackButton = true,
   ticketButtons = false,
+  className = "min-h-screen pb-40 sm:pb-32 px-6",
 }: {
   children: React.ReactNode;
   handleSubmit: React.FormEventHandler<HTMLFormElement>;
   title: string;
   goBackButton?: boolean;
   ticketButtons?: boolean;
+  className?: string;
 }) {
   return (
-    <div className="min-h-screen pb-40 pt-14 sm:pb-32 sm:pt-44 bg-primary-black sm:justify-center sm:items-center text-white flex px-6">
+    <div className={`${className} pt-14 sm:pt-44 bg-primary-black sm:justify-center sm:items-center text-white flex`}>
       {goBackButton && (
         <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
       )}

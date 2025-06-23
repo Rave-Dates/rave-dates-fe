@@ -19,7 +19,7 @@ export default function UsersList({
 }) {
   return (
     <div className="w-full bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
-      <div className="max-w-md mx-auto animate-fade-in">
+      <div className="max-w-xl mx-auto animate-fade-in">
         {/* Search and Add User Section */}
         <div className="flex items-center gap-2 mb-4">
           <SearchInput
