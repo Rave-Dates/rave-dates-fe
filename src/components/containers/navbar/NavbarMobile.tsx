@@ -51,7 +51,7 @@ const NavbarMobile: React.FC = () => {
       },
       {
         id: 'tickets',
-        href: "/tickets",
+        href: "/admin/events",
         label: 'Eventos',
         icon: <CalendarSvg type='thin' className='w-6 h-6' />,
       },
