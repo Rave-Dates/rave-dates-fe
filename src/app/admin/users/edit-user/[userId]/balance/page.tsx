@@ -3,6 +3,7 @@
 import AddSvg from "@/components/svg/AddSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const sampleData = [
   {
@@ -43,20 +44,22 @@ const sampleData = [
 ]
 
 export default function Balance() {
+  const pathname = usePathname();
+
   return (
     <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
       <div>
         <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
         <div className="absolute z-30 top-7 right-5 px-3 py-3 animate-fade-in">
           <Link
-            href="/"
+            href={`${pathname}/add`}
             className="bg-primary text-primary-black p-3 rounded-lg flex items-center justify-center text-center"
             aria-label="Añadir usuario"
           >
             <AddSvg />
           </Link>
         </div>
-        <div className="max-w-md pt-24 mx-auto animate-fade-in">
+        <div className="max-w-xl pt-24 mx-auto animate-fade-in">
           {/* Search and Add User Section */}
 
           <h1 className="text-title font-semibold">Saldo y movimientos</h1>
@@ -97,8 +100,8 @@ export default function Balance() {
         </div>
       </div>
       <Link
-        href="/"
-        className="bg-primary block text-center max-w-md self-center text-black input-button mt-10"
+        href={`${pathname}/add`}
+        className="bg-primary block text-center max-w-xl self-center text-black input-button mt-10"
       >
         Ingresar movimiento
       </Link>

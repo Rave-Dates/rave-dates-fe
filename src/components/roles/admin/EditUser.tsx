@@ -92,7 +92,7 @@ const EditUser = ({ userId } : { userId: number }) => {
         />
 
         <Link
-          href="/"
+          href={`${pathname}/user-events`}
           className="text-primary-white mb-0 py-5 text-center w-full block"
         >
           Ver eventos asignados
