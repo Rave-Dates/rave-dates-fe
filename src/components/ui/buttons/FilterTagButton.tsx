@@ -1,7 +1,7 @@
 import React from "react";
-import { FilterState } from "../../containers/navbar/FilterModal";
+import { FilterState } from "../modals/FilterModal";
 
-const FilterButton = ({
+const FilterTagButton = ({
   items,
   type,
   handleFunc,
@@ -39,4 +39,4 @@ const FilterButton = ({
   );
 };
 
-export default FilterButton;
+export default FilterTagButton;

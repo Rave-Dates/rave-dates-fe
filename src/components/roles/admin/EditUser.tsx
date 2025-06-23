@@ -8,8 +8,8 @@ import { redirect, usePathname } from 'next/navigation';
 import FormDropDown from '@/components/ui/inputs/FormDropDown';
 import Link from 'next/link';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
-import TrashButton from '@/components/ui/buttons/TrashButton';
 import DefaultButton from '@/components/ui/buttons/DefaultButton';
+import DeleteUserModal from '@/components/ui/modals/DeleteUserModal';
 
 const EditUser = ({ userId } : { userId: number }) => {
   const selectedUser = users.find(user => user.id === userId);
@@ -43,9 +43,9 @@ const EditUser = ({ userId } : { userId: number }) => {
     <div>
       <div className='absolute flex w-full px-5 gap-x-2 pt-10 items-center justify-between top-0 sm:top-20 z-20'>
         <GoBackButton className="px-3 rounded-xl py-3 sm:opacity-0" />
-        <div className='flex items-center gap-x-2'>
+        <div className='flex items-center gap-x-3'>
           <DefaultButton className="px-12 rounded-xl py-3" text='Cuenta' href={`${pathname}/balance`} />
-          <TrashButton className='p-3' />
+          <DeleteUserModal />
         </div>
       </div>
       <DefaultForm goBackButton={false} handleSubmit={handleSubmit} title={`${selectedUser?.name} - ${selectedUser?.role}`}>

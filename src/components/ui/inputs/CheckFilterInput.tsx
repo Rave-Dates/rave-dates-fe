@@ -1,5 +1,5 @@
 import React from "react";
-import { FilterState } from "../../containers/navbar/FilterModal";
+import { FilterState } from "../modals/FilterModal";
 
 const CheckFilterInput = ({ items, type, handleFunc, filters, title }: { items: string[], type: "location" | "eventType", handleFunc: (item: string) => void, filters: FilterState, title: string }) => {
   return (

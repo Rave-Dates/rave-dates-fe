@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import FilterSvg from '@/components/svg/FilterSvg';
 import CheckFilterInput from '@/components/ui/inputs/CheckFilterInput';
-import FilterButton from '@/components/ui/buttons/FilterButton';
+import FilterTagButton from '@/components/ui/buttons/FilterTagButton';
 import AddSvg from '@/components/svg/AddSvg';
 
 export interface FilterState {
@@ -122,7 +122,7 @@ function FilterModal() {
                 />
 
                 {/* Organizer Filter */}
-                <FilterButton
+                <FilterTagButton
                   items={organizers}
                   type="organizers"
                   handleFunc={handleOrganizerToggle}
@@ -131,7 +131,7 @@ function FilterModal() {
                 />
 
                 {/* Genre Filter */}
-                <FilterButton
+                <FilterTagButton
                   items={genres}
                   type="genres"
                   handleFunc={handleGenreToggle}

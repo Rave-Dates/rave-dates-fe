@@ -6,7 +6,7 @@ import WhatsappSvg from '@/components/svg/WhatsappSvg';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import FilterModal from './FilterModal';
+import FilterModal from '../../ui/modals/FilterModal';
 import SearchInput from '@/components/ui/inputs/SearchInput';
 import Image from 'next/image';
 
