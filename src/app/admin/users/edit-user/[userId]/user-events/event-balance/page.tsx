@@ -58,7 +58,7 @@ export default function Page() {
           </div>
         </div>
       </div>
-      <div className="mt-20 max-w-xl self-center w-full">
+      <div className="mt-20 max-w-xl self-center w-full animate-fade-in">
         {
           stats.map((data) => (
             <div key={data.id} className="flex justify-between text-sm gap-y-2 py-3 px-3">

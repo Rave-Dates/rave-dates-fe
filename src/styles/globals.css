@@ -43,7 +43,7 @@
 
 @layer components {
   .input-button {
-    @apply w-full font-medium hover:opacity-75 py-4 rounded-lg mt-4 transition-opacity select-none
+    @apply w-full font-medium hover:opacity-75 py-4 rounded-lg mt-4 transition-opacity select-none animate-fade-in
   }
 }
 
