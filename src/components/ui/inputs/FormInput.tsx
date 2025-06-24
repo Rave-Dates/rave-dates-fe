@@ -5,13 +5,15 @@ const FormInput = ({
   title,
   formName,
   type = "text",
-  inputName
+  inputName,
+  className = ""
 }: {
   type?: string;
   handleFunc: (item: ChangeEvent<HTMLInputElement>) => void;
   title: string;
   formName: string;
   inputName: string;
+  className?: string;
 }) => {
   return (
     <div>
@@ -25,7 +27,7 @@ const FormInput = ({
         required
         value={formName}
         onChange={handleFunc}
-        className="w-full mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white"
+        className={`${className} w-full mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white`}
       />
     </div>
   );

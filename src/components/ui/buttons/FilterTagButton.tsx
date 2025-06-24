@@ -23,6 +23,7 @@ const FilterTagButton = ({
       <div className="flex flex-wrap gap-2">
         {items.map((item) => (
           <button
+            type="button"
             key={item}
             onClick={() => handleFunc(item)}
             className={`px-2.5 py-1.5 rounded-xl border text-sm font-normal transition-all duration-200 ${
