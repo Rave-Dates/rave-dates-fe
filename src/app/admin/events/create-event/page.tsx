@@ -5,7 +5,8 @@ import FilterTagButton from "@/components/ui/buttons/FilterTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
-import { redirect } from "next/navigation";
+import Link from "next/link";
+// import { redirect } from "next/navigation";
 import type React from "react";
 
 import { useState } from "react";
@@ -52,7 +53,7 @@ export default function Page() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-    redirect("/admin/events/create-event/ticket-config");
+    // redirect("/admin/events/create-event/ticket-config");
   };
 
   return (
@@ -174,12 +175,13 @@ export default function Page() {
         </div>
       </div>
 
-      <button
-        type="submit"
-        className="bg-primary text-black input-button"
+      <Link
+        href="/admin/events/create-event/ticket-config"
+        // type="submit"
+        className="bg-primary block text-center text-black input-button"
       >
         Continuar
-      </button>
+      </Link>
     </DefaultForm>
   );
 }
