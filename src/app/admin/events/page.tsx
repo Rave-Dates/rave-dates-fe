@@ -33,7 +33,7 @@ export default function Page() {
   return (
     <div className="w-full flex flex-col gap-y-5 bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
       <Link
-        href={`/`}
+        href="/admin/events/create-event"
         className="bg-primary block text-center max-w-xl self-center text-black input-button"
       >
         Nuevo evento
@@ -62,7 +62,7 @@ export default function Page() {
                 <div className="text-end tabular-nums">{data.place}</div>
                 <div className="flex justify-end gap-x-2">
                   <Link
-                    href="/"
+                    href="/admin/events/create-event"
                     className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-black"
                   >
                     <EditSvg className="text-xl" />
