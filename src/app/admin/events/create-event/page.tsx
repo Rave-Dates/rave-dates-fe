@@ -32,6 +32,8 @@ export default function Page() {
     receiveInfo: false,
   });
 
+  console.log(filters.eventType)
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -176,7 +178,7 @@ export default function Page() {
       </div>
 
       <Link
-        href="/admin/events/create-event/ticket-config"
+        href={`${filters.eventType === "Gratuito" ? "/admin/events/create-event/free-ticket-config" : "/admin/events/create-event/ticket-config"}`}
         // type="submit"
         className="bg-primary block text-center text-black input-button"
       >

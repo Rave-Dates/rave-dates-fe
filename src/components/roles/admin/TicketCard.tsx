@@ -2,6 +2,7 @@
 
 import TrashSvg from "@/components/svg/TrashSvg"
 import FormInput from "@/components/ui/inputs/FormInput"
+import Link from "next/link"
 import { useState } from "react"
 
 interface TicketCardProps {
@@ -91,11 +92,12 @@ export function TicketCard({
           </div>
 
           {/* Action Buttons */}
-          <button
-            className={`${stagesEnabled ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"} transition-all duration-300 w-full bg-primary text-black font-medium py-3 rounded-lg text-sm`} 
+          <Link
+            href="/admin/events/create-event/ticket-config/stage-config"
+            className={`${stagesEnabled ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"} block text-center transition-all duration-300 w-full bg-primary text-black font-medium py-3 rounded-lg text-sm`} 
           >
             Editar etapa
-          </button>
+          </Link>
         </div>
       )}
     </div>
