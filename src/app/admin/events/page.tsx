@@ -1,5 +1,5 @@
 import EditSvg from "@/components/svg/EditSvg";
-import UserSvg from "@/components/svg/UserSvg";
+import InfoSvg from "@/components/svg/InfoSvg";
 import Link from "next/link";
 
 const sampleData = [
@@ -68,10 +68,10 @@ export default function Page() {
                     <EditSvg className="text-xl" />
                   </Link>
                   <Link
-                    href="/"
+                    href="/admin/events/event-info"
                     className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end border border-primary text-primary"
                   >
-                    <UserSvg className="text-2xl" />
+                    <InfoSvg className="text-xl" />
                   </Link>
                 </div>
               </div>
