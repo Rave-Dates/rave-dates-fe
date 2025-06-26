@@ -1,6 +1,5 @@
 "use client";
 
-import AddSvg from "@/components/svg/AddSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -50,13 +49,13 @@ export default function Balance() {
     <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
       <div>
         <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
-        <div className="absolute z-30 top-7 right-5 px-3 py-3 animate-fade-in">
+        <div className="absolute z-30 top-10 right-5 animate-fade-in">
           <Link
-            href={`${pathname}/add`}
-            className="bg-primary text-primary-black p-3 rounded-lg flex items-center justify-center text-center"
+            href="/admin/events/event-info/attendees"
+            className="bg-primary text-primary-black p-3 text-sm px-5 rounded-lg font-medium flex items-center justify-center text-center"
             aria-label="Añadir usuario"
           >
-            <AddSvg />
+            Ver asistentes
           </Link>
         </div>
         <div className="max-w-xl pt-24 mx-auto animate-fade-in">
