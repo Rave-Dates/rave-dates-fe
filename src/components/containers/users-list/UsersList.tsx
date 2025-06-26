@@ -29,7 +29,7 @@ export default function UsersList({
           />
           <Link
             href={createHref}
-            className="bg-primary text-primary-black p-2 rounded-lg flex items-center justify-center text-center"
+            className="bg-primary text-primary-black text-2xl p-2.5 rounded-lg flex items-center justify-center text-center"
             aria-label="Añadir usuario"
           >
             <AddSvg />

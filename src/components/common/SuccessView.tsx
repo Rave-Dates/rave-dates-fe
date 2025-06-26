@@ -14,8 +14,8 @@ export default function SuccessView({
   gap?: string;
 }) {
   return (
-    <div className={`min-h-screen pb-32 pt-28 sm:pb-24 sm:pt-40 bg-primary-black ${gap} flex flex-col justify-end sm:justify-center items-center text-white`}>
-      <div className="flex flex-col animate-fade-in w-full items-center justify-center">
+    <div className={`min-h-screen pb-32 pt-20 sm:pb-24  bg-primary-black ${gap} flex flex-col justify-between sm:justify-center items-center text-white`}>
+      <div className="flex flex-col mt-20 animate-fade-in w-full items-center justify-center">
         <SuccessCheckSvg className="text-primary" />
         <p className="w-52 text-center text-text-inactive">
           {title}

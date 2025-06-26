@@ -4,6 +4,7 @@ import { DropdownItem } from "@/components/roles/admin/events/DropDownItem"
 import { StageItem } from "@/components/roles/admin/events/StageItem"
 import UserSvg from "@/components/svg/UserSvg"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
+import Link from "next/link"
 import { useState } from "react"
 
 export default function AttendeesDropdown() {
@@ -49,11 +50,12 @@ export default function AttendeesDropdown() {
   return (
     <div className="bg-primary-black text-white w-full flex items-start justify-center lg:pt-44 pb-44 min-h-screen p-4">
       <GoBackButton className="absolute z-30 top-10 left-5 p-3 animate-fade-in" />
-      <button
-        className="absolute z-30 top-10 right-5 p-3 animate-fade-in bg-primary text-primary-black rounded-xl"
+      <Link
+        href="/admin/events/event-info/attendees"
+        className="absolute block text-center z-30 top-10 right-5 p-3 animate-fade-in bg-primary text-primary-black rounded-xl"
       >
         <UserSvg stroke={1.7} className="text-2xl" />
-      </button>
+      </Link>
       <div className="w-full pt-24">
         {/* Header */}
         <div className="flex justify-between text-xl font-medium items-center mb-4">
