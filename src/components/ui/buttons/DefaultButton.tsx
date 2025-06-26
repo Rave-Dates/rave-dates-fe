@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import EyeSvg from "@/components/svg/EyeSvg";
 
-const DefaultButton = ({ href, text, className }: { href: string, text?: string, className?: string }) => {
+const DefaultButton = ({ href, text, className, icon = <EyeSvg /> }: { href: string, text?: string, className?: string, icon?: React.ReactNode }) => {
   return (
     <Link
       href={href}
@@ -10,7 +10,7 @@ const DefaultButton = ({ href, text, className }: { href: string, text?: string,
       aria-label={`Ver ${href}`}
     >
       {
-        text ? text : <EyeSvg />
+        text ? text : icon
       }
     </Link>
   );
