@@ -1,5 +1,6 @@
 "use client";
 
+import AddBalanceImage from "@/components/roles/admin/AddBalanceImage";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
@@ -23,7 +24,7 @@ export default function AddBalance() {
   };
 
   return (
-    <div className="min-h-screen px-4 bg-primary-black pb-40 sm:pb-32 flex flex-col justify-between">
+    <div className="min-h-screen px-6 bg-primary-black pb-40 sm:pb-32 flex flex-col justify-between">
       <DefaultForm className="h-full pb-10 sm:pb-20" handleSubmit={handleSubmit} title="Ingresar movimiento">
         <FormDropDown
           title="Concepto*"
@@ -46,6 +47,10 @@ export default function AddBalance() {
           formName={formData.amount}
           inputName="amount"
         />
+        
+        <h3 className="text-xs">Imagen</h3>
+
+        <AddBalanceImage />
 
       </DefaultForm>
       <button
