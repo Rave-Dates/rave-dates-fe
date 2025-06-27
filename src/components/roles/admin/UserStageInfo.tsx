@@ -40,7 +40,7 @@ export function UserStageInfo({
       </div>
 
       {/* Input Fields */}
-      <form onSubmit={handleSubmit} className="gap-3">
+      <div onSubmit={handleSubmit} className="gap-3">
         <FormInput
           className="!bg-cards-container"
           handleFunc={handleChange}
@@ -48,7 +48,7 @@ export function UserStageInfo({
           formName={formData.commission}
           inputName="commission"
         />
-      </form>
+      </div>
 
     </div>
   )
