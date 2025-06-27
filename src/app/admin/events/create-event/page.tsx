@@ -1,6 +1,6 @@
 "use client";
 
-import EventImageSwiper from "@/components/roles/admin/EventImagesSwiper";
+import EventImageSwiper from "@/components/roles/admin/events/EventImagesSwiper";
 import FilterTagButton from "@/components/ui/buttons/FilterTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
