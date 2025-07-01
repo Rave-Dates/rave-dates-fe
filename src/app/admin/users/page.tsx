@@ -1,20 +1,26 @@
 "use client";
 
-import { users } from "@/template-data";
 import UsersList from "@/components/containers/users-list/UsersList";
 import { useState } from "react";
 import DefaultButton from "@/components/ui/buttons/DefaultButton";
+import { getAllUsers } from "@/services/admin-services";
+import { useQuery } from "@tanstack/react-query";
+import { useReactiveCookiesNext } from "cookies-next";
 
 export default function UserManagement() {
   const [searchQuery, setSearchQuery] = useState("");
+  const { getCookie } = useReactiveCookiesNext();
 
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const token = getCookie("token");
+  
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["users"],
+    queryFn: () => getAllUsers({ token }),
+    enabled: !!token, // solo se ejecuta si hay token
+  });
 
   return (
     <UsersList
-      filteredUsers={filteredUsers}
       createHref="users/create-user"
       setSearchQuery={setSearchQuery}
       searchQuery={searchQuery}
@@ -29,18 +35,41 @@ export default function UserManagement() {
 
         {/* Table Body */}
         <div className="divide-y divide-divider w-full">
-          {filteredUsers.map((user) => (
+          {data?.map((user) => (
             <div
-              key={user.id}
+              key={user?.userId}
               className="grid grid-cols-[2fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
             >
-              <div className="text-start">{user.name}</div>
-              <div className="text-center">{user.role}</div>
+              <div className="text-start">{user?.name}</div>
+              <div className="text-center">{user?.role?.name}</div>
               <div className="flex justify-end">
-                <DefaultButton href={`users/edit-user/${user.id}`} />
+                <DefaultButton href={`users/edit-user/${user?.userId}`} />
               </div>
             </div>
           ))}
+          {isLoading && (
+            Array.from(Array(10).keys()).map((user) => (
+            <div
+              key={user}
+              className="grid grid-cols-[2fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
+            >
+              <div className="text-start w-20 h-4 rounded animate-pulse bg-inactive"></div>
+              <div className="justify-self-center w-14 h-4 rounded animate-pulse bg-inactive"></div>
+              <div className="justify-self-end w-8 h-8 rounded animate-pulse bg-inactive"></div>
+            </div>
+            ))
+          )}
+          {!isLoading && Array.isArray(data) && data.length === 0 &&  (
+            <div className="text-center py-8 text-text-inactive">
+              No se encontraron usuarios
+            </div>
+          )}
+          {isError &&  (
+            <div className="text-center text-sm py-8 text-system-error">
+              Error cargando usuarios
+            </div>
+          )}
+
         </div>
       </div>
     </UsersList>

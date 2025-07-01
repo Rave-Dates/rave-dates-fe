@@ -1,19 +1,17 @@
-import React, { ChangeEvent } from "react";
+import React from "react";
 
 const FormInput = ({
-  handleFunc,
   title,
-  formName,
   type = "text",
   inputName,
-  className = ""
+  className = "",
+  register
 }: {
   type?: string;
-  handleFunc: (item: ChangeEvent<HTMLInputElement>) => void;
   title: string;
-  formName: string;
   inputName: string;
   className?: string;
+  register: any;
 }) => {
   return (
     <div>
@@ -24,9 +22,7 @@ const FormInput = ({
         id={inputName}
         name={inputName}
         type={type}
-        required
-        value={formName}
-        onChange={handleFunc}
+        {...register}
         className={`${className} w-full mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white`}
       />
     </div>
