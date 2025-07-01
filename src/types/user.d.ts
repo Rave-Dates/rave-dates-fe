@@ -1,8 +1,25 @@
 interface IUser {
-  id: number;
+  userId: number;
   name: string;
   email: string;
-  whatsapp: string;
-  cedula: string;
-  role: string;
+  isActive: boolean;
+  password: string;
+  roleId: number;
+  createdAt: string;
+  updatedAt: string;
+  role: {
+    roleId: number;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+  };
 }
+
+interface IUserLogin {
+  id: number;
+  email: string;
+  exp: number;
+  iat: number;
+  role: string ;
+}
+
