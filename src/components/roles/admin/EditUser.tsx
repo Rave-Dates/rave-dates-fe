@@ -1,7 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
-import { users } from '@/template-data';
+import React, { useEffect } from 'react';
 import DefaultForm from '@/components/ui/forms/DefaultForm';
 import FormInput from '@/components/ui/inputs/FormInput';
 import { redirect, usePathname } from 'next/navigation';
@@ -10,33 +9,77 @@ import Link from 'next/link';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
 import DefaultButton from '@/components/ui/buttons/DefaultButton';
 import DeleteUserModal from '@/components/ui/modals/DeleteUserModal';
+import { useReactiveCookiesNext } from 'cookies-next';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { editUserById, getUserById } from '@/services/admin-users';
+import { useForm } from 'react-hook-form';
+import { jwtDecode } from 'jwt-decode';
+import CheckSvg from '@/components/svg/CheckSvg';
+import { toast } from 'sonner';
 
 const EditUser = ({ userId } : { userId: number }) => {
-  const selectedUser = users.find(user => user.id === userId);
   const pathname = usePathname();
-  
-  if (!selectedUser) {
-    alert("No se encontró el usuario")
-    redirect("/")
-  }
+  const { register, handleSubmit, reset} = useForm();
+  const { getCookie } = useReactiveCookiesNext();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    idNumber: "",
-    role: "",
-    commission: "",
-    tickets: "",
+  const token = getCookie("token");
+  
+  // obtenemos user por id
+  const { data, isPending } = useQuery({
+    queryKey: ["user"],
+    queryFn: () => getUserById({ token, id: userId }),
+    enabled: !!token, // solo se ejecuta si hay token
   });
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
+  // resetea los campos cuando llegan los datos
+  useEffect(() => {
+    if (data) {
+      reset({
+        name: data.name,
+        // idNumber: data.idNumber,
+        email: data.email,
+        role: data.role.name,
+      });
+    }
+  }, [data, reset]);
+
+  // editamos el usuario 
+  const { mutate } = useMutation({
+    mutationFn: editUserById,
+    onSuccess: () => {
+      const decoded: IUserLogin = jwtDecode(`${token}`);
+
+      if (decoded.role !== 'ADMIN') {
+        alert("No tienes permiso para acceder.");
+        // setLoginError("No tienes permiso para acceder.");
+        return
+      }
+      toast('Usuario editado correctamente', {
+        className: 'bg-primary-black',
+        style: {backgroundColor: '#151515', color: '#FFFFFF', borderColor: "#b3ff0020"},
+        duration: 5000,
+        icon: <CheckSvg className="text-primary text-xl" />,
+      });
+      redirect('/admin/users');
+    },
+    onError: () => {
+      // setLoginError("Credenciales incorrectas.");
+      alert("Credenciales incorrectas.");
+    },
+  });
+
+  // editamos el usuario 
+  const onSubmit = () => {
+    mutate({
+      token,
+      id: userId,
+      formData: {
+        name: data?.name,
+        // idNumber: data?.idNumber,
+        email: data?.email,
+        role: data?.role,
+      },
+    });
   };
 
   return (
@@ -48,47 +91,43 @@ const EditUser = ({ userId } : { userId: number }) => {
           <DeleteUserModal />
         </div>
       </div>
-      <DefaultForm goBackButton={false} handleSubmit={handleSubmit} title={`${selectedUser?.name} - ${selectedUser?.role}`}>
+      <DefaultForm isPending={isPending} goBackButton={false} handleSubmit={handleSubmit(onSubmit)} title={`${data?.name}`}>
         <FormInput
-          handleFunc={handleChange}
           title="Nombre completo*"
-          formName={formData.name}
           inputName="name"
+          register={register("name", { required: true, value: data?.name })}
         />
         <FormInput
-          handleFunc={handleChange}
           title="Número de cédula*"
-          formName={formData.idNumber}
           inputName="idNumber"
-        />
+          register={register("idNumber", { required: true })}
+          />
         <FormInput
           type="email"
-          handleFunc={handleChange}
           title="Mail*"
-          formName={formData.email}
           inputName="email"
+          register={register("email", { required: true, value: data?.email })}
         />
         <FormDropDown
           title="Rol*"
-          handleFunc={handleChange}
+          register={register("role", { required: true })}
         >
-          <option value="organizador">Organizador</option>
-          <option value="promotor">Promotor</option>
-          <option value="controlador">Controlador</option>
+          <option value="ORGANIZER">Organizador</option>
+          <option value="PROMOTER">Promotor</option>
+          <option value="CONTROLLER">Controlador</option>
+          <option value="ADMIN">Administrador</option>
         </FormDropDown>
         <FormInput
           type="number"
-          handleFunc={handleChange}
           title="Comisión (%)*"
-          formName={formData.commission}
           inputName="commission"
+          register={register("commission", { required: true })}
         />
         <FormInput
           type="number"
-          handleFunc={handleChange}
           title="Entradas cortesia (una cada)*" 
-          formName={formData.tickets}
           inputName="tickets"
+          register={register("tickets", { required: true })}
         />
 
         <Link
