@@ -1,15 +1,17 @@
 "use client";
 
+import CheckSvg from "@/components/svg/CheckSvg";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
 import FormInput from "@/components/ui/inputs/FormInput";
-import { loginAdmin } from "@/services/admin-services";
+import { loginAdmin } from "@/services/admin-users";
 import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from 'cookies-next';
 import { jwtDecode } from "jwt-decode";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 type LoginForm = {
   email: string;
@@ -52,13 +54,19 @@ export default function Page() {
         expires: expirationDate,
         maxAge: decoded.exp - Math.floor(Date.now() / 1000), // en segundos
       });
+      toast('Logueado correctamente', {
+        className: 'bg-primary-black',
+        style: {backgroundColor: '#151515', color: '#FFFFFF', borderColor: "#b3ff0020"},
+        duration: 5000,
+        icon: <CheckSvg className="text-primary text-xl" />,
+      });
       redirect('/admin/users');
     },
     onError: () => {
       setLoginError("Credenciales incorrectas.");
     },
   });
-
+  
   const onSubmit = (data: LoginForm) => {
     setLoginError("");
     mutate({

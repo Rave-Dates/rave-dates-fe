@@ -4,6 +4,7 @@ import { mainFont } from '@/fonts/index';
 import NavbarMobile from "@/components/containers/navbar/NavbarMobile";
 import { CookiesNextProvider } from "cookies-next";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
+import { Toaster } from "sonner";
 
 export default function RootLayout({
   children,
@@ -20,6 +21,7 @@ export default function RootLayout({
           </ReactQueryProvider>
         </CookiesNextProvider>
         <NavbarMobile />
+        <Toaster />
       </body>
     </html>
   );
