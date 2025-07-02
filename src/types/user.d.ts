@@ -15,6 +15,19 @@ interface IUser {
   };
 }
 
+interface ICreateUser {
+  userId: number;
+  name: string;
+  email: string;
+  phone?: number;
+  isActive: boolean;
+  password: string;
+  roleId: number;
+  createdAt?: string;
+  updatedAt?: string;
+  roleId: number;
+}
+
 interface IUserLogin {
   id: number;
   email: string;
