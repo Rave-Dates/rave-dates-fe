@@ -1,33 +1,37 @@
-import React from "react";
-import { FilterState } from "../modals/FilterModal";
-
 const FilterTagButton = ({
-  items,
+  organizers,
+  values,
   type,
-  handleFunc,
-  filters,
   title,
+  setValue,
 }: {
-  items: string[];
+  organizers: any;
+  values: string[];
   type: "organizers" | "genres";
-  handleFunc: (item: string) => void;
-  filters: FilterState;
   title: string;
+  setValue: any;
 }) => {
+
+  const toggle = (item: string) => {
+    const updated = organizers.includes(item)
+      ? organizers.filter((i: string) => i !== item)
+      : [...organizers, item];
+    setValue("tags", updated);
+  };
+
   return (
     <div>
       <h3 className="text-white text-sm font-medium mb-2">
-        {title}{" "}
-        <span className="text-gray-500">({filters[type].length})</span>
+        {title} <span className="text-gray-500">({organizers.length})</span>
       </h3>
       <div className="flex flex-wrap gap-2">
-        {items.map((item) => (
+        {values.map((item) => (
           <button
             type="button"
             key={item}
-            onClick={() => handleFunc(item)}
+            onClick={() => toggle(item)}
             className={`px-2.5 py-1.5 rounded-xl border text-sm font-normal transition-all duration-200 ${
-              filters[type].includes(item)
+              organizers.includes(item)
                 ? "bg-primary text-primary-black hover:opacity-80"
                 : "bg-transparent text-text-inactive border-inactive hover:bg-inactive hover:text-primary-white/60"
             }`}

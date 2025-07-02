@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useRef } from "react"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Navigation, Pagination } from "swiper/modules"
 
@@ -20,8 +20,7 @@ interface ImageData {
   file: File
 }
 
-export default function EventImageSwiper() {
-  const [images, setImages] = useState<ImageData[]>([])
+export default function EventImageSwiper({ setImages, images }: { setImages: any, images: any[] }) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const prevRef = useRef<HTMLButtonElement | null>(null)
   const nextRef = useRef<HTMLButtonElement | null>(null)
@@ -43,17 +42,17 @@ export default function EventImageSwiper() {
       }
     })
 
-    setImages((prev) => [...prev, ...newImages])
+    setImages("images", [...images, ...newImages])
   }
 
   const removeImage = (id: string) => {
-    setImages((prev) => {
-      const imageToRemove = prev.find((img) => img.id === id)
-      if (imageToRemove) {
-        URL.revokeObjectURL(imageToRemove.url)
-      }
-      return prev.filter((img) => img.id !== id)
-    })
+    const imageToRemove = images.find((img) => img.id === id)
+    if (imageToRemove) {
+      URL.revokeObjectURL(imageToRemove.url)
+    }
+    const filteredImages = images.filter((img) => img.id !== id)
+
+    setImages("images",  [...filteredImages])
   }
 
   const triggerFileInput = () => {

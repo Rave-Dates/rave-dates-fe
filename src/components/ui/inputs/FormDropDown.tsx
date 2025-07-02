@@ -1,15 +1,13 @@
-import React, { ChangeEvent } from "react";
+import React from "react";
 import ArrowDownSvg from "../../svg/ArrowDown";
 
-const FormDropDown = ({
-  children,
-  handleFunc,
-  title,
-}: {
-  children: React.ReactNode;
-  handleFunc: (item: ChangeEvent<HTMLSelectElement>) => void;
+type Props = {
+  register: any;
   title: string;
-}) => {
+  children: React.ReactNode;
+};
+
+const FormDropDown = ({ register, title, children }: Props) => {
   return (
     <div className="relative">
       <label
@@ -20,7 +18,7 @@ const FormDropDown = ({
       </label>
       <div className="relative">
         <select
-          onChange={handleFunc}
+          {...register}
           id="countries"
           className="w-full appearance-none mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white relative"
         >
