@@ -5,98 +5,84 @@ import FilterTagButton from "@/components/ui/buttons/FilterTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
+import { useMutation } from "@tanstack/react-query";
+import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
-// import { redirect } from "next/navigation";
 import type React from "react";
 
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 export default function Page() {
-  const organizers = ['Estacionamiento', 'Baños', 'Alcancía', '+21', 'Al aire libre'];
+  const { register, handleSubmit, watch, setValue } = useForm();
+  const { getCookie } = useReactiveCookiesNext();
+  
+  const tags = watch("tags", ['Alcancía']);
+  const tagsTypes = ['Estacionamiento', 'Baños', 'Alcancía', '+21', 'Al aire libre'];
+  const images = watch("images", []);
   const eventTypes = ['Gratuito', 'Pago'];
+  
+  const token = getCookie("token");
+ 
+  // TODO: hacer get de categorías
+  // const { data: categories } = useQuery({
+  //   queryKey: ["roles"],
+  //   queryFn: () => getAllRoles({ token }),
+  //   enabled: !!token, // solo se ejecuta si hay token
+  // });
+  
+  // TODO: hacer get de organizadores
+  // const { data } = useQuery({
+  //   queryKey: ["roles"],
+  //   queryFn: () => getAllRoles({ token }),
+  //   enabled: !!token, // solo se ejecuta si hay token
+  // });
 
 
-  const [filters, setFilters] = useState({
-    location: 'Bogotá',
-    eventType: 'Gratuito',
-    organizers: ['Alcancía'],
-    genres: ['Hard Techno']
-  });
+  // TODO: logica para avanzar y guradar los datos sin crear el evento, 
+  //  o con RHF o con localStorage o en contexto
 
-  const [formData, setFormData] = useState({
-    title: "",
-    date: "",
-    place: "",
-    geo: "",
-    info: "",
-    receiveInfo: false,
-  });
+  // TODO: agregar el input de lugar para poner la ubicacion
 
-  console.log(filters.eventType)
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-   const handleOrganizerToggle = (organizer: string) => {
-    setFilters(prev => ({
-      ...prev,
-      organizers: prev.organizers.includes(organizer)
-        ? prev.organizers.filter(o => o !== organizer)
-        : [...prev.organizers, organizer]
-    }));
-  };
-
-  const handleEventTypeChange = (eventType: string) => {
-    setFilters(prev => ({ ...prev, eventType }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    // redirect("/admin/events/create-event/ticket-config");
+  // creamos el usuario 
+  const onSubmit = (data: any) => {
+    console.log(data)
+    // guardar datos
   };
 
   return (
-    <DefaultForm handleSubmit={handleSubmit} title="Nuevo evento">
+    <DefaultForm handleSubmit={handleSubmit(onSubmit)} title="Nuevo evento">
       <FormInput
-        handleFunc={handleChange}
         title="Título del evento*"
-        formName={formData.title}
         inputName="title"
+        register={register("title", { required: true })}
       />
       <FormInput
-        handleFunc={handleChange}
         title="Fecha y hora*"
-        formName={formData.date}
         inputName="date"
+        register={register("date", { required: true })}
       />
-      <FormInput
-        handleFunc={handleChange}
+      {/* <FormInput
         title="Lugar*"
-        formName={formData.place}
         inputName="place"
-      />
+        register={register("place", { required: true })}
+      /> */}
       <FormInput
-        handleFunc={handleChange}
         title="Geolocalización*"
-        formName={formData.geo}
         inputName="geo"
+        register={register("geo", { required: true })}
       />
 
-      <EventImageSwiper />
+      <EventImageSwiper setImages={setValue} images={images} />
 
       <FormInput
-        handleFunc={handleChange}
         title="Información general*"
-        formName={formData.info}
-        inputName="info"
+        inputName="description"
+        register={register("description", { required: true })}
       />
 
-      <FormDropDown
+      {/* <FormDropDown
         title="Organizador*"
-        handleFunc={handleChange}
+        register={register("organizer", { required: true })}
       >
         <option value="organizador">Organizador</option>
         <option value="promotor">Promotor</option>
@@ -104,7 +90,7 @@ export default function Page() {
       </FormDropDown>
       <FormDropDown
         title="Categoría 1*"
-        handleFunc={handleChange}
+        register={register("category1", { required: true })}
       >
         <option value="subcategoria1">Subcategoría 1</option>
         <option value="subcategoria2">Subcategoría 2</option>
@@ -112,7 +98,7 @@ export default function Page() {
       </FormDropDown>
       <FormDropDown
         title="Categoría 2*"
-        handleFunc={handleChange}
+        register={register("category2", { required: true })}
       >
         <option value="subcategoria1">Subcategoría 1</option>
         <option value="subcategoria2">Subcategoría 2</option>
@@ -120,22 +106,16 @@ export default function Page() {
       </FormDropDown>
       <FormDropDown
         title="Categoría 3*"
-        handleFunc={handleChange}
+        register={register("category3", { required: true })}
       >
         <option value="subcategoria1">Subcategoría 1</option>
         <option value="subcategoria2">Subcategoría 2</option>
         <option value="subcategoria3">Subcategoría 3</option>
-      </FormDropDown>
+      </FormDropDown> */}
 
       <br />
 
-      <FilterTagButton
-        items={organizers}
-        type="organizers"
-        handleFunc={handleOrganizerToggle}
-        filters={filters}
-        title="Etiquetas"
-      />
+      <FilterTagButton setValue={setValue} organizers={tags} values={tagsTypes} type="organizers" title="Etiquetas" />
 
       <br />
 
@@ -152,19 +132,18 @@ export default function Page() {
               <div className="relative">
                 <input
                   type="radio"
-                  name="location"
-                  checked={filters["eventType"] === item}
-                  onChange={() => handleEventTypeChange(item)}
+                  value={item}
+                  {...register("eventType", { required: true })}
                   className="sr-only"
                 />
                 <div
                   className={`w-6 h-6 rounded-full border-1 flex items-center justify-center transition-colors ${
-                    filters["eventType"] === item
+                    watch("eventType") === item
                       ? "border-inactive bg-primary-black"
                       : "border-inactive group-hover:border-primary/20"
                   }`}
                 >
-                  {filters["eventType"] === item && (
+                  {watch("eventType") === item && (
                     <div className="w-3.5 h-3.5 bg-primary rounded-full"></div>
                   )}
                 </div>
@@ -177,13 +156,19 @@ export default function Page() {
         </div>
       </div>
 
-      <Link
-        href={`${filters.eventType === "Gratuito" ? "/admin/events/create-event/free-ticket-config" : "/admin/events/create-event/ticket-config"}`}
+      <button
+        type="submit"
+        className="bg-primary block text-center text-black input-button"
+      >
+        Continuar
+      </button>
+      {/* <Link
+        href={`${watch("eventType") === "Gratuito" ? "/admin/events/create-event/free-ticket-config" : "/admin/events/create-event/ticket-config"}`}
         // type="submit"
         className="bg-primary block text-center text-black input-button"
       >
         Continuar
-      </Link>
+      </Link> */}
     </DefaultForm>
   );
 }
