@@ -1,21 +1,21 @@
 "use client";
 
-import CheckSvg from "@/components/svg/CheckSvg";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
+import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { getAllRoles } from "@/services/admin-roles";
 import { createUser } from "@/services/admin-users";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 export default function CreateUser() {
   const { register, handleSubmit} = useForm<ICreateUser>();
+  const router = useRouter();
   const { getCookie } = useReactiveCookiesNext();
 
   const token = getCookie("token");
@@ -27,7 +27,6 @@ export default function CreateUser() {
     enabled: !!token, // solo se ejecuta si hay token
   });
 
-
   // creamos el usuario 
   const { mutate } = useMutation({
     mutationFn: createUser,
@@ -35,20 +34,15 @@ export default function CreateUser() {
       const decoded: IUserLogin = jwtDecode(`${token}`);
 
       if (decoded.role !== 'ADMIN') {
-        alert("No tienes permiso para crear un usuario.");
-        // setLoginError("No tienes permiso para acceder.");
+        notifyError("No tienes permiso para crear un usuario.");
         return
       }
-      toast('Usuario creado correctamente', {
-        className: 'bg-primary-black',
-        style: {backgroundColor: '#151515', color: '#FFFFFF', borderColor: "#b3ff0020"},
-        duration: 5000,
-        icon: <CheckSvg className="text-primary text-xl" />,
-      });
-      redirect('/admin/users');
+      notifySuccess('Usuario creado correctamente');
+      router.back();
     },
-    onError: () => {
-      alert("Campos invalidos o error al crear usuario.");
+    onError: (error: any) => {
+      notifyError("Campos invalidos o error al crear usuario.");
+      console.log(error)
     },
   });
 
@@ -60,7 +54,8 @@ export default function CreateUser() {
         name: data.name,
         password: data.password,
         email: data.email,
-        roleId: Number(data.roleId),
+        phone: data.phone,
+        roleId: data.roleId,
         isActive: false,
       },
     });
@@ -82,7 +77,7 @@ export default function CreateUser() {
         type="number"
         title="Número de celular*"
         inputName="phone"
-        register={register("phone")}
+        register={register("phone", { required: true })}
         />
       <FormInput
         type="email"
@@ -93,7 +88,7 @@ export default function CreateUser() {
 
       <FormDropDown
         title="Rol*"
-        register={register("roleId", { required: true })}
+        register={register("roleId", { required: true, valueAsNumber: true })}
       >
         {
           data?.map((role: IRole) => (
