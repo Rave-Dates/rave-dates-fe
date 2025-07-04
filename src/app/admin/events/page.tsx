@@ -12,8 +12,8 @@ export default function Page() {
 
   const token = getCookie("token");
   
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["users"],
+  const { data: events, isLoading, isError } = useQuery({
+    queryKey: ["events"],
     queryFn: () => getAllEvents({ token }),
     enabled: !!token, // solo se ejecuta si hay token
   });
@@ -40,7 +40,7 @@ export default function Page() {
 
           {/* Table Body */}
           <div className="divide-y divide-divider w-full">
-            {data?.map((data) => (
+            {events?.map((data) => (
               <div
                 key={data.eventId}
                 className="grid grid-cols-[1fr_1fr_1fr_1.5fr] items-center py-3 px-3 gap-x-2 text-xs"
@@ -50,7 +50,7 @@ export default function Page() {
                 <div className="text-center tabular-nums">{data.geo}</div>
                 <div className="flex justify-end gap-x-2">
                   <Link
-                    href="/admin/events/create-event"
+                    href={`/admin/events/edit-event/${data.eventId}`}
                     className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-black"
                   >
                     <EditSvg className="text-xl" />
@@ -67,7 +67,7 @@ export default function Page() {
           </div>
         </div>
 
-          {!data && (
+          {!events && (
             Array.from(Array(6).keys()).map((user) => (
             <div
               key={user}
@@ -84,7 +84,7 @@ export default function Page() {
             ))
           )}
 
-          {!isLoading && Array.isArray(data) && data?.length === 0 &&  (
+          {!isLoading && Array.isArray(events) && events?.length === 0 &&  (
             <div className="text-center py-8 text-text-inactive">
               No se encontraron usuarios
             </div>

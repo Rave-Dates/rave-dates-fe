@@ -11,12 +11,11 @@ const FilterTagButton = ({
   title: string;
   setValue: any;
 }) => {
-
   const toggle = (item: string) => {
     const updated = organizers.includes(item)
-      ? organizers.filter((i: string) => i !== item)
+      ? organizers.filter((i: number) => i !== item)
       : [...organizers, item];
-    setValue("tags", updated);
+    setValue("labels", updated);
   };
 
   return (
@@ -25,18 +24,18 @@ const FilterTagButton = ({
         {title} <span className="text-gray-500">({organizers.length})</span>
       </h3>
       <div className="flex flex-wrap gap-2">
-        {values.map((item) => (
+        {values?.map((item) => (
           <button
             type="button"
-            key={item}
-            onClick={() => toggle(item)}
+            key={item.labelId}
+            onClick={() => toggle(item.labelId)}
             className={`px-2.5 py-1.5 rounded-xl border text-sm font-normal transition-all duration-200 ${
-              organizers.includes(item)
+              organizers.includes(item.labelId)
                 ? "bg-primary text-primary-black hover:opacity-80"
                 : "bg-transparent text-text-inactive border-inactive hover:bg-inactive hover:text-primary-white/60"
             }`}
           >
-            {item}
+            {item.name}
           </button>
         ))}
       </div>

@@ -1,8 +1,47 @@
 import React, { useEffect, useState } from 'react';
 import TrashSvg from '@/components/svg/TrashSvg';
+import { deleteUserById } from '@/services/admin-users';
+import { useMutation } from '@tanstack/react-query';
+import { notifyError, notifySuccess } from '../toast-notifications';
+import { redirect } from 'next/navigation';
+import { jwtDecode } from 'jwt-decode';
+import { useReactiveCookiesNext } from 'cookies-next';
 
-function DeleteUserModal() {
+function DeleteUserModal({ userId } : { userId: IUser["userId"] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { getCookie } = useReactiveCookiesNext();
+
+  const token = getCookie("token");
+
+  // borramos el usuario 
+  const { mutate } = useMutation({
+    mutationFn: deleteUserById,
+    onSuccess: () => {
+      const decoded: IUserLogin = jwtDecode(`${token}`);
+
+      if (decoded.role !== 'ADMIN') {
+        notifyError("No tienes permiso para eliminar un usuario.");
+        // setLoginError("No tienes permiso para acceder.");
+        return
+      }
+      notifySuccess('Usuario eliminado correctamente');
+      setIsModalOpen(false);
+      redirect('/admin/users');
+    },
+    onError: (error: any) => {
+      console.log(error)
+      // setLoginError("Credenciales incorrectas.");
+      notifyError("Error al eliminar usuario.");
+    },
+  });
+
+  const handleDeleteUser = () => {
+    mutate({
+      token,
+      id: userId,
+    });
+  };
+
 
   // no scroll when modal is open
   useEffect(() => {
@@ -38,7 +77,7 @@ function DeleteUserModal() {
                 Cancelar
               </button>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => handleDeleteUser()}
                 className="text-system-error w-1/2 py-4 active:opacity-60"
               >
                 Eliminar

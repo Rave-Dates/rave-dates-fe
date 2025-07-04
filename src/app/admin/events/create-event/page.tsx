@@ -5,48 +5,54 @@ import FilterTagButton from "@/components/ui/buttons/FilterTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
-import { useMutation } from "@tanstack/react-query";
+import { getAllCategories } from "@/services/admin-categories";
+import { getAllLabels } from "@/services/admin-labels";
+import { useCreateEventStore } from "@/store/createEventStore";
+import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type React from "react";
 
 import { useForm } from "react-hook-form";
 
 export default function Page() {
+  const state = useCreateEventStore((state) => state)
+  const router = useRouter()
   const { register, handleSubmit, watch, setValue } = useForm();
   const { getCookie } = useReactiveCookiesNext();
-  
-  const tags = watch("tags", ['Alcancía']);
-  const tagsTypes = ['Estacionamiento', 'Baños', 'Alcancía', '+21', 'Al aire libre'];
-  const images = watch("images", []);
-  const eventTypes = ['Gratuito', 'Pago'];
-  
+
   const token = getCookie("token");
- 
-  // TODO: hacer get de categorías
-  // const { data: categories } = useQuery({
-  //   queryKey: ["roles"],
-  //   queryFn: () => getAllRoles({ token }),
-  //   enabled: !!token, // solo se ejecuta si hay token
-  // });
   
-  // TODO: hacer get de organizadores
-  // const { data } = useQuery({
-  //   queryKey: ["roles"],
-  //   queryFn: () => getAllRoles({ token }),
-  //   enabled: !!token, // solo se ejecuta si hay token
-  // });
-
-
-  // TODO: logica para avanzar y guradar los datos sin crear el evento, 
-  //  o con RHF o con localStorage o en contexto
-
+  const labels = watch("labels", [1]);
+  const images = watch("images", []);
+  const type = ['free', 'paid'];
+  
+  const { data: categories, isLoading } = useQuery({
+    queryKey: ["roles"],
+    queryFn: () => getAllCategories({ token }),
+    enabled: !!token, // solo se ejecuta si hay token
+  });
+    
+  const { data: labelsTypes } = useQuery({
+    queryKey: ["labelsTypes"],
+    queryFn: () => getAllLabels({ token }),
+    enabled: !!token, // solo se ejecuta si hay token
+  });
+    
   // TODO: agregar el input de lugar para poner la ubicacion
 
   // creamos el usuario 
   const onSubmit = (data: any) => {
-    console.log(data)
-    // guardar datos
+    state.updateEventFormData({
+      ...state.eventFormData,
+      ...data,
+    })
+
+    router.push(
+      watch("type") === "free" ? 
+      "/admin/events/create-event/free-ticket-config" 
+      : "/admin/events/create-event/ticket-config"
+    )
   };
 
   return (
@@ -59,7 +65,7 @@ export default function Page() {
       <FormInput
         title="Fecha y hora*"
         inputName="date"
-        register={register("date", { required: true })}
+        register={register("date", { required: true, valueAsDate: true })}
       />
       {/* <FormInput
         title="Lugar*"
@@ -80,42 +86,24 @@ export default function Page() {
         register={register("description", { required: true })}
       />
 
-      {/* <FormDropDown
-        title="Organizador*"
-        register={register("organizer", { required: true })}
-      >
-        <option value="organizador">Organizador</option>
-        <option value="promotor">Promotor</option>
-        <option value="controlador">Controlador</option>
-      </FormDropDown>
-      <FormDropDown
-        title="Categoría 1*"
-        register={register("category1", { required: true })}
-      >
-        <option value="subcategoria1">Subcategoría 1</option>
-        <option value="subcategoria2">Subcategoría 2</option>
-        <option value="subcategoria3">Subcategoría 3</option>
-      </FormDropDown>
-      <FormDropDown
-        title="Categoría 2*"
-        register={register("category2", { required: true })}
-      >
-        <option value="subcategoria1">Subcategoría 1</option>
-        <option value="subcategoria2">Subcategoría 2</option>
-        <option value="subcategoria3">Subcategoría 3</option>
-      </FormDropDown>
-      <FormDropDown
-        title="Categoría 3*"
-        register={register("category3", { required: true })}
-      >
-        <option value="subcategoria1">Subcategoría 1</option>
-        <option value="subcategoria2">Subcategoría 2</option>
-        <option value="subcategoria3">Subcategoría 3</option>
-      </FormDropDown> */}
-
+       {/* { 
+        categories?.map((category) => (
+            <FormDropDown
+              key={category.categoryId}
+              title={category.name}
+              register={register(category.name, { required: true })}
+            >
+              {
+                category.categoryValues.map((value) => (
+                  <option key={value.id} value={value.id}>{value.name}</option>
+                ))
+              }
+            </FormDropDown>
+          ))
+        } */}
       <br />
 
-      <FilterTagButton setValue={setValue} organizers={tags} values={tagsTypes} type="organizers" title="Etiquetas" />
+      <FilterTagButton setValue={setValue} organizers={labels} values={labelsTypes} type="organizers" title="Etiquetas" />
 
       <br />
 
@@ -124,7 +112,7 @@ export default function Page() {
           Tipo de evento
         </h3>
         <div className="px-4 flex rounded-xl gap-x-5">
-          {eventTypes.map((item) => (
+          {type.map((item) => (
             <label
               key={item}
               className="flex gap-x-3 items-center py-3 justify-between cursor-pointer group"
@@ -133,23 +121,23 @@ export default function Page() {
                 <input
                   type="radio"
                   value={item}
-                  {...register("eventType", { required: true })}
+                  {...register("type", { required: true })}
                   className="sr-only"
                 />
                 <div
                   className={`w-6 h-6 rounded-full border-1 flex items-center justify-center transition-colors ${
-                    watch("eventType") === item
+                    watch("type") === item
                       ? "border-inactive bg-primary-black"
                       : "border-inactive group-hover:border-primary/20"
                   }`}
                 >
-                  {watch("eventType") === item && (
+                  {watch("type") === item && (
                     <div className="w-3.5 h-3.5 bg-primary rounded-full"></div>
                   )}
                 </div>
               </div>
               <span className="text-primary-white group-hover:text-lime-200 transition-colors">
-                {item}
+                {item === 'free' ? 'Gratuito' : 'Pago'}
               </span>
             </label>
           ))}
@@ -162,13 +150,6 @@ export default function Page() {
       >
         Continuar
       </button>
-      {/* <Link
-        href={`${watch("eventType") === "Gratuito" ? "/admin/events/create-event/free-ticket-config" : "/admin/events/create-event/ticket-config"}`}
-        // type="submit"
-        className="bg-primary block text-center text-black input-button"
-      >
-        Continuar
-      </Link> */}
     </DefaultForm>
   );
 }

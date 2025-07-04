@@ -5,12 +5,14 @@ const FormInput = ({
   type = "text",
   inputName,
   className = "",
+  placeholder,
   register
 }: {
   type?: string;
   title: string;
   inputName: string;
   className?: string;
+  placeholder?: string;
   register: any;
 }) => {
   return (
@@ -21,6 +23,7 @@ const FormInput = ({
       <input
         id={inputName}
         name={inputName}
+        placeholder={placeholder}
         type={type}
         {...register}
         className={`${className} w-full mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white`}

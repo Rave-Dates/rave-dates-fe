@@ -3,49 +3,125 @@
 import { TicketCard } from "@/components/roles/admin/TicketCard"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import FormInput from "@/components/ui/inputs/FormInput";
-import { useState } from "react"
+import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
+import { useCreateEventStore } from "@/store/createEventStore";
+import { useMutation } from "@tanstack/react-query";
+import { useReactiveCookiesNext } from "cookies-next";
+import { useEffect } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 
 export default function TicketConfiguration() {
-  const [formData, setFormData] = useState({
-    rdComission: "",
-    discountCode: "",
-    maxTicketsPerPerson: "",
-    timeToBuy: "",
-    discount: "",
-    transferCost: "",
-    commission: ""
+  const { eventFormData, updateEventFormData } = useCreateEventStore();
+  const { register, handleSubmit, watch, setValue, getValues, control, reset } = useForm({
+    defaultValues: eventFormData
+  });
+  const { mutate: createFullEvent, isLoading } = useCreateFullEvent(reset);
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "tickets",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const piggyBank = watch("piggyBank", false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-  };
-  const [tickets, setTickets] = useState([
-    { id: 1, stagesEnabled: false },
-    { id: 2, stagesEnabled: true },
-    { id: 3, stagesEnabled: false },
-  ])
-  const [piggyBankEnabled, setPiggyBankEnabled] = useState(false)
+  piggyBank === false && setValue("commission", null)
 
-  const handleToggleStages = (ticketId: number, enabled: boolean) => {
-    setTickets((prev) =>
-      prev.map((ticket) => (ticket.id === ticketId ? { ...ticket, stagesEnabled: enabled } : ticket)),
-    )
-  }
+  useEffect(() => {
+    if (eventFormData.tickets?.length || eventFormData.title) {
+      reset(eventFormData); // resetea todo: tickets y campos generales
+    }
+  }, [eventFormData]);
+
+  const onSubmit = (data) => {
+    const validTickets = data.tickets.map(({ ticketId, ...rest }) => rest);
+
+    updateEventFormData({
+      ...eventFormData,
+      ...data,
+      tickets: data.tickets,
+    });
+
+    const yyyyMmDd = data.date.toISOString().split('T')[0];
+
+    const cleanedEventData = {
+      title: data.title,
+      date: yyyyMmDd,
+      geo: data.geo,
+      description: data.description,
+      type: data.type,
+      isActive: data.isActive,
+      feeRD: data.feeRD,
+      feePB: data.feePB,
+      transferCost: data.transferCost,
+      discountCode: data.discountCode,
+      discountType: data.discountType,
+      discount: data.discount,
+      maxPurchase: data.maxPurchase,
+      images: data.images,
+      timeOut: data.timeOut,
+      labels: data.labels,
+      tickets: validTickets,
+    };
+
+    createFullEvent(
+      cleanedEventData
+    );
+    // onSucces borrar los datos del form y del estado
+  };
 
   const handleAddTicket = () => {
-    setTickets((prev) => [...prev, { id: tickets[tickets.length - 1]?.id + 1, stagesEnabled: false }])
-  }
+    const formTickets = getValues("tickets") || [];
 
-  const handleDeleteTicket = (ticketId: number) => {
-    if (tickets.length === 1) return
-    setTickets((prev) => prev.filter((ticket) => ticket.id !== ticketId))
-  }
+    const newId = (formTickets.at(-1)?.ticketId ?? 0) + 1;
+
+    const newTicket = {
+      ticketId: newId,
+      name: '',
+      stages: [
+        {
+          stageId: 1, // stageId comienza en 1
+          date: null,
+          dateMax: null,
+          price: 0,
+          quantity: 0,
+        },
+      ],
+    };
+
+    // 1. Agregar al formulario
+    append(newTicket);
+
+    // 2. Agregar al estado global (Zustand)
+    const updatedTickets = [...(eventFormData.tickets || []), newTicket];
+
+    updateEventFormData({
+      ...eventFormData,
+      tickets: updatedTickets,
+    });
+  };
+
+
+  const handleDeleteTicket = (index: number) => {
+    if (fields.length === 1) return;
+
+    // 1. Obtener el ticketId del formulario
+    const formTickets = getValues("tickets");
+    const ticketIdToDelete = formTickets?.[index]?.ticketId;
+
+    // 2. Eliminar del formulario (React Hook Form)
+    remove(index);
+
+    // 3. Eliminar del estado global (Zustand)
+    const updatedTickets = eventFormData?.tickets?.filter(
+      (ticket) => ticket.ticketId !== ticketIdToDelete
+    );
+
+    updateEventFormData({
+      ...eventFormData,
+      tickets: updatedTickets,
+    });
+  };
+  
 
   return (
     <div className="bg-primary-black text-primary-white min-h-screen px-6 pt-28 pb-44">
@@ -55,13 +131,14 @@ export default function TicketConfiguration() {
 
         {/* Ticket Cards */}
         <div className="space-y-4">
-          {tickets.map((ticket) => (
+          {fields?.map((ticket, index) => (
             <TicketCard
-              key={ticket.id}
-              ticketNumber={ticket.id}
-              stagesEnabled={ticket.stagesEnabled}
-              onToggleStages={(enabled) => handleToggleStages(ticket.id, enabled)}
-              onDelete={() => handleDeleteTicket(ticket.id)}
+              getValues={getValues}
+              register={register}
+              index={index}
+              key={ticket?.ticketId}
+              ticketNumber={ticket.ticketId}
+              onDelete={() => handleDeleteTicket(index)}
             />
           ))}
         </div>
@@ -76,81 +153,75 @@ export default function TicketConfiguration() {
 
         {/* Configuration Options */}
         <div className="space-y-1 pt-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="flex flex-col xs:flex-row gap-x-5">
               <FormInput
-                handleFunc={handleChange}
                 title="Comisión RD"
-                formName={formData.rdComission}
-                inputName="rdComission"
+                inputName="feeRD"
+                register={register("feeRD", {valueAsNumber: true})}
               />
               <FormInput
-                handleFunc={handleChange}
                 title="Costo transferencia de ticket"
-                formName={formData.transferCost}
                 inputName="transferCost"
+                register={register("transferCost", {valueAsNumber: true})}
               />
             </div>
             <div className="flex flex-col xs:flex-row gap-x-5">
               <FormInput
-                handleFunc={handleChange}
                 title="Código de descuento"
-                formName={formData.discountCode}
                 inputName="discountCode"
+                register={register("discountCode")}
               />
               <FormInput
-                handleFunc={handleChange}
                 title="Descuento"
-                formName={formData.discount}
                 inputName="discount"
+                register={register("discount", {valueAsNumber: true})}
               />
             </div>
             <div className="flex flex-col xs:flex-row gap-x-5">
               <FormInput
-                handleFunc={handleChange}
+                type="number"
                 title="Máx. de tickets p/ persona"
-                formName={formData.maxTicketsPerPerson}
-                inputName="maxTicketsPerPerson"
+                inputName="maxPurchase"
+                register={register("maxPurchase", {valueAsNumber: true})}
               />
               <FormInput
-                handleFunc={handleChange}
                 title="Tiempo de compra"
-                formName={formData.timeToBuy}
-                inputName="timeToBuy"
+                inputName="tomeOut"
+                register={register("timeOut", {valueAsNumber: true})}
               />
             </div>
-          </form>
+              <div className="flex items-center justify-between mt-5">
+                <span className="text-white text-lg">Alcancía</span>
+                <button
+                  type="button"
+                  onClick={() => setValue("piggyBank", !piggyBank)}
+                  className="w-12 h-6 rounded-full transition-colors pointer-events-auto bg-cards-container"
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full transition-transform ${
+                      piggyBank ? "translate-x-6 bg-primary" : "translate-x-0.5 bg-text-inactive"
+                    }`}
+                  />
+                </button>
+              </div>
 
-          {/* Piggy Bank Toggle */}
-          <div className="flex items-center justify-between mt-5">
-            <span className="text-white text-lg">Alcancía</span>
-            <button
-              onClick={() => setPiggyBankEnabled(!piggyBankEnabled)}
-              className="w-12 h-6 rounded-full transition-colors pointer-events-auto bg-cards-container"
-            >
-              <div
-                className={`w-5 h-5 rounded-full transition-transform ${
-                  piggyBankEnabled ? "translate-x-6 bg-primary" : "translate-x-0.5 bg-text-inactive"
-                }`}
-              />
-            </button>
+              {/* <div className={`${piggyBank ? "block" : "hidden"}`}>
+                <FormInput
+                  title="Comisión"
+                  inputName="commission"
+                  register={register("commission")}
+                />
+              </div> */}
+
+              <button
+                type="submit"
+                className="w-full bg-primary text-black font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
+              >
+                Crear evento
+              </button>
+            </form>
           </div>
-
-          <div className={`${piggyBankEnabled ? "block" : "hidden"}`}>
-            <FormInput
-              handleFunc={handleChange}
-              title="Comisión"
-              formName={formData.commission}
-              inputName="commission"
-            />
-          </div>
-
-          <button
-            className="w-full bg-primary text-black font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
-          >
-            Crear evento
-          </button>
-        </div>
       </div>
     </div>
   )

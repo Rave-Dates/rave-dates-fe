@@ -13,14 +13,16 @@ import "swiper/css/pagination"
 import AddSvg from "@/components/svg/AddSvg"
 import ArrowDownSvg from "@/components/svg/ArrowDown"
 import FileSvg from "@/components/svg/FileSvg"
+import SpinnerSvg from "@/components/svg/SpinnerSvg"
+import Image from "next/image"
 
 interface ImageData {
   id: string
   url: string
-  file: File
+  file?: File
 }
 
-export default function EventImageSwiper({ setImages, images }: { setImages: any, images: any[] }) {
+export default function EventImageSwiper({ setImages, images, isLoading, isError }: { setImages: any, images: any[], isLoading: boolean, isError: boolean }) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const prevRef = useRef<HTMLButtonElement | null>(null)
   const nextRef = useRef<HTMLButtonElement | null>(null)
@@ -47,7 +49,7 @@ export default function EventImageSwiper({ setImages, images }: { setImages: any
 
   const removeImage = (id: string) => {
     const imageToRemove = images.find((img) => img.id === id)
-    if (imageToRemove) {
+    if (imageToRemove?.file) {
       URL.revokeObjectURL(imageToRemove.url)
     }
     const filteredImages = images.filter((img) => img.id !== id)
@@ -85,7 +87,7 @@ export default function EventImageSwiper({ setImages, images }: { setImages: any
           />
         </div>
 
-        {images.length > 0 ? (
+        {images?.length > 0 ? (
           <div>
             {/* Main Swiper */}
             <div className="relative max-w-40 text-xl max-h-40">
@@ -126,7 +128,9 @@ export default function EventImageSwiper({ setImages, images }: { setImages: any
                 {images.map((image) => (
                   <SwiperSlide key={image.id} className="relative">
                     <div className="relative  aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                      <img
+                      <Image
+                        width={1000}
+                        height={1000}
                         src={image.url}
                         alt="Uploaded"
                         className="w-full h-full object-cover"
@@ -147,7 +151,9 @@ export default function EventImageSwiper({ setImages, images }: { setImages: any
           </div>
         ) : (
           <div className="text-center min-w-40 flex flex-col items-center justify-center h-40 border-2 border-dashed border-inactive text-text-inactive rounded-lg">
-            <FileSvg />
+            {
+              isLoading ? <SpinnerSvg className="p-14 text-inactive fill-primary" /> : <FileSvg className={`${isError && "text-system-error"}`} />
+            }
           </div>
         )}
       </div>
