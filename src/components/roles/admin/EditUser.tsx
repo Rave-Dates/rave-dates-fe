@@ -14,8 +14,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { editUserById, getUserById } from '@/services/admin-users';
 import { useForm } from 'react-hook-form';
 import { jwtDecode } from 'jwt-decode';
-import CheckSvg from '@/components/svg/CheckSvg';
-import { toast } from 'sonner';
+import { notifyError, notifySuccess } from '@/components/ui/toast-notifications';
+import { getAllRoles } from '@/services/admin-roles';
 
 const EditUser = ({ userId } : { userId: number }) => {
   const pathname = usePathname();
@@ -31,14 +31,20 @@ const EditUser = ({ userId } : { userId: number }) => {
     enabled: !!token, // solo se ejecuta si hay token
   });
 
+  const { data: roles } = useQuery({
+    queryKey: ["roles"],
+    queryFn: () => getAllRoles({ token }),
+    enabled: !!token, // solo se ejecuta si hay token
+  });
+
   // resetea los campos cuando llegan los datos
   useEffect(() => {
     if (data) {
       reset({
         name: data.name,
-        // idNumber: data.idNumber,
+        phone: data.phone,
         email: data.email,
-        role: data.role.name,
+        roleId: data.roleId,
       });
     }
   }, [data, reset]);
@@ -50,21 +56,17 @@ const EditUser = ({ userId } : { userId: number }) => {
       const decoded: IUserLogin = jwtDecode(`${token}`);
 
       if (decoded.role !== 'ADMIN') {
-        alert("No tienes permiso para acceder.");
+        notifyError("No tienes permiso para editar un usuario.");
         // setLoginError("No tienes permiso para acceder.");
         return
       }
-      toast('Usuario editado correctamente', {
-        className: 'bg-primary-black',
-        style: {backgroundColor: '#151515', color: '#FFFFFF', borderColor: "#b3ff0020"},
-        duration: 5000,
-        icon: <CheckSvg className="text-primary text-xl" />,
-      });
+      notifySuccess('Usuario editado correctamente');
       redirect('/admin/users');
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.log(error)
       // setLoginError("Credenciales incorrectas.");
-      alert("Credenciales incorrectas.");
+      notifyError("Credenciales incorrectas.");
     },
   });
 
@@ -75,9 +77,9 @@ const EditUser = ({ userId } : { userId: number }) => {
       id: userId,
       formData: {
         name: data?.name,
-        // idNumber: data?.idNumber,
+        phone: data?.phone,
         email: data?.email,
-        role: data?.role,
+        roleId: data?.roleId,
       },
     });
   };
@@ -88,7 +90,7 @@ const EditUser = ({ userId } : { userId: number }) => {
         <GoBackButton className="px-3 rounded-xl py-3 sm:opacity-0" />
         <div className='flex items-center gap-x-3'>
           <DefaultButton className="px-12 rounded-xl py-3" text='Cuenta' href={`${pathname}/balance`} />
-          <DeleteUserModal />
+          <DeleteUserModal userId={userId} />
         </div>
       </div>
       <DefaultForm isPending={isPending} goBackButton={false} handleSubmit={handleSubmit(onSubmit)} title={`${data?.name}`}>
@@ -98,9 +100,9 @@ const EditUser = ({ userId } : { userId: number }) => {
           register={register("name", { required: true, value: data?.name })}
         />
         <FormInput
-          title="Número de cédula*"
-          inputName="idNumber"
-          register={register("idNumber", { required: true })}
+          title="Número de celular*"
+          inputName="phone"
+          register={register("phone", { required: true })}
           />
         <FormInput
           type="email"
@@ -110,24 +112,27 @@ const EditUser = ({ userId } : { userId: number }) => {
         />
         <FormDropDown
           title="Rol*"
-          register={register("role", { required: true })}
+          register={register("roleId", { required: true, valueAsNumber: true })}
         >
-          <option value="ORGANIZER">Organizador</option>
-          <option value="PROMOTER">Promotor</option>
-          <option value="CONTROLLER">Controlador</option>
-          <option value="ADMIN">Administrador</option>
+          {
+            roles?.map((role: IRole) => (
+              <option key={role.roleId} value={role.roleId}>
+                {role.name}
+              </option>
+            ))
+          }
         </FormDropDown>
         <FormInput
           type="number"
           title="Comisión (%)*"
           inputName="commission"
-          register={register("commission", { required: true })}
+          register={register("commission")}
         />
         <FormInput
           type="number"
           title="Entradas cortesia (una cada)*" 
           inputName="tickets"
-          register={register("tickets", { required: true })}
+          register={register("tickets")}
         />
 
         <Link
