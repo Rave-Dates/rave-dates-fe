@@ -21,7 +21,7 @@ export default function RootLayout({
           </ReactQueryProvider>
         </CookiesNextProvider>
         <NavbarMobile />
-        <Toaster />
+        <Toaster position="top-center" />
       </body>
     </html>
   );
