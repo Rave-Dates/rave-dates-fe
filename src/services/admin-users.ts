@@ -31,16 +31,6 @@ export const getUserById = async ({token, id}: { token: CookieValueTypes, id: IU
   return data;
 };
 
-export const editUserById = async ({token, id, formData}: { token: CookieValueTypes, id: IUser["userId"], formData: Partial<IUser> }) => {
-  const res = await axios.put(`${BASE_URL}/admin/users/${id}`, formData, {
-    headers: {
-      "Accept": "application/json",
-      "Authorization": `Bearer ${token}`,
-    },
-  });
-  return res.data;
-};
-
 export const createUser = async ({token, formData}: { token: CookieValueTypes, formData: Partial<ICreateUser> }) => {
   const res = await axios.post(`${BASE_URL}/admin/users`, formData, {
     headers: {
@@ -52,4 +42,26 @@ export const createUser = async ({token, formData}: { token: CookieValueTypes, f
 
   return res.data;
 };
+
+export const editUserById = async ({token, id, formData}: { token: CookieValueTypes, id: IUser["userId"], formData: Partial<IUser> }) => {
+  const res = await axios.put(`${BASE_URL}/admin/users/${id}`, formData, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
+
+export const deleteUserById = async ({token, id}: { token: CookieValueTypes, id: IUser["userId"] }) => {
+  console.log(id)
+  const res = await axios.delete(`${BASE_URL}/admin/users/${id}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
+
 
