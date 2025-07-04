@@ -4,6 +4,7 @@ interface IUser {
   email: string;
   isActive: boolean;
   password: string;
+  phone: string;
   roleId: number;
   createdAt: string;
   updatedAt: string;

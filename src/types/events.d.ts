@@ -34,4 +34,7 @@ interface IEvent {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  images: string[];
+  labels: number[];
+  tickets: IEventCard[];
 }
