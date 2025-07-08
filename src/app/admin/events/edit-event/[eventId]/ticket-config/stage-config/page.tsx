@@ -1,14 +1,12 @@
 "use client"
 
 import { StageCard } from "@/components/roles/admin/StageCard";
-import CheckSvg from "@/components/svg/CheckSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import { notifySuccess } from "@/components/ui/toast-notifications";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 export default function StageConfig() {
  const { eventFormData, updateEventFormData, editingTicketId } = useCreateEventStore();
@@ -16,7 +14,7 @@ export default function StageConfig() {
   const router = useRouter()
 
   const currentTicketIndex = eventFormData.tickets?.findIndex(
-    (t) => t.ticketId === editingTicketId
+    (t) => t.ticketTypeId === editingTicketId
   );
 
   const currentStages = eventFormData.tickets?.[currentTicketIndex!]?.stages || [];
@@ -25,24 +23,26 @@ export default function StageConfig() {
     defaultValues: { stages: currentStages }
   });
 
-  useEffect(() => {
-  if (currentStages.length) {
-    reset({ stages: currentStages });
-  }
-}, [currentStages]);
-
+  
+  //   useEffect(() => {
+    //   if (currentStages.length) {
+      //     reset({ stages: currentStages });
+      //   }
+      // }, [currentStages]);
+      
   const { fields, append, remove } = useFieldArray({
     control,
     name: "stages",
   });
-
+  
   const onSubmit = (data) => {
     const updatedTickets = [...eventFormData.tickets];
     updatedTickets[currentTicketIndex!] = {
       ...updatedTickets[currentTicketIndex!],
       stages: data.stages
     };
-
+    console.log("updated tickets",updatedTickets)
+    
     updateEventFormData({
       ...eventFormData, // ← esto mantiene title, images, etc.
       tickets: updatedTickets,
@@ -71,7 +71,7 @@ export default function StageConfig() {
 
     // También actualiza el estado global (Zustand)
     const updatedTickets = [...eventFormData.tickets];
-    const ticketIndex = updatedTickets.findIndex(t => t.ticketId === editingTicketId);
+    const ticketIndex = updatedTickets.findIndex(t => t.ticketTypeId === editingTicketId);
 
     if (ticketIndex !== -1) {
       updatedTickets[ticketIndex] = {
@@ -94,7 +94,7 @@ export default function StageConfig() {
 
     // 2. Eliminar del estado global (Zustand)
     const updatedTickets = [...eventFormData.tickets];
-    const ticketIndex = updatedTickets.findIndex(t => t.ticketId === editingTicketId);
+    const ticketIndex = updatedTickets.findIndex(t => t.ticketTypeId === editingTicketId);
 
     if (ticketIndex !== -1) {
       const updatedStages = [...(updatedTickets[ticketIndex].stages || [])];

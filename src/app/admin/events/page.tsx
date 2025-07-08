@@ -2,13 +2,21 @@
 
 import EditSvg from "@/components/svg/EditSvg";
 import InfoSvg from "@/components/svg/InfoSvg";
+import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { getAllEvents } from "@/services/admin-events";
+import { useCreateEventStore } from "@/store/createEventStore";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
+import { useEffect } from "react";
 
 export default function Page() {
   const { getCookie } = useReactiveCookiesNext();
+  const { updateEventFormData } = useCreateEventStore();
+
+  useEffect(() => {
+    updateEventFormData(defaultEventFormData);
+  }, []);
 
   const token = getCookie("token");
   
@@ -56,7 +64,7 @@ export default function Page() {
                     <EditSvg className="text-xl" />
                   </Link>
                   <Link
-                    href="/admin/events/event-info"
+                    href={`/admin/events/event-info/${data.eventId}`}
                     className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end border border-primary text-primary"
                   >
                     <InfoSvg className="text-xl" />

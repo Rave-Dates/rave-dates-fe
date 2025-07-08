@@ -5,26 +5,41 @@ import FilterTagButton from "@/components/ui/buttons/FilterTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
+import { notifyError } from "@/components/ui/toast-notifications";
+import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { getAllCategories } from "@/services/admin-categories";
 import { getAllLabels } from "@/services/admin-labels";
-import { useCreateEventStore } from "@/store/createEventStore";
+import { getAllUsers } from "@/services/admin-users";
+import { CategoryValues, useCreateEventStore } from "@/store/createEventStore";
+import { formatDate, validateDateYyyyMmDd } from "@/utils/formatDate";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter } from "next/navigation";
 import type React from "react";
+import { useEffect } from "react";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 export default function Page() {
-  const state = useCreateEventStore((state) => state)
+  const { eventFormData, updateEventFormData } = useCreateEventStore();
   const router = useRouter()
-  const { register, handleSubmit, watch, setValue } = useForm();
+  const { register, handleSubmit, watch, setValue, getValues, control } = useForm({
+    defaultValues: defaultEventFormData
+  });
   const { getCookie } = useReactiveCookiesNext();
 
   const token = getCookie("token");
   
-  const labels = watch("labels", [1]);
-  const images = watch("images", []);
+  register("labels", {
+    validate: (value) =>
+      value && value.length > 0 ? true : "Debes seleccionar al menos una etiqueta",
+  });
+
+  register("images", {
+    validate: (value) =>
+      value && value.length > 0 ? true : "Debes subir al menos una imagen",
+  });
+  
   const type = ['free', 'paid'];
   
   const { data: categories, isLoading } = useQuery({
@@ -38,14 +53,52 @@ export default function Page() {
     queryFn: () => getAllLabels({ token }),
     enabled: !!token, // solo se ejecuta si hay token
   });
+
+  useEffect(() => {
+    if (!eventFormData) return;
+
+    setValue("title", eventFormData.title);
+    setValue("place", eventFormData.place);
+    setValue("date", eventFormData.date);
+    setValue("geo", eventFormData.geo);
+    setValue("description", eventFormData.description);
+    setValue("type", eventFormData.type);
+
+    // Aseguramos que si vienen labels e imágenes, se setean correctamente
+    setValue(
+      "labels",
+      (eventFormData.labels ?? [])
+        .filter((label) => label?.labelId !== undefined)
+        .map((label) => label.labelId)
+    );    
+    setValue("images", eventFormData.images ?? []);
+  }, [eventFormData, setValue]);
+  
+  useEffect(() => {
+  }, [eventFormData]);
     
-  // TODO: agregar el input de lugar para poner la ubicacion
+  const watchedLabels = useWatch({ name: "labels", control });
+  const watchedImages = useWatch({ name: "images", control });
 
   // creamos el usuario 
   const onSubmit = (data: any) => {
-    state.updateEventFormData({
-      ...state.eventFormData,
+    const parsedCategories = data.categories.map((category) => JSON.parse(category))
+    
+    const formattedData = {
       ...data,
+      eventCategoryValues: parsedCategories.map((category) => ({
+        valueId: category.valueId,
+        categoryId: category.categoryId,
+        value: category.value,
+      })),
+    }
+
+    delete formattedData.categories;
+
+    console.log(formattedData)
+    updateEventFormData({
+      ...eventFormData,
+      ...formattedData,
     })
 
     router.push(
@@ -55,56 +108,83 @@ export default function Page() {
     )
   };
 
+  const onInvalid = (errors) => {
+    const firstError = Object.values(errors)[0];
+    if (firstError?.message) {
+      notifyError(firstError.message);
+    } else {
+      notifyError("Por favor completá todos los campos requeridos.");
+    }
+  };
+
   return (
-    <DefaultForm handleSubmit={handleSubmit(onSubmit)} title="Nuevo evento">
+    <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Nuevo evento">
       <FormInput
         title="Título del evento*"
         inputName="title"
-        register={register("title", { required: true })}
+        register={register("title", { required: "El titulo es obligatorio"  })}
       />
       <FormInput
         title="Fecha y hora*"
         inputName="date"
-        register={register("date", { required: true, valueAsDate: true })}
+        register={register("date", { 
+          required: "La fecha es obligatoria", 
+          validate: validateDateYyyyMmDd
+        })}
       />
-      {/* <FormInput
+      <FormInput
         title="Lugar*"
         inputName="place"
-        register={register("place", { required: true })}
-      /> */}
+        register={register("place", {required: "El lugar es obligatorio"  })}
+      />
       <FormInput
         title="Geolocalización*"
         inputName="geo"
-        register={register("geo", { required: true })}
+        register={register("geo", {required: "La geolocalización es obligatoria"  })}
       />
 
-      <EventImageSwiper setImages={setValue} images={images} />
+      <EventImageSwiper setImages={setValue} images={watchedImages} />
 
       <FormInput
         title="Información general*"
         inputName="description"
-        register={register("description", { required: true })}
+        register={register("description", { required: "La descripción es obligatoria"  })}
       />
 
-       {/* { 
+       { 
         categories?.map((category) => (
             <FormDropDown
               key={category.categoryId}
               title={category.name}
-              register={register(category.name, { required: true })}
+              register={register(`categories.${category.categoryId}`, { required: true })}
             >
               {
-                category.categoryValues.map((value) => (
-                  <option key={value.id} value={value.id}>{value.name}</option>
+                category.values.map((value) => (
+                  <option 
+                  key={value.valueId}   
+                  value={JSON.stringify({
+                    valueId: value.valueId,
+                    categoryId: value.categoryId,
+                    value: value.value
+                  })}>
+                    {value.value}
+                  </option>
                 ))
               }
             </FormDropDown>
           ))
-        } */}
+        }
       <br />
 
-      <FilterTagButton setValue={setValue} organizers={labels} values={labelsTypes} type="organizers" title="Etiquetas" />
-
+    {labelsTypes && (
+      <FilterTagButton
+        setValue={setValue}
+        organizers={watchedLabels}
+        values={labelsTypes}
+        type="organizers"
+        title="Etiquetas"
+      />
+    )}
       <br />
 
       <div>

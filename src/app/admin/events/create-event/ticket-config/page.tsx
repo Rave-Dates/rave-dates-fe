@@ -3,8 +3,10 @@
 import { TicketCard } from "@/components/roles/admin/TicketCard"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import FormInput from "@/components/ui/inputs/FormInput";
+import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
 import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
+import { validateDateYyyyMmDd } from "@/utils/formatDate";
 import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useEffect } from "react";
@@ -12,7 +14,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 
 export default function TicketConfiguration() {
   const { eventFormData, updateEventFormData } = useCreateEventStore();
-  const { register, handleSubmit, watch, setValue, getValues, control, reset } = useForm({
+  const { register, handleSubmit, watch, setValue, getValues, control, reset , formState} = useForm({
     defaultValues: eventFormData
   });
   const { mutate: createFullEvent, isLoading } = useCreateFullEvent(reset);
@@ -33,6 +35,7 @@ export default function TicketConfiguration() {
   }, [eventFormData]);
 
   const onSubmit = (data) => {
+    console.log("data", data)
     const validTickets = data.tickets.map(({ ticketId, ...rest }) => rest);
 
     updateEventFormData({
@@ -41,11 +44,10 @@ export default function TicketConfiguration() {
       tickets: data.tickets,
     });
 
-    const yyyyMmDd = data.date.toISOString().split('T')[0];
-
     const cleanedEventData = {
+      eventCategoryValues: data.eventCategoryValues,
       title: data.title,
-      date: yyyyMmDd,
+      date: data.date,
       geo: data.geo,
       description: data.description,
       type: data.type,
@@ -63,10 +65,43 @@ export default function TicketConfiguration() {
       tickets: validTickets,
     };
 
-    createFullEvent(
-      cleanedEventData
+    notifyPending(
+      new Promise((resolve, reject) => {
+        createFullEvent(cleanedEventData, {
+          onSuccess: resolve,
+          onError: reject,
+        });
+      }),
+      {
+        loading: "Creando evento...",
+        success: "Evento creado correctamente",
+        error: "Error al crear el evento",
+      }
     );
+
     // onSucces borrar los datos del form y del estado
+  };
+
+  const onInvalid = (errors) => {
+    const findFirstError = (obj) => {
+      for (const key in obj) {
+        if (typeof obj[key] === "object") {
+          const child = findFirstError(obj[key]);
+          if (child) return child;
+        } else if (key === "message") {
+          return obj[key];
+        }
+      }
+      return null;
+    };
+
+    const firstErrorMessage = findFirstError(errors);
+
+    if (firstErrorMessage) {
+      notifyError(firstErrorMessage);
+    } else {
+      notifyError("Por favor completá todos los campos requeridos.");
+    }
   };
 
   const handleAddTicket = () => {
@@ -153,17 +188,17 @@ export default function TicketConfiguration() {
 
         {/* Configuration Options */}
         <div className="space-y-1 pt-4">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
             <div className="flex flex-col xs:flex-row gap-x-5">
               <FormInput
                 title="Comisión RD"
                 inputName="feeRD"
-                register={register("feeRD", {valueAsNumber: true})}
+                register={register("feeRD", {required: "La comisión RD es obligatoria", valueAsNumber: true})}
               />
               <FormInput
                 title="Costo transferencia de ticket"
                 inputName="transferCost"
-                register={register("transferCost", {valueAsNumber: true})}
+                register={register("transferCost", {required: "El costo de transferencia es obligatorio", valueAsNumber: true})}
               />
             </div>
             <div className="flex flex-col xs:flex-row gap-x-5">
@@ -175,7 +210,7 @@ export default function TicketConfiguration() {
               <FormInput
                 title="Descuento"
                 inputName="discount"
-                register={register("discount", {valueAsNumber: true})}
+                register={register("discount", { valueAsNumber: true })}
               />
             </div>
             <div className="flex flex-col xs:flex-row gap-x-5">
@@ -188,7 +223,7 @@ export default function TicketConfiguration() {
               <FormInput
                 title="Tiempo de compra"
                 inputName="tomeOut"
-                register={register("timeOut", {valueAsNumber: true})}
+                register={register("timeOut", {required: "El tiempo de compra es obligatorio", validate: validateDateYyyyMmDd})}
               />
             </div>
               <div className="flex items-center justify-between mt-5">

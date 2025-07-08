@@ -5,30 +5,72 @@ import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
 import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
+import { useEditEvent } from "@/hooks/useEditEvent";
+import { getTicketTypesById } from "@/services/admin-events";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { useMutation } from "@tanstack/react-query";
+import { formatDate, formatToISO } from "@/utils/formatDate";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
+import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
 export default function FreeTicketConfiguration() {
-  const { eventFormData, updateEventFormData } = useCreateEventStore();
-  const { register, handleSubmit, reset , formState} = useForm({
+  const { eventFormData, updateEventFormData, hasLoadedTickets, setHasLoadedTickets } = useCreateEventStore();
+  const { register, handleSubmit, reset , setValue} = useForm({
     defaultValues: eventFormData
   });
-  const { mutate: createFullEvent, isLoading } = useCreateFullEvent(reset);
+  const { mutate: editEvent } = useEditEvent(reset);
+  const { getCookie } = useReactiveCookiesNext();
+  const token = getCookie("token");
+  const params = useParams();
+  const eventId = Number(params.eventId)
+
+  // 🟢 Traemos tickets del evento
+  const { data: ticketsData } = useQuery({
+    queryKey: ["eventTickets", eventId],
+    queryFn: () => getTicketTypesById(token, eventId),
+    enabled: !!token && !!eventId,
+  })
+  
+  useEffect(() => {
+    if (ticketsData ) {
+      const formattedTickets = ticketsData.map((ticket) => ({
+        name: ticket.name,
+        maxDate: formatDate(ticket.maxDate),
+        stages: ticket.stages.map((stage) => ({
+          date: formatDate(stage.date),
+          dateMax: formatDate(stage.dateMax),
+          quantity: stage.quantity,
+        })),
+      }));
+
+      console.log("formattedTickets",formattedTickets)
+
+      const updatedData = {
+        ...eventFormData,
+        tickets: formattedTickets,
+      };
+
+      updateEventFormData(updatedData);
+      setValue("tickets", ticketsData);
+    }
+  }, [ticketsData]);
 
   const onSubmit = (data) => {
-    const validTickets = data.tickets.map(({ ticketId, stages, ...rest }) => {
-      const maxDate = stages?.[0]?.dateMax ?? null;
-      return {
-        ...rest,
-        stages,
-        maxDate,
-      };
-    });
-
-    const firstTicket = validTickets.length > 0 ? [validTickets[0]] : [];
+    console.log("ticketsDATA",ticketsData)
+    console.log("eventFormData",eventFormData)
+    const formattedTickets = data.tickets.map((ticket) => ({
+      ticketTypeId: data.ticketTypeId,
+      eventId: eventId,
+      name: ticket.name,
+      maxDate: formatDate(ticket.maxDate),
+      stages: ticket.stages.map((stage) => ({
+        date: formatDate(stage.date),
+        dateMax: formatDate(stage.dateMax),
+        quantity: stage.quantity,
+      })),
+    }));
 
     updateEventFormData({
       ...eventFormData,
@@ -36,31 +78,30 @@ export default function FreeTicketConfiguration() {
       tickets: data.tickets,
     });
 
-    const yyyyMmDd = data.date.toISOString().split('T')[0];
-
     const cleanedEventData = {
+      eventId: eventId,
       title: data.title,
-      date: yyyyMmDd,
+      date: formatToISO(data.date),
       geo: data.geo,
       description: data.description,
       type: data.type,
       isActive: data.isActive,
       images: data.images,
       labels: data.labels,
-      tickets: firstTicket,
+      tickets: formattedTickets,
     };
 
     notifyPending(
       new Promise((resolve, reject) => {
-        createFullEvent(cleanedEventData, {
+        editEvent(cleanedEventData, {
           onSuccess: resolve,
           onError: reject,
         });
       }),
       {
-        loading: "Creando evento...",
-        success: "Evento creado correctamente",
-        error: "Error al crear el evento",
+        loading: "Editando evento...",
+        success: "Evento editado correctamente",
+        error: "Error al editar el evento",
       }
     );
 
