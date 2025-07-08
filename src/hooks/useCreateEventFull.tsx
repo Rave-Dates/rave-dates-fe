@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { createEvent, createImage, createTicketTypes } from "../services/admin-events";
+import { createEvent, createEventCategories, createImage, createTicketTypes } from "../services/admin-events";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
@@ -15,7 +15,7 @@ export function useCreateFullEvent(reset: () => void) {
 
   return useMutation({
     mutationFn: async (formData) => {
-      const { tickets, images, ...eventData } = formData;
+      const { eventCategoryValues ,tickets, images, ...eventData } = formData;
 
       // 1. Crear el evento
       const createdEvent = await createEvent(token, eventData);
@@ -23,7 +23,19 @@ export function useCreateFullEvent(reset: () => void) {
 
       console.log("eventId",eventId)
 
-      // // 2. Crear tickets
+      // 2. Crear categorías
+      console.log(eventCategoryValues)
+      await Promise.all(
+        eventCategoryValues.map((category) => {
+          const formatData = {
+            "categoryValueId": category.valueId,
+          }
+          createEventCategories(token, formatData, eventId)
+        }
+        )
+      );
+
+      // 3. Crear tickets
       console.log(tickets)
       await Promise.all(
         tickets.map((ticket) =>{
@@ -35,25 +47,28 @@ export function useCreateFullEvent(reset: () => void) {
       // // 3. Subir imágenes
       console.log("iamges",images)
       await Promise.all(
-        images.map((file) => createImage(token, { eventId, file: file.file }))
+        images.map((file) => {
+          console.log("file",file)
+          if (!file.file) return;
+          createImage(token, { eventId, file: file.file })
+        })
       );
       
       const resetData = {
         ...defaultEventFormData,
         eventId: crypto.randomUUID(),
       };
-      useCreateEventStore.getState().updateEventFormData(resetData); // reset Zustand
+      updateEventFormData(resetData); // reset Zustand
       reset(resetData); // reset React Hook Form
    
       return createdEvent;
     },
     onSuccess: () => {
-      notifySuccess('Evento creado correctamente');
       router.push("/admin/events");
     },
     onError: (error) => {
       console.error("Error creando evento:", error);
-      toast.error("Error al crear el evento.");
+      router.push("/admin/events");
     },
   });
 }
