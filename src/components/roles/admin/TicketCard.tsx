@@ -1,19 +1,18 @@
 "use client"
 
-import AddSvg from "@/components/svg/AddSvg"
 import TrashSvg from "@/components/svg/TrashSvg"
 import FormInput from "@/components/ui/inputs/FormInput"
 import { notifyError } from "@/components/ui/toast-notifications"
 import { useCreateEventStore } from "@/store/createEventStore"
-import Link from "next/link"
-import { redirect, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { validateDateYyyyMmDd } from "@/utils/formatDate"
+import { useRouter, useParams } from "next/navigation"
+import { useState } from "react"
 import { FieldValues, UseFormGetValues, UseFormRegister } from "react-hook-form"
-import { toast } from "sonner"
 
 interface TicketCardProps {
   ticketNumber: number,
   index: number,
+  isEditing?: boolean,
   onDelete?: () => void,
   register: UseFormRegister<FieldValues>,
   getValues: UseFormGetValues<FieldValues>,
@@ -22,11 +21,13 @@ interface TicketCardProps {
 export function TicketCard({
   ticketNumber,
   index,
+  isEditing = false,
   onDelete,
   register,
   getValues,
 }: TicketCardProps) {
   const router = useRouter()
+  const params = useParams()
 
   const [stagesEnabled, setStagesEnabled] = useState(false)
   const { eventFormData, updateEventFormData, setEditingTicketId } = useCreateEventStore();
@@ -34,6 +35,8 @@ export function TicketCard({
   const onEditStages = () => {
     const formValues = getValues(); // obtiene todos los datos del formulario
     const formTickets = formValues.tickets as any[];
+    const eventId = Number(params.eventId)
+
 
     if (!formTickets?.[index]?.name || !formTickets?.[index]?.maxDate) {
       notifyError('Completá los datos del ticket antes de continuar');
@@ -63,7 +66,7 @@ export function TicketCard({
     });
 
     setEditingTicketId(ticketNumber);
-    router.push("/admin/events/create-event/ticket-config/stage-config");
+    router.push(`/admin/events/${isEditing ? `edit-event/${eventId}` : "create-event"}/ticket-config/stage-config`);
   };
 
   return (
@@ -71,37 +74,35 @@ export function TicketCard({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-white font-medium">Ticket {ticketNumber}</h3>
-        <button onClick={onDelete} className="text-text-inactive active:text-system-error">
+        <button onClick={onDelete} className={`${isEditing && "hidden"} text-text-inactive active:text-system-error`}>
           <TrashSvg />
         </button>
       </div>
 
       {/* Input Fields */}
-      <form onSubmit={(e) => e.preventDefault()} className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <input
           type="hidden"
-          {...register(`tickets.${index}.ticketId`, { required: true })}
+          {...register(`tickets.${index}.ticketTypeId`)}
         />
         <FormInput
           className="!bg-cards-container !py-1"
           title="Nombre"
           inputName="ticketName"
-          register={register(`tickets.${index}.name`, { required: true })}
-
+          register={register(`tickets.${index}.name`, { required: "El nombre es obligatorio" })}
         />
         <FormInput
           className="!bg-cards-container !py-1"
           title="Cantidad"
           inputName="quantity"
-          register={register(`tickets.${index}.stages.0.quantity`, { required: true, valueAsNumber: true })}
-
+          register={register(`tickets.${index}.stages.0.quantity`, { required: "La cantidad es obligatoria", valueAsNumber: true })}
         />
         <FormInput
           type="number"
           className="!bg-cards-container !py-1"
           title="Precio"
           inputName="price"
-          register={register(`tickets.${index}.stages.0.price`, { required: true, valueAsNumber: true})}
+          register={register(`tickets.${index}.stages.0.price`, { required: "El precio es obligatorio", valueAsNumber: true})}
         />
         <div className="col-span-3"> 
           <FormInput
@@ -109,10 +110,10 @@ export function TicketCard({
             className="!bg-cards-container !py-1"
             title="Fecha máx."
             inputName="maxDate"
-            register={register(`tickets.${index}.maxDate`, { required: true })}
+            register={register(`tickets.${index}.maxDate`, { required: "la fecha máx. es obligatoria", validate: validateDateYyyyMmDd })}
           />
         </div>
-      </form>
+      </div>
 
       <div className="space-y-3 w-full pointer-events-none">
         <div className="flex items-center justify-between">

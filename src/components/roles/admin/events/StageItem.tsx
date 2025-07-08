@@ -1,38 +1,58 @@
-"use client"
+export function StageItem({ items }) {
+  const stageData = [
+    { label: "Ventas por página", value: "500", amount: "$750.000" },
+    { label: "Ventas de promotores", value: "611", amount: "$750.000" },
+    { label: "Entradas de cortesía", value: "100" },
+  ];
 
-interface StageItemProps {
-  title: string
-  value: string
-  amount: string
-  items: {
-    label: string
-    value: string
-    amount?: string
-  }[]
-}
+  const formattedData = items.map((item) => {
+    return {
+      ...item,
+      stageData,
+    };
+  });
 
-export function StageItem({ title, value, amount, items }: StageItemProps) {
   return (
-    <div className="p-4 space-y-3 bg-cards-container rounded-lg">
-      <div className="flex justify-between items-center border-b pb-4 border-divider">
-        <span className="text-main-white font-medium">{title}</span>
-        <div className="flex items-center gap-2">
-          <span className="text-primary font-medium">{value}</span>
-          <span className="text-primary text-sm">({amount})</span>
-        </div>
-      </div>
-
-      <div className="space-y-2 ml-4">
-        {items.map((item, index) => (
+    <>
+      {formattedData.map((stage, index) => (
+        <div
+          key={index}
+          className="p-4 space-y-3 bg-cards-container rounded-lg"
+        >
           <div key={index} className="flex justify-between items-center">
-            <span className="text-text-inactive text-sm">{item.label}</span>
+            <span className="text-text-inactive text-sm">
+              Etapa {index + 1}
+            </span>
             <div className="flex items-center gap-2">
-              <span className="text-primary text-sm">{item.value}</span>
-              {item.amount && <span className="text-primary text-xs">({item.amount})</span>}
+              {stage.price ? (
+                <span className="text-primary text-sm">
+                  ${stage.price.toLocaleString()}
+                </span>
+              ) : (
+                <span className="text-primary text-sm">Gratuito</span>
+              )}
+              <span className="text-primary text-sm">({stage.quantity})</span>
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  )
+          <div className="space-y-2 ml-4">
+            {stage.stageData.map((stage, index) => (
+              <div key={index} className="flex justify-between items-center">
+                <span className="text-text-inactive text-sm">
+                  {stage.label}
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-primary/70 text-sm">{stage.value}</span>
+                  {stage.amount && (
+                    <span className="text-primary/70 text-xs">
+                      ({stage.amount})
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </>
+  );
 }

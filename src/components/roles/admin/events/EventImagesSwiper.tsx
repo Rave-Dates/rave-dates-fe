@@ -22,7 +22,7 @@ interface ImageData {
   file?: File
 }
 
-export default function EventImageSwiper({ setImages, images, isLoading, isError }: { setImages: any, images: any[], isLoading: boolean, isError: boolean }) {
+export default function EventImageSwiper({ setImages, images, isLoading, isError }: { setImages: any, images: any[], isLoading?: boolean, isError?: boolean }) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const prevRef = useRef<HTMLButtonElement | null>(null)
   const nextRef = useRef<HTMLButtonElement | null>(null)
