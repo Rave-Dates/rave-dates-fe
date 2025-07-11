@@ -21,7 +21,7 @@ import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 export default function Page() {
-  const { eventFormData, updateEventFormData } = useCreateEventStore();
+  const { eventFormData, updateEventFormData, setHasLoadedEvent } = useCreateEventStore();
   const router = useRouter()
   const { register, handleSubmit, watch, setValue, getValues, control } = useForm({
     defaultValues: defaultEventFormData
@@ -100,6 +100,8 @@ export default function Page() {
       ...eventFormData,
       ...formattedData,
     })
+
+    setHasLoadedEvent(true)
 
     router.push(
       watch("type") === "free" ? 

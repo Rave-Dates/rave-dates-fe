@@ -7,17 +7,20 @@ import { notifyError, notifyPending } from "@/components/ui/toast-notifications"
 import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { validateDateYyyyMmDd } from "@/utils/formatDate";
+import { formatGeo } from "@/utils/formatGeo";
 import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
 export default function TicketConfiguration() {
-  const { eventFormData, updateEventFormData } = useCreateEventStore();
+  const { eventFormData, updateEventFormData, hasLoadedEvent } = useCreateEventStore();
   const { register, handleSubmit, watch, setValue, getValues, control, reset , formState} = useForm({
     defaultValues: eventFormData
   });
   const { mutate: createFullEvent, isLoading } = useCreateFullEvent(reset);
+  const router = useRouter()
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -29,14 +32,20 @@ export default function TicketConfiguration() {
   piggyBank === false && setValue("commission", null)
 
   useEffect(() => {
-    if (eventFormData.tickets?.length || eventFormData.title) {
-      reset(eventFormData); // resetea todo: tickets y campos generales
-    }
+    console.log(eventFormData)
   }, [eventFormData]);
+
+  useEffect(() => {
+    if (!hasLoadedEvent) {
+      notifyError("Por favor vuelva a crear un ticket")
+      router.push(`/admin/events/create-event`)
+    }
+  });
 
   const onSubmit = (data) => {
     console.log("data", data)
     const validTickets = data.tickets.map(({ ticketId, ...rest }) => rest);
+    const formattedGeo = formatGeo(data.geo, data.place);
 
     updateEventFormData({
       ...eventFormData,
@@ -48,7 +57,7 @@ export default function TicketConfiguration() {
       eventCategoryValues: data.eventCategoryValues,
       title: data.title,
       date: data.date,
-      geo: data.geo,
+      geo: formattedGeo,
       description: data.description,
       type: data.type,
       isActive: data.isActive,
@@ -58,12 +67,15 @@ export default function TicketConfiguration() {
       discountCode: data.discountCode,
       discountType: data.discountType,
       discount: data.discount,
+      piggyBank: data.piggyBank,
       maxPurchase: data.maxPurchase,
       images: data.images,
       timeOut: data.timeOut,
       labels: data.labels,
       tickets: validTickets,
     };
+
+    console.log(cleanedEventData)
 
     notifyPending(
       new Promise((resolve, reject) => {
