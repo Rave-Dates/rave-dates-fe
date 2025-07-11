@@ -3,15 +3,14 @@ import SubtractSvg from "@/components/svg/SubtractSvg";
 import React from "react";
 
 const TicketButtons = ({ ticket }: { ticket: any }) => {
-  console.log("ticket",ticket)
   const validStage = ticket.stages.find((stage) => {
     const stageDate = new Date(stage.dateMax).getTime();
     const now = new Date().getTime();
     return stageDate > now && stage.quantity > 0;
   });
-  console.log("valid stage",validStage)
+
   return (
-    <div className="space-y-2 mb-6">
+    <div className="space-y-2 mb-3">
       <div
         className="flex flex-wrap gap-x-5 gap-y-4 bg-cards-container px-3.5 py-3 rounded-lg items-center justify-center xs:justify-between"
       >

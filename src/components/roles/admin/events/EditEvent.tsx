@@ -95,8 +95,8 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       
       return processedImages;
     },
-  enabled: !!token,
-});
+    enabled: !!token,
+  });
   
   useEffect(() => {
     if (event) {
