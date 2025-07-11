@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ImagesSwiper from './ImagesSwiper';
 import Link from 'next/link';
 import CalendarSvg from '@/components/svg/CalendarSvg';
@@ -6,6 +6,9 @@ import LocationSvg from '@/components/svg/LocationSvg';
 import BankSvg from '@/components/svg/BankSvg';
 import DollarSvg from '@/components/svg/DollarSvg';
 import { extractPlaceFromGeo } from '@/utils/formatGeo';
+import { useQuery } from '@tanstack/react-query';
+import { getClientEventImagesById, getClientImageById } from '@/services/clients-events';
+import SpinnerSvg from '@/components/svg/SpinnerSvg';
 
 const EventCard: React.FC<IEventCard & { href?: string, text?: string, isTicketList?: boolean}> = ({
   href = "/event/",
@@ -16,12 +19,43 @@ const EventCard: React.FC<IEventCard & { href?: string, text?: string, isTicketL
   title,
   date,
   geo,
-  images,
   piggyBank
 }) => {
+  const { data: eventImages } = useQuery({
+    queryKey: [`eventImages-${eventId}`],
+    queryFn: () => getClientEventImagesById(eventId),
+  });
+
+  const { data: servedImages, isLoading: loadingImages, isError: errorImages } = useQuery({
+    queryKey: [`servedImages-${eventId}`, eventImages?.map(img => img.imageId)],
+    queryFn: async () => {
+      if (!eventImages) return [];
+      const processedImages = await Promise.all(
+        eventImages?.map(async (img) => {
+          const blob = await getClientImageById(img.imageId);
+          const url = URL.createObjectURL(blob);
+          
+          return {
+            id: String(img.imageId),
+            url,
+          };
+        })
+      );
+
+      return processedImages;
+    },
+  });
+
   return (
     <div className="bg-cards-container rounded-xs overflow-hidden shadow-2xl w-xl h-fit mx-auto">
-      <ImagesSwiper images={images} className='w-full aspect-square object-cover h-[36rem]' />
+      {
+        loadingImages ?
+        <div className='h-[36rem] flex items-center justify-center w-full bg-cards-container'>
+          <SpinnerSvg className='fill-primary w-10 sm:w-14' />
+        </div>
+        :
+        <ImagesSwiper images={servedImages} className='w-full aspect-square object-cover h-[36rem]' />
+      }
 
       {/* Event Details */}
       <div className="p-3.5 pt-3">

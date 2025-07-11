@@ -6,18 +6,17 @@ import { events } from '@/template-data';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { getAllClientEvents } from '@/services/clients-events';
+import EventCardSkeleton from '@/utils/skeletons/event-skeletons/EventCardSkeleton';
 
 const EventCardList: React.FC = () => {
-  const images = ["/images/flyer-1.png", "/images/flyer-2.png", "/images/flyer-3.png"]
-
-  const { data: events, isLoading, isError } = useQuery({
-    queryKey: ["events"],
+  const { data: clientEvents, isLoading, isError } = useQuery({
+    queryKey: ["clientEvents"],
     queryFn: () => getAllClientEvents(1, 10),
   });
 
   useEffect(() => {
-    console.log(events)
-  }, [events]);
+    console.log(clientEvents)
+  }, [clientEvents]);
 
   return (
     <div className="py-8 pb-32 sm:pb-8 sm:pt-[7.5rem] bg-primary-black mx-auto px-6">
@@ -32,11 +31,18 @@ const EventCardList: React.FC = () => {
         <Link className='bg-primary py-1 px-2 rounded-xl' href="/otp">/otp</Link>
       </div> */}
       <div className="space-y-4 animate-fade-in">
-        {events?.map((event) => (
-          <div key={event.eventId} className="flex justify-center">
-            <EventCard images={images} {...event} />
-          </div>
-        ))}
+        {
+          isLoading ?
+            Array.from({ length: 3 }).map((_, i) => (
+              <EventCardSkeleton key={i} />
+            ))
+            :
+            clientEvents.map((event) => (
+              <div key={event.eventId} className="flex justify-center">
+                <EventCard {...event} />
+              </div>
+            ))
+        }
       </div>
     </div>
   );
