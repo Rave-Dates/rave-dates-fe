@@ -1,5 +1,4 @@
 import axios from "axios";
-import { CookieValueTypes } from "cookies-next";
 
 const BASE_URL = "http://localhost:3000";
 
@@ -30,4 +29,21 @@ export const getEventClientTickets = async (id: number) => {
     },
   });
   return res.data;
+};
+
+export const getClientEventImagesById = async (id: number) => {
+  const res = await axios.get(`${BASE_URL}/app/images/findByEventId/${id}`, {
+    headers: {
+      "Accept": "application/json",
+    },
+  });
+  return res.data;
+};
+
+export const getClientImageById = async (imageId: number) => {
+  const res = await axios.get(`${BASE_URL}/app/images/${imageId}`, {
+    responseType: "blob",
+  });
+
+  return res.data as Blob;
 };

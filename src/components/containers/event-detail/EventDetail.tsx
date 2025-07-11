@@ -9,19 +9,42 @@ import { events } from '@/template-data';
 import { redirect } from 'next/navigation';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
 import { useQuery } from '@tanstack/react-query';
-import { getClientEventById, getEventClientTickets } from '@/services/clients-events';
+import { getClientEventById, getClientEventImagesById, getClientImageById, getEventClientTickets } from '@/services/clients-events';
+import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
 
 const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isTicketList?: boolean }) => {
-  const images = ["/images/flyer-1.png", "/images/flyer-2.png", "/images/flyer-3.png"]
-  
-  const { data: selectedEvent, isLoading, isError } = useQuery({
+  const { data: selectedEvent, isLoading: isEventLoading } = useQuery({
     queryKey: ["selectedEvent"],
     queryFn: () => getClientEventById(eventId),
   });
   
-  const { data: eventTickets } = useQuery({
+  const { data: eventTickets, isLoading: isTicketsLoading } = useQuery({
     queryKey: ["eventTickets"],
     queryFn: () => getEventClientTickets(eventId),
+  });
+
+  const { data: eventImages } = useQuery({
+    queryKey: [`eventImages-${eventId}`],
+    queryFn: () => getClientEventImagesById(eventId),
+  });
+
+  const { data: servedImages, isLoading: isImagesLoading, isError: errorImages } = useQuery({
+    queryKey: [`servedImages-${eventId}`, eventImages?.map(img => img.imageId)],
+    queryFn: async () => {
+      const processedImages = await Promise.all(
+        eventImages?.map(async (img) => {
+          const blob = await getClientImageById(img.imageId);
+          const url = URL.createObjectURL(blob);
+          
+          return {
+            id: String(img.imageId),
+            url,
+          };
+        })
+      );
+
+      return processedImages;
+    },
   });
   
   console.log("selectedEvent",selectedEvent)
@@ -30,34 +53,40 @@ const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isT
     <div className="min-h-screen bg-primary-black text-white pb-20 md:pt-[6.7rem]">
       <div className="max-w-7xl mx-auto pt-0 pb-20 md:px-6 md:py-8 animate-fade-in">
         {/* Web view */}
-        <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-x-8">
+        <div className="hidden md:grid grid-cols-2 gap-x-8">
           {/* Title */}
-          <div className="mb-4 col-span-2">
-            <h1 className="text-4xl font-semibold text-white mb-0.5 uppercase">{selectedEvent?.title}</h1>
-            <p className="text-text-inactive">Extended set</p>
-          </div>
+          {
+            isEventLoading ? <HeaderSkeleton />
+            :
+            <div className="mb-4 col-span-2">
+              <h1 className="text-4xl font-semibold text-white mb-0.5 uppercase">
+                {selectedEvent?.title}
+              </h1>
+              <p className="text-text-inactive">Extended set</p>
+            </div>
+          }
           {/* Left Column */}
           <div className="space-y-8">
-            <EventHero eventImages={images} />
-            {selectedEvent?.eventCategoryValues?.length > 0 && (
-              <EventInfo
-                labels={selectedEvent?.labels}
-                eventCategoryValues={selectedEvent?.eventCategoryValues}
-              />
-            )}          
+            <EventHero isImagesLoading={isImagesLoading} eventImages={servedImages} />
+            <EventInfo
+              description={selectedEvent?.description}
+              isLoading={isEventLoading}
+              labels={selectedEvent?.labels}
+              eventCategoryValues={selectedEvent?.eventCategoryValues}
+            />
           </div>
           
           {/* Right Column */}
           <div className="space-y-8">
-            <EventLocation event={selectedEvent} />
-            <TicketSelector tickets={eventTickets} isTicketList={isTicketList} />
+            <EventLocation isLoading={isEventLoading} event={selectedEvent} />
+            <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} isTicketList={isTicketList} />
           </div>
         </div>
 
         {/* Mobile view */}
         <div className="grid md:hidden grid-cols-1 gap-x-8 relative">
           <GoBackButton className="absolute z-30 top-20 left-5 px-2 py-2" />
-          <EventHero eventImages={images} />
+          <EventHero isImagesLoading={isImagesLoading} eventImages={servedImages} />
 
           {/* Title */}
           <div className='px-6'>
@@ -75,19 +104,21 @@ const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isT
             </div>
 
             {
-              !isTicketList && <TicketSelector tickets={eventTickets} isTicketList={isTicketList} />
+              !isTicketList && <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} isTicketList={isTicketList} />
             }
 
-            <EventLocation event={selectedEvent} />
+            <EventLocation isLoading={isEventLoading} event={selectedEvent} />
 
             {selectedEvent?.eventCategoryValues?.length > 0 && (
               <EventInfo
+                description={selectedEvent?.description}
+                isLoading={isEventLoading}
                 labels={selectedEvent?.labels}
                 eventCategoryValues={selectedEvent?.eventCategoryValues}
               />
             )}            
             {
-              isTicketList && <TicketSelector ticketStatus={selectedEvent?.status} isTicketList={isTicketList} />
+              isTicketList && <TicketSelector isLoading={isTicketsLoading} ticketStatus={selectedEvent?.status} isTicketList={isTicketList} />
             }
           </div>
         </div>

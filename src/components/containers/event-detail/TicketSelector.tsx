@@ -2,8 +2,9 @@ import TicketButtons from '@/components/ui/buttons/TicketButtons';
 import Link from 'next/link';
 import React from 'react';
 import TicketsChanger from '../tickets/TicketsChanger';
+import TicketsSkeleton from '@/utils/skeletons/event-skeletons/TicketsSkeleton';
 
-const TicketSelector = ({isTicketList = false, ticketStatus, tickets} : { isTicketList?: boolean, ticketStatus?: "paid" | "pending", tickets?: any }) => {
+const TicketSelector = ({isTicketList = false, ticketStatus, tickets, isLoading} : { isTicketList?: boolean, ticketStatus?: "paid" | "pending", tickets?: any, isLoading: boolean }) => {
   console.log(tickets)
 
   return (
@@ -16,10 +17,16 @@ const TicketSelector = ({isTicketList = false, ticketStatus, tickets} : { isTick
         <TicketsChanger ticketStatus={ticketStatus} />
         :
         <>
-          {
-            tickets?.map((ticket) => (
-              <TicketButtons key={ticket.ticketTypeId} ticket={ticket} />
-            ))
+          { isLoading ?
+            <TicketsSkeleton />
+            :
+            <>
+              {
+                tickets?.map((ticket) => (
+                  <TicketButtons key={ticket.ticketTypeId} ticket={ticket} />
+                ))
+              }
+            </>
           }
 
           {/* Total */}
