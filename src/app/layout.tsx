@@ -5,6 +5,7 @@ import NavbarMobile from "@/components/containers/navbar/NavbarMobile";
 import { CookiesNextProvider } from "cookies-next";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import { Toaster } from "sonner";
+import 'leaflet/dist/leaflet.css';
 
 export default function RootLayout({
   children,

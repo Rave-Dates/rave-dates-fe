@@ -160,3 +160,25 @@ export const getImageById = async ({
 
   return res.data as Blob;
 };
+
+export const assignOrganizerToEvent = async (token: CookieValueTypes, data: { organizerId: number }, eventId: number) => {
+  const res = await axios.post(`${BASE_URL}/admin/events/${eventId}/organizer`, data, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+  });
+  return res.data;
+}
+
+export const assignPromoterToEvent = async (token: CookieValueTypes, data: { promoters: [{ promoterId: number, fee: number }] }, eventId: number) => {
+  const res = await axios.post(`${BASE_URL}/admin/events/${eventId}/promoter`, data, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+  });
+  return res.data;
+}
