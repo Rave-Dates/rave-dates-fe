@@ -106,6 +106,17 @@ export const editEventCategories = async (token: CookieValueTypes, data: any, ev
   return res.data;
 }
 
+export const getEventCategoriesById = async (token: CookieValueTypes, id: number) => {
+  const res = await axios.get(`${BASE_URL}/admin/category-values/event/${id}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+  });
+  return res.data;
+}
+
 export const createImage = async (
   token: CookieValueTypes,
   data: { eventId: number; file: File }

@@ -51,19 +51,23 @@ export interface EventFormData {
 }
 
 interface CreateEventState {
+  hasLoadedEvent: boolean;
   hasLoadedTickets: boolean;
   editingTicketId: number | null;
   eventFormData: Partial<EventFormData>;
   updateEventFormData: (newData: Partial<EventFormData>) => void;
   setEditingTicketId: (id: number | null) => void;
   setHasLoadedTickets: (value: boolean) => void;
+  setHasLoadedEvent: (value: boolean) => void;
 }
 
 export const useCreateEventStore = create<CreateEventState>()((set) => ({
   eventFormData: defaultEventFormData,
+  hasLoadedEvent: false,
   hasLoadedTickets: false,
   editingTicketId: null,
   setHasLoadedTickets: (value) => set({ hasLoadedTickets: value }),
+  setHasLoadedEvent: (value) => set({ hasLoadedEvent: value }),
   updateEventFormData: (newData: Partial<EventFormData>) =>
     set((state) => ({
       eventFormData: {

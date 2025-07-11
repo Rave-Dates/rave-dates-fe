@@ -1,6 +1,7 @@
 export const formatDate = (value: string | Date | null | undefined) => {
   if (!value) return "";
   const date = new Date(value);
+  console.log("date", date.toISOString().split("T")[0])
   return date.toISOString().split("T")[0] || "";
 };
 
