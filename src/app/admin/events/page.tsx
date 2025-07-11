@@ -5,6 +5,7 @@ import InfoSvg from "@/components/svg/InfoSvg";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { getAllEvents } from "@/services/admin-events";
 import { useCreateEventStore } from "@/store/createEventStore";
+import { extractPlaceFromGeo } from "@/utils/formatGeo";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
@@ -55,7 +56,7 @@ export default function Page() {
               >
                 <div className="text-start">{data.date}</div>
                 <div className="text-center tabular-nums">{data.title}</div>
-                <div className="text-center tabular-nums">{data.geo}</div>
+                <div className="text-center tabular-nums">{extractPlaceFromGeo(data.geo) || data.geo}</div>
                 <div className="flex justify-end gap-x-2">
                   <Link
                     href={`/admin/events/edit-event/${data.eventId}`}

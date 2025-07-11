@@ -5,19 +5,19 @@ import CalendarSvg from '@/components/svg/CalendarSvg';
 import LocationSvg from '@/components/svg/LocationSvg';
 import BankSvg from '@/components/svg/BankSvg';
 import DollarSvg from '@/components/svg/DollarSvg';
+import { extractPlaceFromGeo } from '@/utils/formatGeo';
 
 const EventCard: React.FC<IEventCard & { href?: string, text?: string, isTicketList?: boolean}> = ({
   href = "/event/",
   text = "Comprar tickets",
+  eventId,
   isTicketList = false,
   status,
-  artist,
-  name,
+  title,
   date,
-  location,
-  venue,
+  geo,
   images,
-  hasPaymentOptions = false
+  piggyBank
 }) => {
   return (
     <div className="bg-cards-container rounded-xs overflow-hidden shadow-2xl w-xl h-fit mx-auto">
@@ -26,7 +26,7 @@ const EventCard: React.FC<IEventCard & { href?: string, text?: string, isTicketL
       {/* Event Details */}
       <div className="p-3.5 pt-3">
         <h3 className="text-white text-subtitle font-semibold text-center border-b border-divider pb-2.5 mb-4">
-          {artist}
+          {title}
         </h3>
         
         <div className="space-y-2 mb-4 text-text-inactive text-body">
@@ -37,7 +37,7 @@ const EventCard: React.FC<IEventCard & { href?: string, text?: string, isTicketL
           
           <div className="flex items-center gap-2">
             <LocationSvg className='w-6 h-6' />
-            {location} • {venue}
+            {extractPlaceFromGeo(geo) || geo}
           </div>
           
           {
@@ -47,7 +47,7 @@ const EventCard: React.FC<IEventCard & { href?: string, text?: string, isTicketL
                 Saldo pendiente
               </div>
               :
-              hasPaymentOptions ? (
+              piggyBank ? (
                 <div className="flex items-center gap-2">
                   <BankSvg className='w-6 h-6' />
                   Pago con alcancía disponible
@@ -64,7 +64,7 @@ const EventCard: React.FC<IEventCard & { href?: string, text?: string, isTicketL
 
         {/* Buy Button and Price */}
         <div className={`${text === "Finalizado" && "hidden"} flex items-center gap-6 justify-between`}>
-          <Link href={`${href}/${name}`} className="bg-primary text-center text-black font-medium text-body py-3 px-8 rounded-md hover:bg-primary/80 transition-all flex-1">
+          <Link href={`${href}/${eventId}`} className="bg-primary text-center text-black font-medium text-body py-3 px-8 rounded-md hover:bg-primary/80 transition-all flex-1">
             {text}
           </Link>
         </div>

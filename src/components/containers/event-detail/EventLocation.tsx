@@ -2,14 +2,13 @@ import Image from 'next/image';
 import React from 'react';
 
 const EventLocation = ({ event } : { event: IEventCard }) => {
-  const { date, location, venue } = event;
   return (
     <div className="space-y-6 mb-5">
       {/* Date */}
       <div className='md:block hidden'>
         <h3 className="text-lg mb-2">Fecha</h3>
          <p className="text-body bg-cards-container px-4 py-3 rounded-lg">
-          {date}
+          {event?.date}
         </p>
       </div>
 
@@ -18,7 +17,7 @@ const EventLocation = ({ event } : { event: IEventCard }) => {
 
       <div className='bg-cards-container rounded-lg px-2 font-light'>
         <h2 className="text-body px-2 py-3">
-          {location} • {venue}
+          {event?.geo} 
         </h2>
         
         {/* Map */}

@@ -1,27 +1,10 @@
 import TicketButtons from '@/components/ui/buttons/TicketButtons';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React from 'react';
 import TicketsChanger from '../tickets/TicketsChanger';
-import { myTickets } from '@/template-data';
 
-const TicketSelector = ({isTicketList = false, ticketStatus} : { isTicketList?: boolean, ticketStatus?: "paid" | "pending" }) => {
-  const [tickets, setTickets] = useState<Ticket[]>(myTickets)
-
-  const updateQuantity = (type: string, increment: boolean) => {
-    setTickets(prev => prev.map(ticket => 
-      ticket.type === type 
-        ? { ...ticket, quantity: increment ? ticket.quantity + 1 : Math.max(0, ticket.quantity - 1) }
-        : ticket
-    ));
-  };
-
-  let total = 0;
-  let totalTickets = 0;
-
-  tickets.forEach(ticket => {
-    total += ticket.price * ticket.quantity;
-    totalTickets += ticket.quantity;
-  });
+const TicketSelector = ({isTicketList = false, ticketStatus, tickets} : { isTicketList?: boolean, ticketStatus?: "paid" | "pending", tickets?: any }) => {
+  console.log(tickets)
 
   return (
     <div>
@@ -33,19 +16,23 @@ const TicketSelector = ({isTicketList = false, ticketStatus} : { isTicketList?: 
         <TicketsChanger ticketStatus={ticketStatus} />
         :
         <>
-          <TicketButtons tickets={tickets} updateQuantity={updateQuantity} />
+          {
+            tickets?.map((ticket) => (
+              <TicketButtons key={ticket.ticketTypeId} ticket={ticket} />
+            ))
+          }
 
           {/* Total */}
           <div className="w-full flex flex-col items-end mb-7 md:mb-0">
-            <div className="w-full sm:w-1/2 mb-3">
+            {/* <div className="w-full sm:w-1/2 mb-3">
               <div className="flex justify-between items-center text-white font-bold text-">
                 <span>TOTAL</span>
                 <span className='font-light tabular-nums'>{totalTickets > 0 ? `$${total.toLocaleString()} COP` : '0'}</span>
               </div>
-            </div>
+            </div> */}
 
             {/* Buy Button */}
-            <Link 
+            {/* <Link 
               tabIndex={totalTickets === 0 ? -1 : undefined}
               aria-disabled={totalTickets === 0} 
               href="/personal-data"
@@ -56,7 +43,7 @@ const TicketSelector = ({isTicketList = false, ticketStatus} : { isTicketList?: 
               }`}
             >
               {totalTickets > 0 ? "Comprar tickets" : "Selecciona tickets"}
-            </Link>
+            </Link> */}
           </div>
         </>
       }

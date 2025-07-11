@@ -1,6 +1,24 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-const EventInfo= ({ labels, genres, artist } : { labels: IEventCard['labels'], genres: IEventCard['genres'], artist: IEventCard['artist'] }) => {
+
+const EventInfo= ({ labels, eventCategoryValues } : { labels: string[], eventCategoryValues: any }) => {
+  const categories = useMemo(() => {
+    if (!eventCategoryValues || !Array.isArray(eventCategoryValues)) return [];
+
+    return eventCategoryValues.map((category) => ({
+      categoryName: category?.category?.name ?? "",
+      categoryValue: category?.value?.value ?? "",
+    }));
+  }, [eventCategoryValues]);
+
+  const genre = categories.find(
+    (category) => category.categoryName.toLowerCase() === "género"
+  );
+
+  const organizer = categories.find(
+    (category) => category.categoryName.toLowerCase() === "organizador"
+  );
+
   return (
     <div className="space-y-6 mb-8">
       {/* About Event */}
@@ -19,9 +37,9 @@ const EventInfo= ({ labels, genres, artist } : { labels: IEventCard['labels'], g
       <div>
         <h3 className="text-small-title font-semibold text-white mb-3">Información adicional</h3>
         <div className="flex flex-wrap gap-2">
-          {labels.map((label, index) => (
+          {labels?.map((label, index) => (
             <span key={index} className="bg-primary text-black px-3 py-1.5 rounded-xl text-sm">
-              {label}
+              {label.name}
             </span>
           ))}
         </div>
@@ -31,7 +49,7 @@ const EventInfo= ({ labels, genres, artist } : { labels: IEventCard['labels'], g
       <div>
         <h3 className="text-small-title font-semibold text-white mb-2">Organizador</h3>
         <p className="text-primary-white text-body bg-cards-container px-4 py-3 rounded-lg">
-          {artist}
+          {organizer?.categoryValue || "Organizador no disponible"}
         </p>
       </div>
 
@@ -39,11 +57,9 @@ const EventInfo= ({ labels, genres, artist } : { labels: IEventCard['labels'], g
       <div>
         <h3 className="text-small-title font-semibold text-white mb-3">Géneros</h3>
         <div className="flex gap-2">
-          {genres.map((genre, index) => (
-            <span key={index} className="bg-primary text-black px-3 py-1.5 rounded-xl text-sm">
-              {genre}
-            </span>
-          ))}
+          <span className="bg-primary text-black px-3 py-1.5 rounded-xl text-sm">
+            {genre?.categoryValue || "Genero no disponible"}
+          </span>
         </div>
       </div>
     </div>
