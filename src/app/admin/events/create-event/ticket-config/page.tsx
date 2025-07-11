@@ -12,7 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 export default function TicketConfiguration() {
   const { eventFormData, updateEventFormData, hasLoadedEvent } = useCreateEventStore();
@@ -27,9 +27,15 @@ export default function TicketConfiguration() {
     name: "tickets",
   });
 
-  const piggyBank = watch("piggyBank", false);
+    
+  register("piggyBank");
+  const watchedPiggyBank = useWatch({ name: "piggyBank", control });
 
-  piggyBank === false && setValue("commission", null)
+  watchedPiggyBank === false && setValue("commission", null)
+
+  useEffect(() => {
+    setValue("piggyBank", false);
+  }, []);
 
   useEffect(() => {
     console.log(eventFormData)
@@ -44,7 +50,14 @@ export default function TicketConfiguration() {
 
   const onSubmit = (data) => {
     console.log("data", data)
-    const validTickets = data.tickets.map(({ ticketId, ...rest }) => rest);
+    const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
+      if (rest.stages.length === 1) return { ...rest, maxDate: rest.stages[0].dateMax };
+      const lastStageMaxDate = rest.stages.at(-1)?.dateMax;
+      return {
+        ...rest,
+        maxDate: lastStageMaxDate,
+      }
+    });
     const formattedGeo = formatGeo(data.geo, data.place);
 
     updateEventFormData({
@@ -75,7 +88,7 @@ export default function TicketConfiguration() {
       tickets: validTickets,
     };
 
-    console.log(cleanedEventData)
+    console.log("clean",cleanedEventData)
 
     notifyPending(
       new Promise((resolve, reject) => {
@@ -242,12 +255,12 @@ export default function TicketConfiguration() {
                 <span className="text-white text-lg">Alcancía</span>
                 <button
                   type="button"
-                  onClick={() => setValue("piggyBank", !piggyBank)}
+                  onClick={() => setValue("piggyBank", !watchedPiggyBank)}
                   className="w-12 h-6 rounded-full transition-colors pointer-events-auto bg-cards-container"
                 >
                   <div
                     className={`w-5 h-5 rounded-full transition-transform ${
-                      piggyBank ? "translate-x-6 bg-primary" : "translate-x-0.5 bg-text-inactive"
+                      watchedPiggyBank ? "translate-x-6 bg-primary" : "translate-x-0.5 bg-text-inactive"
                     }`}
                   />
                 </button>

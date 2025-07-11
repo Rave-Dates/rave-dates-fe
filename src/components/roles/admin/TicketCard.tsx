@@ -39,6 +39,7 @@ export function TicketCard({
 
     const normalizedTickets = formTickets.map((ticket) => ({
       ...ticket,
+      maxDate: !stagesEnabled ? ticket.stages[0].dateMax : ticket.maxDate,
       stages: ticket.stages?.length
         ? ticket.stages
         : [
@@ -52,6 +53,7 @@ export function TicketCard({
           ],
     }));
 
+    console.log("normalizedTickets",normalizedTickets)
     // Guardar todos los datos del form, no solo los tickets
     updateEventFormData({
       ...eventFormData,
