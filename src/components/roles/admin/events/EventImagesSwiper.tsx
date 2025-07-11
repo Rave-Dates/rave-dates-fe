@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Navigation, Pagination } from "swiper/modules"
 
@@ -15,6 +15,7 @@ import ArrowDownSvg from "@/components/svg/ArrowDown"
 import FileSvg from "@/components/svg/FileSvg"
 import SpinnerSvg from "@/components/svg/SpinnerSvg"
 import Image from "next/image"
+import { notifyError } from "@/components/ui/toast-notifications"
 
 interface ImageData {
   id: string
@@ -22,10 +23,16 @@ interface ImageData {
   file?: File
 }
 
-export default function EventImageSwiper({ setImages, images, isLoading, isError }: { setImages: any, images: any[], isLoading?: boolean, isError?: boolean }) {
+export default function EventImageSwiper({ setImages, images, isLoading, isError, isErrorEventImages }: { setImages: any, images: any[], isLoading?: boolean, isError?: boolean, isErrorEventImages?: boolean }) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const prevRef = useRef<HTMLButtonElement | null>(null)
   const nextRef = useRef<HTMLButtonElement | null>(null)
+
+  useEffect(() => {
+    if (isErrorEventImages || isError) {
+      notifyError("Error cargando imágenes")
+    }
+  }, [isErrorEventImages, isError])
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
@@ -152,7 +159,7 @@ export default function EventImageSwiper({ setImages, images, isLoading, isError
         ) : (
           <div className="text-center min-w-40 flex flex-col items-center justify-center h-40 border-2 border-dashed border-inactive text-text-inactive rounded-lg">
             {
-              isLoading ? <SpinnerSvg className="p-14 text-inactive fill-primary" /> : <FileSvg className={`${isError && "text-system-error"}`} />
+              isLoading ? <SpinnerSvg className="p-14 text-inactive fill-primary" /> : <FileSvg className={`${(isError || isErrorEventImages) && "text-system-error"}`} />
             }
           </div>
         )}

@@ -8,7 +8,7 @@ import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { notifySuccess } from "@/components/ui/toast-notifications";
 
 export function useCreateFullEvent(reset: () => void) {
-  const { updateEventFormData } = useCreateEventStore();
+  const { updateEventFormData, setHasLoadedTickets } = useCreateEventStore();
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const router = useRouter();
@@ -60,6 +60,7 @@ export function useCreateFullEvent(reset: () => void) {
       };
       updateEventFormData(resetData); // reset Zustand
       reset(resetData); // reset React Hook Form
+      setHasLoadedTickets(false);
    
       return createdEvent;
     },

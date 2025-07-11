@@ -37,12 +37,6 @@ export function TicketCard({
     const formTickets = formValues.tickets as any[];
     const eventId = Number(params.eventId)
 
-
-    if (!formTickets?.[index]?.name || !formTickets?.[index]?.maxDate) {
-      notifyError('Completá los datos del ticket antes de continuar');
-      return;
-    }
-
     const normalizedTickets = formTickets.map((ticket) => ({
       ...ticket,
       stages: ticket.stages?.length
@@ -110,7 +104,12 @@ export function TicketCard({
             className="!bg-cards-container !py-1"
             title="Fecha máx."
             inputName="maxDate"
-            register={register(`tickets.${index}.maxDate`, { required: "la fecha máx. es obligatoria", validate: validateDateYyyyMmDd })}
+            register={
+              stagesEnabled ?
+              register(`tickets.${index}.maxDate`, { required: "la fecha máx. es obligatoria", validate: validateDateYyyyMmDd })
+              :
+              register(`tickets.${index}.stages.0.dateMax`, { required: "la fecha máx. es obligatoria", validate: validateDateYyyyMmDd })
+            }
           />
         </div>
       </div>

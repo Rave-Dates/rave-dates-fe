@@ -8,10 +8,11 @@ import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { getAllCategories } from "@/services/admin-categories";
-import { getEventById, getEventImages, getImageById } from "@/services/admin-events";
+import { getEventById, getEventCategoriesById, getEventImages, getImageById } from "@/services/admin-events";
 import { getAllLabels } from "@/services/admin-labels";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { formatDate, validateDateYyyyMmDd } from "@/utils/formatDate";
+import { extractLatAndLng, extractPlaceFromGeo, formatGeo, validateGeo } from "@/utils/formatGeo";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter } from "next/navigation";
@@ -21,7 +22,7 @@ import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 export default function EditEvent({ eventId }: { eventId: number }) {
-  const { eventFormData, updateEventFormData } = useCreateEventStore();
+  const { eventFormData, updateEventFormData, setHasLoadedEvent, setHasLoadedTickets } = useCreateEventStore();
   const router = useRouter()
   const { register, handleSubmit, watch, setValue, control } = useForm({
     defaultValues: defaultEventFormData
@@ -37,70 +38,72 @@ export default function EditEvent({ eventId }: { eventId: number }) {
     validate: (value) =>
       value && value.length > 0 ? true : "Debes subir al menos una imagen",
   });
-      
+
   const watchedLabels = useWatch({ name: "labels", control });
   const watchedImages = useWatch({ name: "images", control });
+  const watchedIsActive = useWatch({ name: "isActive", control });
   
   const token = getCookie("token");
   
-  const isActive = watch("isActive");
   const type = ['free', 'paid'];
   
-  // TODO: TERMINAR
-  // const { data: categories, isLoading } = useQuery({
-    //   queryKey: ["roles"],
-    //   queryFn: () => getAllCategories({ token }),
-    //   enabled: !!token, // solo se ejecuta si hay token
-    // });
+  const { data: eventCategories } = useQuery({
+    queryKey: ["eventCategories"],
+    queryFn: () => getEventCategoriesById(token, eventId),
+    enabled: !!token, // solo se ejecuta si hay token
+  });
+
+  const { data: categories, isLoading } = useQuery({
+    queryKey: ["oldCategories"],
+    queryFn: () => getAllCategories({ token }),
+    enabled: !!token, // solo se ejecuta si hay token
+  });
     
-    const { data: event } = useQuery({
-      queryKey: ["eventById"],
-      queryFn: () => getEventById({ token, id: eventId }),
-      enabled: !!token, // solo se ejecuta si hay token
-    });
-    
-    const { data: labelsTypes } = useQuery({
-      queryKey: ["labelsTypes"],
-      queryFn: () => getAllLabels({ token }),
-      enabled: !!token, // solo se ejecuta si hay token
-    });
-    
-    const { data: eventImages } = useQuery({
-      queryKey: ["eventImages", eventId],
-      queryFn: () => getEventImages({ token, eventId }),
-      enabled: !!token && !!eventId,
-    });
-    
-    const { data: imagesData, isLoading: loadingImages, isError: errorImages } = useQuery({
-      queryKey: ["imagesData", eventImages?.map(img => img.imageId)],
-      queryFn: async () => {
-        if (!eventImages || !token) return [];
-        const processedImages = await Promise.all(
-          eventImages?.map(async (img) => {
-            const blob = await getImageById({ token, imageId: img.imageId });
-            const url = URL.createObjectURL(blob);
-            
-            return {
-              id: String(img.imageId),
-              url,
-            };
-          })
-        );
-        
-        return processedImages;
-      },
-    enabled: !!token,
+  const { data: event } = useQuery({
+    queryKey: ["eventById"],
+    queryFn: () => getEventById({ token, id: eventId }),
+    enabled: !!token, // solo se ejecuta si hay token
   });
   
-  useEffect(() => {
-    console.log("eventFormData actualizado:", eventFormData);
-  }, [eventFormData, imagesData]);
+  const { data: labelsTypes } = useQuery({
+    queryKey: ["labelsTypes"],
+    queryFn: () => getAllLabels({ token }),
+    enabled: !!token, // solo se ejecuta si hay token
+  });
+  
+  const { data: eventImages, isError: isErrorEventImages } = useQuery({
+    queryKey: ["eventImages", eventId],
+    queryFn: () => getEventImages({ token, eventId }),
+    enabled: !!token && !!eventId,
+  });
+  
+  const { data: imagesData, isLoading: loadingImages, isError: errorImages } = useQuery({
+    queryKey: ["imagesData", eventImages?.map(img => img.imageId)],
+    queryFn: async () => {
+      if (!eventImages || !token) return [];
+      const processedImages = await Promise.all(
+        eventImages?.map(async (img) => {
+          const blob = await getImageById({ token, imageId: img.imageId });
+          const url = URL.createObjectURL(blob);
+          
+          return {
+            id: String(img.imageId),
+            url,
+          };
+        })
+      );
+      
+      return processedImages;
+    },
+  enabled: !!token,
+});
   
   useEffect(() => {
     if (event) {
       // Labels como array de IDs
       const labelIds = event.labels.map((label) => label.labelId);
-
+      const formattedDate = formatDate(event.timeOut)
+      
       // Seteamos todo al formulario
       setValue("title", event.title);
       setValue("discount", event.discount);
@@ -108,20 +111,22 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       setValue("feeRD", event.feeRD);
       setValue("date", event.date);
       setValue("maxPurchase", event.maxPurchase);
-      setValue("geo", event.geo);
+      setValue("geo", extractLatAndLng(event.geo));
+      setValue("place", extractPlaceFromGeo(event.geo));
       setValue("description", event.description);
       setValue("type", event.type);
       setValue("labels", labelIds);
       setValue("isActive", event.isActive);
-      // setValue("place", event.place);
-      setValue("timeOut", formatDate(event.timeOut));
-
+      setValue("timeOut", formattedDate);
+      
       // Guardamos en zustand 
       updateEventFormData({
         ...event,
         labels: labelIds,
-        isActive: isActive,
+        timeOut: formattedDate
       });
+      setHasLoadedEvent(true);
+      setHasLoadedTickets(false);
     }
   }, [event]);
 
@@ -144,15 +149,55 @@ export default function EditEvent({ eventId }: { eventId: number }) {
     }
   }, [eventImages]);
 
+useEffect(() => {
+  const defaultCategoryValues = {};
+
+  eventCategories?.forEach((cat) => {
+    const selectedValue = cat.value;
+    if (selectedValue) {
+      defaultCategoryValues[cat.categoryId] = JSON.stringify({
+        valueId: selectedValue.valueId,
+        categoryId: cat.categoryId,
+        value: selectedValue.value,
+      });
+    }
+  });
+
+  setValue("oldCategories", defaultCategoryValues);
+}, [eventCategories, categories]);
+
   // creamos evento local
   const onSubmit = (data: any) => {
     if (loadingImages) {
       notifyError("Por favor espere a que se carguen las imágenes")
       return
     }
+    
+    const parsedCategories = Object.values(data.oldCategories).map((cat) => JSON.parse(cat));
+    const formattedOldCategories = eventCategories.map((category) => ({
+      categoryId: category.categoryId,
+      valueId: category.valueId,
+    }));
+
+    const categoriesToUpdate = parsedCategories
+      .map((newCat) => {
+        const oldCat = formattedOldCategories.find((old) => old.categoryId === newCat.categoryId);
+        if (!oldCat || oldCat.valueId === newCat.valueId) return null;
+        return {
+          categoryId: newCat.categoryId,
+          oldCategoryValueId: oldCat.valueId,
+          newCategoryValueId: newCat.valueId,
+        };
+      })
+      .filter(Boolean);
+
+    const formattedGeo = formatGeo(data.geo, data.place);
+
     updateEventFormData({
       ...eventFormData,
-      ...data,
+      isActive: watchedIsActive,
+      geo: formattedGeo,
+      categoriesToUpdate,
     })
 
     router.push(
@@ -191,12 +236,12 @@ export default function EditEvent({ eventId }: { eventId: number }) {
         <span className="text-white text-lg">Activo</span>
         <button
           type="button"
-          onClick={() => setValue("isActive", !isActive)}
+          onClick={() => setValue("isActive", !watchedIsActive)}
           className="w-12 h-6 rounded-full transition-colors pointer-events-auto bg-cards-container"
         >
           <div
             className={`w-5 h-5 rounded-full transition-transform ${
-              isActive ? "translate-x-6 bg-primary" : "translate-x-0.5 bg-system-error"
+              watchedIsActive ? "translate-x-6 bg-primary" : "translate-x-0.5 bg-system-error"
             }`}
           />
         </button>
@@ -206,23 +251,32 @@ export default function EditEvent({ eventId }: { eventId: number }) {
         inputName="title"
         register={register("title", { required: "El titulo es obligatorio"  })}
       />
+      
       <FormInput
         title="Fecha y hora*"
         inputName="date"
-        register={register("date", { required: "La fecha es obligatoria", valueAsDate: true, validate: validateDateYyyyMmDd })}
+        register={register("date", 
+          { required: "La fecha es obligatoria", 
+            validate: validateDateYyyyMmDd 
+          })}
       />
-      {/* <FormInput
+
+      <FormInput
         title="Lugar*"
         inputName="place"
         register={register("place", { required: "El lugar es obligatorio"  })}
-      /> */}
+      />
+
       <FormInput
         title="Geolocalización*"
         inputName="geo"
-        register={register("geo", { required: "La geolocalización es obligatoria"  })}
+        register={register("geo", { 
+          required: "La geolocalización es obligatoria",
+          validate: validateGeo
+        })}
       />
 
-      <EventImageSwiper isError={errorImages} isLoading={loadingImages} setImages={setValue} images={watchedImages} />
+      <EventImageSwiper isErrorEventImages={isErrorEventImages} isError={errorImages} isLoading={loadingImages} setImages={setValue} images={watchedImages} />
 
       <FormInput
         title="Información general*"
@@ -230,21 +284,30 @@ export default function EditEvent({ eventId }: { eventId: number }) {
         register={register("description", { required: "La descripción es obligatoria"  })}
       />
 
-       {/* { 
-        categories?.map((category) => (
+       { 
+          categories?.map((category) => (
             <FormDropDown
               key={category.categoryId}
               title={category.name}
-              register={register(category.name, { required: true })}
+              register={register(`oldCategories.${category.categoryId}`, { required: true })}
             >
               {
-                category.categoryValues.map((value) => (
-                  <option key={value.id} value={value.id}>{value.name}</option>
+                category.values.map((value) => (
+                  <option 
+                    key={value.valueId}   
+                    value={JSON.stringify({
+                      valueId: value.valueId,
+                      categoryId: value.categoryId,
+                      value: value.value
+                    })}
+                  >
+                    {value.value}
+                  </option>
                 ))
               }
             </FormDropDown>
           ))
-        } */}
+        }
       <br />
 
       <FilterTagButton setValue={setValue} organizers={watchedLabels} values={labelsTypes} type="organizers" title="Etiquetas" />
