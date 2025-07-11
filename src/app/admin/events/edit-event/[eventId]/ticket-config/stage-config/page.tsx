@@ -2,16 +2,18 @@
 
 import { StageCard } from "@/components/roles/admin/StageCard";
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
-import { notifySuccess } from "@/components/ui/toast-notifications";
+import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
 export default function StageConfig() {
- const { eventFormData, updateEventFormData, editingTicketId } = useCreateEventStore();
+ const { eventFormData, updateEventFormData, editingTicketId, hasLoadedEvent } = useCreateEventStore();
 
   const router = useRouter()
+  const params = useParams()
+  const eventId = Number(params.eventId)
 
   const currentTicketIndex = eventFormData.tickets?.findIndex(
     (t) => t.ticketTypeId === editingTicketId
@@ -24,11 +26,19 @@ export default function StageConfig() {
   });
 
   
-  //   useEffect(() => {
-    //   if (currentStages.length) {
-      //     reset({ stages: currentStages });
-      //   }
-      // }, [currentStages]);
+  useEffect(() => {
+    if (currentStages.length) {
+        reset({ stages: currentStages });
+      }
+    }, [currentStages]);
+
+  useEffect(() => {
+    if (!hasLoadedEvent) {
+      notifyError("Por favor vuelva a seleccionar un ticket")
+      router.push(`/admin/events/edit-event/${eventId}`)
+    }
+  });
+
       
   const { fields, append, remove } = useFieldArray({
     control,

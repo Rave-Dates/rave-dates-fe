@@ -8,20 +8,20 @@ import { useCreateFullEvent } from "@/hooks/useCreateEventFull"
 import { useEditEvent } from "@/hooks/useEditEvent"
 import { getTicketTypesById } from "@/services/admin-events"
 import { useCreateEventStore } from "@/store/createEventStore"
-import { formatDate, formatToISO } from "@/utils/formatDate"
+import { formatDate, formatToISO, validateDateYyyyMmDd } from "@/utils/formatDate"
 import { useQuery } from "@tanstack/react-query"
 import { useReactiveCookiesNext } from "cookies-next"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useEffect, useRef } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 
 export default function EditTicketConfiguration() {
-  const { eventFormData, updateEventFormData, hasLoadedTickets, setHasLoadedTickets } = useCreateEventStore()
+  const { eventFormData, updateEventFormData, hasLoadedTickets, setHasLoadedTickets, hasLoadedEvent } = useCreateEventStore()
   const { register, handleSubmit, watch, setValue, getValues, control, reset, formState } = useForm({
     defaultValues: eventFormData,
   })
+  const route = useRouter()
   const { mutate: editEvent } = useEditEvent(reset)
-
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -41,6 +41,14 @@ export default function EditTicketConfiguration() {
   })
 
   useEffect(() => {
+    if (!hasLoadedEvent) {
+      console.log(hasLoadedEvent)
+      notifyError("Por favor vuelva a seleccionar un ticket")
+      route.push(`/admin/events/edit-event/${eventId}`)
+    }
+  }, [eventFormData]);
+
+  useEffect(() => {
     console.log("eventFormData actualizado:", eventFormData);
   }, [eventFormData]);
 
@@ -56,15 +64,14 @@ export default function EditTicketConfiguration() {
           dateMax: formatDate(stage.dateMax),
         })),
       }));
-      console.log("formattedTickets",formattedTickets)
 
       const updatedData = {
         ...eventFormData,
         tickets: formattedTickets,
       };
 
-      updateEventFormData(updatedData);
       setValue("tickets", formattedTickets);
+      updateEventFormData(updatedData);
       setHasLoadedTickets(true);
     }
   }, [ticketsData]);
@@ -104,6 +111,7 @@ export default function EditTicketConfiguration() {
       isActive: data.isActive,
       feeRD: data.feeRD,
       feePB: data.feePB,
+      categoriesToUpdate: data.categoriesToUpdate,
       transferCost: data.transferCost,
       discountCode: data.discountCode,
       discountType: data.discountType,
@@ -119,47 +127,76 @@ export default function EditTicketConfiguration() {
     notifyPending(
       new Promise((resolve, reject) => {
         editEvent(cleanedEventData, {
-          onSuccess: resolve,
-          onError: reject,
+          onSuccess: () => {
+            resolve();
+            route.push("/admin/events");
+          },
+          onError: (err) => {
+            reject(err);
+            route.push("/admin/events");
+          },
         });
       }),
       {
         loading: "Editando evento...",
-        success: "Evento editaddo correctamente",
+        success: "Evento editado correctamente",
         error: "Error al editar el evento",
       }
     );
     
+    
   }
   
-  const onInvalid = () => {
-    notifyError("Por favor completá todos los campos.")
-  }
+  const onInvalid = (errors) => {
+    const findFirstError = (obj) => {
+      for (const key in obj) {
+        if (typeof obj[key] === "object") {
+          const child = findFirstError(obj[key]);
+          if (child) return child;
+        } else if (key === "message") {
+          return obj[key];
+        }
+      }
+      return null;
+    };
 
-  const handleAddTicket = () => {
-    const formTickets = getValues("tickets") || []
-    const newId = (formTickets.at(-1)?.ticketTypeId ?? 0) + 1
+    const firstErrorMessage = findFirstError(errors);
 
-    const newTicket = {
-      ticketTypeId: newId,
-      name: "",
-      stages: [
-        {
-          stageId: 1,
-          date: null,
-          dateMax: null,
-          price: 0,
-          quantity: 0,
-        },
-      ],
+    if (firstErrorMessage) {
+      notifyError(firstErrorMessage);
+    } else {
+      notifyError("Por favor completá todos los campos requeridos.");
     }
+  };
 
-    append(newTicket)
-    updateEventFormData({
-      ...eventFormData,
-      tickets: [...(eventFormData.tickets || []), newTicket],
-    })
-  }
+  // const handleAddTicket = () => {
+  //   const formTickets = getValues("tickets") || [];
+
+  //   // Buscar el ticketTypeId más alto
+  //   const maxId = Math.max(...formTickets.map(t => t.ticketTypeId || 0))
+
+  //   const newId = maxId + 1;
+
+  //   const newTicket = {
+  //     ticketTypeId: newId,
+  //     name: "",
+  //     stages: [
+  //       {
+  //         stageId: 1,
+  //         date: null,
+  //         dateMax: null,
+  //         price: 0,
+  //         quantity: 0,
+  //       },
+  //     ],
+  //   };
+
+  //   append(newTicket);
+  //   updateEventFormData({
+  //     ...eventFormData,
+  //     tickets: [...(eventFormData.tickets || []), newTicket],
+  //   });
+  // };
 
   const handleDeleteTicket = (index: number) => {
     if (fields.length === 1) return
@@ -192,33 +229,33 @@ export default function EditTicketConfiguration() {
               register={register}
               index={index}
               isEditing={true}
-              key={ticket?.ticketTypeId || index}
+              key={ticket.id}
               ticketNumber={ticket.ticketTypeId}
               onDelete={() => handleDeleteTicket(index)}
             />
           ))}
         </div>
 
-        <button
+        {/* <button
           onClick={handleAddTicket}
           className="w-full bg-primary outline-none text-black font-medium py-3 rounded-lg text-sm flex items-center justify-center gap-2"
         >
           + Incorporar ticket
-        </button>
+        </button> */}
 
         <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4 pt-4">
           {/* Inputs de configuración */}
           <div className="flex flex-col xs:flex-row gap-x-5">
-            <FormInput title="Comisión RD" inputName="feeRD" register={register("feeRD", { valueAsNumber: true, required: true, max: 100 })} />
-            <FormInput title="Comisión PB" inputName="feePB" register={register("feePB", { valueAsNumber: true, required: true, max: 100 })} />
+            <FormInput title="Comisión RD" inputName="feeRD" register={register("feeRD", { valueAsNumber: true, required: "La comisión RD es obligatoria", max: 100 })} />
+            <FormInput title="Comisión PB" inputName="feePB" register={register("feePB", { valueAsNumber: true, required: "La comisión PB es obligatoria", max: 100 })} />
           </div>
           <div className="flex flex-col xs:flex-row gap-x-5">
-            <FormInput title="Costo transferencia de ticket" inputName="transferCost" register={register("transferCost", { valueAsNumber: true, required: true })} />
-            <FormInput title="Descuento" inputName="discount" register={register("discount", { valueAsNumber: true, required: true })} />
+            <FormInput title="Costo transferencia de ticket" inputName="transferCost" register={register("transferCost", { valueAsNumber: true, required: "El costo de transferencia es obligatorio" })} />
+            <FormInput title="Descuento" inputName="discount" register={register("discount", { valueAsNumber: true, required: "El descuento es obligatorio" })} />
           </div>
           <div className="flex flex-col xs:flex-row gap-x-5">
-            <FormInput type="number" title="Máx. de tickets p/ persona" inputName="maxPurchase" register={register("maxPurchase", { valueAsNumber: true, required: true })} />
-            <FormInput title="Tiempo de compra" inputName="timeOut" register={register("timeOut", { required: true })} />
+            <FormInput type="number" title="Máx. de tickets p/ persona" inputName="maxPurchase" register={register("maxPurchase", { valueAsNumber: true, required: "El máximo de tickets es obligatorio" })} />
+            <FormInput title="Tiempo de compra" inputName="timeOut" register={register("timeOut", { required: "El tiempo de compra es obligatorio", validate: validateDateYyyyMmDd })} />
           </div>
           <FormInput title="Código de descuento" inputName="discountCode" register={register("discountCode")} />
 
