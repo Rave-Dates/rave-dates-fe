@@ -14,7 +14,7 @@ import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
 
 const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isTicketList?: boolean }) => {
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery({
-    queryKey: ["selectedEvent"],
+    queryKey: [`selectedEvent-${eventId}`],
     queryFn: () => getClientEventById(eventId),
   });
   
