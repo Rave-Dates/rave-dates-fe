@@ -10,7 +10,7 @@ export const loginAdmin = async (data: { email: string; password: string }) => {
 };
 
 export const getAllUsers = async ({token}: { token: CookieValueTypes }) => {
-  const res = await axios.get(`${BASE_URL}/admin/users?limit=20&page=1`, {
+  const res = await axios.get(`${BASE_URL}/admin/users?limit=20&page=1&isActive=true`, {
     headers: {
       "Accept": "application/json",
       "Authorization": `Bearer ${token}`,

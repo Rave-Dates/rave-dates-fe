@@ -56,7 +56,7 @@ export default function CreateUser() {
         email: data.email,
         phone: data.phone,
         roleId: data.roleId,
-        isActive: false,
+        isActive: true,
       },
     });
   };

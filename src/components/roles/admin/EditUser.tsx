@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import DefaultForm from '@/components/ui/forms/DefaultForm';
 import FormInput from '@/components/ui/inputs/FormInput';
-import { redirect, usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import FormDropDown from '@/components/ui/inputs/FormDropDown';
 import Link from 'next/link';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
@@ -21,6 +21,7 @@ const EditUser = ({ userId } : { userId: number }) => {
   const pathname = usePathname();
   const { register, handleSubmit, reset} = useForm();
   const { getCookie } = useReactiveCookiesNext();
+  const router = useRouter();
 
   const token = getCookie("token");
   
@@ -53,6 +54,7 @@ const EditUser = ({ userId } : { userId: number }) => {
   const { mutate } = useMutation({
     mutationFn: editUserById,
     onSuccess: () => {
+
       const decoded: IUserLogin = jwtDecode(`${token}`);
 
       if (decoded.role !== 'ADMIN') {
@@ -61,7 +63,7 @@ const EditUser = ({ userId } : { userId: number }) => {
         return
       }
       notifySuccess('Usuario editado correctamente');
-      redirect('/admin/users');
+      router.back();
     },
     onError: (error: any) => {
       console.log(error)
@@ -71,7 +73,8 @@ const EditUser = ({ userId } : { userId: number }) => {
   });
 
   // editamos el usuario 
-  const onSubmit = () => {
+  const onSubmit = (data) => {
+    console.log(data)
     mutate({
       token,
       id: userId,
