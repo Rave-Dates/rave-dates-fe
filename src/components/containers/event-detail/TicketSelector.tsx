@@ -3,10 +3,16 @@ import Link from 'next/link';
 import React from 'react';
 import TicketsChanger from '../tickets/TicketsChanger';
 import TicketsSkeleton from '@/utils/skeletons/event-skeletons/TicketsSkeleton';
+import { useTicketStore } from '@/store/useTicketStore';
 
 const TicketSelector = ({isTicketList = false, ticketStatus, tickets, isLoading} : { isTicketList?: boolean, ticketStatus?: "paid" | "pending", tickets?: any, isLoading: boolean }) => {
-  console.log(tickets)
+  const { selected } = useTicketStore();
 
+  const totalQuantity = Object.values(selected).reduce((acc, curr) => acc + curr.quantity, 0);
+  const totalPrice = Object.values(selected).reduce(
+    (acc, curr) => acc + curr.quantity * curr.stage.price,
+    0
+  );
   return (
     <div>
       <h3 className={`${isTicketList && "hidden"} text-lg font-semibold text-white mb-2`}>
@@ -30,28 +36,29 @@ const TicketSelector = ({isTicketList = false, ticketStatus, tickets, isLoading}
           }
 
           {/* Total */}
-          <div className="w-full flex flex-col items-end mb-7 md:mb-0">
-            {/* <div className="w-full sm:w-1/2 mb-3">
-              <div className="flex justify-between items-center text-white font-bold text-">
-                <span>TOTAL</span>
-                <span className='font-light tabular-nums'>{totalTickets > 0 ? `$${total.toLocaleString()} COP` : '0'}</span>
-              </div>
-            </div> */}
-
-            {/* Buy Button */}
-            {/* <Link 
-              tabIndex={totalTickets === 0 ? -1 : undefined}
-              aria-disabled={totalTickets === 0} 
-              href="/personal-data"
-              className={`w-full md:w-1/2 text-center py-3 rounded-lg transition-colors ${
-                totalTickets > 0 
-                  ? 'bg-primary hover:bg-primary/70 text-black' 
-                  : 'bg-inactive text-text-inactive pointer-events-none'
-              }`}
-            >
-              {totalTickets > 0 ? "Comprar tickets" : "Selecciona tickets"}
-            </Link> */}
+         <div className="w-full flex flex-col items-end mb-7 md:mb-0">
+        <div className="w-full sm:w-1/2 mb-3">
+          <div className="flex justify-between items-center text-white font-bold">
+            <span>TOTAL</span>
+            <span className='font-light tabular-nums'>
+              {totalQuantity > 0 ? `$${totalPrice.toLocaleString()} COP` : '0'}
+            </span>
           </div>
+        </div>
+
+        <Link
+          tabIndex={totalQuantity === 0 ? -1 : undefined}
+          aria-disabled={totalQuantity === 0}
+          href="/personal-data"
+          className={`w-full md:w-1/2 text-center py-3 rounded-lg transition-colors ${
+            totalQuantity > 0
+              ? 'bg-primary hover:bg-primary/70 text-black'
+              : 'bg-inactive text-text-inactive pointer-events-none'
+          }`}
+        >
+          {totalQuantity > 0 ? "Comprar tickets" : "Selecciona tickets"}
+        </Link>
+      </div>
         </>
       }
     </div>
