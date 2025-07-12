@@ -63,7 +63,11 @@ export default function Page() {
         organizerId: selectedUser.organizer.organizerId,
       }
       console.log("ORGANIZER formattedData",formattedData)
-      assignOrganizerEvent.mutate({data:formattedData, eventId: data[`assignedEvent-${userId}`]}, {
+      assignOrganizerEvent.mutate(
+        {
+          data:formattedData, 
+          eventId: data[`assignedEvent-${userId}`]
+        }, {
         onSuccess: () => {
           notifySuccess("Evento asignado a un organizador correctamente");
           router.back();
@@ -79,7 +83,11 @@ export default function Page() {
           promoterId: selectedUser.promoter.promoterId,
         }],
       }
-      assignPromoterEvent.mutate({data:formattedData, eventId: data[`assignedEvent-${userId}`]}, {
+      assignPromoterEvent.mutate(
+        {
+          data:formattedData, 
+          eventId: data[`assignedEvent-${userId}`]
+        }, {
         onSuccess: () => {
           notifySuccess("Evento asignado a un promotor correctamente");
           router.back();
