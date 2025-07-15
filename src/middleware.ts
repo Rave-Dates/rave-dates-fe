@@ -12,7 +12,7 @@ export function middleware(req: NextRequest) {
   
   // si no hay token → redirigir
   if (!token) {
-    return NextResponse.redirect(new URL("/", req.url));
+    return NextResponse.redirect(new URL("/admin/auth", req.url));
   }
   
   // si es admin y esta en la ruta /admin se deja pasar

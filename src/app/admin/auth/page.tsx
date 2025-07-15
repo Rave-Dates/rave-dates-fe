@@ -1,17 +1,16 @@
 "use client";
 
-import CheckSvg from "@/components/svg/CheckSvg";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
 import FormInput from "@/components/ui/inputs/FormInput";
+import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { loginAdmin } from "@/services/admin-users";
 import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from 'cookies-next';
 import { jwtDecode } from "jwt-decode";
 import { redirect } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 type LoginForm = {
   email: string;
@@ -21,7 +20,6 @@ type LoginForm = {
 
 export default function Page() {
   const { setCookie, getCookie } = useReactiveCookiesNext();
-  const [loginError, setLoginError] = useState("");
 
   const {
     watch,
@@ -45,61 +43,55 @@ export default function Page() {
       const decoded: IUserLogin = jwtDecode(data);
       const expirationDate = new Date(decoded.exp * 1000);
 
-      if (decoded.role !== 'ADMIN') {
-        setLoginError("No tienes permiso para acceder.");
-        return
-      }
       setCookie("token", data, {
         path: "/",
         expires: expirationDate,
         maxAge: decoded.exp - Math.floor(Date.now() / 1000), // en segundos
       });
-      toast('Logueado correctamente', {
-        className: 'bg-primary-black',
-        style: {backgroundColor: '#151515', color: '#FFFFFF', borderColor: "#b3ff0020"},
-        duration: 5000,
-        icon: <CheckSvg className="text-primary text-xl" />,
-      });
+      notifySuccess("Logueado correctamente");
       redirect('/admin/users');
     },
     onError: () => {
-      setLoginError("Credenciales incorrectas.");
+      notifyError("Error al loguear");
     },
   });
   
   const onSubmit = (data: LoginForm) => {
-    setLoginError("");
     mutate({
       email: data.email,
       password: data.password,
     });
   };
+  
+  const onInvalid = (errors: any) => {
+    const firstError = Object.values(errors)[0];
+    if (firstError?.message) {
+      notifyError(firstError.message);
+    } else {
+      notifyError("Por favor completá todos los campos requeridos.");
+    }
+  };
+  
 
   return (
-    <DefaultForm handleSubmit={handleSubmit(onSubmit)} title="Iniciar sesión - Admin">
+    <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Iniciar sesión - Admin">
       <FormInput
         type="email"
         title="Usuario*"
         inputName="email"
-        register={register("email", { required: true })}
+        register={register("email", { required: "El email es obligatorio" })}
       />
       <FormInput
         type="password"
         title="Contraseña*"
         inputName="password"
-        register={register("password", { required: true })}
+        register={register("password", { required: "La contraseña es obligatoria" })}
       />
 
       <CheckFormInput
         register={register}
         value={receiveInfo}
       />
-
-      <div className="h-5 mb-0">
-        {loginError && (
-          <p className="text-system-error text-sm">{loginError}</p>
-        )}
-      </div>
 
       <button
         type="submit"

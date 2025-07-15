@@ -9,6 +9,7 @@ import { useEditEvent } from "@/hooks/useEditEvent"
 import { getTicketTypesById } from "@/services/admin-events"
 import { useCreateEventStore } from "@/store/createEventStore"
 import { formatDate, formatToISO, validateDateYyyyMmDd } from "@/utils/formatDate"
+import { extractPlaceFromGeo } from "@/utils/formatGeo"
 import { useQuery } from "@tanstack/react-query"
 import { useReactiveCookiesNext } from "cookies-next"
 import { useParams, useRouter } from "next/navigation"
@@ -100,7 +101,7 @@ export default function EditTicketConfiguration() {
       ...data,
       tickets: data.tickets,
     })
-    
+
     const cleanedEventData = {
       eventId: eventFormData.eventId,
       title: data.title,
@@ -118,10 +119,12 @@ export default function EditTicketConfiguration() {
       discount: data.discount,
       maxPurchase: data.maxPurchase,
       images: data.images,
-      timeOut: formatToISO(data.timeOut),
+      timeOut: data.timeOut,
       labels: data.labels,
       tickets: formattedTickets,
     }
+
+    console.log("cleanedEventData",cleanedEventData)
 
     // funcion para editar evento
     notifyPending(
@@ -132,6 +135,7 @@ export default function EditTicketConfiguration() {
             route.push("/admin/events");
           },
           onError: (err) => {
+            console.log(err)
             reject(err);
             route.push("/admin/events");
           },
@@ -143,8 +147,6 @@ export default function EditTicketConfiguration() {
         error: "Error al editar el evento",
       }
     );
-    
-    
   }
   
   const onInvalid = (errors) => {
@@ -255,7 +257,7 @@ export default function EditTicketConfiguration() {
           </div>
           <div className="flex flex-col xs:flex-row gap-x-5">
             <FormInput type="number" title="Máx. de tickets p/ persona" inputName="maxPurchase" register={register("maxPurchase", { valueAsNumber: true, required: "El máximo de tickets es obligatorio" })} />
-            <FormInput title="Tiempo de compra" inputName="timeOut" register={register("timeOut", { required: "El tiempo de compra es obligatorio", validate: validateDateYyyyMmDd })} />
+            <FormInput title="Tiempo de compra (minutos)" inputName="timeOut" register={register("timeOut", { required: "El tiempo de compra es obligatorio", valueAsNumber: true })} />
           </div>
           <FormInput title="Código de descuento" inputName="discountCode" register={register("discountCode")} />
 

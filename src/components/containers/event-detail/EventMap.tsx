@@ -19,7 +19,7 @@ export default function EventMap({ position, place }: { position: [number, numbe
 
   return (
     <>
-      <MapContainer center={position} zoom={13} scrollWheelZoom={true} style={{ height: '300px', width: '100%' }}>
+      <MapContainer center={position} zoom={13} scrollWheelZoom={true} style={{ height: '300px', width: '100%', zIndex: 10 }}>
         <TileLayer
           attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

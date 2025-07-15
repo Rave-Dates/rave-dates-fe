@@ -58,7 +58,8 @@ export default function TicketConfiguration() {
         maxDate: lastStageMaxDate,
       }
     });
-    const formattedGeo = formatGeo(data.geo, data.place);
+
+    const formattedGeo = `${data.geo};${data.place.trim()}`;
 
     updateEventFormData({
       ...eventFormData,
@@ -246,9 +247,10 @@ export default function TicketConfiguration() {
                 register={register("maxPurchase", {valueAsNumber: true})}
               />
               <FormInput
-                title="Tiempo de compra"
-                inputName="tomeOut"
-                register={register("timeOut", {required: "El tiempo de compra es obligatorio", validate: validateDateYyyyMmDd})}
+                type="number"
+                title="Tiempo de compra (minutos)"
+                inputName="timeOut"
+                register={register("timeOut", {required: "El tiempo de compra es obligatorio", valueAsNumber: true})}
               />
             </div>
               <div className="flex items-center justify-between mt-5">

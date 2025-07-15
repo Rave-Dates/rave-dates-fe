@@ -12,7 +12,7 @@ import { getEventById, getEventCategoriesById, getEventImages, getImageById } fr
 import { getAllLabels } from "@/services/admin-labels";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { formatDate, validateDateYyyyMmDd } from "@/utils/formatDate";
-import { extractLatAndLng, extractPlaceFromGeo, formatGeo, validateGeo } from "@/utils/formatGeo";
+import { extractLatAndLng, extractPlaceFromGeo } from "@/utils/formatGeo";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter } from "next/navigation";
@@ -20,11 +20,12 @@ import type React from "react";
 import { useEffect } from "react";
 
 import { useForm, useWatch } from "react-hook-form";
+import GeoAutocomplete from "./GeoAutocomplete";
 
 export default function EditEvent({ eventId }: { eventId: number }) {
   const { eventFormData, updateEventFormData, setHasLoadedEvent, setHasLoadedTickets } = useCreateEventStore();
   const router = useRouter()
-  const { register, handleSubmit, watch, setValue, control } = useForm({
+  const { register, handleSubmit, watch, setValue, getValues, control } = useForm({
     defaultValues: defaultEventFormData
   });
   const { getCookie } = useReactiveCookiesNext();
@@ -102,7 +103,6 @@ export default function EditEvent({ eventId }: { eventId: number }) {
     if (event) {
       // Labels como array de IDs
       const labelIds = event.labels.map((label) => label.labelId);
-      const formattedDate = formatDate(event.timeOut)
       
       // Seteamos todo al formulario
       setValue("title", event.title);
@@ -117,13 +117,12 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       setValue("type", event.type);
       setValue("labels", labelIds);
       setValue("isActive", event.isActive);
-      setValue("timeOut", formattedDate);
+      setValue("timeOut", event.timeOut);
       
       // Guardamos en zustand 
       updateEventFormData({
         ...event,
         labels: labelIds,
-        timeOut: formattedDate
       });
       setHasLoadedEvent(true);
       setHasLoadedTickets(false);
@@ -191,7 +190,7 @@ useEffect(() => {
       })
       .filter(Boolean);
 
-    const formattedGeo = formatGeo(data.geo, data.place);
+    const formattedGeo = `${data.geo};${data.place.trim()}`;
 
     updateEventFormData({
       ...eventFormData,
@@ -267,13 +266,12 @@ useEffect(() => {
         register={register("place", { required: "El lugar es obligatorio"  })}
       />
 
-      <FormInput
-        title="Geolocalización*"
-        inputName="geo"
-        register={register("geo", { 
-          required: "La geolocalización es obligatoria",
-          validate: validateGeo
-        })}
+      <GeoAutocomplete
+        register={register}
+        setValue={setValue}
+        defaultGeo={eventFormData.geo}
+        getValues={getValues}
+        isEditing={true}
       />
 
       <EventImageSwiper isErrorEventImages={isErrorEventImages} isError={errorImages} isLoading={loadingImages} setImages={setValue} images={watchedImages} />

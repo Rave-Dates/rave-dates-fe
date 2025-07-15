@@ -14,11 +14,15 @@ import { CategoryValues, useCreateEventStore } from "@/store/createEventStore";
 import { formatDate, validateDateYyyyMmDd } from "@/utils/formatDate";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
 
 import { useForm, useWatch } from "react-hook-form";
+
+const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/GeoAutocomplete"), { ssr: false });
+
 
 export default function Page() {
   const { eventFormData, updateEventFormData, setHasLoadedEvent } = useCreateEventStore();
@@ -54,6 +58,23 @@ export default function Page() {
     enabled: !!token, // solo se ejecuta si hay token
   });
 
+
+
+  useEffect(() => {
+    register("geo", {
+      required: "Debes seleccionar una ubicación válida",
+      validate: (value) => {
+        const parts = value?.split(";");
+        if (parts.length !== 2) return "Ubicación inválida";
+        return true;
+      },
+    });
+
+    register("editPlace");
+  }, [register]);
+
+
+
   useEffect(() => {
     if (!eventFormData) return;
 
@@ -61,6 +82,7 @@ export default function Page() {
     setValue("place", eventFormData.place);
     setValue("date", eventFormData.date);
     setValue("geo", eventFormData.geo);
+    setValue("editPlace", eventFormData.editPlace);
     setValue("description", eventFormData.description);
     setValue("type", eventFormData.type);
 
@@ -80,7 +102,7 @@ export default function Page() {
   const watchedLabels = useWatch({ name: "labels", control });
   const watchedImages = useWatch({ name: "images", control });
 
-  // creamos el usuario 
+  // creamos el evento 
   const onSubmit = (data: any) => {
     const parsedCategories = data.categories.map((category) => JSON.parse(category))
     
@@ -139,10 +161,12 @@ export default function Page() {
         inputName="place"
         register={register("place", {required: "El lugar es obligatorio"  })}
       />
-      <FormInput
-        title="Geolocalización*"
-        inputName="geo"
-        register={register("geo", {required: "La geolocalización es obligatoria"  })}
+
+      <GeoAutocomplete
+        register={register}
+        setValue={setValue}
+        defaultGeo={eventFormData.editPlace}
+        getValues={getValues}
       />
 
       <EventImageSwiper setImages={setValue} images={watchedImages} />
