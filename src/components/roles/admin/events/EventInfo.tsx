@@ -16,7 +16,7 @@ export default function EventInfo({ eventId }: { eventId: number }) {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
 
-  const { data: ticketTypes } = useQuery({
+  const { data: ticketTypes } = useQuery<IEventTicket[]>({
     queryKey: ["ticketTypes"],
     queryFn: () => getTicketTypesById(token, eventId),
     enabled: !!token, // solo se ejecuta si hay token

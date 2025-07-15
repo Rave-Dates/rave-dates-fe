@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 type TicketStage = {
   ticketTypeId: number;
-  stageId: string;
+  stageId: number;
   price: number;
   quantity: number;
 };

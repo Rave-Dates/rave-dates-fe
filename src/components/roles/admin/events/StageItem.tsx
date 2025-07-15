@@ -1,4 +1,4 @@
-export function StageItem({ items }) {
+export function StageItem({ items }: { items: IEventTicket["stages"] }) {
   const stageData = [
     { label: "Ventas por página", value: "500", amount: "$750.000" },
     { label: "Ventas de promotores", value: "611", amount: "$750.000" },

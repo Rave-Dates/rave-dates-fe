@@ -14,7 +14,7 @@ export function useCreateFullEvent(reset: () => void) {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: async (formData) => {
+    mutationFn: async (formData: IEventFormData) => {
       const { eventCategoryValues ,tickets, images, ...eventData } = formData;
 
       // 1. Crear el evento
@@ -25,15 +25,17 @@ export function useCreateFullEvent(reset: () => void) {
 
       // 2. Crear categorías
       console.log(eventCategoryValues)
-      await Promise.all(
-        eventCategoryValues.map((category) => {
-          const formatData = {
-            "categoryValueId": category.valueId,
+      if (eventCategoryValues) {
+        await Promise.all(
+          eventCategoryValues.map((category) => {
+            const formatData = {
+              "categoryValueId": category.valueId,
+            }
+            createEventCategories(token, formatData, eventId)
           }
-          createEventCategories(token, formatData, eventId)
-        }
-        )
-      );
+          )
+        );
+      }
 
       // 3. Crear tickets
       console.log(tickets)
@@ -54,12 +56,8 @@ export function useCreateFullEvent(reset: () => void) {
         })
       );
       
-      const resetData = {
-        ...defaultEventFormData,
-        eventId: crypto.randomUUID(),
-      };
-      updateEventFormData(resetData); // reset Zustand
-      reset(resetData); // reset React Hook Form
+      updateEventFormData(defaultEventFormData); // reset Zustand
+      reset(); // reset React Hook Form
       setHasLoadedTickets(false);
    
       return createdEvent;

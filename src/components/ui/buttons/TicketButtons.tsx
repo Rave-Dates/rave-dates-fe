@@ -5,6 +5,8 @@ import { useTicketStore } from "@/store/useTicketStore";
 import { useParams } from "next/navigation";
 
 const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {
+  if (typeof ticket.ticketTypeId !== "number") return null;
+  
   const { add, subtract, selected, setEventId } = useTicketStore();
   const params = useParams();
   const eventId = Number(params.eventId);
@@ -20,7 +22,7 @@ const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {
     return new Date(stage.dateMax).getTime() > now && stage.quantity > 0;
   });
 
-  const currentQuantity = selected[ticket.ticketTypeId]?.quantity || 0;
+  const currentQuantity =  selected[ticket.ticketTypeId]?.quantity || 0;
 
   return (
     <div className="space-y-2 mb-3">
@@ -34,7 +36,7 @@ const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {
 
         <div className="flex items-center font-light text-subtitle">
           <button
-            onClick={() => subtract(ticket.ticketTypeId)}
+            onClick={() => ticket.ticketTypeId && subtract(ticket.ticketTypeId)}
             disabled={currentQuantity === 0}
             className={`p-3 rounded-l-xl ${
               currentQuantity > 0 ? "bg-primary" : "bg-inactive text-text-inactive"
@@ -48,7 +50,7 @@ const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {
           </span>
 
           <button
-            onClick={() => validStage && add({ ticketTypeId: ticket.ticketTypeId, stageId: validStage.stageId, price: validStage.price, quantity: validStage.quantity })}
+            onClick={() => ticket.ticketTypeId && validStage?.stageId && validStage && add({ ticketTypeId: ticket.ticketTypeId, stageId: validStage.stageId, price: validStage.price, quantity: validStage.quantity })}
             disabled={!validStage || currentQuantity >= validStage.quantity}
             className={`p-3 rounded-r-xl flex items-center justify-center text-black transition-colors ${
               validStage && currentQuantity < validStage.quantity

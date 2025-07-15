@@ -14,8 +14,10 @@ export function useEditEvent(reset: () => void) {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: async (formData) => {
-      const { categoriesToUpdate, tickets, images, eventId, ticketTypeId, ...eventData } = formData;
+    mutationFn: async (formData: IEventFormData) => {
+      const { categoriesToUpdate, tickets, images, eventId, ...eventData } = formData;
+
+      if (!eventId) return
 
       // 1. Editar el evento
       console.log("eventDataA",eventData)
@@ -28,30 +30,28 @@ export function useEditEvent(reset: () => void) {
       await Promise.all(
         tickets.map(({ ticketTypeId, ...rest }) => {
           const ticketValues = { ...rest };
+          if (!ticketTypeId) return;
           return editTicketTypes(token, ticketValues, ticketTypeId);
         })
       );
 
       // 3. Editar las categorías
-      await Promise.all(
-        categoriesToUpdate.map((category) =>
-          editEventCategories(token, category, eventId)
-        )
-      );
+      if (categoriesToUpdate) {
+        await Promise.all(
+          categoriesToUpdate.map((category) =>
+            editEventCategories(token, category, eventId)
+          )
+        );
+      }
 
       // 4. Subir imágenes
       console.log("iamges",images)
       await Promise.all(
-        images.map((file) => createImage(token, { eventId, file: file.file }))
+        images.map((file) => file.file && createImage(token, { eventId, file: file.file }))
       );
       
-      const resetData = {
-        ...defaultEventFormData,
-        eventId: crypto.randomUUID(),
-      };
-
-      updateEventFormData(resetData); // reset Zustand
-      reset(resetData); // reset React Hook Form
+      updateEventFormData(defaultEventFormData); // reset Zustand
+      reset(); // reset React Hook Form
       setHasLoadedTickets(false);
    
       return editedEvent;

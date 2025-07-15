@@ -1,5 +1,5 @@
 interface IEvent {
-  eventId: number;
+  eventId?: number;
   title: string;
   date: string;
   piggyBank: boolean;
@@ -22,10 +22,12 @@ interface IEvent {
 }
 
 interface IEventFormData extends Partial<IEvent>, Omit<IEvent, 'labels'> {
+  editPlace?: string;
+  categoriesToUpdate?: IEventCategoryValue[];
   labels: number[];
-  place: string;
-  images: { id: string; url: string }[];
-  oldCategories: Record<number, string>;
+  place?: string;
+  images: { id: string; url: string, file?: File }[];
+  oldCategories?: Record<number, string>;
   tickets: IEventTicket[]; // solo para el form
 }
 

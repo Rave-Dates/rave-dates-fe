@@ -73,7 +73,7 @@ const EditUser = ({ userId } : { userId: number }) => {
   });
 
   // editamos el usuario 
-  const onSubmit = (data) => {
+  const onSubmit = (data: Partial<IUser>) => {
     console.log(data)
     mutate({
       token,
@@ -103,9 +103,10 @@ const EditUser = ({ userId } : { userId: number }) => {
           register={register("name", { required: true, value: data?.name })}
         />
         <FormInput
+          type='number'
           title="Número de celular*"
           inputName="phone"
-          register={register("phone", { required: true })}
+          register={register("phone", { required: true, valueAsNumber: true })}
           />
         <FormInput
           type="email"

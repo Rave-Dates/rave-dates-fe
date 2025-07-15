@@ -2,12 +2,12 @@
 
 import TrashSvg from "@/components/svg/TrashSvg"
 import FormInput from "@/components/ui/inputs/FormInput"
-import { FieldValues, UseFormRegister } from "react-hook-form";
+import { UseFormRegister } from "react-hook-form";
 
 interface StageCardProps {
   index: number,
   onDelete?: () => void,
-  register: UseFormRegister<FieldValues>,
+  register: UseFormRegister<IEventTicket>,
 }
 
 export function StageCard({
@@ -57,12 +57,12 @@ export function StageCard({
           inputName="dateMax"
           register={register(`stages.${index}.dateMax`, { required: true })}
         />
-        <FormInput
+        {/* <FormInput
           className="!bg-cards-container"
           title="Comisión promotor (%)"
           inputName="commission"
           register={register(`stages.${index}.commission`, { required: true, valueAsNumber: true })}
-        />
+        /> */}
       </div>
     </div>
   )

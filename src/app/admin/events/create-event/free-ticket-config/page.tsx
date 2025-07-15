@@ -36,7 +36,7 @@ export default function FreeTicketConfiguration() {
       tickets: data.tickets,
     });
 
-    const yyyyMmDd = data.date?.toISOString().split('T')[0];
+    const yyyyMmDd = data.date && (new Date(data.date))?.toISOString().split('T')[0];
 
     const cleanedEventData = {
       title: data.title,

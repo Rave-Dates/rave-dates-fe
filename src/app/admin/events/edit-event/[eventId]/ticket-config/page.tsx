@@ -14,11 +14,11 @@ import { useQuery } from "@tanstack/react-query"
 import { useReactiveCookiesNext } from "cookies-next"
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useRef } from "react"
-import { useFieldArray, useForm } from "react-hook-form"
+import { FieldErrors, useFieldArray, useForm } from "react-hook-form"
 
 export default function EditTicketConfiguration() {
   const { eventFormData, updateEventFormData, hasLoadedTickets, setHasLoadedTickets, hasLoadedEvent } = useCreateEventStore()
-  const { register, handleSubmit, watch, setValue, getValues, control, reset, formState } = useForm({
+  const { register, handleSubmit, watch, setValue, getValues, control, reset, formState } = useForm<IEventFormData>({
     defaultValues: eventFormData,
   })
   const route = useRouter()
@@ -35,7 +35,7 @@ export default function EditTicketConfiguration() {
   const eventId = Number(params.eventId)
 
   // 🟢 Traemos tickets del evento
-  const { data: ticketsData } = useQuery({
+  const { data: ticketsData } = useQuery<IEventTicket[]>({
     queryKey: ["eventTickets", eventId],
     queryFn: () => getTicketTypesById(token, eventId),
     enabled: !!token && !!eventId,
@@ -78,9 +78,9 @@ export default function EditTicketConfiguration() {
   }, [ticketsData]);
 
   const piggyBank = watch("piggyBank", false)
-  if (piggyBank === false) setValue("commission", null)
+  if (piggyBank === false) setValue("commission", undefined)
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: IEventFormData) => {
     
     const formattedTickets = data.tickets.map((ticket) => ({
       ticketTypeId: ticket.ticketTypeId,
@@ -131,7 +131,7 @@ export default function EditTicketConfiguration() {
       new Promise((resolve, reject) => {
         editEvent(cleanedEventData, {
           onSuccess: () => {
-            resolve();
+            resolve("ok");
             route.push("/admin/events");
           },
           onError: (err) => {
@@ -149,8 +149,8 @@ export default function EditTicketConfiguration() {
     );
   }
   
-  const onInvalid = (errors) => {
-    const findFirstError = (obj) => {
+  const onInvalid = (errors: FieldErrors<IEventFormData>) => {
+    const findFirstError = (obj: any): string | null => {
       for (const key in obj) {
         if (typeof obj[key] === "object") {
           const child = findFirstError(obj[key]);

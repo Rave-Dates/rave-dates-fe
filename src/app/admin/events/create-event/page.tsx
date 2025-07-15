@@ -9,9 +9,8 @@ import { notifyError } from "@/components/ui/toast-notifications";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { getAllCategories } from "@/services/admin-categories";
 import { getAllLabels } from "@/services/admin-labels";
-import { getAllUsers } from "@/services/admin-users";
-import { CategoryValues, useCreateEventStore } from "@/store/createEventStore";
-import { formatDate, validateDateYyyyMmDd } from "@/utils/formatDate";
+import { useCreateEventStore } from "@/store/createEventStore";
+import { validateDateYyyyMmDd } from "@/utils/formatDate";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import dynamic from "next/dynamic";
@@ -19,7 +18,7 @@ import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
 
-import { useForm, useWatch } from "react-hook-form";
+import { FieldErrors, useForm, useWatch } from "react-hook-form";
 
 const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/GeoAutocomplete"), { ssr: false });
 
@@ -27,7 +26,7 @@ const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/Ge
 export default function Page() {
   const { eventFormData, updateEventFormData, setHasLoadedEvent } = useCreateEventStore();
   const router = useRouter()
-  const { register, handleSubmit, watch, setValue, getValues, control } = useForm({
+  const { register, handleSubmit, watch, setValue, getValues, control } = useForm<IEventFormData>({
     defaultValues: defaultEventFormData
   });
   const { getCookie } = useReactiveCookiesNext();
@@ -46,13 +45,13 @@ export default function Page() {
   
   const type = ['free', 'paid'];
   
-  const { data: categories, isLoading } = useQuery({
+  const { data: categories } = useQuery<IEventCategories[]>({
     queryKey: ["roles"],
     queryFn: () => getAllCategories({ token }),
     enabled: !!token, // solo se ejecuta si hay token
   });
     
-  const { data: labelsTypes } = useQuery({
+  const { data: labelsTypes } = useQuery<IEventLabel[]>({
     queryKey: ["labelsTypes"],
     queryFn: () => getAllLabels({ token }),
     enabled: !!token, // solo se ejecuta si hay token
@@ -65,7 +64,7 @@ export default function Page() {
       required: "Debes seleccionar una ubicación válida",
       validate: (value) => {
         const parts = value?.split(";");
-        if (parts.length !== 2) return "Ubicación inválida";
+        if (parts?.length !== 2) return "Ubicación inválida";
         return true;
       },
     });
@@ -90,8 +89,8 @@ export default function Page() {
     setValue(
       "labels",
       (eventFormData.labels ?? [])
-        .filter((label) => label?.labelId !== undefined)
-        .map((label) => label.labelId)
+        .filter((label: any) => label?.labelId !== undefined)
+        .map((label: any) => label.labelId)
     );    
     setValue("images", eventFormData.images ?? []);
   }, [eventFormData, setValue]);
@@ -104,11 +103,11 @@ export default function Page() {
 
   // creamos el evento 
   const onSubmit = (data: any) => {
-    const parsedCategories = data.categories.map((category) => JSON.parse(category))
+    const parsedCategories = data.categories.map((category: any) => JSON.parse(category))
     
     const formattedData = {
       ...data,
-      eventCategoryValues: parsedCategories.map((category) => ({
+      eventCategoryValues: parsedCategories.map((category: any) => ({
         valueId: category.valueId,
         categoryId: category.categoryId,
         value: category.value,
@@ -132,7 +131,7 @@ export default function Page() {
     )
   };
 
-  const onInvalid = (errors) => {
+  const onInvalid = (errors: FieldErrors<IEventFormData>) => {
     const firstError = Object.values(errors)[0];
     if (firstError?.message) {
       notifyError(firstError.message);
@@ -163,10 +162,8 @@ export default function Page() {
       />
 
       <GeoAutocomplete
-        register={register}
         setValue={setValue}
         defaultGeo={eventFormData.editPlace}
-        getValues={getValues}
       />
 
       <EventImageSwiper setImages={setValue} images={watchedImages} />
@@ -182,7 +179,7 @@ export default function Page() {
             <FormDropDown
               key={category.categoryId}
               title={category.name}
-              register={register(`categories.${category.categoryId}`, { required: true })}
+              register={register(`categories.${category.categoryId}` as any, { required: true })}
             >
               {
                 category.values.map((value) => (
@@ -205,9 +202,8 @@ export default function Page() {
     {labelsTypes && (
       <FilterTagButton
         setValue={setValue}
-        organizers={watchedLabels}
+        labels={watchedLabels}
         values={labelsTypes}
-        type="organizers"
         title="Etiquetas"
       />
     )}

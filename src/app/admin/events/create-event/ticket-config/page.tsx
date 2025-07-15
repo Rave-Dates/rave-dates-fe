@@ -8,7 +8,7 @@ import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { FieldErrors, useFieldArray, useForm, useWatch } from "react-hook-form";
 
 export default function TicketConfiguration() {
   const { eventFormData, updateEventFormData, hasLoadedEvent } = useCreateEventStore();
@@ -48,14 +48,14 @@ export default function TicketConfiguration() {
     console.log("data", data)
     const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
       if (rest.stages.length === 1) return { ...rest, maxDate: rest.stages[0].dateMax };
-      const lastStageMaxDate = rest.stages.at(-1)?.dateMax;
+      const lastStageMaxDate = rest.stages.at(-1)?.dateMax || "";
       return {
         ...rest,
         maxDate: lastStageMaxDate,
       }
     });
 
-    const formattedGeo = `${data.geo};${data.place.trim()}`;
+    const formattedGeo = `${data.geo};${data.place?.trim()}`;
 
     updateEventFormData({
       ...eventFormData,
@@ -104,8 +104,8 @@ export default function TicketConfiguration() {
     // onSucces borrar los datos del form y del estado
   };
 
-  const onInvalid = (errors) => {
-    const findFirstError = (obj) => {
+  const onInvalid = (errors: FieldErrors<IEventFormData>) => {
+    const findFirstError = (obj: any): string | null => {
       for (const key in obj) {
         if (typeof obj[key] === "object") {
           const child = findFirstError(obj[key]);

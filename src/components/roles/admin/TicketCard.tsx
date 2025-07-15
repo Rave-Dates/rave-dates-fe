@@ -2,20 +2,19 @@
 
 import TrashSvg from "@/components/svg/TrashSvg"
 import FormInput from "@/components/ui/inputs/FormInput"
-import { notifyError } from "@/components/ui/toast-notifications"
 import { useCreateEventStore } from "@/store/createEventStore"
 import { validateDateYyyyMmDd } from "@/utils/formatDate"
 import { useRouter, useParams } from "next/navigation"
 import { useState } from "react"
-import { FieldValues, UseFormGetValues, UseFormRegister } from "react-hook-form"
+import { UseFormGetValues, UseFormRegister } from "react-hook-form"
 
 interface TicketCardProps {
   ticketNumber: number | undefined,
   index: number,
   isEditing?: boolean,
   onDelete?: () => void,
-  register: UseFormRegister<FieldValues>,
-  getValues: UseFormGetValues<FieldValues>,
+  register: UseFormRegister<IEventFormData>,
+  getValues: UseFormGetValues<IEventFormData>,
 }
 
 export function TicketCard({

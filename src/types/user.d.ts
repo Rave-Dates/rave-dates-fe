@@ -6,8 +6,6 @@ interface IUser {
   password: string;
   phone: string;
   roleId: number;
-  createdAt: string;
-  updatedAt: string;
   role: {
     roleId: number;
     name: string;
@@ -20,12 +18,9 @@ interface ICreateUser {
   userId: number;
   name: string;
   email: string;
-  phone?: number;
+  phone: string;
   isActive: boolean;
   password: string;
-  roleId: number;
-  createdAt?: string;
-  updatedAt?: string;
   roleId: number;
 }
 

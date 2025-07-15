@@ -34,6 +34,7 @@ export default function FreeTicketConfiguration() {
   useEffect(() => {
     if (ticketsData) {
       const formattedTickets = ticketsData.map((ticket) => ({
+        ticketTypeId: ticket.ticketTypeId,
         name: ticket.name,
         maxDate: formatDate(ticket.maxDate),
         stages: ticket.stages.map((stage) => ({
@@ -59,12 +60,13 @@ export default function FreeTicketConfiguration() {
   const onSubmit = (data: IEventFormData) => {
     console.log("ticketsDATA",ticketsData)
     console.log("eventFormData",eventFormData)
-    const formattedTickets = data.tickets.map((ticket) => ({
-      ticketTypeId: data.ticketTypeId,
+    const formattedTickets: IEventTicket[] = data.tickets.map((ticket) => ({
+      ticketTypeId: ticket.ticketTypeId,
       eventId: eventId,
       name: ticket.name,
       maxDate: formatDate(ticket.maxDate),
       stages: ticket.stages.map((stage) => ({
+        price: stage.price,
         date: formatDate(stage.date),
         dateMax: formatDate(stage.dateMax),
         quantity: stage.quantity,

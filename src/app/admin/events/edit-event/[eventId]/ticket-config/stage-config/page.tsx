@@ -6,7 +6,7 @@ import { notifyError, notifySuccess } from "@/components/ui/toast-notifications"
 import { useCreateEventStore } from "@/store/createEventStore";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, UseFormRegister } from "react-hook-form";
 
 export default function StageConfig() {
  const { eventFormData, updateEventFormData, editingTicketId, hasLoadedEvent } = useCreateEventStore();
@@ -21,7 +21,7 @@ export default function StageConfig() {
 
   const currentStages = eventFormData.tickets?.[currentTicketIndex!]?.stages || [];
   
-  const { control, register, handleSubmit, getValues, reset } = useForm({
+  const { control, register, handleSubmit, getValues, reset } = useForm<IEventTicket>({
     defaultValues: { stages: currentStages }
   });
 
@@ -45,7 +45,7 @@ export default function StageConfig() {
     name: "stages",
   });
   
-  const onSubmit = (data) => {
+  const onSubmit = (data: IEventTicket) => {
     if (!eventFormData.tickets) return
     const updatedTickets = [...eventFormData.tickets];
     updatedTickets[currentTicketIndex!] = {
@@ -136,7 +136,6 @@ export default function StageConfig() {
               <StageCard
                 register={register}
                 key={stage.id}
-                stageNumber={stage.stageId}
                 index={index}
                 onDelete={() => handleDeleteStage(index)}
               />

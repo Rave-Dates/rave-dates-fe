@@ -1,17 +1,14 @@
 import { useEffect } from "react";
+import { UseFormSetValue } from "react-hook-form";
 import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
 
 const GeoAutocomplete = ({
   setValue,
-  register,
   defaultGeo,
-  getValues,
   isEditing = false,
 }: {
-  setValue: (name: string, value: any) => void;
-  register: any;
+  setValue: UseFormSetValue<IEventFormData>;
   defaultGeo?: string;
-  getValues: any;
   isEditing?: boolean;
 }) => {
   const {

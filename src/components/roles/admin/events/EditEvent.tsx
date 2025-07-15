@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
 
-import { useForm, useWatch } from "react-hook-form";
+import { FieldErrors, useForm, useWatch } from "react-hook-form";
 import GeoAutocomplete from "./GeoAutocomplete";
 
 export default function EditEvent({ eventId }: { eventId: number }) {
@@ -78,7 +78,7 @@ export default function EditEvent({ eventId }: { eventId: number }) {
     enabled: !!token && !!eventId,
   });
   
-  const { data: imagesData, isLoading: loadingImages, isError: errorImages } = useQuery({
+  const { data: imagesData, isLoading: loadingImages, isError: errorImages } = useQuery<{ id: string, url: string }[]>({
     queryKey: ["imagesData", eventImages?.map(img => img.imageId)],
     queryFn: async () => {
       if (!eventImages || !token) return [];
@@ -122,6 +122,7 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       // Guardamos en zustand 
       updateEventFormData({
         ...event,
+        labels: event.labels.map((label) => label.labelId),
       });
       setHasLoadedEvent(true);
       setHasLoadedTickets(false);
@@ -139,39 +140,39 @@ export default function EditEvent({ eventId }: { eventId: number }) {
     if (eventImages) {
       const same = JSON.stringify(eventFormData.images) === JSON.stringify(eventImages);
       if (!same) {
-        updateEventFormData((prev) => ({
-          ...prev,
-          images: eventImages,
-        }));
+      updateEventFormData({
+        ...eventFormData,
+        images: eventImages,
+      });
       }
     }
   }, [eventImages]);
 
-useEffect(() => {
-  const defaultCategoryValues = {};
+  useEffect(() => {
+    const defaultCategoryValues: any = {};
 
-  eventCategories?.forEach((cat) => {
-    const selectedValue = cat.value;
-    if (selectedValue) {
-      defaultCategoryValues[cat.categoryId] = JSON.stringify({
-        valueId: selectedValue.valueId,
-        categoryId: cat.categoryId,
-        value: selectedValue.value,
-      });
-    }
-  });
+    eventCategories?.forEach((cat) => {
+      const selectedValue = cat.value;
+      if (selectedValue) {
+        defaultCategoryValues[cat.categoryId] = JSON.stringify({
+          valueId: selectedValue.valueId,
+          categoryId: cat.categoryId,
+          value: selectedValue.value,
+        });
+      }
+    });
 
-  setValue("oldCategories", defaultCategoryValues);
-}, [eventCategories, categories]);
+    setValue("oldCategories", defaultCategoryValues);
+  }, [eventCategories, categories]);
 
   // creamos evento local
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: IEventFormData) => {
     if (loadingImages) {
       notifyError("Por favor espere a que se carguen las imágenes")
       return
     }
     
-    const parsedCategories = Object.values(data.oldCategories).map((cat) => JSON.parse(cat));
+    const parsedCategories = Object.values(data.oldCategories ?? {}).map((cat) => JSON.parse(cat));
     const formattedOldCategories = eventCategories?.map((category) => ({
       categoryId: category.categoryId,
       valueId: category.valueId,
@@ -189,7 +190,7 @@ useEffect(() => {
       })
       .filter(Boolean);
 
-    const formattedGeo = `${data.geo};${data.place.trim()}`;
+    const formattedGeo = `${data.geo};${data.place?.trim()}`;
 
     updateEventFormData({
       ...eventFormData,
@@ -205,8 +206,8 @@ useEffect(() => {
     )
   };
 
-  const onInvalid = (errors: any) => {
-    const findFirstError = (obj) => {
+  const onInvalid = (errors: FieldErrors<IEventFormData>) => {
+    const findFirstError = (obj: any): string | null => {
       for (const key in obj) {
         if (typeof obj[key] === "object") {
           const child = findFirstError(obj[key]);
@@ -266,10 +267,8 @@ useEffect(() => {
       />
 
       <GeoAutocomplete
-        register={register}
         setValue={setValue}
         defaultGeo={eventFormData.geo}
-        getValues={getValues}
         isEditing={true}
       />
 
@@ -286,7 +285,7 @@ useEffect(() => {
             <FormDropDown
               key={category.categoryId}
               title={category.name}
-              register={register(`oldCategories.${category.categoryId}`, { required: true })}
+              register={register(`oldCategories.${category.categoryId}` as any, { required: true })}
             >
               {
                 category.values.map((value) => (
@@ -306,8 +305,10 @@ useEffect(() => {
           ))
         }
       <br />
-
-      <FilterTagButton setValue={setValue} organizers={watchedLabels} values={labelsTypes} type="organizers" title="Etiquetas" />
+      {
+        labelsTypes &&
+        <FilterTagButton setValue={setValue} labels={watchedLabels} values={labelsTypes} title="Etiquetas" />
+      }
 
       <br />
 
