@@ -13,12 +13,12 @@ import { useFieldArray, useForm } from "react-hook-form";
 
 export default function FreeTicketConfiguration() {
   const { eventFormData, updateEventFormData } = useCreateEventStore();
-  const { register, handleSubmit, reset , formState} = useForm({
+  const { register, handleSubmit, reset} = useForm<IEventFormData>({
     defaultValues: eventFormData
   });
-  const { mutate: createFullEvent, isLoading } = useCreateFullEvent(reset);
+  const { mutate: createFullEvent } = useCreateFullEvent(reset);
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: IEventFormData) => {
     const validTickets = data.tickets.map(({ ticketId, stages, ...rest }) => {
       const maxDate = stages?.[0]?.dateMax ?? null;
       return {
@@ -36,7 +36,7 @@ export default function FreeTicketConfiguration() {
       tickets: data.tickets,
     });
 
-    const yyyyMmDd = data.date.toISOString().split('T')[0];
+    const yyyyMmDd = data.date?.toISOString().split('T')[0];
 
     const cleanedEventData = {
       title: data.title,

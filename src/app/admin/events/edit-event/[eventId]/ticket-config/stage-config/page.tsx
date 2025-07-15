@@ -46,6 +46,7 @@ export default function StageConfig() {
   });
   
   const onSubmit = (data) => {
+    if (!eventFormData.tickets) return
     const updatedTickets = [...eventFormData.tickets];
     updatedTickets[currentTicketIndex!] = {
       ...updatedTickets[currentTicketIndex!],
@@ -70,9 +71,9 @@ export default function StageConfig() {
 
     const newStage = {
       stageId: newId,
-      dateMax: null,
-      price: null,
-      quantity: null,
+      dateMax: "",
+      price: 0,
+      quantity: 0,
       date: yyyyMmDd,
     };
 
@@ -80,6 +81,7 @@ export default function StageConfig() {
     append(newStage);
 
     // También actualiza el estado global (Zustand)
+    if (!eventFormData.tickets) return
     const updatedTickets = [...eventFormData.tickets];
     const ticketIndex = updatedTickets.findIndex(t => t.ticketTypeId === editingTicketId);
 
@@ -103,6 +105,7 @@ export default function StageConfig() {
     remove(index);
 
     // 2. Eliminar del estado global (Zustand)
+    if (!eventFormData.tickets) return
     const updatedTickets = [...eventFormData.tickets];
     const ticketIndex = updatedTickets.findIndex(t => t.ticketTypeId === editingTicketId);
 

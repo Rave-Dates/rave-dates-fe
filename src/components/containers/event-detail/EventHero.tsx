@@ -1,6 +1,7 @@
 import React from 'react';
 import ImagesSwiper from '@/components/containers/home/ImagesSwiper';
 import SpinnerSvg from '@/components/svg/SpinnerSvg';
+import Image from 'next/image';
 
 const EventHero = ({ eventImages, isImagesLoading } : { eventImages: { id: string, url: string }[] | undefined, isImagesLoading: boolean }) => {
   
@@ -14,6 +15,16 @@ const EventHero = ({ eventImages, isImagesLoading } : { eventImages: { id: strin
           </div>
           :
           <ImagesSwiper images={eventImages} className='w-full aspect-square object-cover h-[576px]' />
+        }
+        {
+          !eventImages && !isImagesLoading &&
+          <Image
+            width={1000}
+            height={1000}
+            src="/images/event-placeholder.png"
+            alt="Sin imagen"
+            className="w-full aspect-square object-cover h-[576px]"
+          /> 
         }
       </div>
     </div>

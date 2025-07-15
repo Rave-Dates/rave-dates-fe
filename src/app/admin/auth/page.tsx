@@ -63,7 +63,7 @@ export default function Page() {
     });
   };
   
-  const onInvalid = (errors: any) => {
+  const onInvalid = (errors: { [key: string]: any }) => {
     const firstError = Object.values(errors)[0];
     if (firstError?.message) {
       notifyError(firstError.message);

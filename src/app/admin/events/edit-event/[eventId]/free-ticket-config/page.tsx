@@ -1,23 +1,21 @@
 "use client"
 
-import { TicketCard } from "@/components/roles/admin/TicketCard"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
-import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
 import { useEditEvent } from "@/hooks/useEditEvent";
 import { getTicketTypesById } from "@/services/admin-events";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { formatDate, formatToISO } from "@/utils/formatDate";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 export default function FreeTicketConfiguration() {
-  const { eventFormData, updateEventFormData, hasLoadedTickets, setHasLoadedTickets } = useCreateEventStore();
-  const { register, handleSubmit, reset , setValue} = useForm({
+  const { eventFormData, updateEventFormData } = useCreateEventStore();
+  const { register, handleSubmit, reset , setValue} = useForm<IEventFormData>({
     defaultValues: eventFormData
   });
   const { mutate: editEvent } = useEditEvent(reset);
@@ -27,18 +25,19 @@ export default function FreeTicketConfiguration() {
   const eventId = Number(params.eventId)
 
   // 🟢 Traemos tickets del evento
-  const { data: ticketsData } = useQuery({
+  const { data: ticketsData } = useQuery<IEventTicket[]>({
     queryKey: ["eventTickets", eventId],
     queryFn: () => getTicketTypesById(token, eventId),
     enabled: !!token && !!eventId,
   })
   
   useEffect(() => {
-    if (ticketsData ) {
+    if (ticketsData) {
       const formattedTickets = ticketsData.map((ticket) => ({
         name: ticket.name,
         maxDate: formatDate(ticket.maxDate),
         stages: ticket.stages.map((stage) => ({
+          price: stage.price,
           date: formatDate(stage.date),
           dateMax: formatDate(stage.dateMax),
           quantity: stage.quantity,
@@ -57,7 +56,7 @@ export default function FreeTicketConfiguration() {
     }
   }, [ticketsData]);
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: IEventFormData) => {
     console.log("ticketsDATA",ticketsData)
     console.log("eventFormData",eventFormData)
     const formattedTickets = data.tickets.map((ticket) => ({

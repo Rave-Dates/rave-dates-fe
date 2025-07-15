@@ -6,20 +6,16 @@ import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
 import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { validateDateYyyyMmDd } from "@/utils/formatDate";
-import { formatGeo } from "@/utils/formatGeo";
-import { useMutation } from "@tanstack/react-query";
-import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 export default function TicketConfiguration() {
   const { eventFormData, updateEventFormData, hasLoadedEvent } = useCreateEventStore();
-  const { register, handleSubmit, watch, setValue, getValues, control, reset , formState} = useForm({
+  const { register, handleSubmit, setValue, getValues, control, reset} = useForm<IEventFormData>({
     defaultValues: eventFormData
   });
-  const { mutate: createFullEvent, isLoading } = useCreateFullEvent(reset);
+  const { mutate: createFullEvent } = useCreateFullEvent(reset);
   const router = useRouter()
 
   const { fields, append, remove } = useFieldArray({
@@ -31,7 +27,7 @@ export default function TicketConfiguration() {
   register("piggyBank");
   const watchedPiggyBank = useWatch({ name: "piggyBank", control });
 
-  watchedPiggyBank === false && setValue("commission", null)
+  watchedPiggyBank === false && setValue("commission", undefined)
 
   useEffect(() => {
     setValue("piggyBank", false);
@@ -48,7 +44,7 @@ export default function TicketConfiguration() {
     }
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: IEventFormData) => {
     console.log("data", data)
     const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
       if (rest.stages.length === 1) return { ...rest, maxDate: rest.stages[0].dateMax };
@@ -138,11 +134,12 @@ export default function TicketConfiguration() {
     const newTicket = {
       ticketId: newId,
       name: '',
+      maxDate: "",
       stages: [
         {
           stageId: 1, // stageId comienza en 1
-          date: null,
-          dateMax: null,
+          date: "",
+          dateMax: "",
           price: 0,
           quantity: 0,
         },

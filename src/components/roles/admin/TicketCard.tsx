@@ -10,7 +10,7 @@ import { useState } from "react"
 import { FieldValues, UseFormGetValues, UseFormRegister } from "react-hook-form"
 
 interface TicketCardProps {
-  ticketNumber: number,
+  ticketNumber: number | undefined,
   index: number,
   isEditing?: boolean,
   onDelete?: () => void,
@@ -61,7 +61,7 @@ export function TicketCard({
       tickets: normalizedTickets,
     });
 
-    setEditingTicketId(ticketNumber);
+    ticketNumber && setEditingTicketId(ticketNumber);
     router.push(`/admin/events/${isEditing ? `edit-event/${eventId}` : "create-event"}/ticket-config/stage-config`);
   };
 

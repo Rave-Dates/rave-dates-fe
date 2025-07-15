@@ -11,6 +11,7 @@ import GoBackButton from '@/components/ui/buttons/GoBackButton';
 import { useQuery } from '@tanstack/react-query';
 import { getClientEventById, getClientEventImagesById, getClientImageById, getEventClientTickets } from '@/services/clients-events';
 import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
+import SpinnerSvg from '@/components/svg/SpinnerSvg';
 
 const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isTicketList?: boolean }) => {
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
@@ -28,8 +29,8 @@ const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isT
     queryFn: () => getClientEventImagesById(eventId),
   });
 
-  const { data: servedImages, isLoading: isImagesLoading, isError: errorImages } = useQuery<{ id: string, url: string }[]>({
-    queryKey: [`servedImages-${eventId}`, ...(eventImages?.map(img => img.imageId) || [])],
+  const { data: servedImages, isLoading: isImagesLoading } = useQuery<{ id: string, url: string }[]>({
+    queryKey: [`servedImages-${eventId}`, eventImages?.map(img => img.imageId)],
     enabled: !!eventImages,
     queryFn: async () => {
       if (!eventImages) return [];

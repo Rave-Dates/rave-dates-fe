@@ -2,26 +2,31 @@ interface IEvent {
   eventId: number;
   title: string;
   date: string;
-  place: string;
   piggyBank: boolean;
   geo: string;
   eventCategoryValues: IEventCategoryValue[];
   description: string;
-  type: string;
+  type: 'free' | 'paid';
   feeRD: number;
   transferCost: number;
   feePB: number;
+  commission?: number;
   discountCode: string;
   discountType: string;
   discount: number;
+  maxDate: string;
   maxPurchase: number;
   timeOut: number;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  images: string[];
   labels: IEventLabel[];
-  tickets: IEventTicket[];
+}
+
+interface IEventFormData extends Partial<IEvent>, Omit<IEvent, 'labels'> {
+  labels: number[];
+  place: string;
+  images: { id: string; url: string }[];
+  oldCategories: Record<number, string>;
+  tickets: IEventTicket[]; // solo para el form
 }
 
 interface IEventImages {
@@ -51,12 +56,13 @@ interface IEventCategoryValue {
 }
 
 interface IEventTicket {
-  ticketTypeId: number;
-  eventId: number;
+  ticketId?: number; // para uso interno
+  ticketTypeId?: number;
+  eventId?: number;
   name: string;
   maxDate: string;
   stages: {
-    stageId?: string;
+    stageId?: number; // para uso interno
     date: string;
     dateMax: string;
     price: number;
@@ -64,4 +70,14 @@ interface IEventTicket {
   }[];
   count?: number;
   limit?: number;
+}
+
+interface IEventCategories {
+  categoryId: number;
+  name: string;
+  values: {
+    valueId: number;
+    categoryId: number;
+    value: string;
+  }[];
 }

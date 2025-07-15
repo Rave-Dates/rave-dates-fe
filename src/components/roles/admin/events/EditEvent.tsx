@@ -5,13 +5,13 @@ import FilterTagButton from "@/components/ui/buttons/FilterTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
-import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
+import { notifyError } from "@/components/ui/toast-notifications";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { getAllCategories } from "@/services/admin-categories";
 import { getEventById, getEventCategoriesById, getEventImages, getImageById } from "@/services/admin-events";
 import { getAllLabels } from "@/services/admin-labels";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { formatDate, validateDateYyyyMmDd } from "@/utils/formatDate";
+import { validateDateYyyyMmDd } from "@/utils/formatDate";
 import { extractLatAndLng, extractPlaceFromGeo } from "@/utils/formatGeo";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
@@ -25,8 +25,8 @@ import GeoAutocomplete from "./GeoAutocomplete";
 export default function EditEvent({ eventId }: { eventId: number }) {
   const { eventFormData, updateEventFormData, setHasLoadedEvent, setHasLoadedTickets } = useCreateEventStore();
   const router = useRouter()
-  const { register, handleSubmit, watch, setValue, getValues, control } = useForm({
-    defaultValues: defaultEventFormData
+  const { register, handleSubmit, watch, setValue, getValues, control } = useForm<IEventFormData>({
+    defaultValues: defaultEventFormData,
   });
   const { getCookie } = useReactiveCookiesNext();
 
@@ -48,31 +48,31 @@ export default function EditEvent({ eventId }: { eventId: number }) {
   
   const type = ['free', 'paid'];
   
-  const { data: eventCategories } = useQuery({
+  const { data: eventCategories } = useQuery<IEventCategoryValue[]>({
     queryKey: ["eventCategories"],
     queryFn: () => getEventCategoriesById(token, eventId),
     enabled: !!token, // solo se ejecuta si hay token
   });
 
-  const { data: categories, isLoading } = useQuery({
+  const { data: categories } = useQuery<IEventCategories[]>({
     queryKey: ["oldCategories"],
     queryFn: () => getAllCategories({ token }),
     enabled: !!token, // solo se ejecuta si hay token
   });
     
-  const { data: event } = useQuery({
+  const { data: event } = useQuery<IEvent>({
     queryKey: ["eventById"],
     queryFn: () => getEventById({ token, id: eventId }),
     enabled: !!token, // solo se ejecuta si hay token
   });
   
-  const { data: labelsTypes } = useQuery({
+  const { data: labelsTypes } = useQuery<IEventLabel[]>({
     queryKey: ["labelsTypes"],
     queryFn: () => getAllLabels({ token }),
     enabled: !!token, // solo se ejecuta si hay token
   });
   
-  const { data: eventImages, isError: isErrorEventImages } = useQuery({
+  const { data: eventImages, isError: isErrorEventImages } = useQuery<IEventImages[]>({
     queryKey: ["eventImages", eventId],
     queryFn: () => getEventImages({ token, eventId }),
     enabled: !!token && !!eventId,
@@ -102,27 +102,26 @@ export default function EditEvent({ eventId }: { eventId: number }) {
   useEffect(() => {
     if (event) {
       // Labels como array de IDs
-      const labelIds = event.labels.map((label) => label.labelId);
+      const labelIds = event?.labels?.map((label) => label.labelId);
       
       // Seteamos todo al formulario
       setValue("title", event.title);
       setValue("discount", event.discount);
       setValue("discountCode", event.discountCode);
       setValue("feeRD", event.feeRD);
-      setValue("date", event.date);
+      setValue("date", (new Date(event.date)).toDateString());
       setValue("maxPurchase", event.maxPurchase);
       setValue("geo", extractLatAndLng(event.geo));
       setValue("place", extractPlaceFromGeo(event.geo));
       setValue("description", event.description);
       setValue("type", event.type);
-      setValue("labels", labelIds);
       setValue("isActive", event.isActive);
       setValue("timeOut", event.timeOut);
+      labelIds && setValue("labels", labelIds);
       
       // Guardamos en zustand 
       updateEventFormData({
         ...event,
-        labels: labelIds,
       });
       setHasLoadedEvent(true);
       setHasLoadedTickets(false);
@@ -173,14 +172,14 @@ useEffect(() => {
     }
     
     const parsedCategories = Object.values(data.oldCategories).map((cat) => JSON.parse(cat));
-    const formattedOldCategories = eventCategories.map((category) => ({
+    const formattedOldCategories = eventCategories?.map((category) => ({
       categoryId: category.categoryId,
       valueId: category.valueId,
     }));
 
     const categoriesToUpdate = parsedCategories
       .map((newCat) => {
-        const oldCat = formattedOldCategories.find((old) => old.categoryId === newCat.categoryId);
+        const oldCat = formattedOldCategories?.find((old) => old.categoryId === newCat.categoryId);
         if (!oldCat || oldCat.valueId === newCat.valueId) return null;
         return {
           categoryId: newCat.categoryId,
@@ -196,7 +195,7 @@ useEffect(() => {
       ...eventFormData,
       isActive: watchedIsActive,
       geo: formattedGeo,
-      categoriesToUpdate,
+      ...categoriesToUpdate,
     })
 
     router.push(
@@ -206,7 +205,7 @@ useEffect(() => {
     )
   };
 
-  const onInvalid = (errors) => {
+  const onInvalid = (errors: any) => {
     const findFirstError = (obj) => {
       for (const key in obj) {
         if (typeof obj[key] === "object") {
