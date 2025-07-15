@@ -4,16 +4,21 @@ type TicketStage = {
   ticketTypeId: string;
   stageId: string;
   price: number;
+  quantity: number;
 };
 
 type TicketStore = {
+  eventId: number;
   selected: Record<string, { quantity: number; stage: TicketStage }>;
+  setEventId: (eventId: number) => void;
   add: (ticket: TicketStage) => void;
   subtract: (ticketTypeId: string) => void;
 };
 
 export const useTicketStore = create<TicketStore>((set, get) => ({
   selected: {},
+  eventId: 0,
+  setEventId: (eventId) => set({ eventId }),
   add: (stage) => {
     const current = get().selected[stage.ticketTypeId];
     const quantity = current ? current.quantity : 0;

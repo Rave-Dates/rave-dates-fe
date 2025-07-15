@@ -1,8 +1,3 @@
-export function formatGeo(geoString: string, place: string): string {
-  const [lat, lng] = geoString.split(",").map((part) => part.trim());
-  return `${lat};${lng};${place.trim()}`;
-}
-
 export function extractPlaceFromGeo(geoString: string): string {
   const parts = geoString.split(";").map(part => part.trim());
   return parts.length === 3 ? parts[2] : "";
