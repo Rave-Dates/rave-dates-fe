@@ -13,24 +13,26 @@ import { getClientEventById, getClientEventImagesById, getClientImageById, getEv
 import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
 
 const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isTicketList?: boolean }) => {
-  const { data: selectedEvent, isLoading: isEventLoading } = useQuery({
+  const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
     queryKey: [`selectedEvent-${eventId}`],
     queryFn: () => getClientEventById(eventId),
   });
   
-  const { data: eventTickets, isLoading: isTicketsLoading } = useQuery({
+  const { data: eventTickets, isLoading: isTicketsLoading } = useQuery<IEventTicket[]>({
     queryKey: ["eventTickets"],
     queryFn: () => getEventClientTickets(eventId),
   });
 
-  const { data: eventImages } = useQuery({
+  const { data: eventImages } = useQuery<IEventImages[]>({
     queryKey: [`eventImages-${eventId}`],
     queryFn: () => getClientEventImagesById(eventId),
   });
 
-  const { data: servedImages, isLoading: isImagesLoading, isError: errorImages } = useQuery({
-    queryKey: [`servedImages-${eventId}`, eventImages?.map(img => img.imageId)],
+  const { data: servedImages, isLoading: isImagesLoading, isError: errorImages } = useQuery<{ id: string, url: string }[]>({
+    queryKey: [`servedImages-${eventId}`, ...(eventImages?.map(img => img.imageId) || [])],
+    enabled: !!eventImages,
     queryFn: async () => {
+      if (!eventImages) return [];
       const processedImages = await Promise.all(
         eventImages?.map(async (img) => {
           const blob = await getClientImageById(img.imageId);
@@ -69,7 +71,7 @@ const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isT
           <div className="space-y-8">
             <EventHero isImagesLoading={isImagesLoading} eventImages={servedImages} />
             <EventInfo
-              description={selectedEvent?.description}
+              description={selectedEvent?.description || ""}
               isLoading={isEventLoading}
               labels={selectedEvent?.labels}
               eventCategoryValues={selectedEvent?.eventCategoryValues}
@@ -78,7 +80,9 @@ const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isT
           
           {/* Right Column */}
           <div className="space-y-8">
-            <EventLocation isLoading={isEventLoading} event={selectedEvent} />
+            {
+              selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
+            }
             <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} isTicketList={isTicketList} />
           </div>
         </div>
@@ -107,18 +111,20 @@ const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isT
               !isTicketList && <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} isTicketList={isTicketList} />
             }
 
-            <EventLocation isLoading={isEventLoading} event={selectedEvent} />
-
-            {selectedEvent?.eventCategoryValues?.length > 0 && (
+            {
+              selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
+            }
+            
+            {selectedEvent && selectedEvent.eventCategoryValues.length > 0 && (
               <EventInfo
-                description={selectedEvent?.description}
+                description={selectedEvent?.description || ""}
                 isLoading={isEventLoading}
                 labels={selectedEvent?.labels}
                 eventCategoryValues={selectedEvent?.eventCategoryValues}
               />
             )}            
             {
-              isTicketList && <TicketSelector isLoading={isTicketsLoading} ticketStatus={selectedEvent?.status} isTicketList={isTicketList} />
+              isTicketList && <TicketSelector isLoading={isTicketsLoading} ticketStatus="paid" isTicketList={isTicketList} />
             }
           </div>
         </div>

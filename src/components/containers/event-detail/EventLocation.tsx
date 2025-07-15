@@ -3,7 +3,10 @@ import Image from 'next/image';
 import React from 'react';
 import EventMap from './EventMap';
 
-const EventLocation = ({ event, isLoading } : { event: IEventCard, isLoading: boolean }) => {
+const EventLocation = ({ event, isLoading } : { event: IEvent, isLoading: boolean }) => {
+  const geoParts = extractLatAndLng(event.geo).split(",").map(Number);
+  const position = geoParts.length === 2 ? geoParts as [number, number] : undefined;
+
   return (
     <div className="space-y-6 mb-5">
       {/* Date */}
@@ -45,8 +48,8 @@ const EventLocation = ({ event, isLoading } : { event: IEventCard, isLoading: bo
             :
             <>
               {
-                event?.geo &&
-                <EventMap place={extractPlaceFromGeo(event?.geo)} position={extractLatAndLng(event?.geo).split(",").map(Number)} />
+                position &&
+                <EventMap place={extractPlaceFromGeo(event?.geo)} position={position} />
               }
             </>
         }

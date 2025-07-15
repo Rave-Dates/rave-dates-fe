@@ -31,8 +31,8 @@ export const getEventClientTickets = async (id: number) => {
   return res.data;
 };
 
-export const getClientEventImagesById = async (id: number) => {
-  const res = await axios.get(`${BASE_URL}/app/images/findByEventId/${id}`, {
+export const getClientEventImagesById = async (eventId: number): Promise<IEventImages[]> => {
+  const res = await axios.get(`${BASE_URL}/app/images/findByEventId/${eventId}`, {
     headers: {
       "Accept": "application/json",
     },

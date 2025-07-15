@@ -9,7 +9,7 @@ import { getAllClientEvents } from '@/services/clients-events';
 import EventCardSkeleton from '@/utils/skeletons/event-skeletons/EventCardSkeleton';
 
 const EventCardList: React.FC = () => {
-  const { data: clientEvents, isLoading, isError } = useQuery({
+  const { data: clientEvents, isLoading, isError } = useQuery<IEvent[]>({
     queryKey: ["clientEvents"],
     queryFn: () => getAllClientEvents(1, 10),
   });
@@ -31,17 +31,27 @@ const EventCardList: React.FC = () => {
         <Link className='bg-primary py-1 px-2 rounded-xl' href="/otp">/otp</Link>
       </div> */}
       <div className="space-y-4 animate-fade-in">
+
         {
-          isLoading ?
-            Array.from({ length: 3 }).map((_, i) => (
-              <EventCardSkeleton key={i} />
-            ))
-            :
-            clientEvents.map((event) => (
-              <div key={event.eventId} className="flex justify-center">
-                <EventCard {...event} />
-              </div>
-            ))
+          !isError ?
+          <>
+            {
+              isLoading ?
+                Array.from({ length: 3 }).map((_, i) => (
+                  <EventCardSkeleton key={i} />
+                ))
+                :
+                clientEvents?.map((event) => (
+                  <div key={event.eventId} className="flex justify-center">
+                    <EventCard {...event} />
+                  </div>
+                ))
+            }
+          </>
+          :
+          <div className="text-center h-screen py-8 text-system-error">
+            Error cargando eventos
+          </div>
         }
       </div>
     </div>

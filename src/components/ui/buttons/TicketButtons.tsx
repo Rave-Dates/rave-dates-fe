@@ -4,7 +4,7 @@ import SubtractSvg from "@/components/svg/SubtractSvg";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useParams } from "next/navigation";
 
-const TicketButtons = ({ ticket }: { ticket: any }) => {
+const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {
   const { add, subtract, selected, setEventId } = useTicketStore();
   const params = useParams();
   const eventId = Number(params.eventId);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import ImagesSwiper from './ImagesSwiper';
 import Link from 'next/link';
 import CalendarSvg from '@/components/svg/CalendarSvg';
@@ -10,23 +10,22 @@ import { useQuery } from '@tanstack/react-query';
 import { getClientEventImagesById, getClientImageById } from '@/services/clients-events';
 import SpinnerSvg from '@/components/svg/SpinnerSvg';
 
-const EventCard: React.FC<IEventCard & { href?: string, text?: string, isTicketList?: boolean}> = ({
+const EventCard: React.FC<IEvent & { href?: string, text?: string, isTicketList?: boolean}> = ({
   href = "/event/",
   text = "Comprar tickets",
   eventId,
   isTicketList = false,
-  status,
   title,
   date,
   geo,
   piggyBank
 }) => {
-  const { data: eventImages } = useQuery({
+  const { data: eventImages } = useQuery<IEventImages[]>({
     queryKey: [`eventImages-${eventId}`],
     queryFn: () => getClientEventImagesById(eventId),
   });
 
-  const { data: servedImages, isLoading: loadingImages, isError: errorImages } = useQuery({
+  const { data: servedImages, isLoading: loadingImages } = useQuery({
     queryKey: [`servedImages-${eventId}`, eventImages?.map(img => img.imageId)],
     queryFn: async () => {
       if (!eventImages) return [];
@@ -74,7 +73,7 @@ const EventCard: React.FC<IEventCard & { href?: string, text?: string, isTicketL
             {extractPlaceFromGeo(geo) || geo}
           </div>
           
-          {
+          {/* {
             status === "pending" && isTicketList ?
               <div className="flex items-center text-system-error gap-2">
                 <DollarSvg className='w-6 h-6' />
@@ -92,7 +91,7 @@ const EventCard: React.FC<IEventCard & { href?: string, text?: string, isTicketL
                   Pago con alcancía no disponible
                 </div>
               )
-          }
+          } */}
 
         </div>
 

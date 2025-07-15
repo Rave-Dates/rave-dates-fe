@@ -6,7 +6,7 @@ import TicketsSkeleton from '@/utils/skeletons/event-skeletons/TicketsSkeleton';
 import { useTicketStore } from '@/store/useTicketStore';
 import { useReactiveCookiesNext } from 'cookies-next';
 
-const TicketSelector = ({isTicketList = false, ticketStatus, tickets, isLoading} : { isTicketList?: boolean, ticketStatus?: "paid" | "pending", tickets?: any, isLoading: boolean }) => {
+const TicketSelector = ({isTicketList = false, ticketStatus, tickets, isLoading} : { isTicketList?: boolean, ticketStatus?: "paid" | "pending", tickets?: IEventTicket[], isLoading: boolean }) => {
   const { selected } = useTicketStore();
   const { getCookie } = useReactiveCookiesNext();
   const clientData = getCookie("clientData");

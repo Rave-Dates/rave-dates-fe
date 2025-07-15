@@ -21,7 +21,7 @@ export default function Page() {
 
   const token = getCookie("token");
   
-  const { data: events, isLoading, isError } = useQuery({
+  const { data: events, isLoading, isError } = useQuery<IEvent[]>({
     queryKey: ["events"],
     queryFn: () => getAllEvents({ token }),
     enabled: !!token, // solo se ejecuta si hay token
@@ -76,7 +76,7 @@ export default function Page() {
           </div>
         </div>
 
-          {!events && (
+          {!events &&!isError && (
             Array.from(Array(6).keys()).map((user) => (
             <div
               key={user}
@@ -95,13 +95,13 @@ export default function Page() {
 
           {!isLoading && Array.isArray(events) && events?.length === 0 &&  (
             <div className="text-center py-8 text-text-inactive">
-              No se encontraron usuarios
+              No se encontraron eventos
             </div>
           )}
 
           {isError &&  (
             <div className="text-center text-sm py-8 text-system-error">
-              Error cargando usuarios
+              Error cargando eventos
             </div>
           )}
         </div>

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 type TicketStage = {
-  ticketTypeId: string;
+  ticketTypeId: number;
   stageId: string;
   price: number;
   quantity: number;
@@ -12,7 +12,7 @@ type TicketStore = {
   selected: Record<string, { quantity: number; stage: TicketStage }>;
   setEventId: (eventId: number) => void;
   add: (ticket: TicketStage) => void;
-  subtract: (ticketTypeId: string) => void;
+  subtract: (ticketTypeId: number) => void;
 };
 
 export const useTicketStore = create<TicketStore>((set, get) => ({

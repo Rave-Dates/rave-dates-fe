@@ -2,7 +2,7 @@ import InfoSkeleton from '@/utils/skeletons/event-skeletons/InfoSkeleton';
 import React, { useMemo } from 'react';
 
 
-const EventInfo= ({ labels, eventCategoryValues, isLoading, description } : { labels?: any, eventCategoryValues?: any, isLoading?: boolean, description: string }) => {
+const EventInfo= ({ labels, eventCategoryValues, isLoading, description } : { labels?: IEventLabel[], eventCategoryValues?: IEventCategoryValue[], isLoading?: boolean, description: string }) => {
   const categories = useMemo(() => {
     if (!eventCategoryValues || !Array.isArray(eventCategoryValues)) return [];
 

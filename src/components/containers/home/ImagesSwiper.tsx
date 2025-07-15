@@ -10,7 +10,8 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import ArrowSvg from '@/components/svg/ArrowSvg';
 
-export default function ImagesSwiper({ images, className }: { images: any, className: string }) {
+export default function ImagesSwiper({ images, className }: { images: { id: string, url: string }[] | undefined, className?: string }) {
+  if (!images) return
   const prevRef = useRef(null);
   const nextRef = useRef(null);
 

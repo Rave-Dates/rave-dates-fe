@@ -2,7 +2,7 @@ import React from 'react';
 import ImagesSwiper from '@/components/containers/home/ImagesSwiper';
 import SpinnerSvg from '@/components/svg/SpinnerSvg';
 
-const EventHero = ({ eventImages, isImagesLoading } : { eventImages: IEventCard['images'], isImagesLoading: boolean }) => {
+const EventHero = ({ eventImages, isImagesLoading } : { eventImages: { id: string, url: string }[] | undefined, isImagesLoading: boolean }) => {
   
   return (
     <div className="relative !mb-4">
