@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import AddSvg from "@/components/svg/AddSvg";
 import SubtractSvg from "@/components/svg/SubtractSvg";
 import { useTicketStore } from "@/store/useTicketStore";
+import { useParams } from "next/navigation";
 
 const TicketButtons = ({ ticket }: { ticket: any }) => {
-  const { add, subtract, selected } = useTicketStore();
+  const { add, subtract, selected, setEventId } = useTicketStore();
+  const params = useParams();
+  const eventId = Number(params.eventId);
+
+  useEffect(() => {
+    if (eventId) {
+      setEventId(eventId);
+    }
+  }, [eventId]);
+
   const validStage = ticket.stages.find((stage) => {
     const now = Date.now();
     return new Date(stage.dateMax).getTime() > now && stage.quantity > 0;

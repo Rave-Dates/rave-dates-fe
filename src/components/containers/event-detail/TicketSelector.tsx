@@ -4,9 +4,12 @@ import React from 'react';
 import TicketsChanger from '../tickets/TicketsChanger';
 import TicketsSkeleton from '@/utils/skeletons/event-skeletons/TicketsSkeleton';
 import { useTicketStore } from '@/store/useTicketStore';
+import { useReactiveCookiesNext } from 'cookies-next';
 
 const TicketSelector = ({isTicketList = false, ticketStatus, tickets, isLoading} : { isTicketList?: boolean, ticketStatus?: "paid" | "pending", tickets?: any, isLoading: boolean }) => {
   const { selected } = useTicketStore();
+  const { getCookie } = useReactiveCookiesNext();
+  const clientData = getCookie("clientData");
 
   const totalQuantity = Object.values(selected).reduce((acc, curr) => acc + curr.quantity, 0);
   const totalPrice = Object.values(selected).reduce(
@@ -49,7 +52,7 @@ const TicketSelector = ({isTicketList = false, ticketStatus, tickets, isLoading}
         <Link
           tabIndex={totalQuantity === 0 ? -1 : undefined}
           aria-disabled={totalQuantity === 0}
-          href="/personal-data"
+          href={clientData ? "/checkout" : "/personal-data"}
           className={`w-full md:w-1/2 text-center py-3 rounded-lg transition-colors ${
             totalQuantity > 0
               ? 'bg-primary hover:bg-primary/70 text-black'
