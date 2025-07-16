@@ -6,7 +6,7 @@ import { notifyError, notifySuccess } from "@/components/ui/toast-notifications"
 import { useCreateEventStore } from "@/store/createEventStore";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useFieldArray, useForm, UseFormRegister } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 
 export default function StageConfig() {
  const { eventFormData, updateEventFormData, editingTicketId, hasLoadedEvent } = useCreateEventStore();

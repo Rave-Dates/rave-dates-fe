@@ -2,8 +2,6 @@
 
 import React, { useEffect } from 'react';
 import EventCard from './EventCard';
-import { events } from '@/template-data';
-import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { getAllClientEvents } from '@/services/clients-events';
 import EventCardSkeleton from '@/utils/skeletons/event-skeletons/EventCardSkeleton';

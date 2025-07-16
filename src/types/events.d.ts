@@ -22,18 +22,27 @@ interface IEvent {
 }
 
 interface IEventFormData extends Partial<IEvent>, Omit<IEvent, 'labels'> {
+  categories?: [];
   editPlace?: string;
-  categoriesToUpdate?: IEventCategoryValue[];
+  categoriesToUpdate?: ({ categoryId: number; oldCategoryValueId: number; newCategoryValueId: number } | null)[];
   labels: number[];
   place?: string;
-  images: { id: string; url: string, file?: File }[];
-  oldCategories?: Record<number, string>;
+  images: IImageData[];
+  oldCategories?: {
+    [key: string]: string; // o más estrictamente: Record<number, string>
+  };
   tickets: IEventTicket[]; // solo para el form
 }
 
 interface IEventImages {
   eventId: number;
   imageId: number;
+}
+
+interface IImageData {
+  id: string;
+  url: string;
+  file?: File;
 }
 
 interface IEventLabel {

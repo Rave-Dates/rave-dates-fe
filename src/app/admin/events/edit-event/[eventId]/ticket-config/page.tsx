@@ -4,27 +4,26 @@ import { TicketCard } from "@/components/roles/admin/TicketCard"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import FormInput from "@/components/ui/inputs/FormInput"
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications"
-import { useCreateFullEvent } from "@/hooks/useCreateEventFull"
 import { useEditEvent } from "@/hooks/useEditEvent"
 import { getTicketTypesById } from "@/services/admin-events"
 import { useCreateEventStore } from "@/store/createEventStore"
-import { formatDate, formatToISO, validateDateYyyyMmDd } from "@/utils/formatDate"
-import { extractPlaceFromGeo } from "@/utils/formatGeo"
+import { formatDate, formatToISO } from "@/utils/formatDate"
+import { onInvalid } from "@/utils/onInvalidFunc"
 import { useQuery } from "@tanstack/react-query"
 import { useReactiveCookiesNext } from "cookies-next"
 import { useParams, useRouter } from "next/navigation"
-import { useEffect, useRef } from "react"
-import { FieldErrors, useFieldArray, useForm } from "react-hook-form"
+import { useEffect } from "react"
+import { useFieldArray, useForm } from "react-hook-form"
 
 export default function EditTicketConfiguration() {
   const { eventFormData, updateEventFormData, hasLoadedTickets, setHasLoadedTickets, hasLoadedEvent } = useCreateEventStore()
-  const { register, handleSubmit, watch, setValue, getValues, control, reset, formState } = useForm<IEventFormData>({
+  const { register, handleSubmit, watch, setValue, getValues, control, reset } = useForm<IEventFormData>({
     defaultValues: eventFormData,
   })
   const route = useRouter()
   const { mutate: editEvent } = useEditEvent(reset)
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, remove } = useFieldArray({
     control,
     name: "tickets",
   })
@@ -131,7 +130,7 @@ export default function EditTicketConfiguration() {
       new Promise((resolve, reject) => {
         editEvent(cleanedEventData, {
           onSuccess: () => {
-            resolve("ok");
+            resolve();
             route.push("/admin/events");
           },
           onError: (err) => {
@@ -149,28 +148,6 @@ export default function EditTicketConfiguration() {
     );
   }
   
-  const onInvalid = (errors: FieldErrors<IEventFormData>) => {
-    const findFirstError = (obj: any): string | null => {
-      for (const key in obj) {
-        if (typeof obj[key] === "object") {
-          const child = findFirstError(obj[key]);
-          if (child) return child;
-        } else if (key === "message") {
-          return obj[key];
-        }
-      }
-      return null;
-    };
-
-    const firstErrorMessage = findFirstError(errors);
-
-    if (firstErrorMessage) {
-      notifyError(firstErrorMessage);
-    } else {
-      notifyError("Por favor completá todos los campos requeridos.");
-    }
-  };
-
   // const handleAddTicket = () => {
   //   const formTickets = getValues("tickets") || [];
 

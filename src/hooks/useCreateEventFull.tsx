@@ -1,11 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createEvent, createEventCategories, createImage, createTicketTypes } from "../services/admin-events";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
-import { notifySuccess } from "@/components/ui/toast-notifications";
 
 export function useCreateFullEvent(reset: () => void) {
   const { updateEventFormData, setHasLoadedTickets } = useCreateEventStore();
@@ -49,11 +47,9 @@ export function useCreateFullEvent(reset: () => void) {
       // // 3. Subir imágenes
       console.log("iamges",images)
       await Promise.all(
-        images.map((file) => {
-          console.log("file",file)
-          if (!file.file) return;
-          createImage(token, { eventId, file: file.file })
-        })
+        images
+          .filter((img): img is { id: string; url: string; file: File } => 'file' in img && !!img.file)
+          .map((img) => createImage(token, { eventId, file: img.file }))
       );
       
       updateEventFormData(defaultEventFormData); // reset Zustand

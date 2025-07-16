@@ -33,7 +33,7 @@ export function TicketCard({
 
   const onEditStages = () => {
     const formValues = getValues(); // obtiene todos los datos del formulario
-    const formTickets = formValues.tickets as any[];
+    const formTickets = formValues.tickets;
     const eventId = Number(params.eventId)
 
     const normalizedTickets = formTickets.map((ticket) => ({
@@ -44,8 +44,8 @@ export function TicketCard({
         : [
             {
               stageId: 1,
-              date: null,
-              dateMax: null,
+              date: "",
+              dateMax: "",
               price: ticket.stages?.[0]?.price ?? 0,
               quantity: ticket.stages?.[0]?.quantity ?? 0,
             },
@@ -60,7 +60,9 @@ export function TicketCard({
       tickets: normalizedTickets,
     });
 
-    ticketNumber && setEditingTicketId(ticketNumber);
+    if (ticketNumber) {
+      setEditingTicketId(ticketNumber);
+    }
     router.push(`/admin/events/${isEditing ? `edit-event/${eventId}` : "create-event"}/ticket-config/stage-config`);
   };
 

@@ -5,13 +5,10 @@ import EventHero from './EventHero';
 import EventInfo from './EventInfo';
 import EventLocation from './EventLocation';
 import TicketSelector from './TicketSelector';
-import { events } from '@/template-data';
-import { redirect } from 'next/navigation';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
 import { useQuery } from '@tanstack/react-query';
 import { getClientEventById, getClientEventImagesById, getClientImageById, getEventClientTickets } from '@/services/clients-events';
 import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
-import SpinnerSvg from '@/components/svg/SpinnerSvg';
 
 const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isTicketList?: boolean }) => {
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({

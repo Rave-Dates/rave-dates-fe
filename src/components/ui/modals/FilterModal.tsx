@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import FilterSvg from '@/components/svg/FilterSvg';
 import CheckFilterInput from '@/components/ui/inputs/CheckFilterInput';
-import FilterTagButton from '@/components/ui/buttons/FilterTagButton';
+// import FilterTagButton from '@/components/ui/buttons/FilterTagButton';
 import AddSvg from '@/components/svg/AddSvg';
 
 export interface FilterState {
@@ -35,8 +35,8 @@ function FilterModal() {
 
   const locations = ['Bogotá', 'Medellín'];
   const eventTypes = ['Rave', 'Club'];
-  const organizers = ['Organizador 1', 'Organizador 2', 'Organizador 3', 'Organizador 4', 'Organizador 5'];
-  const genres = ['Hard Techno', 'Melodic Techno', 'Drum & Bass', 'Raw Techno', 'Hardcore'];
+  // const organizers = ['Organizador 1', 'Organizador 2', 'Organizador 3', 'Organizador 4', 'Organizador 5'];
+  // const genres = ['Hard Techno', 'Melodic Techno', 'Drum & Bass', 'Raw Techno', 'Hardcore'];
 
   const handleLocationChange = (location: string) => {
     setFilters(prev => ({ ...prev, location }));
@@ -46,23 +46,23 @@ function FilterModal() {
     setFilters(prev => ({ ...prev, eventType }));
   };
 
-  const handleOrganizerToggle = (organizer: string) => {
-    setFilters(prev => ({
-      ...prev,
-      organizers: prev.organizers.includes(organizer)
-        ? prev.organizers.filter(o => o !== organizer)
-        : [...prev.organizers, organizer]
-    }));
-  };
+  // const handleOrganizerToggle = (organizer: string) => {
+  //   setFilters(prev => ({
+  //     ...prev,
+  //     organizers: prev.organizers.includes(organizer)
+  //       ? prev.organizers.filter(o => o !== organizer)
+  //       : [...prev.organizers, organizer]
+  //   }));
+  // };
 
-  const handleGenreToggle = (genre: string) => {
-    setFilters(prev => ({
-      ...prev,
-      genres: prev.genres.includes(genre)
-        ? prev.genres.filter(g => g !== genre)
-        : [...prev.genres, genre]
-    }));
-  };
+  // const handleGenreToggle = (genre: string) => {
+  //   setFilters(prev => ({
+  //     ...prev,
+  //     genres: prev.genres.includes(genre)
+  //       ? prev.genres.filter(g => g !== genre)
+  //       : [...prev.genres, genre]
+  //   }));
+  // };
 
   const clearFilters = () => {
     setFilters({
@@ -122,22 +122,22 @@ function FilterModal() {
                 />
 
                 {/* Organizer Filter */}
-                <FilterTagButton
+                {/* <FilterTagButton
                   items={organizers}
                   type="organizers"
                   handleFunc={handleOrganizerToggle}
                   filters={filters}
                   title="Organizador"
-                />
+                /> */}
 
                 {/* Genre Filter */}
-                <FilterTagButton
+                {/* <FilterTagButton
                   items={genres}
                   type="genres"
                   handleFunc={handleGenreToggle}
                   filters={filters}
                   title="Género"
-                />
+                /> */}
               </div>
             </div>
 

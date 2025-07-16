@@ -5,12 +5,12 @@ import FilterTagButton from "@/components/ui/buttons/FilterTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
-import { notifyError } from "@/components/ui/toast-notifications";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { getAllCategories } from "@/services/admin-categories";
 import { getAllLabels } from "@/services/admin-labels";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { validateDateYyyyMmDd } from "@/utils/formatDate";
+import { onInvalid } from "@/utils/onInvalidFunc";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import dynamic from "next/dynamic";
@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
 
-import { FieldErrors, useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/GeoAutocomplete"), { ssr: false });
 
@@ -26,7 +26,7 @@ const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/Ge
 export default function Page() {
   const { eventFormData, updateEventFormData, setHasLoadedEvent } = useCreateEventStore();
   const router = useRouter()
-  const { register, handleSubmit, watch, setValue, getValues, control } = useForm<IEventFormData>({
+  const { register, handleSubmit, watch, setValue, control } = useForm<IEventFormData>({
     defaultValues: defaultEventFormData
   });
   const { getCookie } = useReactiveCookiesNext();
@@ -57,8 +57,6 @@ export default function Page() {
     enabled: !!token, // solo se ejecuta si hay token
   });
 
-
-
   useEffect(() => {
     register("geo", {
       required: "Debes seleccionar una ubicación válida",
@@ -72,8 +70,6 @@ export default function Page() {
     register("editPlace");
   }, [register]);
 
-
-
   useEffect(() => {
     if (!eventFormData) return;
 
@@ -86,12 +82,13 @@ export default function Page() {
     setValue("type", eventFormData.type);
 
     // Aseguramos que si vienen labels e imágenes, se setean correctamente
-    setValue(
-      "labels",
-      (eventFormData.labels ?? [])
-        .filter((label: any) => label?.labelId !== undefined)
-        .map((label: any) => label.labelId)
-    );    
+    // setValue(
+    //   "labels",
+    //   (eventFormData.labels ?? [])
+    //     .filter((label) => label?.labelId !== undefined)
+    //     .map((label) => label.labelId)
+    // );    
+
     setValue("images", eventFormData.images ?? []);
   }, [eventFormData, setValue]);
   
@@ -102,12 +99,13 @@ export default function Page() {
   const watchedImages = useWatch({ name: "images", control });
 
   // creamos el evento 
-  const onSubmit = (data: any) => {
-    const parsedCategories = data.categories.map((category: any) => JSON.parse(category))
+  const onSubmit = (data: IEventFormData) => {
+    const parsedCategories = data.categories?.map((category: string) => JSON.parse(category))
     
     const formattedData = {
       ...data,
-      eventCategoryValues: parsedCategories.map((category: any) => ({
+      eventCategoryValues: parsedCategories?.map((category: IEventCategoryValue) => ({
+        ...category,
         valueId: category.valueId,
         categoryId: category.categoryId,
         value: category.value,
@@ -129,15 +127,6 @@ export default function Page() {
       "/admin/events/create-event/free-ticket-config" 
       : "/admin/events/create-event/ticket-config"
     )
-  };
-
-  const onInvalid = (errors: FieldErrors<IEventFormData>) => {
-    const firstError = Object.values(errors)[0];
-    if (firstError?.message) {
-      notifyError(firstError.message);
-    } else {
-      notifyError("Por favor completá todos los campos requeridos.");
-    }
   };
 
   return (
@@ -179,7 +168,7 @@ export default function Page() {
             <FormDropDown
               key={category.categoryId}
               title={category.name}
-              register={register(`categories.${category.categoryId}` as any, { required: true })}
+              register={register(`categories.${category.categoryId}` as "categories", { required: true })}
             >
               {
                 category.values.map((value) => (

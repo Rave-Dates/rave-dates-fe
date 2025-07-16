@@ -5,7 +5,11 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Fix para que el ícono de marcador funcione bien en Next.js
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+type IconWithOptionalPrivateUrl = {
+  _getIconUrl?: () => void;
+};
+
+delete (L.Icon.Default.prototype as IconWithOptionalPrivateUrl)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: '/markers/marker.png',
   iconSize: [40, 40],

@@ -1,14 +1,12 @@
 "use client"
 
 import { StageCard } from "@/components/roles/admin/StageCard";
-import CheckSvg from "@/components/svg/CheckSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import { notifySuccess } from "@/components/ui/toast-notifications";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 export default function StageConfig() {
  const { eventFormData, updateEventFormData, editingTicketId } = useCreateEventStore();

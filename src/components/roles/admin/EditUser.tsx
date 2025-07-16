@@ -65,7 +65,7 @@ const EditUser = ({ userId } : { userId: number }) => {
       notifySuccess('Usuario editado correctamente');
       router.back();
     },
-    onError: (error: any) => {
+    onError: (error) => {
       console.log(error)
       // setLoginError("Credenciales incorrectas.");
       notifyError("Credenciales incorrectas.");

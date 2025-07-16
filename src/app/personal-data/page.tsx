@@ -6,6 +6,7 @@ import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { createClient } from "@/services/clients-login";
 import { useTicketStore } from "@/store/useTicketStore";
+import { onInvalid } from "@/utils/onInvalidFunc";
 import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
@@ -67,7 +68,7 @@ export default function DataForm() {
       notifySuccess("Logueado correctamente");
       router.push('/checkout');
     },
-    onError: (error: any) => {
+    onError: (error: { response: { data: { message: string } } }) => {
       if (error.response.data.message === "Client already exists") {
         notifyError("El cliente ya existe.");
       } else {
@@ -83,15 +84,6 @@ export default function DataForm() {
       idCard: data.idCard,
       whatsapp: data.whatsapp,
     });
-  };
-
-  const onInvalid = (errors) => {
-    const firstError = Object.values(errors)[0];
-    if (firstError?.message) {
-      notifyError(firstError.message);
-    } else {
-      notifyError("Por favor completá todos los campos requeridos.");
-    }
   };
 
   return (
@@ -125,7 +117,8 @@ export default function DataForm() {
       </p>
 
        <CheckFormInput
-        register={register}
+        name="receiveInfo"
+        register={register("receiveInfo")}
         value={receiveInfo}
       />
 

@@ -3,8 +3,6 @@ import ImagesSwiper from './ImagesSwiper';
 import Link from 'next/link';
 import CalendarSvg from '@/components/svg/CalendarSvg';
 import LocationSvg from '@/components/svg/LocationSvg';
-import BankSvg from '@/components/svg/BankSvg';
-import DollarSvg from '@/components/svg/DollarSvg';
 import { extractPlaceFromGeo } from '@/utils/formatGeo';
 import { useQuery } from '@tanstack/react-query';
 import { getClientEventImagesById, getClientImageById } from '@/services/clients-events';
@@ -14,15 +12,15 @@ const EventCard: React.FC<IEvent & { href?: string, text?: string, isTicketList?
   href = "/event/",
   text = "Comprar tickets",
   eventId,
-  isTicketList = false,
+  // isTicketList = false,
   title,
   date,
   geo,
-  piggyBank
+  // piggyBank
 }) => {
   const { data: eventImages } = useQuery<IEventImages[]>({
     queryKey: [`eventImages-${eventId}`],
-    queryFn: () => getClientEventImagesById(eventId),
+    queryFn: () => getClientEventImagesById(Number(eventId)),
   });
 
   const { data: servedImages, isLoading: loadingImages } = useQuery({

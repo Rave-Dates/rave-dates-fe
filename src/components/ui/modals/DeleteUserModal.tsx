@@ -28,7 +28,7 @@ function DeleteUserModal({ userId } : { userId: IUser["userId"] }) {
       setIsModalOpen(false);
       redirect('/admin/users');
     },
-    onError: (error: any) => {
+    onError: (error) => {
       console.log(error)
       // setLoginError("Credenciales incorrectas.");
       notifyError("Error al eliminar usuario.");
