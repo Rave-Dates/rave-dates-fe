@@ -21,17 +21,20 @@ interface IEvent {
   labels: IEventLabel[];
 }
 
-interface IEventFormData extends Partial<IEvent>, Omit<IEvent, 'labels'> {
+interface IEventFormData extends Partial<IEvent> {
   categories?: [];
   editPlace?: string;
   categoriesToUpdate?: ({ categoryId: number; oldCategoryValueId: number; newCategoryValueId: number } | null)[];
-  labels: number[];
   place?: string;
   images: IImageData[];
   oldCategories?: {
     [key: string]: string; // o más estrictamente: Record<number, string>
   };
   tickets: IEventTicket[]; // solo para el form
+}
+
+interface IEventForUpdate extends Partial<IEventFormData>, Omit<IEventFormData, 'labels'> {
+  labels: number[];
 }
 
 interface IEventImages {
@@ -47,7 +50,7 @@ interface IImageData {
 
 interface IEventLabel {
   labelId: number;
-  name: string;
+  name?: string;
   icon?: string | null
 }
 

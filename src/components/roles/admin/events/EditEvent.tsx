@@ -103,35 +103,40 @@ export default function EditEvent({ eventId }: { eventId: number }) {
   });
   
   useEffect(() => {
-    if (event) {
-      // Labels como array de IDs
-      const labelIds = event?.labels?.map((label) => label.labelId);
-      
-      // Seteamos todo al formulario
-      setValue("title", event.title);
-      setValue("discount", event.discount);
-      setValue("discountCode", event.discountCode);
-      setValue("feeRD", event.feeRD);
-      setValue("date", event.date);
-      setValue("maxPurchase", event.maxPurchase);
-      setValue("geo", extractLatAndLng(event.geo));
-      setValue("place", extractPlaceFromGeo(event.geo));
-      setValue("description", event.description);
-      setValue("transferCost", event.transferCost);
-      setValue("feePB", event.feePB);
-      setValue("type", event.type);
-      setValue("isActive", event.isActive);
-      setValue("timeOut", event.timeOut);
-      setValue("labels", labelIds);
-      
-      // Guardamos en zustand 
-      updateEventFormData({
-        ...event,
-        labels: event.labels.map(label => label.labelId),
-      });
-      setHasLoadedEvent(true);
-      setHasLoadedTickets(false);
-    }
+    if (!event) return;
+
+    const sameLabels = JSON.stringify(event.labels) === JSON.stringify(eventFormData.labels);
+    const hasFormLabels = Array.isArray(eventFormData.labels) && eventFormData.labels.length > 0;
+
+    // Seteamos todo al formulario
+    const setters = {
+      title: event.title,
+      discount: event.discount,
+      discountCode: event.discountCode,
+      feeRD: event.feeRD,
+      date: event.date,
+      maxPurchase: event.maxPurchase,
+      geo: extractLatAndLng(event.geo),
+      place: extractPlaceFromGeo(event.geo),
+      description: event.description,
+      transferCost: event.transferCost,
+      feePB: event.feePB,
+      type: event.type,
+      isActive: event.isActive,
+      timeOut: event.timeOut,
+    };
+
+    Object.entries(setters).forEach(([key, value]) => {
+      setValue(key as keyof IEventFormData, value);
+    });
+
+    const finalLabels = sameLabels && hasFormLabels ? event.labels : hasFormLabels ? eventFormData.labels : event.labels;
+    setValue("labels", finalLabels);
+
+    // Guardamos en Zustand
+    updateEventFormData({ ...event });
+    setHasLoadedEvent(true);
+    setHasLoadedTickets(false);
   }, [event]);
 
   useEffect(() => {
@@ -139,6 +144,10 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       setValue("images", imagesData);
     }
   }, [imagesData]);
+
+  useEffect(() => {
+    console.log(eventFormData)
+  }, [eventFormData]);
 
   // Actualiza Zustand solo si cambia eventImages
   useEffect(() => {
@@ -253,7 +262,7 @@ useEffect(() => {
 
       <GeoAutocomplete
         setValue={setValue}
-        defaultGeo={eventFormData.geo}
+        defaultGeo={eventFormData?.geo ? eventFormData.geo : event?.geo}
         isEditing={true}
       />
 
@@ -291,8 +300,8 @@ useEffect(() => {
         }
       <br />
       {
-        labelsTypes &&
-        <FilterTagButton setValue={setValue} labels={watchedLabels} values={labelsTypes} title="Etiquetas" />
+        labelsTypes && watchedLabels &&
+        <FilterTagButton setValue={setValue} watchedLabels={watchedLabels} labelsTypes={labelsTypes} title="Etiquetas" />
       }
 
       <br />

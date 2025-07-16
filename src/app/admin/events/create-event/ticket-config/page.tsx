@@ -64,7 +64,7 @@ export default function TicketConfiguration() {
     updateEventFormData({
       ...eventFormData,
       ...data,
-      tickets: data.tickets,
+      tickets: validTickets,
     });
 
     const cleanedEventData = {

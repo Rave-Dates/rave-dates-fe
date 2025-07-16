@@ -80,15 +80,7 @@ export default function Page() {
     setValue("editPlace", eventFormData.editPlace);
     setValue("description", eventFormData.description);
     setValue("type", eventFormData.type);
-
-    // Aseguramos que si vienen labels e imágenes, se setean correctamente
-    // setValue(
-    //   "labels",
-    //   (eventFormData.labels ?? [])
-    //     .filter((label) => label?.labelId !== undefined)
-    //     .map((label) => label.labelId)
-    // );    
-
+    setValue("labels", eventFormData.labels ?? []);
     setValue("images", eventFormData.images ?? []);
   }, [eventFormData, setValue]);
   
@@ -188,11 +180,11 @@ export default function Page() {
         }
       <br />
 
-    {labelsTypes && (
+    {labelsTypes && watchedLabels && (
       <FilterTagButton
         setValue={setValue}
-        labels={watchedLabels}
-        values={labelsTypes}
+        watchedLabels={watchedLabels}
+        labelsTypes={labelsTypes}
         title="Etiquetas"
       />
     )}

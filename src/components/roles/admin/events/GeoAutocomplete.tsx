@@ -23,7 +23,6 @@ const GeoAutocomplete = ({
 
   // 👇 Seteamos el valor inicial si viene geo ya cargado
   useEffect(() => {
-    console.log(defaultGeo)
     if (defaultGeo && !isEditing) {
       async function getGeo() {
         const results = await getGeocode({ address: defaultGeo });
@@ -55,7 +54,6 @@ const GeoAutocomplete = ({
     }
   }, [defaultGeo]);
 
-
   const handleSelect = async (description: string) => {
     setInputValue(description, false);
     clearSuggestions();
@@ -77,7 +75,6 @@ const GeoAutocomplete = ({
         value={value}
         onChange={(e) => {
           setInputValue(e.target.value);
-          setValue("geo", e.target.value); // actualiza también el valor en RHF
         }}
         disabled={!ready}
         placeholder="Buscar ubicación"
