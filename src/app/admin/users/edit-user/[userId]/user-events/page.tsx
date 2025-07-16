@@ -9,19 +9,6 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const sampleData = [
-  {
-    id: 1,
-    eventName: "Evento 1",
-    date: "Lun 14",
-  },
-  {
-    id: 2,
-    eventName: "Evento 2",
-    date: "Mar 17",
-  }
-]
-
 export default function Page() {
   const [assignedEvents, setAssignedEvents] = useState<any[]>([]);
   const { getCookie } = useReactiveCookiesNext();
@@ -30,9 +17,9 @@ export default function Page() {
   const userId = Number(params.userId)
   
   const token = getCookie("token");
-  
+
   // obtenemos user por id
-  const { data, isPending } = useQuery({
+  const { data, isLoading } = useQuery<IUser>({
     queryKey: ["user"],
     queryFn: () => getUserById({ token, id: userId }),
     enabled: !!token, // solo se ejecuta si hay token

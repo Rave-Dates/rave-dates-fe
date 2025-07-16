@@ -36,7 +36,7 @@ const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {
 
         <div className="flex items-center font-light text-subtitle">
           <button
-            onClick={() => ticket.ticketTypeId && subtract(ticket.ticketTypeId)}
+            onClick={() => subtract(ticket.ticketTypeId)}
             disabled={currentQuantity === 0}
             className={`p-3 rounded-l-xl ${
               currentQuantity > 0 ? "bg-primary" : "bg-inactive text-text-inactive"
@@ -50,7 +50,7 @@ const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {
           </span>
 
           <button
-            onClick={() => ticket.ticketTypeId && validStage?.stageId && validStage && add({ ticketTypeId: ticket.ticketTypeId, stageId: validStage.stageId, price: validStage.price, quantity: validStage.quantity })}
+            onClick={() => validStage && add({ ticketTypeId: ticket.ticketTypeId, stageId: validStage.stageId, price: validStage.price, quantity: validStage.quantity })}
             disabled={!validStage || currentQuantity >= validStage.quantity}
             className={`p-3 rounded-r-xl flex items-center justify-center text-black transition-colors ${
               validStage && currentQuantity < validStage.quantity

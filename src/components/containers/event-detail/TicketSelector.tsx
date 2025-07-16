@@ -16,6 +16,7 @@ const TicketSelector = ({isTicketList = false, ticketStatus, tickets, isLoading}
     (acc, curr) => acc + curr.quantity * curr.stage.price,
     0
   );
+
   return (
     <div>
       <h3 className={`${isTicketList && "hidden"} text-lg font-semibold text-white mb-2`}>

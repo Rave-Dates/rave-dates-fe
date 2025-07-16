@@ -8,9 +8,23 @@ interface IUser {
   roleId: number;
   role: {
     roleId: number;
-    name: string;
+    name: "ADMIN" | "ORGANIZER" | "PROMOTER";
     createdAt: string;
     updatedAt: string;
+  };
+  promoter?: {
+    userId: number;
+    promoterId?: number;
+    organizerId: null;
+    fee: number;
+    feeType: "fixed" | "percentage";
+    events: IPromoterEvent[];
+  };
+  organizer?: {
+    userId: number;
+    promoterId?: number;
+    organizerId: number | null;
+    events: IOrganizerEvent[];
   };
 }
 
@@ -22,6 +36,20 @@ interface ICreateUser {
   isActive: boolean;
   password: string;
   roleId: number;
+}
+
+interface IOrganizerEvent extends Partial<IEvent> {
+  OrganizerEvent: {
+    organizerId: number;
+    eventId: number;
+  }
+}
+interface IPromoterEvent extends Partial<IEvent> {
+  PromoterEvent: {
+    promoterId: number;
+    eventId: number;
+    url: string | null;
+  }
 }
 
 interface IUserLogin {

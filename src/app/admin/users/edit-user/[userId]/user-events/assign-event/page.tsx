@@ -11,7 +11,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FieldErrors, useForm } from "react-hook-form";
 
 export default function Page() {
   const queryClient = useQueryClient();
@@ -42,13 +42,13 @@ export default function Page() {
     },
   });
   
-  const { data: clientEvents } = useQuery({
+  const { data: clientEvents } = useQuery<IEvent[]>({
     queryKey: ["clientEvents"],
     queryFn: () => getAllEvents({ token }),
     enabled: !!token, // solo se ejecuta si hay token
   });
 
-  const { data: selectedUser } = useQuery({
+  const { data: selectedUser } = useQuery<IUser>({
     queryKey: ["user"],
     queryFn: () => getUserById({ token, id: userId }),
     enabled: !!token, // solo se ejecuta si hay token
@@ -80,7 +80,7 @@ export default function Page() {
     } else if (selectedUser?.role.name === "PROMOTER") {
       const formattedData = {
         promoters: [{
-          promoterId: selectedUser.promoter.promoterId,
+          promoterId: selectedUser.promoter?.promoterId,
         }],
       }
       assignPromoterEvent.mutate(
@@ -101,7 +101,7 @@ export default function Page() {
     
   };
 
-  const onInvalid = (errors) => {
+  const onInvalid = (errors: FieldErrors<IEventFormData>) => {
     const firstError = Object.values(errors)[0];
     if (firstError?.message) {
       notifyError(firstError.message);
