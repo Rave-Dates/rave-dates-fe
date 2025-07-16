@@ -4,7 +4,7 @@ import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 
-export function useEditEvent(reset: () => void) {
+export function useEditEvent(reset: (data: IEventFormData) => void) {
   const { updateEventFormData, setHasLoadedTickets } = useCreateEventStore();
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
@@ -16,8 +16,12 @@ export function useEditEvent(reset: () => void) {
       if (!eventId) return
 
       // 1. Editar el evento
-      console.log("eventDataA",eventData)
-      const editedEvent = await editEvent(token, eventId, eventData);
+      const validLabels = eventData.labels?.map((label) => (label.labelId));
+      const cleanedEvent = {
+        ...eventData,
+        labels: validLabels,
+      };
+      const editedEvent = await editEvent(token, eventId, cleanedEvent);
 
       // console.log("eventId",eventId)
 
@@ -50,7 +54,7 @@ export function useEditEvent(reset: () => void) {
       );
       
       updateEventFormData(defaultEventFormData); // reset Zustand
-      reset(); // reset React Hook Form
+      reset(defaultEventFormData); // reset React Hook Form
       setHasLoadedTickets(false);
    
       return editedEvent;

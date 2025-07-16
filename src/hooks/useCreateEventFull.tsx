@@ -5,7 +5,7 @@ import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 
-export function useCreateFullEvent(reset: () => void) {
+export function useCreateFullEvent(reset: (data: IEventFormData) => void) {
   const { updateEventFormData, setHasLoadedTickets } = useCreateEventStore();
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
@@ -16,7 +16,12 @@ export function useCreateFullEvent(reset: () => void) {
       const { eventCategoryValues ,tickets, images, ...eventData } = formData;
 
       // 1. Crear el evento
-      const createdEvent = await createEvent(token, eventData);
+      const validLabels = eventData.labels?.map((label) => (label.labelId));
+      const cleanedEvent = {
+        ...eventData,
+        labels: validLabels,
+      };
+      const createdEvent = await createEvent(token, cleanedEvent);
       const eventId = createdEvent.eventId;
 
       console.log("eventId",eventId)
@@ -53,7 +58,7 @@ export function useCreateFullEvent(reset: () => void) {
       );
       
       updateEventFormData(defaultEventFormData); // reset Zustand
-      reset(); // reset React Hook Form
+      reset(defaultEventFormData); // reset React Hook Form
       setHasLoadedTickets(false);
    
       return createdEvent;
