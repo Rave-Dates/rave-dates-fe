@@ -1,6 +1,5 @@
+import { BASE_URL } from "@/utils/envHelper";
 import axios from "axios";
-
-const BASE_URL = "http://localhost:3000";
 
 export const getAllClientEvents = async (page: number, limit: number) => {
   const res = await axios.get(`${BASE_URL}/app/events?page=${page}&limit=${limit}`, {

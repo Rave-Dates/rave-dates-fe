@@ -1,7 +1,6 @@
+import { BASE_URL } from "@/utils/envHelper";
 import axios from "axios";
 import { CookieValueTypes } from "cookies-next";
-
-const BASE_URL = "http://localhost:3000";
 
 export const getAllEvents = async ({token}: { token: CookieValueTypes }) => {
   const res = await axios.get(`${BASE_URL}/admin/events`, {
