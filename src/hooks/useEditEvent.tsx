@@ -51,7 +51,7 @@ export function useEditEvent(reset: () => void) {
       );
       
       updateEventFormData(defaultEventFormData); // reset Zustand
-      reset(); // reset React Hook Form
+      reset(defaultEventFormData); // reset React Hook Form
       setHasLoadedTickets(false);
    
       return editedEvent;

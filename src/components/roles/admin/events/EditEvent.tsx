@@ -17,7 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter } from "next/navigation";
 import type React from "react";
-import { useEffect } from "react";
+import { use, useEffect } from "react";
 
 import { FieldErrors, useForm, useWatch } from "react-hook-form";
 import GeoAutocomplete from "./GeoAutocomplete";
@@ -78,7 +78,7 @@ export default function EditEvent({ eventId }: { eventId: number }) {
     enabled: !!token && !!eventId,
   });
   
-  const { data: imagesData, isLoading: loadingImages, isError: errorImages } = useQuery<{ id: string, url: string }[]>({
+  const { data: imagesData, isLoading: loadingImages, isError: errorImages } = useQuery({
     queryKey: ["imagesData", eventImages?.map(img => img.imageId)],
     queryFn: async () => {
       if (!eventImages || !token) return [];
@@ -109,20 +109,21 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       setValue("discount", event.discount);
       setValue("discountCode", event.discountCode);
       setValue("feeRD", event.feeRD);
-      setValue("date", (new Date(event.date)).toDateString());
+      setValue("date", event.date);
       setValue("maxPurchase", event.maxPurchase);
       setValue("geo", extractLatAndLng(event.geo));
       setValue("place", extractPlaceFromGeo(event.geo));
       setValue("description", event.description);
+      setValue("transferCost", event.transferCost);
+      setValue("feePB", event.feePB);
       setValue("type", event.type);
       setValue("isActive", event.isActive);
       setValue("timeOut", event.timeOut);
-      labelIds && setValue("labels", labelIds);
+      setValue("labels", labelIds);
       
       // Guardamos en zustand 
       updateEventFormData({
         ...event,
-        labels: event.labels.map((label) => label.labelId),
       });
       setHasLoadedEvent(true);
       setHasLoadedTickets(false);
@@ -135,44 +136,54 @@ export default function EditEvent({ eventId }: { eventId: number }) {
     }
   }, [imagesData]);
 
+  useEffect(() => {
+    console.log("imagesData", imagesData);
+  }, [imagesData]);
+
+  useEffect(() => {
+    console.log("eventFormData actualizado:", eventFormData);
+  }, [eventFormData]);
+
   // Actualiza Zustand solo si cambia eventImages
   useEffect(() => {
     if (eventImages) {
       const same = JSON.stringify(eventFormData.images) === JSON.stringify(eventImages);
       if (!same) {
-      updateEventFormData({
-        ...eventFormData,
-        images: eventImages,
-      });
+        updateEventFormData((prev) => ({
+          ...prev,
+          images: eventImages,
+        }));
       }
     }
   }, [eventImages]);
 
-  useEffect(() => {
-    const defaultCategoryValues: any = {};
+useEffect(() => {
+  const defaultCategoryValues: any = {};
 
-    eventCategories?.forEach((cat) => {
-      const selectedValue = cat.value;
-      if (selectedValue) {
-        defaultCategoryValues[cat.categoryId] = JSON.stringify({
-          valueId: selectedValue.valueId,
-          categoryId: cat.categoryId,
-          value: selectedValue.value,
-        });
-      }
-    });
+  eventCategories?.forEach((cat) => {
+    const selectedValue = cat.value;
+    if (selectedValue) {
+      defaultCategoryValues[cat.categoryId] = JSON.stringify({
+        valueId: selectedValue.valueId,
+        categoryId: cat.categoryId,
+        value: selectedValue.value,
+      });
+    }
+  });
 
-    setValue("oldCategories", defaultCategoryValues);
-  }, [eventCategories, categories]);
+  setValue("oldCategories", defaultCategoryValues);
+}, [eventCategories, categories]);
 
   // creamos evento local
   const onSubmit = (data: IEventFormData) => {
+    console.log("data",data)
     if (loadingImages) {
       notifyError("Por favor espere a que se carguen las imágenes")
       return
     }
     
-    const parsedCategories = Object.values(data.oldCategories ?? {}).map((cat) => JSON.parse(cat));
+    if (!data.oldCategories) return
+    const parsedCategories = Object.values(data.oldCategories).map((cat) => JSON.parse(cat));
     const formattedOldCategories = eventCategories?.map((category) => ({
       categoryId: category.categoryId,
       valueId: category.valueId,
@@ -191,12 +202,13 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       .filter(Boolean);
 
     const formattedGeo = `${data.geo};${data.place?.trim()}`;
-
+    
     updateEventFormData({
       ...eventFormData,
+      ...data,
       isActive: watchedIsActive,
       geo: formattedGeo,
-      ...categoriesToUpdate,
+      categoriesToUpdate
     })
 
     router.push(

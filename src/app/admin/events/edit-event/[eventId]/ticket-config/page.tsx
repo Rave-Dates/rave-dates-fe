@@ -75,7 +75,7 @@ export default function EditTicketConfiguration() {
       updateEventFormData(updatedData);
       setHasLoadedTickets(true);
     }
-  }, [ticketsData]);
+  }, [ticketsData, eventFormData]);
 
   const piggyBank = watch("piggyBank", false)
   if (piggyBank === false) setValue("commission", undefined)
@@ -126,7 +126,7 @@ export default function EditTicketConfiguration() {
 
     console.log("cleanedEventData",cleanedEventData)
 
-    // funcion para editar evento
+    // // funcion para editar evento
     notifyPending(
       new Promise((resolve, reject) => {
         editEvent(cleanedEventData, {

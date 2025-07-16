@@ -16,6 +16,7 @@ import FileSvg from "@/components/svg/FileSvg"
 import SpinnerSvg from "@/components/svg/SpinnerSvg"
 import Image from "next/image"
 import { notifyError } from "@/components/ui/toast-notifications"
+import { UseFormSetValue } from "react-hook-form"
 
 interface ImageData {
   id: string
@@ -23,7 +24,7 @@ interface ImageData {
   file?: File
 }
 
-export default function EventImageSwiper({ setImages, images, isLoading, isError, isErrorEventImages }: { setImages: any, images: any[], isLoading?: boolean, isError?: boolean, isErrorEventImages?: boolean }) {
+export default function EventImageSwiper({ setImages, images, isLoading, isError, isErrorEventImages }: { setImages: UseFormSetValue<IEventFormData>, images: any[], isLoading?: boolean, isError?: boolean, isErrorEventImages?: boolean }) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const prevRef = useRef<HTMLButtonElement | null>(null)
   const nextRef = useRef<HTMLButtonElement | null>(null)
