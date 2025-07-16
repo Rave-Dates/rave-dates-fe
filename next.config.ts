@@ -9,10 +9,17 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
-
+  
   images: {
-    domains: ["images.unsplash.com", "plus.unsplash.com"],
-  },
+    remotePatterns: [
+      {
+        hostname: 'images.unsplash.com',
+      },
+      {
+        hostname: 'plus.unsplash.com',
+      }
+    ],
+},
 };
 
 export default nextConfig;
