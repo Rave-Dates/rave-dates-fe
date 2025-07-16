@@ -5,6 +5,7 @@ import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { loginAdmin } from "@/services/admin-users";
+import { onInvalid } from "@/utils/onInvalidFunc";
 import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from 'cookies-next';
 import { jwtDecode } from "jwt-decode";
@@ -64,16 +65,6 @@ export default function Page() {
     });
   };
   
-  const onInvalid = (errors: { [key: string]: any }) => {
-    const firstError = Object.values(errors)[0];
-    if (firstError?.message) {
-      notifyError(firstError.message);
-    } else {
-      notifyError("Por favor completá todos los campos requeridos.");
-    }
-  };
-  
-
   return (
     <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Iniciar sesión - Admin">
       <FormInput
@@ -90,7 +81,8 @@ export default function Page() {
       />
 
       <CheckFormInput
-        register={register}
+        name="receiveInfo"
+        register={register("receiveInfo")} 
         value={receiveInfo}
       />
 

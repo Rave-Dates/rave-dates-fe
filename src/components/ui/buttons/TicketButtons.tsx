@@ -4,9 +4,7 @@ import SubtractSvg from "@/components/svg/SubtractSvg";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useParams } from "next/navigation";
 
-const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {
-  if (typeof ticket.ticketTypeId !== "number") return null;
-  
+const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {  
   const { add, subtract, selected, setEventId } = useTicketStore();
   const params = useParams();
   const eventId = Number(params.eventId);
@@ -22,6 +20,7 @@ const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {
     return new Date(stage.dateMax).getTime() > now && stage.quantity > 0;
   });
 
+  if (typeof ticket.ticketTypeId !== "number") return null;
   const currentQuantity =  selected[ticket.ticketTypeId]?.quantity || 0;
 
   return (

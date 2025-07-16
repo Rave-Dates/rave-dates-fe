@@ -1,5 +1,4 @@
 import { extractLatAndLng, extractPlaceFromGeo } from '@/utils/formatGeo';
-import Image from 'next/image';
 import React from 'react';
 import EventMap from './EventMap';
 

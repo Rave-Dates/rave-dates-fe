@@ -17,15 +17,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter } from "next/navigation";
 import type React from "react";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 
-import { FieldErrors, useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import GeoAutocomplete from "./GeoAutocomplete";
+import { onInvalid } from "@/utils/onInvalidFunc";
 
 export default function EditEvent({ eventId }: { eventId: number }) {
   const { eventFormData, updateEventFormData, setHasLoadedEvent, setHasLoadedTickets } = useCreateEventStore();
   const router = useRouter()
-  const { register, handleSubmit, watch, setValue, getValues, control } = useForm<IEventFormData>({
+  const { register, handleSubmit, watch, setValue, control } = useForm<IEventFormData>({
     defaultValues: defaultEventFormData,
   });
   const { getCookie } = useReactiveCookiesNext();
@@ -77,26 +78,28 @@ export default function EditEvent({ eventId }: { eventId: number }) {
     queryFn: () => getEventImages({ token, eventId }),
     enabled: !!token && !!eventId,
   });
-  
-  const { data: imagesData, isLoading: loadingImages, isError: errorImages } = useQuery({
+
+  const { data: imagesData, isLoading: loadingImages, isError: errorImages } = useQuery<IImageData[]>({
     queryKey: ["imagesData", eventImages?.map(img => img.imageId)],
     queryFn: async () => {
       if (!eventImages || !token) return [];
+
       const processedImages = await Promise.all(
-        eventImages?.map(async (img) => {
+        eventImages.map(async (img) => {
           const blob = await getImageById({ token, imageId: img.imageId });
           const url = URL.createObjectURL(blob);
-          
+
           return {
-            id: String(img.imageId),
+            id: img.imageId.toString(),
             url,
+            // file no viene del backend, solo se añade en frontend si hay uploads
           };
         })
       );
-      
+
       return processedImages;
     },
-    enabled: !!token,
+    enabled: !!token && !!eventImages,
   });
   
   useEffect(() => {
@@ -124,6 +127,7 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       // Guardamos en zustand 
       updateEventFormData({
         ...event,
+        labels: event.labels.map(label => label.labelId),
       });
       setHasLoadedEvent(true);
       setHasLoadedTickets(false);
@@ -136,29 +140,21 @@ export default function EditEvent({ eventId }: { eventId: number }) {
     }
   }, [imagesData]);
 
-  useEffect(() => {
-    console.log("imagesData", imagesData);
-  }, [imagesData]);
-
-  useEffect(() => {
-    console.log("eventFormData actualizado:", eventFormData);
-  }, [eventFormData]);
-
   // Actualiza Zustand solo si cambia eventImages
   useEffect(() => {
     if (eventImages) {
       const same = JSON.stringify(eventFormData.images) === JSON.stringify(eventImages);
       if (!same) {
-        updateEventFormData((prev) => ({
-          ...prev,
-          images: eventImages,
-        }));
+      updateEventFormData({
+        ...eventFormData,
+        images: imagesData ?? [],
+      });
       }
     }
   }, [eventImages]);
 
 useEffect(() => {
-  const defaultCategoryValues: any = {};
+  const defaultCategoryValues: { [key: string]: string } = {};
 
   eventCategories?.forEach((cat) => {
     const selectedValue = cat.value;
@@ -190,7 +186,7 @@ useEffect(() => {
     }));
 
     const categoriesToUpdate = parsedCategories
-      .map((newCat) => {
+      .map((newCat: IEventCategoryValue) => {
         const oldCat = formattedOldCategories?.find((old) => old.categoryId === newCat.categoryId);
         if (!oldCat || oldCat.valueId === newCat.valueId) return null;
         return {
@@ -217,29 +213,6 @@ useEffect(() => {
       : `/admin/events/edit-event/${eventId}/ticket-config`
     )
   };
-
-  const onInvalid = (errors: FieldErrors<IEventFormData>) => {
-    const findFirstError = (obj: any): string | null => {
-      for (const key in obj) {
-        if (typeof obj[key] === "object") {
-          const child = findFirstError(obj[key]);
-          if (child) return child;
-        } else if (key === "message") {
-          return obj[key];
-        }
-      }
-      return null;
-    };
-
-    const firstErrorMessage = findFirstError(errors);
-
-    if (firstErrorMessage) {
-      notifyError(firstErrorMessage);
-    } else {
-      notifyError("Por favor completá todos los campos requeridos.");
-    }
-  };
-
 
   return (
     <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Editar evento">
@@ -297,7 +270,7 @@ useEffect(() => {
             <FormDropDown
               key={category.categoryId}
               title={category.name}
-              register={register(`oldCategories.${category.categoryId}` as any, { required: true })}
+              register={register(`oldCategories.${category.categoryId}`, { required: true })}
             >
               {
                 category.values.map((value) => (

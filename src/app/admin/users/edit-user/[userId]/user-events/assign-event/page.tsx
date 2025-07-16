@@ -6,11 +6,10 @@ import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { assignOrganizerToEvent, assignPromoterToEvent, getAllEvents } from "@/services/admin-events";
 import { getUserById } from "@/services/admin-users";
-import { getAllClientEvents } from "@/services/clients-events";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FieldErrors, useForm } from "react-hook-form";
 
 export default function Page() {
@@ -21,21 +20,21 @@ export default function Page() {
   const token = getCookie("token");
   const router = useRouter();
 
-  const { register, handleSubmit, formState } = useForm({
+  const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
       [`assignedEvent-${userId}`]: "",
       assignedCommission: ""
     }
   });
   
-  const assignOrganizerEvent = useMutation({
+  const assignOrganizerEvent = useMutation<void, Error, {data: {organizerId: number | null | undefined}, eventId: number}>({
     mutationFn: ({data, eventId}) => assignOrganizerToEvent(token, data, eventId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`assignedEvent-${userId}`] });
     },
   });
 
-  const assignPromoterEvent = useMutation({
+  const assignPromoterEvent = useMutation<void, Error, {data: {promoters: {promoterId: number; fee: number;}[]}, eventId: number}>({
     mutationFn: ({data, eventId}) => assignPromoterToEvent(token, data, eventId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`assignedEvent-${userId}`] });
@@ -55,18 +54,20 @@ export default function Page() {
   });
 
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: FormValues) => {
     console.log("Form submitted:", data);
     console.log("selectedUser",selectedUser)
     if (selectedUser?.role.name === "ORGANIZER") {
       const formattedData = {
-        organizerId: selectedUser.organizer.organizerId,
+        organizerId: selectedUser.organizer?.organizerId,
       }
       console.log("ORGANIZER formattedData",formattedData)
+      if (!formattedData.organizerId) return
+      const selectedEventId = Number(data[`assignedEvent-${userId}`]);
       assignOrganizerEvent.mutate(
         {
-          data:formattedData, 
-          eventId: data[`assignedEvent-${userId}`]
+          data: formattedData, 
+          eventId: selectedEventId
         }, {
         onSuccess: () => {
           notifySuccess("Evento asignado a un organizador correctamente");
@@ -78,15 +79,18 @@ export default function Page() {
         },
       });
     } else if (selectedUser?.role.name === "PROMOTER") {
+      if (!selectedUser.promoter || !selectedUser.promoter.promoterId) return
+      const selectedEventId = Number(data[`assignedEvent-${userId}`]);
       const formattedData = {
         promoters: [{
-          promoterId: selectedUser.promoter?.promoterId,
+          promoterId: selectedUser.promoter.promoterId,
+          fee: 2,
         }],
       }
       assignPromoterEvent.mutate(
         {
           data:formattedData, 
-          eventId: data[`assignedEvent-${userId}`]
+          eventId: selectedEventId
         }, {
         onSuccess: () => {
           notifySuccess("Evento asignado a un promotor correctamente");
@@ -104,7 +108,7 @@ export default function Page() {
   const onInvalid = (errors: FieldErrors<IEventFormData>) => {
     const firstError = Object.values(errors)[0];
     if (firstError?.message) {
-      notifyError(firstError.message);
+      notifyError(firstError.message.toString());
     } else {
       notifyError("Por favor completá todos los campos requeridos.");
     }

@@ -1,15 +1,12 @@
 "use client"
 
-import { TicketCard } from "@/components/roles/admin/TicketCard"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import FormInput from "@/components/ui/inputs/FormInput";
-import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
+import { notifyPending } from "@/components/ui/toast-notifications";
 import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { useMutation } from "@tanstack/react-query";
-import { useReactiveCookiesNext } from "cookies-next";
-import { useEffect } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { onInvalid } from "@/utils/onInvalidFunc";
+import { useForm } from "react-hook-form";
 
 export default function FreeTicketConfiguration() {
   const { eventFormData, updateEventFormData } = useCreateEventStore();
@@ -20,6 +17,7 @@ export default function FreeTicketConfiguration() {
 
   const onSubmit = (data: IEventFormData) => {
     const validTickets = data.tickets.map(({ ticketId, stages, ...rest }) => {
+      console.log(ticketId)
       const maxDate = stages?.[0]?.dateMax ?? null;
       return {
         ...rest,
@@ -66,10 +64,6 @@ export default function FreeTicketConfiguration() {
 
     // onSucces borrar los datos del form y del estado
   };
-
-  const onInvalid = () => {
-    notifyError("Por favor completá todos los campos.")
-  }
 
   return (
     <div className="bg-primary-black text-primary-white min-h-screen px-6 pt-28 pb-44">

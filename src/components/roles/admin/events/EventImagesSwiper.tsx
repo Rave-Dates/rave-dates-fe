@@ -24,7 +24,7 @@ interface ImageData {
   file?: File
 }
 
-export default function EventImageSwiper({ setImages, images, isLoading, isError, isErrorEventImages }: { setImages: UseFormSetValue<IEventFormData>, images: any[], isLoading?: boolean, isError?: boolean, isErrorEventImages?: boolean }) {
+export default function EventImageSwiper({ setImages, images, isLoading, isError, isErrorEventImages }: { setImages: UseFormSetValue<IEventFormData>, images: IImageData[], isLoading?: boolean, isError?: boolean, isErrorEventImages?: boolean }) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const prevRef = useRef<HTMLButtonElement | null>(null)
   const nextRef = useRef<HTMLButtonElement | null>(null)
@@ -51,17 +51,18 @@ export default function EventImageSwiper({ setImages, images, isLoading, isError
         })
       }
     })
-
+    if (!images) return
     setImages("images", [...images, ...newImages])
   }
 
   const removeImage = (id: string) => {
-    const imageToRemove = images.find((img) => img.id === id)
+    const imageToRemove = images?.find((img) => img.id === id)
     if (imageToRemove?.file) {
       URL.revokeObjectURL(imageToRemove.url)
     }
-    const filteredImages = images.filter((img) => img.id !== id)
+    const filteredImages = images?.filter((img) => img.id !== id)
 
+    if (!filteredImages) return
     setImages("images",  [...filteredImages])
   }
 
@@ -95,7 +96,7 @@ export default function EventImageSwiper({ setImages, images, isLoading, isError
           />
         </div>
 
-        {images?.length > 0 ? (
+        {images && images?.length > 0 ? (
           <div>
             {/* Main Swiper */}
             <div className="relative max-w-40 text-xl max-h-40">

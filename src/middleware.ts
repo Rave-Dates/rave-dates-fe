@@ -17,13 +17,14 @@ export function middleware(req: NextRequest) {
   
   // si es admin y esta en la ruta /admin se deja pasar
   try {
-    const decoded: any = jwtDecode(token);
+    const decoded: IUserLogin = jwtDecode(token);
     const role = decoded.role;
     
     if (req.nextUrl.pathname.startsWith("/admin") && role !== "ADMIN") {
       return NextResponse.redirect(new URL("/", req.url));
     }
   } catch (error) {
+    console.log(error)
     return NextResponse.redirect(new URL("/", req.url));
   }
 

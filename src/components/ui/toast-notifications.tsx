@@ -31,7 +31,7 @@ export const notifyError = (message: string) => {
   });
 };
 
-export const notifyPending = (promise: Promise<any>, options?: any) => {
+export const notifyPending = (promise: Promise<void>, options?: {  loading?: string, success?: string, error?: string }) => {
   toast.promise(promise, {
     loading: (
       <div className="flex items-center gap-2">
@@ -39,13 +39,13 @@ export const notifyPending = (promise: Promise<any>, options?: any) => {
         {options?.loading || "Cargando..."}
       </div>
     ),
-    success: (data) => (
+    success: () => (
       <div className="flex items-center gap-2">
         <CheckSvg className="text-primary text-xl" />
         {options?.success || "Operación completada correctamente"}
       </div>
     ),
-    error: (err) => (
+    error: () => (
       <div className="flex items-center gap-2">
         <AddSvg className="text-system-error border border-system-error/50 text-xl rotate-45" />
         {options?.error || "Ocurrió un error"}

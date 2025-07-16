@@ -6,9 +6,10 @@ import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
 import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
+import { onInvalid } from "@/utils/onInvalidFunc";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { FieldErrors, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 export default function TicketConfiguration() {
   const { eventFormData, updateEventFormData, hasLoadedEvent } = useCreateEventStore();
@@ -27,7 +28,9 @@ export default function TicketConfiguration() {
   register("piggyBank");
   const watchedPiggyBank = useWatch({ name: "piggyBank", control });
 
-  watchedPiggyBank === false && setValue("commission", undefined)
+  useEffect(() => {
+    setValue("commission", undefined)
+  }, [watchedPiggyBank]);
 
   useEffect(() => {
     setValue("piggyBank", false);
@@ -47,6 +50,7 @@ export default function TicketConfiguration() {
   const onSubmit = (data: IEventFormData) => {
     console.log("data", data)
     const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
+      console.log(ticketId, ticketTypeId)
       if (rest.stages.length === 1) return { ...rest, maxDate: rest.stages[0].dateMax };
       const lastStageMaxDate = rest.stages.at(-1)?.dateMax || "";
       return {
@@ -102,28 +106,6 @@ export default function TicketConfiguration() {
     );
 
     // onSucces borrar los datos del form y del estado
-  };
-
-  const onInvalid = (errors: FieldErrors<IEventFormData>) => {
-    const findFirstError = (obj: any): string | null => {
-      for (const key in obj) {
-        if (typeof obj[key] === "object") {
-          const child = findFirstError(obj[key]);
-          if (child) return child;
-        } else if (key === "message") {
-          return obj[key];
-        }
-      }
-      return null;
-    };
-
-    const firstErrorMessage = findFirstError(errors);
-
-    if (firstErrorMessage) {
-      notifyError(firstErrorMessage);
-    } else {
-      notifyError("Por favor completá todos los campos requeridos.");
-    }
   };
 
   const handleAddTicket = () => {

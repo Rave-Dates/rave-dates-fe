@@ -1,8 +1,15 @@
 import React from "react";
 import ArrowDownSvg from "../../svg/ArrowDown";
 
+type SelectRegister = {
+  name: string;
+  onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  onBlur: (event: React.FocusEvent<HTMLSelectElement>) => void;
+  ref: (instance: HTMLSelectElement | null) => void;
+};
+
 type Props = {
-  register: any;
+  register: SelectRegister;
   title: string;
   children: React.ReactNode;
 };

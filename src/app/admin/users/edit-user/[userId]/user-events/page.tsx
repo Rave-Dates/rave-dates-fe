@@ -10,7 +10,7 @@ import { useParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Page() {
-  const [assignedEvents, setAssignedEvents] = useState<any[]>([]);
+  const [assignedEvents, setAssignedEvents] = useState<IOrganizerEvent[] | IPromoterEvent[]>([]);
   const { getCookie } = useReactiveCookiesNext();
   const pathname = usePathname();
   const params = useParams();
@@ -19,17 +19,17 @@ export default function Page() {
   const token = getCookie("token");
 
   // obtenemos user por id
-  const { data, isLoading } = useQuery<IUser>({
+  const { data } = useQuery<IUser>({
     queryKey: ["user"],
     queryFn: () => getUserById({ token, id: userId }),
     enabled: !!token, // solo se ejecuta si hay token
   });
 
   useEffect(() => {
-    if (data?.role.name === "ORGANIZER") {
-      setAssignedEvents(data?.organizer?.events);
-    } else if (data?.role.name === "PROMOTER") {
-      setAssignedEvents(data?.promoter?.events);
+    if (data?.role.name === "ORGANIZER" && data.organizer) {
+      setAssignedEvents(data.organizer.events);
+    } else if (data?.role.name === "PROMOTER" && data.promoter) {
+      setAssignedEvents(data.promoter.events);
     }
   }, [data]);
 

@@ -1,4 +1,14 @@
 import React from "react";
+import { UseFormRegisterReturn } from "react-hook-form";
+
+type FormInputProps = {
+  title: string;
+  type?: string;
+  inputName: string;
+  className?: string;
+  placeholder?: string;
+  register: UseFormRegisterReturn;
+};
 
 const FormInput = ({
   title,
@@ -6,15 +16,8 @@ const FormInput = ({
   inputName,
   className = "",
   placeholder,
-  register
-}: {
-  type?: string;
-  title: string;
-  inputName: string;
-  className?: string;
-  placeholder?: string;
-  register: any;
-}) => {
+  register,
+}: FormInputProps) => {
   return (
     <div>
       <label htmlFor={inputName} className="text-xs">
@@ -22,7 +25,6 @@ const FormInput = ({
       </label>
       <input
         id={inputName}
-        name={inputName}
         placeholder={placeholder}
         type={type}
         {...register}

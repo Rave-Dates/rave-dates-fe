@@ -9,7 +9,7 @@ import { createUser } from "@/services/admin-users";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 
@@ -40,7 +40,7 @@ export default function CreateUser() {
       notifySuccess('Usuario creado correctamente');
       router.back();
     },
-    onError: (error: any) => {
+    onError: (error) => {
       notifyError("Campos invalidos o error al crear usuario.");
       console.log(error)
     },

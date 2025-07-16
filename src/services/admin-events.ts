@@ -24,7 +24,7 @@ export const getEventById = async ({token, id}: { token: CookieValueTypes, id: I
 };
 
 
-export const createEvent = async (token: CookieValueTypes, data: any) => {
+export const createEvent = async (token: CookieValueTypes, data: Partial<IEventFormData>) => {
   console.log(data)
   const res = await axios.post(`${BASE_URL}/admin/events`, data, {
     headers: {
@@ -36,7 +36,7 @@ export const createEvent = async (token: CookieValueTypes, data: any) => {
   return res.data;
 }
 
-export const editEvent = async (token: CookieValueTypes, id: number, data: any) => {
+export const editEvent = async (token: CookieValueTypes, id: number, data: Partial<IEventFormData>) => {
   const res = await axios.put(`${BASE_URL}/admin/events/${id}`, data, {
     headers: {
       "Accept": "application/json",
@@ -47,7 +47,7 @@ export const editEvent = async (token: CookieValueTypes, id: number, data: any) 
   return res.data;
 }
 
-export const createTicketTypes = async (token: CookieValueTypes ,ticket: any) => {
+export const createTicketTypes = async (token: CookieValueTypes ,ticket: IEventTicket) => {
   const res = await axios.post(`${BASE_URL}/admin/ticket-types`, ticket, {
     headers: {
       "Accept": "application/json",
@@ -58,7 +58,7 @@ export const createTicketTypes = async (token: CookieValueTypes ,ticket: any) =>
   return res.data;
 }
 
-export const editTicketTypes = async (token: CookieValueTypes ,ticket: any, id: number) => {
+export const editTicketTypes = async (token: CookieValueTypes ,ticket: IEventTicket, id: number) => {
   console.log("ticket",ticket)
   console.log("id",id)
   console.log("token",token)
@@ -83,7 +83,7 @@ export const getTicketTypesById = async (token: CookieValueTypes, id: number) =>
   return res.data;
 }
 
-export const createEventCategories = async (token: CookieValueTypes, categoryValueId: any, eventId: number) => {
+export const createEventCategories = async (token: CookieValueTypes, categoryValueId: { categoryValueId: number; }, eventId: number) => {
   const res = await axios.post(`${BASE_URL}/admin/events/${eventId}/category-value`, categoryValueId, {
     headers: {
       "Accept": "application/json",
@@ -94,7 +94,7 @@ export const createEventCategories = async (token: CookieValueTypes, categoryVal
   return res.data;
 }
 
-export const editEventCategories = async (token: CookieValueTypes, data: any, eventId: number) => {
+export const editEventCategories = async (token: CookieValueTypes, data: { categoryId: number; oldCategoryValueId: number; newCategoryValueId: number; }, eventId: number) => {
   const res = await axios.put(`${BASE_URL}/admin/events/${eventId}/category-value`, data, {
     headers: {
       "Accept": "application/json",
@@ -160,7 +160,7 @@ export const getImageById = async ({
   return res.data as Blob;
 };
 
-export const assignOrganizerToEvent = async (token: CookieValueTypes, data: { organizerId: number }, eventId: number) => {
+export const assignOrganizerToEvent = async (token: CookieValueTypes, data: { organizerId: number | null | undefined }, eventId: number) => {
   const res = await axios.put(`${BASE_URL}/admin/events/${eventId}/organizer`, data, {
     headers: {
       "Accept": "application/json",
@@ -171,7 +171,7 @@ export const assignOrganizerToEvent = async (token: CookieValueTypes, data: { or
   return res.data;
 }
 
-export const assignPromoterToEvent = async (token: CookieValueTypes, data: { promoters: [{ promoterId: number, fee: number }] }, eventId: number) => {
+export const assignPromoterToEvent = async (token: CookieValueTypes, data: { promoters: { promoterId: number, fee: number }[] }, eventId: number) => {
   const res = await axios.put(`${BASE_URL}/admin/events/${eventId}/promoter`, data, {
     headers: {
       "Accept": "application/json",
