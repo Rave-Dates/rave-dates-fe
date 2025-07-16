@@ -8,7 +8,7 @@ import { loginAdmin } from "@/services/admin-users";
 import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from 'cookies-next';
 import { jwtDecode } from "jwt-decode";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
@@ -20,6 +20,7 @@ type LoginForm = {
 
 export default function Page() {
   const { setCookie, getCookie } = useReactiveCookiesNext();
+  const router = useRouter();
 
   const {
     watch,
@@ -49,7 +50,7 @@ export default function Page() {
         maxAge: decoded.exp - Math.floor(Date.now() / 1000), // en segundos
       });
       notifySuccess("Logueado correctamente");
-      redirect('/admin/users');
+      router.push('/admin/users');
     },
     onError: () => {
       notifyError("Error al loguear");
