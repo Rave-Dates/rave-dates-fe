@@ -2,36 +2,54 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtDecode } from "jwt-decode";
 
 export function middleware(req: NextRequest) {
-  const token = req.cookies.get("token")?.value;
   const path = req.nextUrl.pathname;
+  const isAdminRoute = path.startsWith("/admin");
 
-  // si se quiere loguear y no tiene token se deja pasar
-  if (path.startsWith("/admin/auth") && !token) {
+  const tokenName = isAdminRoute ? "token" : "tempToken";
+  const token = req.cookies.get(tokenName)?.value;
+
+  // permitir /admin/auth sin token
+  if (isAdminRoute && path.startsWith("/admin/auth") && !token) {
     return NextResponse.next();
   }
-  
-  // si no hay token → redirigir
-  if (!token) {
+
+  // permitir ruta pública sin token
+  if (!isAdminRoute && !token) {
+    return NextResponse.next();
+  }
+
+  if (isAdminRoute && !token) {
+    // si no hay token, redirigir
     return NextResponse.redirect(new URL("/admin/auth", req.url));
   }
-  
-  // si es admin y esta en la ruta /admin se deja pasar
-  try {
-    const decoded: IUserLogin = jwtDecode(token);
-    const role = decoded.role;
-    
-    if (req.nextUrl.pathname.startsWith("/admin") && role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/", req.url));
-    }
-  } catch (error) {
-    console.log(error)
+  if (!token) {
+    // si no hay token, redirigir
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  return NextResponse.next();
-}
+  try {
+    const decoded: IUserLogin = jwtDecode(token);
 
-// rutas donde funciona
-export const config = {
-  matcher: ["/admin/:path*"],
-};
+    const now = Math.floor(Date.now() / 1000); // tiempo actual en segundos
+
+    if (decoded.exp < now) {
+      // token expirado → borrar cookie y redirigir
+      console.log("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+      const res = NextResponse.redirect(new URL("/", req.url));
+      res.cookies.delete(tokenName);
+      return res;
+    }
+    
+    if (isAdminRoute && decoded.role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+    
+    return NextResponse.next();
+  } catch {
+    // token inválido → borrar cookie y redirigir
+    console.log("Token inválido. Por favor, inicia sesión nuevamente.");
+    const res = NextResponse.redirect(new URL("/", req.url));
+    res.cookies.delete(tokenName);
+    return res;
+  }
+}

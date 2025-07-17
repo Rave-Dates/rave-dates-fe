@@ -27,14 +27,14 @@ export default function DataForm() {
   const { setCookie, getCookie } = useReactiveCookiesNext();
   const { selected } = useTicketStore()
   const router = useRouter()
-  const clientData = getCookie("clientData");
+  const tempToken = getCookie("tempToken");
   
   useEffect(() => {
-    if (clientData && selected && Object.keys(selected).length > 0) {
+    if (tempToken && selected && Object.keys(selected).length > 0) {
       router.push('/checkout');
-    } else if (!clientData && selected && Object.keys(selected).length < 1) {
+    } else if (!tempToken && selected && Object.keys(selected).length < 1) {
       router.push('/');
-    } else if (!clientData) {
+    } else if (!tempToken) {
       router.push('/personal-data');
     }
   }, [selected]);
@@ -50,16 +50,10 @@ export default function DataForm() {
   const { mutate, isPending } = useMutation({
     mutationFn: createClient,
     onSuccess: (data) => {
-      const decoded: IUserLogin = jwtDecode(data);
+      const decoded: {id: number, email: string, iat: number, exp: number} = jwtDecode(data);
       const expirationDate = new Date(decoded.exp * 1000);
       
       setCookie("tempToken", data, {
-        path: "/",
-        expires: expirationDate,
-        maxAge: decoded.exp - Math.floor(Date.now() / 1000),
-      });
-
-      setCookie("clientData", decoded, {
         path: "/",
         expires: expirationDate,
         maxAge: decoded.exp - Math.floor(Date.now() / 1000),
