@@ -31,7 +31,7 @@ export const notifyError = (message: string) => {
   });
 };
 
-export const notifyPending = (promise: Promise<void>, options?: {  loading?: string, success?: string, error?: string }) => {
+export const notifyPending = (promise: Promise<string>, options?: {  loading?: string, success?: string, error?: string }) => {
   toast.promise(promise, {
     loading: (
       <div className="flex items-center gap-2">

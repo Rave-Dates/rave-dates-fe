@@ -6,6 +6,7 @@ import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
 import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
+import { combineDateAndTimeToISO } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -48,7 +49,6 @@ export default function TicketConfiguration() {
   });
 
   const onSubmit = (data: IEventFormData) => {
-    console.log("data", data)
     const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
       console.log(ticketId, ticketTypeId)
       if (rest.stages.length === 1) return { ...rest, maxDate: rest.stages[0].dateMax };
@@ -67,10 +67,14 @@ export default function TicketConfiguration() {
       tickets: validTickets,
     });
 
+    if (!data.date || !data.time) return
+    const validDate = combineDateAndTimeToISO(data.date, data.time)
+
     const cleanedEventData = {
       eventCategoryValues: data.eventCategoryValues,
       title: data.title,
-      date: data.date,
+      subtitle: data.subtitle,
+      date: validDate,
       geo: formattedGeo,
       description: data.description,
       type: data.type,

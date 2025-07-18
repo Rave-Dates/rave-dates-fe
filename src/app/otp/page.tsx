@@ -20,7 +20,7 @@ type VerificationForm = {
 export default function Verification() {
   const [loadingSend, setLoadingSend] = useState(false);
   const [loadingValidate, setLoadingValidate] = useState(false);
-  const { getCookie } = useReactiveCookiesNext();
+  const { getCookie, setCookie, deleteCookie } = useReactiveCookiesNext();
   const router = useRouter();
   const [selectedVerification, setSelectedVerification] = useState("Email");
   const { sendCode, validateCode } = useVerification();
@@ -96,11 +96,21 @@ export default function Verification() {
   const onSubmit = (data: { code: string[]; email: string }) => {
     const pin = data.code.join("");
     validateCode(data.email, pin)
-      .then(() => {
+      .then((propToken) => {
+        const decoded: IUserLogin = jwtDecode(propToken);
+        const expirationDate = new Date(decoded.exp * 1000);
+
+        setCookie("clientToken", propToken, {
+          path: "/",
+          expires: expirationDate,
+          maxAge: decoded.exp - Math.floor(Date.now() / 1000), // en segundos
+        });
+        deleteCookie("tempToken")
         notifySuccess("Código validado correctamente");
         router.push("/checkout"); // Si no está en la mutación
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err)
         notifyError("Código inválido o error al validar");
       })
       .finally(() => {

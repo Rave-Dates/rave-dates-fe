@@ -34,6 +34,7 @@ export function useVerification() {
       const expirationDate = new Date(Date.now() + 1000 * 60 * 60 * 24);
       setCookie("clientToken", data, { path: "/", expires: expirationDate });
       router.push("/checkout");
+      return data
     });
     notifyPending(promise, {
       loading: "Validando código...",
