@@ -10,7 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getClientEventById, getClientEventImagesById, getClientImageById, getEventClientTickets } from '@/services/clients-events';
 import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
 
-const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isTicketList?: boolean }) => {
+const EventDetails = ({ eventId } : { eventId: number }) => {
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
     queryKey: [`selectedEvent-${eventId}`],
     queryFn: () => getClientEventById(eventId),
@@ -79,7 +79,7 @@ const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isT
             {
               selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
             }
-            <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} isTicketList={isTicketList} />
+            <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} />
           </div>
         </div>
 
@@ -103,9 +103,8 @@ const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isT
               </p>
             </div>
 
-            {
-              !isTicketList && <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} isTicketList={isTicketList} />
-            }
+            <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} />
+
 
             {
               selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
@@ -119,9 +118,6 @@ const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isT
                 eventCategoryValues={selectedEvent?.eventCategoryValues}
               />
             )}            
-            {
-              isTicketList && <TicketSelector isLoading={isTicketsLoading} ticketStatus="paid" isTicketList={isTicketList} />
-            }
           </div>
         </div>
       </div>

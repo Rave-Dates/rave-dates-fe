@@ -28,7 +28,7 @@ const EventCardList: React.FC = () => {
         <Link className='bg-primary py-1 px-2 rounded-xl' href="/checkout">/checkout</Link>
         <Link className='bg-primary py-1 px-2 rounded-xl' href="/otp">/otp</Link>
       </div> */}
-      <div className="space-y-4 animate-fade-in">
+      <div className="animate-fade-in">
 
         {
           !isError ?

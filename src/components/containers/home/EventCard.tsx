@@ -3,10 +3,10 @@ import ImagesSwiper from './ImagesSwiper';
 import Link from 'next/link';
 import CalendarSvg from '@/components/svg/CalendarSvg';
 import LocationSvg from '@/components/svg/LocationSvg';
-import { extractPlaceFromGeo } from '@/utils/formatGeo';
 import { useQuery } from '@tanstack/react-query';
 import { getClientEventImagesById, getClientImageById } from '@/services/clients-events';
 import SpinnerSvg from '@/components/svg/SpinnerSvg';
+import { parseISODate } from '@/utils/formatDate';
 
 const EventCard: React.FC<IEvent & { href?: string, text?: string, isTicketList?: boolean}> = ({
   href = "/event/",
@@ -68,7 +68,7 @@ const EventCard: React.FC<IEvent & { href?: string, text?: string, isTicketList?
           
           <div className="flex items-center gap-2">
             <LocationSvg className='w-6 h-6' />
-            {extractPlaceFromGeo(geo) || geo}
+            {parseISODate(date).date} {parseISODate(date).time}hs (UTC)
           </div>
           
           {/* {
