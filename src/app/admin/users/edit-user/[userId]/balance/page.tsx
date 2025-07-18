@@ -82,7 +82,7 @@ export default function Balance() {
                 className="grid grid-cols-[1fr_1fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-xs"
               >
                 <div className="text-start">{data.lastDate}</div>
-                <div className="text-center">{data.concept}</div>
+                <div className="text-center">Evento 1</div>
                 <div className="text-end tabular-nums">${data.amount.toLocaleString("es-ES")}</div>
                 <div className="text-end tabular-nums">${data.balance.toLocaleString("es-ES")}</div>
               </div>

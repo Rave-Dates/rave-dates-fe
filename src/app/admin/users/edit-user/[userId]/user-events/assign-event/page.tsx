@@ -6,11 +6,12 @@ import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { assignOrganizerToEvent, assignPromoterToEvent, getAllEvents } from "@/services/admin-events";
 import { getUserById } from "@/services/admin-users";
+import { onInvalid } from "@/utils/onInvalidFunc";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
-import { FieldErrors, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 export default function Page() {
   const queryClient = useQueryClient();
@@ -103,15 +104,6 @@ export default function Page() {
       console.log("PROMOTER formattedData",formattedData)
     }
     
-  };
-
-  const onInvalid = (errors: FieldErrors<IEventFormData>) => {
-    const firstError = Object.values(errors)[0];
-    if (firstError?.message) {
-      notifyError(firstError.message.toString());
-    } else {
-      notifyError("Por favor completá todos los campos requeridos.");
-    }
   };
 
   return (
