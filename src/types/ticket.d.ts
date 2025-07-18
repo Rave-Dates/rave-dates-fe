@@ -1,3 +1,4 @@
+// PROVISIONAL BORRAR interface Ticket
 interface Ticket {
   id: number
   type: string
@@ -6,4 +7,24 @@ interface Ticket {
   transferred: boolean
   price: number;
   quantity: number;
+}
+
+/** Purchased ticket interface */
+interface IPurchaseTicket {
+  purchaseTicketId: number;
+  purchaseId: number;
+  ticketTypeId: number;
+  status: 'PENDING' | 'READ' | 'DEFEATED';
+  checkerId: number | null;
+  isTransferred: boolean;
+  clientId: number;
+  createdAt: string;
+  updatedAt: string;
+  ticketType: {
+    ticketTypeId: number;
+    eventId: number;
+    name: string;
+    stages: IEventStages[];
+    event: IEvent;
+  };
 }

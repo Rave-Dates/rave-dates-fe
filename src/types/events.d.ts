@@ -1,6 +1,7 @@
 interface IEvent {
   eventId?: number;
   title: string;
+  subtitle: string;
   date: string;
   piggyBank: boolean;
   geo: string;
@@ -23,6 +24,7 @@ interface IEvent {
 
 interface IEventFormData extends Partial<IEvent> {
   categories?: [];
+  time?: string;
   editPlace?: string;
   categoriesToUpdate?: ({ categoryId: number; oldCategoryValueId: number; newCategoryValueId: number } | null)[];
   place?: string;
@@ -75,15 +77,17 @@ interface IEventTicket {
   eventId?: number;
   name: string;
   maxDate: string;
-  stages: {
-    stageId?: number; // para uso interno
-    date: string;
-    dateMax: string;
-    price: number;
-    quantity: number;
-  }[];
+  stages: IEventStages[];
   count?: number;
   limit?: number;
+}
+
+interface IEventStages {
+  stageId?: number;
+  date: string;
+  dateMax: string;
+  price: number;
+  quantity: number;
 }
 
 interface IEventCategories {

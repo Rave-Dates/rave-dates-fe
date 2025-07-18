@@ -5,7 +5,9 @@ const yyyyMmDd = formatDate(today);
 
 export const defaultEventFormData: IEventFormData = {
   title: '',
-  date: yyyyMmDd,
+  subtitle: '',
+  date: "",
+  time: "",
   geo: '',
   place: '',
   description: '',
