@@ -44,7 +44,7 @@ const EventCard: React.FC<IEvent & { href?: string, text?: string, isTicketList?
   });
 
   return (
-    <div className="bg-cards-container rounded-xs overflow-hidden shadow-2xl w-xl h-fit mx-auto">
+    <div className="bg-cards-container rounded-xs overflow-hidden shadow-2xl w-xl h-fit mx-auto mb-5">
       {
         loadingImages ?
         <div className='h-[36rem] flex items-center justify-center w-full bg-cards-container'>

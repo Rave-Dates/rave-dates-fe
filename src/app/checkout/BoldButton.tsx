@@ -1,38 +1,58 @@
-"use client";
+// components/BoldCheckoutProvider.tsx
+import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 
-import { useEffect, useRef } from "react";
+type BoldCheckoutRef = {
+  open: () => void;
+};
 
-export default function BoldButtonClient() {
-  const containerRef = useRef<HTMLDivElement>(null);
+type Props = {
+  orderId: string;
+  integritySignature: string;
+  amount: number;
+};
+
+const BoldCheckoutProvider = forwardRef<BoldCheckoutRef, Props>(({ orderId, integritySignature, amount }, ref) => {
+    const [checkout, setCheckout] = useState<any>(null);
 
   useEffect(() => {
-    // Espera a que Bold esté disponible y luego escanea el DOM
-    const interval = setInterval(() => {
-      if (window.BoldPaymentButton) {
-        window.BoldPaymentButton.initialize();
-        clearInterval(interval);
+    if (typeof window === "undefined") return;
+
+    function onLoad() {
+      if ((window as any).BoldCheckout) {
+        const instance = new (window as any).BoldCheckout({
+          currency: "COP",
+          orderId,
+          integritySignature,
+          amount: amount.toString(),
+          apiKey: process.env.NEXT_PUBLIC_BOLD_API_KEY || "",
+          renderMode: "embedded",
+        });
+
+        setCheckout(instance);
+      } else {
+        window.addEventListener("boldCheckoutLoaded", onLoad);
       }
-    }, 300);
+    }
 
-    return () => clearInterval(interval);
-  }, []);
+    onLoad();
 
-  return (
-    <div ref={containerRef}>
-      <div
-        data-bold-button
-        data-bold-button="light-L"
-        data-order-id="TEST-1"
-        data-currency="COP"
-        data-amount="30000"
-        data-api-key="2OygkTwlUJIcS_IV0xB2fK_uAldgVZ58AGLqtxLOQdc"
-        data-integrity-signature="f961d0c8446f164b9439d3aafbcb72854b5d7d64cc82177430c59f99eb61a5ab"
-        data-redirection-url="https://ravedates.proxising.com/checkout"
-        data-description="Concierto Rolling Stones XL"
-        data-customer-data='{"email": "example@correo.com","fullName": "Lola Flores","phone": "3040777777","dialCode": "+57","documentNumber": "123456789","documentType": "CC"}'
-        data-origin-url="https://micomercio.com/pagos/abandono/promo"
-        data-render-mode="embedded"
-      />
-    </div>
-  );
-}
+    return () => {
+      window.removeEventListener("boldCheckoutLoaded", onLoad);
+    };
+  }, [orderId, integritySignature, amount]);
+
+  // expone la instancia al padre usando ref
+  useImperativeHandle(ref, () => ({
+    open: () => {
+      if (checkout) {
+        checkout.open();
+      } else {
+        alert("El sistema de pagos aún no está listo, por favor intenta de nuevo.");
+      }
+    },
+  }));
+
+  return null; // no renderiza nada, sólo inicializa el checkout
+});
+
+export default BoldCheckoutProvider;
