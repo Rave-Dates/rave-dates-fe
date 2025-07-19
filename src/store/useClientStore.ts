@@ -4,14 +4,14 @@ type ClientStore = {
   name: string;
   email: string; 
   idCard: number; 
-  whatsapp: number;
-  setClientData: (name: string, email: string, idCard: number, whatsapp: number) => void;
+  whatsapp: string;
+  setClientData: ({name, email, idCard, whatsapp}: { name?: string; email: string; idCard?: number; whatsapp: string }) => void;
 };
 
 export const useClientStore = create<ClientStore>((set) => ({
   name: "",
   email: "",
   idCard: 0,
-  whatsapp: 0,
-  setClientData: (name, email, idCard, whatsapp) => set({ name, email, idCard, whatsapp }),
+  whatsapp: "",
+  setClientData: ({name, email, idCard, whatsapp}) => set({ name, email, idCard, whatsapp }),
 }));

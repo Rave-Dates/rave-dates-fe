@@ -5,14 +5,16 @@ import SpinnerSvg from "@/components/svg/SpinnerSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { useVerification } from "@/hooks/useVerification";
+import { useClientStore } from "@/store/useClientStore";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 type VerificationForm = {
+  whatsapp: string;
   email: string;
   code: [string, string, string, string];
 };
@@ -20,11 +22,13 @@ type VerificationForm = {
 export default function Verification() {
   const [loadingSend, setLoadingSend] = useState(false);
   const [loadingValidate, setLoadingValidate] = useState(false);
+  const [selectedVerification, setSelectedVerification] = useState<"Email" | "Whatsapp">("Email");
+
   const { getCookie, setCookie, deleteCookie } = useReactiveCookiesNext();
-  const router = useRouter();
-  const [selectedVerification, setSelectedVerification] = useState("Email");
   const { sendCode, validateCode } = useVerification();
-  console.log(loadingValidate)
+  const { email, whatsapp } = useClientStore()
+  const router = useRouter();
+  const clientToken = getCookie("clientToken");
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const {
@@ -45,10 +49,24 @@ export default function Verification() {
   useEffect(() => {
     const data = getCookie("tempToken");
     if (data) {
-      const decoded: { id: number; email: string; exp: number; iat: number } = jwtDecode(data.toString());
+      const decoded: { id: number; email: string, whatsapp: string; exp: number; iat: number } = jwtDecode(data.toString());
+      console.log("despues de crear cliente",decoded.email, decoded.whatsapp)
+      setValue("whatsapp", decoded.whatsapp);
       setValue("email", decoded.email)
+    } else if (email && whatsapp) {
+      console.log("despues de iniciar sesion",email, whatsapp)
+      setValue("email", email)
+      setValue("whatsapp", whatsapp)
+    } else {
+      router.replace('/');
     }
   });
+
+  useEffect(() => {
+    if (clientToken) {
+      redirect('/my-data');
+    }
+  }, [clientToken]);
 
   const handleInputChange = (index: number, value: string) => {
     if (value.length > 1) return;
@@ -79,13 +97,17 @@ export default function Verification() {
 
   const handleSendCode = () => {
     const email = getValues("email");
+    const method: "EMAIL" | "WHATSAPP" = selectedVerification === "Email" ? "EMAIL" : "WHATSAPP";
     if (!email) return alert("Debes ingresar un email");
     setLoadingSend(true);
-    sendCode(email)
+
+    console.log("prueba",{email, method})
+    sendCode({email, method})
       .then(() => {
         notifySuccess("Código enviado correctamente");
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err)
         notifyError("Error al enviar el código");
       })
       .finally(() => {
@@ -132,12 +154,18 @@ export default function Verification() {
           setSelected={setSelectedVerification}
         />
 
-        <input
-          type="email"
-          placeholder="Ingresa tu email"
-          className="w-full py-3 px-4 rounded bg-cards-container text-white"
-          {...register("email", { required: "El email es obligatorio" })}
-        />
+        {
+          selectedVerification === "Email" ?
+            <input
+              className="sr-only"
+              {...register("email", { required: "El email es obligatorio" })}
+            />
+            :
+            <input
+              className="sr-only"
+              {...register("whatsapp", { required: "El WhatsApp es obligatorio" })}
+            />
+        }
 
         <button
           type="button"

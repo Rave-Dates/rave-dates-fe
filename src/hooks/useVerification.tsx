@@ -9,7 +9,7 @@ export function useVerification() {
   const { setCookie } = useReactiveCookiesNext();
 
   const sendCodeMutation = useMutation({
-    mutationFn: (email: string) => initLoginClient({ email }),
+    mutationFn: ({email, method}: {email: string, method: "EMAIL" | "WHATSAPP"}) => initLoginClient({ email, method }),
   });
 
   const validateCodeMutation = useMutation({
@@ -17,8 +17,8 @@ export function useVerification() {
   });
 
   // Función para enviar código que envuelve la mutación en notifyPending
-  const sendCode = (email: string) => {
-    const promise = sendCodeMutation.mutateAsync(email);
+  const sendCode = ({email, method}: {email: string, method: "EMAIL" | "WHATSAPP"}) => {
+    const promise = sendCodeMutation.mutateAsync({email, method});
     notifyPending(promise, {
       loading: "Enviando código de validación...",
       success: "Código enviado correctamente",

@@ -1,9 +1,9 @@
 "use client"
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
 import { useQuery } from '@tanstack/react-query';
-import { getClientEventById, getClientEventImagesById, getClientImageById, getEventClientTickets } from '@/services/clients-events';
+import { getClientEventImagesById, getClientImageById, getEventClientTickets } from '@/services/clients-events';
 import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
 import EventHero from '../event-detail/EventHero';
 import EventLocation from '../event-detail/EventLocation';
@@ -20,7 +20,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
   const decoded = token && jwtDecode(token.toString());
   const clientId = Number(decoded?.id);
 
-  const { data: purchasedTickets, isLoading: isPurchasedTicketsLoading, isError: isPurchasedTicketsError } = useQuery<IPurchaseTicket[]>({
+  const { data: purchasedTickets, isLoading: isPurchasedTicketsLoading } = useQuery<IPurchaseTicket[]>({
     queryKey: ["purchasedTickets", clientId], // agregamos clientId por seguridad
     queryFn: async () => {
       if (!token) throw new Error("Token missing");
