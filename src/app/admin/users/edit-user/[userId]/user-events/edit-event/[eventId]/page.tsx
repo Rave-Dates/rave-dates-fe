@@ -10,20 +10,29 @@ import { onInvalid } from "@/utils/onInvalidFunc";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function Page() {
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+  const [assignedEventValue, setAssignedEventValue] = useState("");
+
   const queryClient = useQueryClient();
   const params = useParams();
   const userId = Number(params.userId)
+  const eventId = Number(params.eventId)
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const router = useRouter();
 
+  interface FormValues {
+    assignedEvent: string;
+    assignedCommission: string;
+  }
+
   const { register, handleSubmit, reset } = useForm<FormValues>({
     defaultValues: {
-      [`assignedEvent-${userId}`]: "",
+      assignedEvent: "",
       assignedCommission: ""
     }
   });
@@ -54,24 +63,48 @@ export default function Page() {
     enabled: !!token, // solo se ejecuta si hay token
   });
 
+  const { data: newEventData } = useQuery<IEvent>({
+    queryKey: ["eventToAssign", selectedEventId],
+    queryFn: () => getAllEvents({ token }).then(events => events.find(ev => ev.eventId === selectedEventId)!),
+    enabled: !!token && !!selectedEventId,
+  });
+
   useEffect(() => {
     if (!selectedUser) return;
+    if (selectedUser.role.name === "ORGANIZER" && !selectedUser.organizer?.events?.length) return;
+    if (selectedUser.role.name === "PROMOTER" && !selectedUser.promoter?.events?.length) return;
 
-    const assignedEvent =
-      selectedUser.role.name === "ORGANIZER"
-        ? selectedUser.organizer?.events?.[0]
-        : selectedUser.promoter?.events?.[0];
+    const assignedOrganizerEvent =
+      selectedUser.role.name === "ORGANIZER" && selectedUser.organizer?.events?.[0];
 
-    reset({
-      [`assignedEvent-${userId}`]: assignedEvent?.eventId?.toString() || "",
-      assignedCommission: "" // podés setear un valor real si lo tenés
-    });
-  }, [selectedUser, reset, userId]);
+    const assignedPromotorEvent =
+      selectedUser.role.name === "PROMOTER" && selectedUser.promoter?.events.find(e => e.eventId === eventId);
+
+    if (assignedOrganizerEvent) {
+      console.log("assignedEvent", assignedOrganizerEvent);
+      console.log("selectedEventId", selectedEventId);
+      setAssignedEventValue(assignedOrganizerEvent.OrganizerEvent.eventId.toString());
+      reset({
+        assignedEvent: assignedOrganizerEvent.OrganizerEvent.eventId.toString(),
+        assignedCommission: ""
+      });
+    }
+
+    if (assignedPromotorEvent && assignedPromotorEvent.eventId) {
+      console.log("assignedPromotorEvent", assignedPromotorEvent);
+      console.log("assignedPromotorEvent.eventId.toString()", assignedPromotorEvent.eventId.toString());
+      setAssignedEventValue(assignedPromotorEvent.eventId.toString());
+      reset({
+        assignedEvent: assignedPromotorEvent.eventId.toString(),
+        assignedCommission: ""
+      });
+    }
+  }, [selectedUser, reset, userId, selectedUser?.organizer?.events?.length, selectedUser?.promoter?.events?.length ]);
 
 
   const onSubmit = async (data: FormValues) => {
     if (!selectedUser) return;
-    const newEventId = Number(data[`assignedEvent-${userId}`]);
+    const newEventId = Number(data.assignedEvent);
     const commission = Number(data.assignedCommission); // solo para PROMOTER
 
     const role = selectedUser?.role.name;
@@ -90,8 +123,23 @@ export default function Page() {
 
     try {
       if (role === "PROMOTER") {
-        if (!selectedUser.promoter || !selectedUser.promoter.promoterId) return;
-        // Eliminar evento anterior si existe
+        if (!selectedUser.promoter || !selectedUser.promoter.promoterId || !newEventData) return;
+
+        const prevPromoters = newEventData.promoters?.filter(p => p.promoterId !== selectedUser.promoter?.promoterId) || [];
+
+        const formattedData = {
+          promoters: [
+            ...prevPromoters.map(p => ({
+              promoterId: p.promoterId!,
+              fee: p.fee
+            })),
+            {
+              promoterId: selectedUser.promoter.promoterId,
+              fee: commission,
+            },
+          ],
+        };
+
         if (currentEventId) {
           await deletePromoterEvent(
             token,
@@ -100,12 +148,7 @@ export default function Page() {
           );
         }
 
-        // Asignar nuevo evento
-        await assignPromoterToEvent(
-          token,
-          { promoters: [{ promoterId: selectedUser.promoter.promoterId, fee: commission }] },
-          newEventId
-        );
+        await assignPromoterToEvent(token, formattedData, newEventId);
       }
 
       if (role === "ORGANIZER") {
@@ -136,7 +179,7 @@ export default function Page() {
   
   const handleDelete = (data: FormValues) => {
     console.log("handleDelete")
-    const selectedEventId = Number(data[`assignedEvent-${userId}`]);
+    const selectedEventId = Number(data["assignedEvent"]);
     if (selectedUser?.role.name === "ORGANIZER") {
       const formattedData = {
         organizerId: selectedUser.organizer?.organizerId,
@@ -159,7 +202,7 @@ export default function Page() {
       });
     } else if (selectedUser?.role.name === "PROMOTER") {
       if (!selectedUser.promoter || !selectedUser.promoter.promoterId) return
-      const selectedEventId = Number(data[`assignedEvent-${userId}`]);
+      const selectedEventId = Number(data["assignedEvent"]);
       const formattedData = {
         promoters: [{
           promoterId: selectedUser.promoter.promoterId,
@@ -189,12 +232,21 @@ export default function Page() {
       <DefaultForm className="h-full pb-10 sm:pb-20" handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Asignar evento">
         <FormDropDown
           title="Evento*"
-          register={register(`assignedEvent-${userId}`, { required: "El evento es obligatorio" })}
+          register={register("assignedEvent", {
+            required: "El evento es obligatorio"
+          })}
+          value={assignedEventValue}
+          onChange={(e) => {
+            const val = e.target.value;
+            setAssignedEventValue(val);
+            const id = Number(val);
+            if (!isNaN(id)) setSelectedEventId(id);
+          }}
         >
           <option value="" disabled hidden>Seleccioná un evento</option>
           {
             clientEvents?.map((event) => (
-              <option key={event.eventId} value={event.eventId}>
+              <option key={event.eventId} value={String(event.eventId)}>
                 {event.title}
               </option>
             ))

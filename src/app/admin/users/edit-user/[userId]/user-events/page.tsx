@@ -75,7 +75,7 @@ export default function Page() {
                     Cuenta
                   </Link>
                   <Link
-                    href={`${pathname}/edit-event`}
+                    href={`${pathname}/edit-event/${event.eventId}`}
                     className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-black"
                   >
                     <EditSvg className="text-xl" />

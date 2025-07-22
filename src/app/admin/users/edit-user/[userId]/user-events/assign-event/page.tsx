@@ -4,16 +4,18 @@ import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
-import { assignOrganizerToEvent, assignPromoterToEvent, getAllEvents } from "@/services/admin-events";
+import { assignOrganizerToEvent, assignPromoterToEvent, getAllEvents, getEventById } from "@/services/admin-events";
 import { getUserById } from "@/services/admin-users";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useParams, useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function Page() {
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+
   const queryClient = useQueryClient();
   const params = useParams();
   const userId = Number(params.userId)
@@ -41,82 +43,95 @@ export default function Page() {
       queryClient.invalidateQueries({ queryKey: [`assignedEvent-${userId}`] });
     },
   });
-  
-  const { data: clientEvents } = useQuery<IEvent[]>({
-    queryKey: ["clientEvents"],
+
+  const { data: allEvents } = useQuery<IEvent[]>({
+    queryKey: ["allEvents"],
     queryFn: () => getAllEvents({ token }),
     enabled: !!token, // solo se ejecuta si hay token
   });
-
+  
   const { data: selectedUser } = useQuery<IUser>({
     queryKey: ["user"],
     queryFn: () => getUserById({ token, id: userId }),
     enabled: !!token, // solo se ejecuta si hay token
   });
-
+    
+  const { data: eventById } = useQuery<IEvent>({
+    queryKey: ["eventById", selectedEventId],
+    queryFn: () => getEventById({ token, id: selectedEventId! }),
+    enabled: !!token && selectedEventId !== null,
+  });
 
   const onSubmit = (data: FormValues) => {
-    console.log("Form submitted:", data);
-    console.log("selectedUser",selectedUser)
-    if (selectedUser?.role.name === "ORGANIZER") {
+    if (!selectedUser) return;
+    const selectedEventId = Number(data[`assignedEvent-${userId}`]);
+
+    if (selectedUser.role.name === "ORGANIZER") {
       const formattedData = {
         organizerId: selectedUser.organizer?.organizerId,
-      }
-      console.log("ORGANIZER formattedData",formattedData)
-      if (!formattedData.organizerId) return
-      const selectedEventId = Number(data[`assignedEvent-${userId}`]);
+      };
+      if (!formattedData.organizerId) return;
+      
       assignOrganizerEvent.mutate(
+        { data: formattedData, eventId: selectedEventId },
         {
-          data: formattedData, 
-          eventId: selectedEventId
-        }, {
-        onSuccess: () => {
-          notifySuccess("Evento asignado a un organizador correctamente");
-          router.back();
-        },
-        onError: (error) => {
-          console.log(error)
-          notifyError("Error al asignar evento a un organizador");
-        },
-      });
-    } else if (selectedUser?.role.name === "PROMOTER") {
-      if (!selectedUser.promoter || !selectedUser.promoter.promoterId) return
-      const selectedEventId = Number(data[`assignedEvent-${userId}`]);
+          onSuccess: () => {
+            notifySuccess("Evento asignado a un organizador correctamente");
+            router.back();
+          },
+          onError: () => notifyError("Error al asignar evento a un organizador"),
+        }
+      );
+    } else if (selectedUser.role.name === "PROMOTER") {
+      if (!selectedUser.promoter?.promoterId || !eventById) return;
+
+      const prevPromoters = eventById.promoters?.map((promoter) => ({
+        promoterId: promoter.promoterId!,
+        fee: promoter.fee,
+      })) || [];
+
       const formattedData = {
-        promoters: [{
-          promoterId: selectedUser.promoter.promoterId,
-          fee: 2,
-        }],
-      }
+        promoters: [
+          ...prevPromoters,
+          {
+            promoterId: selectedUser.promoter.promoterId,
+            fee: Number(data.assignedCommission), // importante: usar el dato ingresado
+          },
+        ],
+      };
+
       assignPromoterEvent.mutate(
+        { data: formattedData, eventId: selectedEventId },
         {
-          data:formattedData, 
-          eventId: selectedEventId
-        }, {
-        onSuccess: () => {
-          notifySuccess("Evento asignado a un promotor correctamente");
-          router.back();
-        },
-        onError: () => {
-          notifyError("Error al asignar evento a un promotor");
-        },
-      });
-      console.log("PROMOTER formattedData",formattedData)
+          onSuccess: () => {
+            notifySuccess("Evento asignado a un promotor correctamente");
+            router.back();
+          },
+          onError: () => notifyError("Error al asignar evento a un promotor"),
+        }
+      );
     }
-    
   };
+
 
   return (
     <div className="min-h-screen px-4 bg-primary-black pb-40 sm:pb-32 flex flex-col justify-between">
       <DefaultForm className="h-full pb-10 sm:pb-20" handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Asignar evento">
         <FormDropDown
           title="Evento*"
-          register={register(`assignedEvent-${userId}`, { required: "El evento es obligatorio" })}
+          register={register(`assignedEvent-${userId}`, {
+            required: "El evento es obligatorio"
+          })}
+          onChange={(e) => {
+            const val = e.target.value;
+            const id = Number(val);
+            if (!isNaN(id)) setSelectedEventId(id);
+          }}
         >
-           <option value="" disabled hidden>Seleccioná un evento</option>
+          <option value="" disabled hidden>Seleccioná un evento</option>
           {
-            clientEvents?.map((event) => (
-              <option key={event.eventId} value={event.eventId}>
+            allEvents?.map((event) => (
+              <option key={event.eventId} value={String(event.eventId)}>
                 {event.title}
               </option>
             ))

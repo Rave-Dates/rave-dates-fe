@@ -13,7 +13,7 @@ export const notifySuccess = (message: string) => {
       color: "#FFFFFF",
       borderColor: "#b3ff0020"
     },
-    duration: 5000,
+    duration: 2500,
     icon: <CheckSvg className="text-primary text-xl" />,
   });
 };
@@ -26,7 +26,7 @@ export const notifyError = (message: string) => {
       color: "#FFFFFF",
       borderColor: "#ff2e2e40"
     },
-    duration: 5000,
+    duration: 3500,
     icon: <AddSvg className="text-red-500 text-xl rotate-45" />,
   });
 };
@@ -47,7 +47,7 @@ export const notifyPending = (promise: Promise<string>, options?: {  loading?: s
     ),
     error: () => (
       <div className="flex items-center gap-2">
-        <AddSvg className="text-system-error border border-system-error/50 text-xl rotate-45" />
+        <AddSvg className="text-system-error text-xl rotate-45" />
         {options?.error || "Ocurrió un error"}
       </div>
     ),
@@ -57,7 +57,7 @@ export const notifyPending = (promise: Promise<string>, options?: {  loading?: s
       color: "#FFFFFF",
       borderColor: "#3B3B3B"
     },
-    duration: 5000,
+    duration: 3500,
     icon: null,
   });
 };
