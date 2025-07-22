@@ -20,6 +20,19 @@ interface IEvent {
   timeOut: number;
   isActive: boolean;
   labels: IEventLabel[];
+  organizer?: {
+    userId: number;
+    organizerId: number;
+    events: IOrganizerEvent[];
+  };
+  promoters?: {
+    promoterId?: number;
+    userId: number;
+    organizerId: null;
+    fee: number;
+    feeType: "fixed" | "percentage";
+    events: IPromoterEvent[];
+  }[];
 }
 
 interface IEventFormData extends Partial<IEvent> {
@@ -88,6 +101,8 @@ interface IEventStages {
   dateMax: string;
   price: number;
   quantity: number;
+  promoterFee: number;
+  feeType: "percentage" | "fixed";
 }
 
 interface IEventCategories {

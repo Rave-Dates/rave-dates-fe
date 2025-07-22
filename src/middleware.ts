@@ -22,6 +22,11 @@ export function middleware(req: NextRequest) {
     // si no hay token, redirigir
     return NextResponse.redirect(new URL("/admin/auth", req.url));
   }
+
+  if (path === "/admin")  {
+    return NextResponse.redirect(new URL("/admin/auth", req.url));
+  }
+
   if (!token) {
     // si no hay token, redirigir
     return NextResponse.redirect(new URL("/", req.url));
