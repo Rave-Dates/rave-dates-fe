@@ -1,10 +1,12 @@
+import { Dispatch, SetStateAction } from "react";
+
 type Props = {
   selected: string;
-  setSelected: (value: string) => void;
+  setSelected: Dispatch<SetStateAction<"Email" | "Whatsapp">>
 };
 
 export default function VerificationTypeSelector({ selected, setSelected }: Props) {
-  const methods = ["Email", "WhatsApp"];
+  const methods: ["Email", "Whatsapp"] = ["Email", "Whatsapp"];
 
   return (
     <div className="bg-cards-container rounded-lg">

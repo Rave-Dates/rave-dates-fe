@@ -3,9 +3,9 @@
 import VerificationTypeSelector from "@/components/containers/otp/VerificationTypeSelector";
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
-import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
+import { notifyError } from "@/components/ui/toast-notifications";
 import { useVerification } from "@/hooks/useVerification";
-import { useClientStore } from "@/store/useClientStore";
+import { useClientAuthStore } from "@/store/useClientAuthStore";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
@@ -14,19 +14,18 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 type VerificationForm = {
-  whatsapp: string;
-  email: string;
+  emailOrWhatsapp: string;
   code: [string, string, string, string];
 };
 
 export default function Verification() {
   const [loadingSend, setLoadingSend] = useState(false);
-  const [loadingValidate, setLoadingValidate] = useState(false);
+  const [_loadingValidate, setLoadingValidate] = useState(false);
   const [selectedVerification, setSelectedVerification] = useState<"Email" | "Whatsapp">("Email");
 
   const { getCookie, setCookie, deleteCookie } = useReactiveCookiesNext();
   const { sendCode, validateCode } = useVerification();
-  const { email, whatsapp } = useClientStore()
+  const { emailOrWhatsapp } = useClientAuthStore()
   const router = useRouter();
   const clientToken = getCookie("clientToken");
 
@@ -39,7 +38,7 @@ export default function Verification() {
     setValue,
   } = useForm<VerificationForm>({
     defaultValues: {
-      email: "",
+      emailOrWhatsapp: "",
       code: ["", "", "", ""],
     },
   });
@@ -50,13 +49,9 @@ export default function Verification() {
     const data = getCookie("tempToken");
     if (data) {
       const decoded: { id: number; email: string, whatsapp: string; exp: number; iat: number } = jwtDecode(data.toString());
-      console.log("despues de crear cliente",decoded.email, decoded.whatsapp)
-      setValue("whatsapp", decoded.whatsapp);
-      setValue("email", decoded.email)
-    } else if (email && whatsapp) {
-      console.log("despues de iniciar sesion",email, whatsapp)
-      setValue("email", email)
-      setValue("whatsapp", whatsapp)
+      setValue("emailOrWhatsapp", decoded.email)
+    } else if (emailOrWhatsapp) {
+      setValue("emailOrWhatsapp", emailOrWhatsapp)
     } else {
       router.replace('/');
     }
@@ -96,28 +91,25 @@ export default function Verification() {
   };
 
   const handleSendCode = () => {
-    const email = getValues("email");
+    const emailOrWhatsapp = getValues("emailOrWhatsapp");
     const method: "EMAIL" | "WHATSAPP" = selectedVerification === "Email" ? "EMAIL" : "WHATSAPP";
-    if (!email) return alert("Debes ingresar un email");
     setLoadingSend(true);
 
-    console.log("prueba",{email, method})
-    sendCode({email, method})
-      .then(() => {
-        notifySuccess("Código enviado correctamente");
-      })
+    sendCode({email: emailOrWhatsapp, method})
       .catch((err) => {
-        console.log(err)
-        notifyError("Error al enviar el código");
+        if (err.response.data.message === "Client not found") {
+          notifyError("Cliente no registrado, verifique su email o WhatsApp");
+          return
+        }
       })
       .finally(() => {
         setLoadingSend(false);
       });
   };
 
-  const onSubmit = (data: { code: string[]; email: string }) => {
+  const onSubmit = (data: { code: string[]; emailOrWhatsapp: string }) => {
     const pin = data.code.join("");
-    validateCode(data.email, pin)
+    validateCode(data.emailOrWhatsapp, pin)
       .then((propToken) => {
         const decoded: IUserLogin = jwtDecode(propToken);
         const expirationDate = new Date(decoded.exp * 1000);
@@ -128,12 +120,13 @@ export default function Verification() {
           maxAge: decoded.exp - Math.floor(Date.now() / 1000), // en segundos
         });
         deleteCookie("tempToken")
-        notifySuccess("Código validado correctamente");
         router.push("/checkout"); // Si no está en la mutación
       })
       .catch((err) => {
-        console.log(err)
-        notifyError("Código inválido o error al validar");
+        if (err.response.data.message === "Client not found") {
+          notifyError("Cliente no registrado, verifique su email o WhatsApp");
+          return
+        }
       })
       .finally(() => {
         setLoadingValidate(false);
@@ -154,18 +147,10 @@ export default function Verification() {
           setSelected={setSelectedVerification}
         />
 
-        {
-          selectedVerification === "Email" ?
-            <input
-              className="sr-only"
-              {...register("email", { required: "El email es obligatorio" })}
-            />
-            :
-            <input
-              className="sr-only"
-              {...register("whatsapp", { required: "El WhatsApp es obligatorio" })}
-            />
-        }
+        <input
+          className="sr-only"
+          {...register("emailOrWhatsapp", { required: "El email o el WhatsApp es obligatorio" })}
+        />
 
         <button
           type="button"
@@ -192,7 +177,7 @@ export default function Verification() {
                   pattern: /^[0-9]$/,
                 })}
                 ref={(el) => { inputRefs.current[index] = el }}
-                type="text"
+                type="number"
                 inputMode="numeric"
                 maxLength={1}
                 className="w-1/2 h-20 sm:h-28 bg-cards-container border border-cards-container rounded-lg text-center text-2xl font-bold text-white focus:border-primary focus:outline-none"
@@ -208,7 +193,7 @@ export default function Verification() {
           <button
             type="submit"
             disabled={!isCodeComplete}
-            className="w-full bg-primary text-black py-3 rounded-lg font-medium disabled:opacity-60"
+            className="w-full bg-primary text-black py-3 rounded-lg font-medium disabled:pointer-events-none disabled:opacity-60"
           >
             Continuar
           </button>

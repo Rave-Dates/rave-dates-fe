@@ -1,10 +1,9 @@
 "use client";
 
 import DefaultForm from "@/components/ui/forms/DefaultForm";
-import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
-import { createClient, editClient, getClientById } from "@/services/clients-login";
+import { editClient, getClientById } from "@/services/clients-login";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
@@ -25,7 +24,7 @@ export type ClientForm = {
 };
 
 export default function DataForm() {
-  const { setCookie, getCookie } = useReactiveCookiesNext();
+  const { getCookie } = useReactiveCookiesNext();
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
@@ -68,7 +67,7 @@ export default function DataForm() {
   
   const { mutate, isPending } = useMutation({
     mutationFn: editClient,
-    onSuccess: (data) => {
+    onSuccess: () => {
       notifySuccess("Datos editados correctamente");
       router.replace('/');
     },
@@ -120,7 +119,7 @@ export default function DataForm() {
         className="bg-primary text-black input-button"
         disabled={isPending}
       >
-         {isPending ? "Cargando..." : "Continuar"}
+         {isPending ? "Cargando..." : "Editar"}
       </button>
     </DefaultForm>
   );

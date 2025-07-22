@@ -5,14 +5,14 @@ import PaymentMethodSelector from "@/components/containers/checkout/PaymentMetho
 import PaymentTypeSelector from "@/components/containers/checkout/PaymentTypeSelector";
 import PricingDetails from "@/components/containers/checkout/PricingDetails";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
-import { verifyBoldTransaction } from "@/services/clients-tickets";
-import { useMutation } from "@tanstack/react-query";
+// import { verifyBoldTransaction } from "@/services/clients-tickets";
+// import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
-import Link from "next/link";
+// import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import BoldButton from "./BoldButton";
-import BoldPaymentButton from "./BoldButton";
+import { useRef, useState } from "react";
+// import BoldButton from "./BoldButton";
+// import BoldPaymentButton from "./BoldButton";
 import BoldCheckoutProvider from "./BoldButton";
 
 export default function Checkout() {
@@ -21,11 +21,11 @@ export default function Checkout() {
   const [check, setCheck] = useState(false);
 
   const { getCookie } = useReactiveCookiesNext();
-  const token = getCookie("clientToken");
+  // const token = getCookie("clientToken");
 
   const searchParams = useSearchParams();
-  const transactionId = searchParams.get("transactionId");
-  const status = searchParams.get("status");
+  // const transactionId = searchParams.get("transactionId");
+  // const status = searchParams.get("status");
 
   const boldCheckoutRef = useRef<{ open: () => void }>(null);
 
