@@ -3,13 +3,14 @@ import TrashSvg from '@/components/svg/TrashSvg';
 import { deleteUserById } from '@/services/admin-users';
 import { useMutation } from '@tanstack/react-query';
 import { notifyError, notifySuccess } from '../toast-notifications';
-import { redirect } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import { useReactiveCookiesNext } from 'cookies-next';
+import { useRouter } from 'next/navigation';
 
 function DeleteUserModal({ userId } : { userId: IUser["userId"] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { getCookie } = useReactiveCookiesNext();
+  const router = useRouter();
 
   const token = getCookie("token");
 
@@ -21,16 +22,14 @@ function DeleteUserModal({ userId } : { userId: IUser["userId"] }) {
 
       if (decoded.role !== 'ADMIN') {
         notifyError("No tienes permiso para eliminar un usuario.");
-        // setLoginError("No tienes permiso para acceder.");
         return
       }
       notifySuccess('Usuario eliminado correctamente');
       setIsModalOpen(false);
-      redirect('/admin/users');
+      router.push('/admin/users');
     },
     onError: (error) => {
       console.log(error)
-      // setLoginError("Credenciales incorrectas.");
       notifyError("Error al eliminar usuario.");
     },
   });
