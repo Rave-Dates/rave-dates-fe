@@ -11,7 +11,7 @@ import { getAllCategories } from "@/services/admin-categories";
 import { getEventById, getEventCategoriesById, getEventImages, getImageById } from "@/services/admin-events";
 import { getAllLabels } from "@/services/admin-labels";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { parseISODate, validateDateYyyyMmDd } from "@/utils/formatDate";
+import { combineDateAndTimeToISO, formatDateToColombiaTime, parseISODate, validateDateYyyyMmDd } from "@/utils/formatDate";
 import { extractLatAndLng, extractPlaceFromGeo } from "@/utils/formatGeo";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
@@ -109,6 +109,9 @@ export default function EditEvent({ eventId }: { eventId: number }) {
     const hasFormLabels = Array.isArray(eventFormData.labels) && eventFormData.labels.length > 0;
     const result = parseISODate(event.date)
 
+    const validDate = combineDateAndTimeToISO(result.date, result.time)
+    const formattedTimeZone = formatDateToColombiaTime(validDate)
+
     // Seteamos todo al formulario
     const setters = {
       title: event.title,
@@ -116,8 +119,8 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       discount: event.discount,
       discountCode: event.discountCode,
       feeRD: event.feeRD,
-      date: result.date,
-      time: result.time,
+      date: formattedTimeZone.date,
+      time: formattedTimeZone.time,
       maxPurchase: event.maxPurchase,
       geo: extractLatAndLng(event.geo),
       place: extractPlaceFromGeo(event.geo),

@@ -5,7 +5,7 @@ import InfoSvg from "@/components/svg/InfoSvg";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { getAllEvents } from "@/services/admin-events";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { parseISODate } from "@/utils/formatDate";
+import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { extractPlaceFromGeo } from "@/utils/formatGeo";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
@@ -56,8 +56,7 @@ export default function Page() {
                 className="grid grid-cols-[1fr_1fr_1fr_1.5fr] items-center py-3 px-3 gap-x-2 text-xs"
               >
                 <div className="text-start flex flex-col">
-                  <h3>{parseISODate(data.date).date}</h3>
-                  <h3>{parseISODate(data.date).time}hs</h3>
+                  <h3>{formatDateToColombiaTime(data.date).date} {formatDateToColombiaTime(data.date).time}hs</h3>
                 </div>
                 <div className="text-center tabular-nums">{data.title}</div>
                 <div className="text-center tabular-nums">{extractPlaceFromGeo(data.geo) || data.geo}</div>

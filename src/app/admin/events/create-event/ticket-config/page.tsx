@@ -6,7 +6,7 @@ import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
 import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { combineDateAndTimeToISO } from "@/utils/formatDate";
+import { combineDateAndTimeToISO, formatColombiaTimeToUTC } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -74,7 +74,7 @@ export default function TicketConfiguration() {
       eventCategoryValues: data.eventCategoryValues,
       title: data.title,
       subtitle: data.subtitle,
-      date: validDate,
+      date: formatColombiaTimeToUTC(validDate),
       geo: formattedGeo,
       description: data.description,
       type: data.type,
@@ -92,8 +92,6 @@ export default function TicketConfiguration() {
       labels: data.labels,
       tickets: validTickets,
     };
-
-    console.log("clean",cleanedEventData)
 
     notifyPending(
       new Promise((resolve, reject) => {

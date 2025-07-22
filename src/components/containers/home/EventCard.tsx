@@ -6,7 +6,8 @@ import LocationSvg from '@/components/svg/LocationSvg';
 import { useQuery } from '@tanstack/react-query';
 import { getClientEventImagesById, getClientImageById } from '@/services/clients-events';
 import SpinnerSvg from '@/components/svg/SpinnerSvg';
-import { parseISODate } from '@/utils/formatDate';
+import { formatDateToColombiaTime } from '@/utils/formatDate';
+import { extractPlaceFromGeo } from '@/utils/formatGeo';
 
 const EventCard: React.FC<IEvent & { href?: string, text?: string, isTicketList?: boolean}> = ({
   href = "/event/",
@@ -63,12 +64,12 @@ const EventCard: React.FC<IEvent & { href?: string, text?: string, isTicketList?
         <div className="space-y-2 mb-4 text-text-inactive text-body">
           <div className="flex items-center gap-2">
             <CalendarSvg className='w-6 h-6' />
-            {date}
+            {formatDateToColombiaTime(date).date} {formatDateToColombiaTime(date).time}hs (COL)
           </div>
           
           <div className="flex items-center gap-2">
             <LocationSvg className='w-6 h-6' />
-            {parseISODate(date).date} {parseISODate(date).time}hs (UTC)
+            {extractPlaceFromGeo(geo)}
           </div>
           
           {/* {

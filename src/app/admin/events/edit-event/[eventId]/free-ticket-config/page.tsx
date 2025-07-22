@@ -6,7 +6,7 @@ import { notifyError, notifyPending } from "@/components/ui/toast-notifications"
 import { useEditEvent } from "@/hooks/useEditEvent";
 import { getTicketTypesById } from "@/services/admin-events";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { formatDate, formatToISO } from "@/utils/formatDate";
+import { formatDate } from "@/utils/formatDate";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useParams } from "next/navigation";

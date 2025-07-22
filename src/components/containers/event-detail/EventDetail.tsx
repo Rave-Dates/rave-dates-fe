@@ -9,6 +9,7 @@ import GoBackButton from '@/components/ui/buttons/GoBackButton';
 import { useQuery } from '@tanstack/react-query';
 import { getClientEventById, getClientEventImagesById, getClientImageById, getEventClientTickets } from '@/services/clients-events';
 import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
+import { formatDateToColombiaTime } from '@/utils/formatDate';
 
 const EventDetails = ({ eventId } : { eventId: number }) => {
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
@@ -99,7 +100,10 @@ const EventDetails = ({ eventId } : { eventId: number }) => {
             <div className='mb-8'>
               <h3 className="text-lg mb-2">Fecha</h3>
               <p className="text-body bg-cards-container px-4 py-3 rounded-lg">
-                {selectedEvent?.date}
+                {
+                  selectedEvent?.date &&
+                  <>{formatDateToColombiaTime(selectedEvent.date).date} {formatDateToColombiaTime(selectedEvent.date).time}hs (COL)</>
+                }
               </p>
             </div>
 

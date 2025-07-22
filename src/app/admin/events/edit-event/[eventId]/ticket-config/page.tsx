@@ -7,7 +7,7 @@ import { notifyError, notifyPending } from "@/components/ui/toast-notifications"
 import { useEditEvent } from "@/hooks/useEditEvent"
 import { getTicketTypesById } from "@/services/admin-events"
 import { useCreateEventStore } from "@/store/createEventStore"
-import { combineDateAndTimeToISO, formatDate } from "@/utils/formatDate"
+import { combineDateAndTimeToISO, formatColombiaTimeToUTC, formatDate } from "@/utils/formatDate"
 import { onInvalid } from "@/utils/onInvalidFunc"
 import { useQuery } from "@tanstack/react-query"
 import { useReactiveCookiesNext } from "cookies-next"
@@ -95,6 +95,7 @@ export default function EditTicketConfiguration() {
 
     if (!data.date || !data.time) return
     const validDate = combineDateAndTimeToISO(data.date, data.time)
+    const formattedTimeUTC = formatColombiaTimeToUTC(validDate)
     
     updateEventFormData({
       ...eventFormData,
@@ -106,7 +107,7 @@ export default function EditTicketConfiguration() {
       eventId: eventFormData.eventId,
       title: data.title,
       subtitle: data.subtitle,
-      date: validDate,
+      date: formattedTimeUTC,
       geo: data.geo,
       description: data.description,
       type: data.type,
@@ -132,7 +133,7 @@ export default function EditTicketConfiguration() {
       new Promise((resolve, reject) => {
         editEvent(cleanedEventData, {
           onSuccess: () => {
-            resolve();
+            resolve("");
             route.push("/admin/events");
           },
           onError: (err) => {
