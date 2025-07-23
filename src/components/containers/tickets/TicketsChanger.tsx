@@ -1,6 +1,5 @@
 "use client"
 
-import { myTickets } from "@/template-data"
 import { TicketRow } from "./TicketRow"
 import Link from "next/link"
 import { usePathname } from "next/navigation";
@@ -16,7 +15,7 @@ export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid
   const decoded: {id: number} = (token && jwtDecode(token.toString())) || {id: 0};
   const clientId = Number(decoded?.id);
 
-  const { data: purchasedTickets, isLoading: isPurchasedTicketsLoading } = useQuery<IPurchaseTicket[]>({
+  const { data: purchasedTickets } = useQuery<IPurchaseTicket[]>({
     queryKey: ["purchasedTickets", clientId], // agregamos clientId por seguridad
     queryFn: async () => {
       if (!token) throw new Error("Token missing");

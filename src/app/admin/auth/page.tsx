@@ -19,7 +19,7 @@ type LoginForm = {
 };
 
 export default function Page() {
-  const { setCookie, getCookie } = useReactiveCookiesNext();
+  const { setCookie } = useReactiveCookiesNext();
   const router = useRouter();
 
   const {

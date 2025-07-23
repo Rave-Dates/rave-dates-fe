@@ -102,7 +102,7 @@ interface IEventStages {
   price: number;
   quantity: number;
   promoterFee: number;
-  feeType: "percentage" | "fixed";
+  feeType?: "percentage" | "fixed";
 }
 
 interface IEventCategories {
