@@ -48,6 +48,7 @@ export function TicketCard({
               dateMax: "",
               price: ticket.stages?.[0]?.price ?? 0,
               quantity: ticket.stages?.[0]?.quantity ?? 0,
+              promoterFee: ticket.stages?.[0]?.promoterFee ?? 0,
             },
           ],
     }));

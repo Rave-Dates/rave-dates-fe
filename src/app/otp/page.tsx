@@ -1,133 +1,215 @@
 "use client"
 
-import VerificationTypeSelector from "@/components/containers/otp/VerificationTypeSelector"
-import GoBackButton from "@/components/ui/buttons/GoBackButton"
-import Link from "next/link"
-import type React from "react"
+import VerificationTypeSelector from "@/components/containers/otp/VerificationTypeSelector";
+import SpinnerSvg from "@/components/svg/SpinnerSvg";
+import GoBackButton from "@/components/ui/buttons/GoBackButton";
+import { notifyError } from "@/components/ui/toast-notifications";
+import { useVerification } from "@/hooks/useVerification";
+import { useClientAuthStore } from "@/store/useClientAuthStore";
+import { onInvalid } from "@/utils/onInvalidFunc";
+import { useReactiveCookiesNext } from "cookies-next";
+import { jwtDecode } from "jwt-decode";
+import { redirect, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 
-import { useState, useRef } from "react"
+type VerificationForm = {
+  emailOrWhatsapp: string;
+  code: [string, string, string, string];
+};
 
 export default function Verification() {
-  const [code, setCode] = useState(["", "", "", ""])
-  const [selectedVerification, setSelectedVerification] = useState("Email");
+  const [loadingSend, setLoadingSend] = useState(false);
+  const [loadingValidate, setLoadingValidate] = useState(false);
+  const [selectedVerification, setSelectedVerification] = useState<"Email" | "Whatsapp">("Email");
 
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([])
+  const { getCookie, setCookie, deleteCookie } = useReactiveCookiesNext();
+  const { sendCode, validateCode } = useVerification();
+  const { emailOrWhatsapp } = useClientAuthStore()
+  const router = useRouter();
+  const clientToken = getCookie("clientToken");
+
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    watch,
+    setValue,
+  } = useForm<VerificationForm>({
+    defaultValues: {
+      emailOrWhatsapp: "",
+      code: ["", "", "", ""],
+    },
+  });
+
+  const code = watch("code");
+
+  useEffect(() => {
+    const data = getCookie("tempToken");
+    if (data) {
+      const decoded: { id: number; email: string, whatsapp: string; exp: number; iat: number } = jwtDecode(data.toString());
+      setValue("emailOrWhatsapp", decoded.email)
+    } else if (emailOrWhatsapp) {
+      setValue("emailOrWhatsapp", emailOrWhatsapp)
+    } else {
+      router.replace('/');
+    }
+  });
+
+  useEffect(() => {
+    if (clientToken) {
+      redirect('/my-data');
+    }
+  }, [clientToken]);
 
   const handleInputChange = (index: number, value: string) => {
-    // Only allow single digits
-    if (value.length > 1) return
+    if (value.length > 1) return;
 
-    const newCode = [...code]
-    newCode[index] = value
+    const newCode = [...code];
+    newCode[index] = value;
+    setValue("code", newCode as [string, string, string, string]);
 
-    setCode(newCode)
-
-    // Auto-advance to next input
     if (value && index < 3) {
-      inputRefs.current[index + 1]?.focus()
+      inputRefs.current[index + 1]?.focus();
     }
-  }
+  };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Handle backspace to go to previous input
     if (e.key === "Backspace" && !code[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus()
+      inputRefs.current[index - 1]?.focus();
     }
-  }
+  };
 
   const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault()
-    const pastedData = e.clipboardData.getData("text").slice(0, 4)
-    const newCode = pastedData.split("").slice(0, 4)
-
-    // Fill remaining slots with empty strings
-    while (newCode.length < 4) {
-      newCode.push("")
-    }
-
-    setCode(newCode)
-
-    // Focus on the next empty input or the last one
-    const nextEmptyIndex = newCode.findIndex((digit) => digit === "")
-    const focusIndex = nextEmptyIndex === -1 ? 3 : nextEmptyIndex
-    inputRefs.current[focusIndex]?.focus()
-  }
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").slice(0, 4).split("");
+    const newCode = [...pasted, "", "", "", ""].slice(0, 4);
+    setValue("code", newCode as [string, string, string, string]);
+    const focusIndex = newCode.findIndex((d) => d === "") ?? 3;
+    inputRefs.current[focusIndex]?.focus();
+  };
 
   const handleSendCode = () => {
-    console.log("Sending validation code...")
-    // Implement send code logic
-  }
+    const emailOrWhatsapp = getValues("emailOrWhatsapp");
+    const method: "EMAIL" | "WHATSAPP" = selectedVerification === "Email" ? "EMAIL" : "WHATSAPP";
+    setLoadingSend(true);
 
-  const handleContinue = () => {
-    const fullCode = code.join("")
-    console.log("Verification code:", fullCode)
-    // Implement continue logic
-  }
+    console.log("objeto de send code",{emailOrWhatsapp, method})
 
-  const isCodeComplete = code.every((digit) => digit !== "")
+    sendCode({email: emailOrWhatsapp, method})
+      .catch((err) => {
+        if (err.response.data.message === "Client not found") {
+          notifyError("Cliente no registrado, verifique su email o WhatsApp");
+          return
+        }
+      })
+      .finally(() => {
+        setLoadingSend(false);
+      });
+  };
+
+  const onSubmit = (data: { code: string[]; emailOrWhatsapp: string }) => {
+    const pin = data.code.join("");
+    setLoadingValidate(true);
+
+    validateCode(data.emailOrWhatsapp, pin)
+      .then((propToken) => {
+        const decoded: IUserLogin = jwtDecode(propToken);
+        const expirationDate = new Date(decoded.exp * 1000);
+
+        setCookie("clientToken", propToken, {
+          path: "/",
+          expires: expirationDate,
+          maxAge: decoded.exp - Math.floor(Date.now() / 1000), // en segundos
+        });
+        
+        deleteCookie("tempToken")
+        router.replace("/");
+      })
+      .catch((err) => {
+        if (err.response.data.message === "Client not found") {
+          notifyError("Cliente no registrado, verifique su email o WhatsApp");
+          return
+        }
+      })
+      .finally(() => {
+        setLoadingValidate(false);
+      });
+  };
+
+  const isCodeComplete = code.every((d) => d !== "");
+  const codeFieldNames = ["code.0", "code.1", "code.2", "code.3"] as const;
 
   return (
-    <div className="min-h-screen pb-40 pt-28 sm:pb-24 sm:pt-36 bg-primary-black sm:justify-center sm:items-center text-white flex px-6">
-      <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
-      <div className="max-w-md animate-fade-in mx-auto space-y-3">
+    <div className="min-h-screen pb-40 pt-28 sm:pb-24 sm:pt-36 bg-primary-black text-white flex px-6">
+      <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3" />
+      <div className="max-w-md mx-auto space-y-6 animate-fade-in">
         <h1 className="text-3xl font-bold">Valida tus datos</h1>
 
-        {/* Verification Status */}
-        <div className="space-y-3">
-          <VerificationTypeSelector 
-            selected={selectedVerification} 
-            setSelected={setSelectedVerification} 
-          />
-        </div>
+        <VerificationTypeSelector
+          selected={selectedVerification}
+          setSelected={setSelectedVerification}
+        />
 
-        {/* Send Code Button */}
+        <input
+          className="sr-only"
+          {...register("emailOrWhatsapp", { required: "El email o el WhatsApp es obligatorio" })}
+        />
+
         <button
+          type="button"
           onClick={handleSendCode}
-          className="w-full mb-8 bg-primary text-black font-medium py-3 rounded-lg hover:bg-[#b8f000] transition-colors"
+          disabled={loadingSend}
+          className={`${loadingSend ? "opacity-70 pointer-events-none" : "opacity-100 pointer-events-auto"} w-full bg-primary text-center flex items-center justify-center text-black py-3 rounded-lg transition-all`}
         >
-          Enviar código de validación
+          {
+            loadingSend ? <i><SpinnerSvg className="text-primary fill-inactive w-6" /></i> : <p>Enviar código de validación</p>
+          }
         </button>
 
-        {/* Code Input Section */}
-        <div className="space-y-4">
-          <p className="text-sm">Ingresa el código de 4 dígitos que te enviamos</p>
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
+          <p className="text-sm">Ingresa el código de 4 dígitos</p>
 
-          <div className="flex w-full gap-2 sm:gap-4 justify-center">
-            {code.map((digit, index) => (
-              <input
+          <div className="flex gap-3 justify-center">
+            {code.map((digit, index) => {
+              const name = codeFieldNames[index];
+              return (
+                <input
                 key={index}
-                ref={(el) => {
-                  inputRefs.current[index] = el;
-                }}
+                {...register(name, {
+                  required: "Requerido",
+                  pattern: /^[0-9]$/,
+                })}
+                ref={(el) => { inputRefs.current[index] = el }}
                 type="number"
                 inputMode="numeric"
-                pattern="[0-9]"
                 maxLength={1}
+                className="w-1/2 h-20 sm:h-28 bg-cards-container border border-cards-container rounded-lg text-center text-2xl font-bold text-white focus:border-primary focus:outline-none"
                 value={digit}
                 onChange={(e) => handleInputChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 onPaste={handlePaste}
-                className="w-1/2 h-20 sm:h-28 bg-cards-container border border-cards-container rounded-lg text-center text-2xl font-bold text-white focus:border-primary focus:outline-none"
               />
-            ))}
+              )
+            })}
           </div>
-        </div>
 
-        {/* Continue Button */}
-        <Link
-          href="/transfer-confirm"
-          onClick={handleContinue}
-          className={`${!isCodeComplete && "opacity-80 pointer-events-none"} block text-center w-full bg-primary text-black font-medium py-3 rounded-lg hover:bg-[#b8f000] transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
-        >
-          Continuar
-        </Link>
+          <button
+            type="submit"
+            disabled={!isCodeComplete || loadingValidate}
+            className={`${loadingValidate ? "opacity-70 pointer-events-none" : "opacity-100 pointer-events-auto"} w-full bg-primary text-black py-3 rounded-lg font-medium disabled:pointer-events-none disabled:opacity-60`}
+          >
+            {
+              loadingValidate ? <i><SpinnerSvg className="text-primary fill-inactive w-6" /></i> : <p>Continuar</p>
+            }
+          </button>
 
-        {/* Disclaimer */}
-        <p className="text-xs text-neutral-400 text-center">
-          Te enviaremos los tickets vía email o Whatsapp. En tu email revisa las
-          carpetas de Spam, No deseados, Promociones y otras carpetas ocultas.
-        </p>
+          <p className="text-xs text-neutral-400 text-center">
+            Revisa tu correo (spam, promociones, etc.)
+          </p>
+        </form>
       </div>
     </div>
-  )
+  );
 }

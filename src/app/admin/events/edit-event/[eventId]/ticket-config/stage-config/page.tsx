@@ -69,12 +69,14 @@ export default function StageConfig() {
     const today = new Date();
     const yyyyMmDd = today.toISOString().split('T')[0];
 
-    const newStage = {
+    const newStage: IEventStages = {
       stageId: newId,
       dateMax: "",
       price: 0,
       quantity: 0,
       date: yyyyMmDd,
+      feeType: "percentage",
+      promoterFee: 0
     };
 
     // Agrega el stage al hook de formulario (React Hook Form)

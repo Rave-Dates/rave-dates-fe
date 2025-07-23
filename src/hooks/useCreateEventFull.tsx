@@ -21,6 +21,7 @@ export function useCreateFullEvent(reset: (data: IEventFormData) => void) {
         ...eventData,
         labels: validLabels,
       };
+      console.log("cleandedEvent desde el hook",cleanedEvent)
       const createdEvent = await createEvent(token, cleanedEvent);
       const eventId = createdEvent.eventId;
 

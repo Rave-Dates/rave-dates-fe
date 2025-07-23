@@ -11,7 +11,7 @@ import { getAllCategories } from "@/services/admin-categories";
 import { getEventById, getEventCategoriesById, getEventImages, getImageById } from "@/services/admin-events";
 import { getAllLabels } from "@/services/admin-labels";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { validateDateYyyyMmDd } from "@/utils/formatDate";
+import { combineDateAndTimeToISO, formatDateToColombiaTime, parseISODate, validateDateYyyyMmDd } from "@/utils/formatDate";
 import { extractLatAndLng, extractPlaceFromGeo } from "@/utils/formatGeo";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
@@ -107,14 +107,20 @@ export default function EditEvent({ eventId }: { eventId: number }) {
 
     const sameLabels = JSON.stringify(event.labels) === JSON.stringify(eventFormData.labels);
     const hasFormLabels = Array.isArray(eventFormData.labels) && eventFormData.labels.length > 0;
+    const result = parseISODate(event.date)
+
+    const validDate = combineDateAndTimeToISO(result.date, result.time)
+    const formattedTimeZone = formatDateToColombiaTime(validDate)
 
     // Seteamos todo al formulario
     const setters = {
       title: event.title,
+      subtitle: event.subtitle,
       discount: event.discount,
       discountCode: event.discountCode,
       feeRD: event.feeRD,
-      date: event.date,
+      date: formattedTimeZone.date,
+      time: formattedTimeZone.time,
       maxPurchase: event.maxPurchase,
       geo: extractLatAndLng(event.geo),
       place: extractPlaceFromGeo(event.geo),
@@ -155,7 +161,6 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       const same = JSON.stringify(eventFormData.images) === JSON.stringify(eventImages);
       if (!same) {
       updateEventFormData({
-        ...eventFormData,
         images: imagesData ?? [],
       });
       }
@@ -242,17 +247,34 @@ useEffect(() => {
       <FormInput
         title="Título del evento*"
         inputName="title"
-        register={register("title", { required: "El titulo es obligatorio"  })}
+        register={register("title", { required: "El título es obligatorio"  })}
+      />
+      <FormInput
+        title="Subtítulo del evento*"
+        inputName="subtitle"
+        register={register("subtitle", { required: "El subtítulo es obligatorio"  })}
       />
       
-      <FormInput
-        title="Fecha y hora*"
-        inputName="date"
-        register={register("date", 
-          { required: "La fecha es obligatoria", 
-            validate: validateDateYyyyMmDd 
+      <div className="w-full gap-x-5 flex justify-between">
+        <FormInput
+          title="Fecha*"
+          inputName="date"
+          placeholder="yyyy-mm-dd"
+          register={register("date", { 
+            required: "La fecha es obligatoria", 
+            validate: validateDateYyyyMmDd
           })}
-      />
+        />
+
+        <FormInput
+          title="Hora (COL)*"
+          inputName="time"
+          placeholder="00:00"
+          register={register("time", { 
+            required: "La fecha es obligatoria", 
+          })}
+        />
+      </div>
 
       <FormInput
         title="Lugar*"

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { UseFormSetValue } from "react-hook-form";
 import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
 
@@ -20,6 +20,8 @@ const GeoAutocomplete = ({
   } = usePlacesAutocomplete({
     debounce: 300,
   });
+
+  const [isActive, setIsActive] = useState(false);
 
   // 👇 Seteamos el valor inicial si viene geo ya cargado
   useEffect(() => {
@@ -76,10 +78,11 @@ const GeoAutocomplete = ({
         onChange={(e) => {
           setInputValue(e.target.value);
         }}
+        onClick={() => setIsActive(true)}
         disabled={!ready}
         placeholder="Buscar ubicación"
       />
-      {status === "OK" && (
+      {status === "OK" && isActive && (
         <ul className="absolute z-10 w-full bg-main-container border-divider border mt-1 rounded shadow">
           {data.map(({ place_id, description }) => (
             <li

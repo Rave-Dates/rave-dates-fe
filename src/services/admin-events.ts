@@ -181,3 +181,27 @@ export const assignPromoterToEvent = async (token: CookieValueTypes, data: { pro
   });
   return res.data;
 }
+
+export const deletePromoterEvent = async (token: CookieValueTypes, data: { promoters: { promoterId: number, fee: number }[] }, eventId: number) => {
+  const res = await axios.delete(`${BASE_URL}/admin/events/${eventId}/promoter`, {
+    data,
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+  });
+  return res.data;
+}
+
+export const deleteOrganizerEvent = async (token: CookieValueTypes, data: { organizerId: number | null | undefined }, eventId: number) => {
+  const res = await axios.delete(`${BASE_URL}/admin/events/${eventId}/organizer`, {
+    data,
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+  });
+  return res.data;
+}

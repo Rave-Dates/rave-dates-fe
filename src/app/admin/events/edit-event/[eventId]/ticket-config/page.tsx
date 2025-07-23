@@ -7,7 +7,7 @@ import { notifyError, notifyPending } from "@/components/ui/toast-notifications"
 import { useEditEvent } from "@/hooks/useEditEvent"
 import { getTicketTypesById } from "@/services/admin-events"
 import { useCreateEventStore } from "@/store/createEventStore"
-import { formatDate, formatToISO } from "@/utils/formatDate"
+import { combineDateAndTimeToISO, formatColombiaTimeToUTC, formatDate } from "@/utils/formatDate"
 import { onInvalid } from "@/utils/onInvalidFunc"
 import { useQuery } from "@tanstack/react-query"
 import { useReactiveCookiesNext } from "cookies-next"
@@ -80,7 +80,6 @@ export default function EditTicketConfiguration() {
   if (piggyBank === false) setValue("commission", undefined)
 
   const onSubmit = (data: IEventFormData) => {
-    
     const formattedTickets = data.tickets.map((ticket) => ({
       ticketTypeId: ticket.ticketTypeId,
       eventId: eventId,
@@ -91,9 +90,14 @@ export default function EditTicketConfiguration() {
         dateMax: formatDate(stage.dateMax),
         quantity: stage.quantity,
         price: stage.price,
+        promoterFee: stage.promoterFee,
+        feeType: stage.feeType,
       })),
     }));
 
+    if (!data.date || !data.time) return
+    const validDate = combineDateAndTimeToISO(data.date, data.time)
+    const formattedTimeUTC = formatColombiaTimeToUTC(validDate)
     
     updateEventFormData({
       ...eventFormData,
@@ -104,7 +108,8 @@ export default function EditTicketConfiguration() {
     const cleanedEventData = {
       eventId: eventFormData.eventId,
       title: data.title,
-      date: formatToISO(data.date),
+      subtitle: data.subtitle,
+      date: formattedTimeUTC,
       geo: data.geo,
       description: data.description,
       type: data.type,
@@ -130,7 +135,7 @@ export default function EditTicketConfiguration() {
       new Promise((resolve, reject) => {
         editEvent(cleanedEventData, {
           onSuccess: () => {
-            resolve();
+            resolve("");
             route.push("/admin/events");
           },
           onError: (err) => {

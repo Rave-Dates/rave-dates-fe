@@ -3,10 +3,11 @@ import ImagesSwiper from './ImagesSwiper';
 import Link from 'next/link';
 import CalendarSvg from '@/components/svg/CalendarSvg';
 import LocationSvg from '@/components/svg/LocationSvg';
-import { extractPlaceFromGeo } from '@/utils/formatGeo';
 import { useQuery } from '@tanstack/react-query';
 import { getClientEventImagesById, getClientImageById } from '@/services/clients-events';
 import SpinnerSvg from '@/components/svg/SpinnerSvg';
+import { formatDateToColombiaTime } from '@/utils/formatDate';
+import { extractPlaceFromGeo } from '@/utils/formatGeo';
 
 const EventCard: React.FC<IEvent & { href?: string, text?: string, isTicketList?: boolean}> = ({
   href = "/event/",
@@ -44,7 +45,7 @@ const EventCard: React.FC<IEvent & { href?: string, text?: string, isTicketList?
   });
 
   return (
-    <div className="bg-cards-container rounded-xs overflow-hidden shadow-2xl w-xl h-fit mx-auto">
+    <div className="bg-cards-container rounded-xs overflow-hidden shadow-2xl w-xl h-fit mx-auto mb-5">
       {
         loadingImages ?
         <div className='h-[36rem] flex items-center justify-center w-full bg-cards-container'>
@@ -63,12 +64,12 @@ const EventCard: React.FC<IEvent & { href?: string, text?: string, isTicketList?
         <div className="space-y-2 mb-4 text-text-inactive text-body">
           <div className="flex items-center gap-2">
             <CalendarSvg className='w-6 h-6' />
-            {date}
+            {formatDateToColombiaTime(date).date} {formatDateToColombiaTime(date).time}hs (COL)
           </div>
           
           <div className="flex items-center gap-2">
             <LocationSvg className='w-6 h-6' />
-            {extractPlaceFromGeo(geo) || geo}
+            {extractPlaceFromGeo(geo)}
           </div>
           
           {/* {

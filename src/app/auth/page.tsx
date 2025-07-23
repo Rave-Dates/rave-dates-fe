@@ -1,69 +1,75 @@
 "use client";
 
-// import DefaultForm from "@/components/ui/forms/DefaultForm";
-// import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
-// import FormInput from "@/components/ui/inputs/FormInput";
+import DefaultForm from "@/components/ui/forms/DefaultForm";
+import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
+import FormInput from "@/components/ui/inputs/FormInput";
+import { useClientAuthStore } from "@/store/useClientAuthStore";
+import { onInvalid } from "@/utils/onInvalidFunc";
+import { useReactiveCookiesNext } from "cookies-next";
+import { redirect, useRouter } from "next/navigation";
 import type React from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 
-export default function LoginForm() {
-  // const [formData, setFormData] = useState({
-  //   email: "",
-  //   whatsapp: "",
-  //   receiveInfo: false,
-  // });
+type ClientForm = {
+  emailOrWhatsapp: string;
+  receiveInfo?: boolean;
+};
 
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prev) => ({ ...prev, [name]: value }));
-  // };
+export default function ClientAuth() {
+  const { getCookie } = useReactiveCookiesNext();
+  const { setClientAuthData } = useClientAuthStore()
+  const router = useRouter()
+  const tempToken = getCookie("tempToken");
+  const clientToken = getCookie("clientToken");
+  
+  useEffect(() => {
+    if (tempToken) {
+      router.push('/otp');
+    }
+    if (clientToken) {
+      redirect('/my-data');
+    }
+  }, [tempToken, clientToken, router]);
+  
+  const {
+    watch,
+    register,
+    handleSubmit,
+  } = useForm<ClientForm>();
+  
+  const receiveInfo = watch("receiveInfo", false);
 
-  // const handleCheckboxChange = (checked: boolean) => {
-  //   setFormData((prev) => ({ ...prev, receiveInfo: checked }));
-  // };
-
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   console.log("Form submitted:", formData);
-  // };
+  const onSubmit = (data: ClientForm) => {
+    if(!data.emailOrWhatsapp) return
+    setClientAuthData({emailOrWhatsapp: data.emailOrWhatsapp})
+    redirect('/otp');
+  };
 
   return (
-    // <DefaultForm handleSubmit={handleSubmit} title="Iniciar sesión">
-    //   <FormInput
-    //     type="email"
-    //     handleFunc={handleChange}
-    //     title="Email*"
-    //     formName={formData.email}
-    //     inputName="email"
-    //   />
-    //   <FormInput
-    //     type="tel"
-    //     handleFunc={handleChange}
-    //     title="Celular con WhatsApp*"
-    //     formName={formData.whatsapp}
-    //     inputName="whatsapp"
-    //   />
+    <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Ingresa tus datos">
+      <FormInput
+        title="Email o WhatsApp*"
+        inputName="emailOrWhatsapp"
+        register={register("emailOrWhatsapp", { required: "El email o el WhatsApp es obligatorio"  })}
+      />
 
-    //   <p className="text-sm">
-    //     Te enviaremos los tickets vía email y/o WhatsApp
-    //   </p>
+      <p className="text-sm">
+        Te enviaremos los tickets vía email y/o WhatsApp
+      </p>
 
-    //   <CheckFormInput
-    //     handleFunc={handleCheckboxChange}
-    //     inputData={formData.receiveInfo}
-    //   />
+       <CheckFormInput
+        name="receiveInfo"
+        register={register("receiveInfo")}
+        value={receiveInfo}
+      />
 
-    //   <button
-    //     disabled={!formData.receiveInfo}
-    //     type="submit"
-    //     className={`${
-    //       formData.receiveInfo
-    //         ? "bg-primary text-black"
-    //         : "bg-inactive text-text-inactive pointer-events-none"
-    //     } input-button`}
-    //   >
-    //     Iniciar sesión
-    //   </button>
-    // </DefaultForm>
-    <></>
+      <button
+        type="submit"
+        className="bg-primary text-black input-button"
+      >
+         Iniciar sesión
+      </button>
+    </DefaultForm>
   );
 }

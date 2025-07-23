@@ -3,6 +3,7 @@
 import EditSvg from "@/components/svg/EditSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { getUserById } from "@/services/admin-users";
+import { parseISODate } from "@/utils/formatDate";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
@@ -61,7 +62,10 @@ export default function Page() {
                 className="grid grid-cols-[1fr_1fr_2fr] items-center py-3 px-3 gap-x-2 text-xs"
               >
                 <div className="text-start">{event.title}</div>
-                <div className="text-end tabular-nums">{event.date}</div>
+                <div className="text-end tabular-nums flex flex-col">
+                  <h2>{event.date && parseISODate(event.date).date}</h2>
+                  <h2>{event.date && parseISODate(event.date).time}hs</h2>
+                </div>
                 <div className="flex gap-x-2 justify-end">
                   <Link
                     href={`${pathname}/event-balance`}
@@ -71,7 +75,7 @@ export default function Page() {
                     Cuenta
                   </Link>
                   <Link
-                    href={`${pathname}/edit-event`}
+                    href={`${pathname}/edit-event/${event.eventId}`}
                     className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-black"
                   >
                     <EditSvg className="text-xl" />
@@ -90,20 +94,12 @@ export default function Page() {
           )}
         </div>
       </div>
-      <div className="w-full justify-items-center">
-        <Link
-          href={`${pathname}/assign-event`}
-          className="block text-center pb-2 max-w-xl self-center text-primary-white input-button mt-10"
-        >
-          Asignar nuevo evento +
-        </Link>
-        <Link
-          href={`${pathname}/add`}
-          className="bg-primary block text-center max-w-xl self-center text-black input-button"
-        >
-          Guardar
-        </Link>
-      </div>
+      <Link
+        href={`${pathname}/assign-event`}
+        className="bg-primary block text-center max-w-xl self-center text-black input-button"
+      >
+        Asignar nuevo evento
+      </Link>
     </div>
   );
 }

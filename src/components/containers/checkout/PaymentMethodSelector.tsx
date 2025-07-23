@@ -1,15 +1,16 @@
 import Image from "next/image";
 import CheckSvg from "@/components/svg/CheckSvg";
+import { SetStateAction } from "react";
 
 type Props = {
   selected: string;
-  setSelected: (value: string) => void;
+  setSelected: React.Dispatch<SetStateAction<"Nequi" | "Bold">>;
   check: boolean;
   setCheck: (value: boolean) => void;
 };
 
 export default function PaymentMethodSelector({ selected, setSelected, check, setCheck }: Props) {
-  const methods = ["Nequi", "Tarjeta de débito o crédito"];
+  const methods: ["Nequi", "Bold"] = ["Nequi", "Bold"];
 
   return (
     <div className="bg-cards-container rounded-lg p-4">
@@ -43,14 +44,11 @@ export default function PaymentMethodSelector({ selected, setSelected, check, se
           </div>
           <div className="flex w-full items-center justify-between px-4">
             <div className="flex flex-col items-start justify-center">
-              <span className="group-hover:text-lime-200 font-light transition-colors">{item}</span>
-              <h3 className={`${item === "Nequi" && "hidden"} text-xs text-primary-white/45`}>
-                Cargo adicional: 10%
-              </h3>
+              <span className="group-hover:text-lime-200 font-light transition-colors">{item} {item === "Bold" && "(Tarjeta o PSE)"}</span>
             </div>
             <Image
-              className={item === "Nequi" ? "w-16 h-5 object-cover drop-shadow-sm drop-shadow-white/60" : "w-16 h-10 object-cover"}
-              src={item === "Nequi" ? "/images/nequi.png" : "/images/payment-methods.png"}
+              className="w-16 h-5 object-cover"
+              src={item === "Nequi" && "/images/nequi.webp" || item === "Bold" && "/images/bold.png" || ""}
               width={100}
               height={100}
               alt="logo"
@@ -58,6 +56,7 @@ export default function PaymentMethodSelector({ selected, setSelected, check, se
           </div>
         </label>
       ))}
+
 
       <div className="flex items-center pt-3 pb-1 select-none">
         <input type="checkbox" id="receiveInfo" checked={check} onChange={() => setCheck(!check)} className="hidden" />

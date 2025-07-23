@@ -19,7 +19,7 @@ const FormInput = ({
   register,
 }: FormInputProps) => {
   return (
-    <div>
+    <div className="w-full">
       <label htmlFor={inputName} className="text-xs">
         {title}
       </label>

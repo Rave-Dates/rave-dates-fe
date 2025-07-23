@@ -6,6 +6,7 @@ import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
 import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
+import { combineDateAndTimeToISO, formatColombiaTimeToUTC } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -23,18 +24,16 @@ export default function TicketConfiguration() {
     control,
     name: "tickets",
   });
-
-    
   register("piggyBank");
   const watchedPiggyBank = useWatch({ name: "piggyBank", control });
 
   useEffect(() => {
     setValue("commission", undefined)
-  }, [watchedPiggyBank]);
+  }, [watchedPiggyBank, setValue]);
 
   useEffect(() => {
     setValue("piggyBank", false);
-  }, []);
+  }, [setValue]);
 
   useEffect(() => {
     console.log(eventFormData)
@@ -48,7 +47,6 @@ export default function TicketConfiguration() {
   });
 
   const onSubmit = (data: IEventFormData) => {
-    console.log("data", data)
     const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
       console.log(ticketId, ticketTypeId)
       if (rest.stages.length === 1) return { ...rest, maxDate: rest.stages[0].dateMax };
@@ -67,10 +65,14 @@ export default function TicketConfiguration() {
       tickets: validTickets,
     });
 
+    if (!data.date || !data.time) return
+    const validDate = combineDateAndTimeToISO(data.date, data.time)
+
     const cleanedEventData = {
       eventCategoryValues: data.eventCategoryValues,
       title: data.title,
-      date: data.date,
+      subtitle: data.subtitle,
+      date: formatColombiaTimeToUTC(validDate),
       geo: formattedGeo,
       description: data.description,
       type: data.type,
@@ -89,8 +91,6 @@ export default function TicketConfiguration() {
       tickets: validTickets,
     };
 
-    console.log("clean",cleanedEventData)
-
     notifyPending(
       new Promise((resolve, reject) => {
         createFullEvent(cleanedEventData, {
@@ -104,8 +104,6 @@ export default function TicketConfiguration() {
         error: "Error al crear el evento",
       }
     );
-
-    // onSucces borrar los datos del form y del estado
   };
 
   const handleAddTicket = () => {
@@ -113,7 +111,7 @@ export default function TicketConfiguration() {
 
     const newId = (formTickets.at(-1)?.ticketId ?? 0) + 1;
 
-    const newTicket = {
+    const newTicket: IEventTicket = {
       ticketId: newId,
       name: '',
       maxDate: "",
@@ -124,6 +122,8 @@ export default function TicketConfiguration() {
           dateMax: "",
           price: 0,
           quantity: 0,
+          promoterFee: 0,
+          feeType: "percentage",
         },
       ],
     };

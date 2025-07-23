@@ -64,4 +64,3 @@ interface IUserLogin {
   iat: number;
   role: string ;
 }
-

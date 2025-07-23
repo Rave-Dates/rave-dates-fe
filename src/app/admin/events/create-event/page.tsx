@@ -73,15 +73,23 @@ export default function Page() {
   useEffect(() => {
     if (!eventFormData) return;
 
-    setValue("title", eventFormData.title);
-    setValue("place", eventFormData.place);
-    setValue("date", eventFormData.date);
-    setValue("geo", eventFormData.geo);
-    setValue("editPlace", eventFormData.editPlace);
-    setValue("description", eventFormData.description);
-    setValue("type", eventFormData.type);
-    setValue("labels", eventFormData.labels ?? []);
-    setValue("images", eventFormData.images ?? []);
+    const setters = {
+      title: eventFormData.title,
+      subtitle: eventFormData.subtitle,
+      place: eventFormData.place,
+      date: eventFormData.date,
+      time: eventFormData.time,
+      geo: eventFormData.geo,
+      editPlace: eventFormData.editPlace,
+      description: eventFormData.description,
+      type: eventFormData.type,
+      labels: eventFormData.labels,
+      images: eventFormData.images,
+    };
+
+    Object.entries(setters).forEach(([key, value]) => {
+      setValue(key as keyof IEventFormData, value);
+    });
   }, [eventFormData, setValue]);
   
   useEffect(() => {
@@ -129,13 +137,30 @@ export default function Page() {
         register={register("title", { required: "El titulo es obligatorio"  })}
       />
       <FormInput
-        title="Fecha y hora*"
-        inputName="date"
-        register={register("date", { 
-          required: "La fecha es obligatoria", 
-          validate: validateDateYyyyMmDd
-        })}
+        title="Subtítulo del evento*"
+        inputName="subtitle"
+        register={register("subtitle", { required: "El subtítulo es obligatorio"  })}
       />
+      <div className="w-full gap-x-5 flex justify-between">
+        <FormInput
+          title="Fecha*"
+          inputName="date"
+          placeholder="yyyy-mm-dd"
+          register={register("date", { 
+            required: "La fecha es obligatoria", 
+            validate: validateDateYyyyMmDd
+          })}
+        />
+
+        <FormInput
+          title="Hora (COL)*"
+          inputName="time"
+          placeholder="00:00"
+          register={register("time", { 
+            required: "La fecha es obligatoria", 
+          })}
+        />
+      </div>
       <FormInput
         title="Lugar*"
         inputName="place"
@@ -163,7 +188,7 @@ export default function Page() {
               register={register(`categories.${category.categoryId}` as "categories", { required: true })}
             >
               {
-                category.values.map((value) => (
+                category.values?.map((value) => (
                   <option 
                   key={value.valueId}   
                   value={JSON.stringify({

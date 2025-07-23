@@ -9,21 +9,25 @@ import GoBackButton from '@/components/ui/buttons/GoBackButton';
 import { useQuery } from '@tanstack/react-query';
 import { getClientEventById, getClientEventImagesById, getClientImageById, getEventClientTickets } from '@/services/clients-events';
 import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
+import { formatDateToColombiaTime } from '@/utils/formatDate';
 
-const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isTicketList?: boolean }) => {
+const EventDetails = ({ eventId } : { eventId: number }) => {
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
     queryKey: [`selectedEvent-${eventId}`],
     queryFn: () => getClientEventById(eventId),
+    enabled: !!eventId,
   });
   
   const { data: eventTickets, isLoading: isTicketsLoading } = useQuery<IEventTicket[]>({
     queryKey: ["eventTickets"],
     queryFn: () => getEventClientTickets(eventId),
+    enabled: !!eventId,
   });
-
+  
   const { data: eventImages } = useQuery<IEventImages[]>({
     queryKey: [`eventImages-${eventId}`],
     queryFn: () => getClientEventImagesById(eventId),
+    enabled: !!eventId,
   });
 
   const { data: servedImages, isLoading: isImagesLoading } = useQuery<{ id: string, url: string }[]>({
@@ -60,7 +64,7 @@ const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isT
               <h1 className="text-4xl font-semibold text-white mb-0.5 uppercase">
                 {selectedEvent?.title}
               </h1>
-              <p className="text-text-inactive">Extended set</p>
+              <p className="text-text-inactive">{selectedEvent?.subtitle}</p>
             </div>
           }
           {/* Left Column */}
@@ -79,7 +83,7 @@ const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isT
             {
               selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
             }
-            <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} isTicketList={isTicketList} />
+            <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} />
           </div>
         </div>
 
@@ -99,13 +103,15 @@ const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isT
             <div className='mb-8'>
               <h3 className="text-lg mb-2">Fecha</h3>
               <p className="text-body bg-cards-container px-4 py-3 rounded-lg">
-                {selectedEvent?.date}
+                {
+                  selectedEvent?.date &&
+                  <>{formatDateToColombiaTime(selectedEvent.date).date} {formatDateToColombiaTime(selectedEvent.date).time}hs (COL)</>
+                }
               </p>
             </div>
 
-            {
-              !isTicketList && <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} isTicketList={isTicketList} />
-            }
+            <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} />
+
 
             {
               selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
@@ -119,9 +125,6 @@ const EventDetails = ({ eventId, isTicketList = false } : { eventId: number, isT
                 eventCategoryValues={selectedEvent?.eventCategoryValues}
               />
             )}            
-            {
-              isTicketList && <TicketSelector isLoading={isTicketsLoading} ticketStatus="paid" isTicketList={isTicketList} />
-            }
           </div>
         </div>
       </div>
