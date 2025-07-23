@@ -20,7 +20,7 @@ type VerificationForm = {
 
 export default function Verification() {
   const [loadingSend, setLoadingSend] = useState(false);
-  const [_loadingValidate, setLoadingValidate] = useState(false);
+  const [loadingValidate, setLoadingValidate] = useState(false);
   const [selectedVerification, setSelectedVerification] = useState<"Email" | "Whatsapp">("Email");
 
   const { getCookie, setCookie, deleteCookie } = useReactiveCookiesNext();
@@ -95,6 +95,8 @@ export default function Verification() {
     const method: "EMAIL" | "WHATSAPP" = selectedVerification === "Email" ? "EMAIL" : "WHATSAPP";
     setLoadingSend(true);
 
+    console.log("objeto de send code",{emailOrWhatsapp, method})
+
     sendCode({email: emailOrWhatsapp, method})
       .catch((err) => {
         if (err.response.data.message === "Client not found") {
@@ -109,6 +111,8 @@ export default function Verification() {
 
   const onSubmit = (data: { code: string[]; emailOrWhatsapp: string }) => {
     const pin = data.code.join("");
+    setLoadingValidate(true);
+
     validateCode(data.emailOrWhatsapp, pin)
       .then((propToken) => {
         const decoded: IUserLogin = jwtDecode(propToken);
@@ -119,8 +123,9 @@ export default function Verification() {
           expires: expirationDate,
           maxAge: decoded.exp - Math.floor(Date.now() / 1000), // en segundos
         });
+        
         deleteCookie("tempToken")
-        router.push("/checkout"); // Si no está en la mutación
+        router.replace("/");
       })
       .catch((err) => {
         if (err.response.data.message === "Client not found") {
@@ -192,10 +197,12 @@ export default function Verification() {
 
           <button
             type="submit"
-            disabled={!isCodeComplete}
-            className="w-full bg-primary text-black py-3 rounded-lg font-medium disabled:pointer-events-none disabled:opacity-60"
+            disabled={!isCodeComplete || loadingValidate}
+            className={`${loadingValidate ? "opacity-70 pointer-events-none" : "opacity-100 pointer-events-auto"} w-full bg-primary text-black py-3 rounded-lg font-medium disabled:pointer-events-none disabled:opacity-60`}
           >
-            Continuar
+            {
+              loadingValidate ? <i><SpinnerSvg className="text-primary fill-inactive w-6" /></i> : <p>Continuar</p>
+            }
           </button>
 
           <p className="text-xs text-neutral-400 text-center">

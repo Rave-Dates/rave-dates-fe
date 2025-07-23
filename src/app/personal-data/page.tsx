@@ -28,16 +28,20 @@ export default function DataForm() {
   const { selected } = useTicketStore()
   const router = useRouter()
   const tempToken = getCookie("tempToken");
+  const clientToken = getCookie("clientToken");
   
   useEffect(() => {
-    if (tempToken && selected && Object.keys(selected).length > 0) {
-      router.push('/checkout');
-    } else if (!tempToken && selected && Object.keys(selected).length < 1) {
+    const withoutTickets = Object.keys(selected).length < 1
+    if ((!tempToken || !clientToken) && withoutTickets) {
+      notifyError("Debes seleccionar un ticket para continuar")
       router.push('/');
-    } else if (!tempToken) {
-      router.push('/personal-data');
+    } else if ((tempToken || clientToken) && !withoutTickets) {
+      notifySuccess("Tenes cuenta y seleccionaste tickets");
+      router.push('/checkout');
+    } else if ((!tempToken || !clientToken) && !withoutTickets) {
+      return
     }
-  }, [selected]);
+  }, [selected, tempToken, clientToken]);
   
   const {
     watch,

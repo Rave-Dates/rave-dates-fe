@@ -26,7 +26,7 @@ export const defaultEventFormData: IEventFormData = {
   discountCode: '',
   discount: 0,
   discountType: 'percentage',
-  maxPurchase: 0,
+  maxPurchase: 1,
   maxDate: yyyyMmDd,
   timeOut: 0,
   commission: 0,

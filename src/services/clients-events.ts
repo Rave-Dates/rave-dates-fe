@@ -8,7 +8,6 @@ export const getAllClientEvents = async (page: number, limit: number) => {
     },
   });
 
-  console.log("res",res.data.data)
   return res.data.data;
 };
 

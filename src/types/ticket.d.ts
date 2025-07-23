@@ -28,3 +28,18 @@ interface IPurchaseTicket {
     event: IEvent;
   };
 }
+
+interface IClientPurchaseTicket {
+  method: "NEQUI" | "BOLD";
+  clientId: number;
+  tickets: {
+    quantity: number;
+    ticketTypeId: number;
+  }[];
+  isPartial: boolean;
+  amount?: number;
+  promoterId?: number;
+  eventId: number;
+  boldMethod: string;
+  returnUrl: string;
+}
