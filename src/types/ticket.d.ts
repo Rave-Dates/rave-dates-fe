@@ -20,13 +20,32 @@ interface IPurchaseTicket {
   clientId: number;
   createdAt: string;
   updatedAt: string;
+  purchase: IPurchaseData;
   ticketType: {
     ticketTypeId: number;
     eventId: number;
     name: string;
+    maxDate?: string;
+    limit?: number;
     stages: IEventStages[];
-    event: IEvent;
   };
+}
+
+interface IPurchaseData {
+  purchaseId: number;
+  clientId: number;
+  promoterId: number | null;
+  transferredClientId: number | null;
+  paymentMethod: 'BOLD' | 'NEQUI' | string;
+  paymentStatus: 'PENDING' | 'COMPLETED' | 'FAILED' | string;
+  totalAmount: number;
+  partialAmount: number | null;
+  quantity: number;
+  isPartial: boolean;
+  referenceId: string;
+  purchaseDate: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface IClientPurchaseTicket {
@@ -42,4 +61,12 @@ interface IClientPurchaseTicket {
   eventId: number;
   boldMethod: string;
   returnUrl: string;
+}
+
+
+interface ITransferUser {
+  name: string;
+  email: string;
+  whatsapp: string;
+  idCard: string;
 }

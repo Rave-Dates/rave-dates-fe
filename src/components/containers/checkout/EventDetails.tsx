@@ -13,12 +13,6 @@ type Props = {
 };
 
 export default function EventDetails({className, selectedEvent, eventId}: Props) {
-  // const { data: eventImages } = useQuery<IEventImages[]>({
-  //   queryKey: [`eventImages-${eventId}`],
-  //   queryFn: () => getClientEventImagesById(eventId),
-  //   enabled: !!eventId,
-  // });
-
   const { data: eventImages } = useQuery<IEventImages[]>({
     queryKey: [`eventImages-${eventId}`],
     queryFn: async () => {

@@ -7,20 +7,16 @@ import DefaultTitledButton from "@/components/ui/buttons/DefaultTitledButton";
 import { usePathname } from 'next/navigation';
 
 interface TicketRowProps {
-  ticketId: number;
+  purchaseTicketId: number;
   href: string;
   ticketType: string;
-  userName: string;
-  actions: ("send" | "download" | "view")[];
-  onAction: (action: string, ticketType: string, userName: string) => void;
+  onAction: (action: string, ticketType: string) => void;
 }
 
 export function TicketRow({
-  ticketId,
+  purchaseTicketId,
   href,
   ticketType,
-  userName,
-  actions,
   onAction,
 }: TicketRowProps) {
   const pathname = usePathname();
@@ -42,15 +38,15 @@ export function TicketRow({
     <div className="bg-cards-container rounded-lg p-4 gap-x-5 flex items-center justify-between">
       <div>
         <div className="font-medium text-sm mb-1">{ticketType}</div>
-        <div className="text-sm">{userName}</div>
+        <div className="text-sm">algo aca</div>
       </div>
       <div className="flex gap-2">
-        {actions.map((action) => (
+        {["send", "download", "view"].map((action) => (
           <DefaultTitledButton
             key={action}
-            handleOnClick={() => onAction(action, ticketType, userName)}
+            handleOnClick={() => onAction(action, ticketType)}
             className={action === "view" ? "block" : "hidden sm:block"}
-            href={action === "view" ? `${pathname}/${href}/${ticketId}` : undefined}
+            href={action === "view" ? `${pathname}/${href}/${purchaseTicketId}` : undefined}
           >
             {getActionIcon(action)}
             <h2 className="text-[10px]">

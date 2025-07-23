@@ -3,36 +3,23 @@
 import React from 'react';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
 import { useQuery } from '@tanstack/react-query';
-import { getClientEventImagesById, getClientImageById, getEventClientTickets } from '@/services/clients-events';
+import { getClientEventById, getClientEventImagesById, getClientImageById, getEventClientTickets } from '@/services/clients-events';
 import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
 import EventHero from '../event-detail/EventHero';
 import EventLocation from '../event-detail/EventLocation';
 import TicketSelector from '../event-detail/TicketSelector';
 import EventInfo from '../event-detail/EventInfo';
-import { useReactiveCookiesNext } from 'cookies-next';
-import { jwtDecode } from 'jwt-decode';
-import { getTicketsFromClient } from '@/services/clients-tickets';
 import { parseISODate } from '@/utils/formatDate';
 
 const EventTicketDetails = ({ eventId } : { eventId: number }) => {
-  const { getCookie } = useReactiveCookiesNext();
-  const token = getCookie("clientToken");
-  const decoded: {id: number} = (token && jwtDecode(token.toString())) || {id: 0};
-  const clientId = Number(decoded?.id);
-
-  const { data: purchasedTickets, isLoading: isPurchasedTicketsLoading } = useQuery<IPurchaseTicket[]>({
-    queryKey: ["purchasedTickets", clientId], // agregamos clientId por seguridad
+  const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
+    queryKey: ["selectedEvent"],
     queryFn: async () => {
-      if (!token) throw new Error("Token missing");
-      return await getTicketsFromClient(clientId, token);
+      if (!eventId) throw new Error("EventId missing");
+      return await getClientEventById(eventId);
     },
-    enabled: !!token && !!clientId,
+    enabled: !!eventId,
   });
-
-  const selectedTicket = purchasedTickets?.find(ticket => ticket.ticketType.event.eventId === eventId)
-  const selectedEvent = selectedTicket?.ticketType.event;
-
-  console.log(selectedEvent)
 
   const { data: eventTickets, isLoading: isTicketsLoading } = useQuery<IEventTicket[]>({
     queryKey: ["eventTickets"],
@@ -72,7 +59,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
         <div className="hidden md:grid grid-cols-2 gap-x-8">
           {/* Title */}
           {
-            isPurchasedTicketsLoading ? <HeaderSkeleton />
+            isEventLoading ? <HeaderSkeleton />
             :
             <div className="mb-4 col-span-2">
               <h1 className="text-4xl font-semibold text-white mb-0.5 uppercase">
@@ -86,7 +73,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
             <EventHero isImagesLoading={isImagesLoading} eventImages={servedImages} />
             <EventInfo
               description={selectedEvent?.description || ""}
-              isLoading={isPurchasedTicketsLoading}
+              isLoading={isEventLoading}
               labels={selectedEvent?.labels}
               eventCategoryValues={selectedEvent?.eventCategoryValues}
             />
@@ -95,7 +82,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
           {/* Right Column */}
           <div className="space-y-8">
             {
-              selectedEvent && <EventLocation isLoading={isPurchasedTicketsLoading} event={selectedEvent} />
+              selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
             }
             <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} isTicketList={true} />
           </div>
@@ -121,13 +108,13 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
               </p>
             </div>
             {
-              selectedEvent && <EventLocation isLoading={isPurchasedTicketsLoading} event={selectedEvent} />
+              selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
             }
             
             {selectedEvent && selectedEvent.eventCategoryValues?.length > 0 && (
               <EventInfo
                 description={selectedEvent?.description || ""}
-                isLoading={isPurchasedTicketsLoading}
+                isLoading={isEventLoading}
                 labels={selectedEvent?.labels}
                 eventCategoryValues={selectedEvent?.eventCategoryValues}
               />

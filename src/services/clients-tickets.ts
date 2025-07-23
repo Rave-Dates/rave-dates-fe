@@ -23,3 +23,13 @@ export const initTicketPurchase = async ({ticketData, clientToken}: { ticketData
   });
   return data;
 };
+
+export const transferTickets = async ({ticketData, purchaseTicketId, clientToken}: { ticketData: ITransferUser, purchaseTicketId: number, clientToken: CookieValueTypes }) => {
+  const { data } = await axios.post(`${BASE_URL}/app/tickets/transfer/${purchaseTicketId}`, ticketData, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${clientToken}`,
+    },
+  });
+  return data;
+};
