@@ -1,41 +1,37 @@
 import React from "react";
 import CheckSvg from "../../svg/CheckSvg";
 
-const CheckFormInput = ({
-  handleFunc,
-  inputData,
-}: {
-  inputData: boolean;
-  handleFunc: (item: boolean) => void;
-}) => {
+type Props = {
+  register: ReturnType<ReturnType<typeof import("react-hook-form").useForm>["register"]>;
+  name?: string;
+  value?: boolean;
+};
+
+const CheckFormInput = ({ register, name = "receiveInfo", value }: Props) => {
   return (
-    <div className="flex items-center w-fit select-none">
-      {/* Invisible real checkbox (for accessibility if needed) */}
+    <label
+      htmlFor={name}
+      className="flex items-center w-fit select-none cursor-pointer gap-2"
+    >
       <input
         type="checkbox"
-        id="receiveInfo"
-        name="receiveInfo"
-        checked={inputData}
-        onChange={() => handleFunc(!inputData)}
-        className="hidden cursor-pointer"
+        id={name}
+        {...register}
+        className="sr-only"
+        checked={value}
       />
 
-      {/* Visual representation */}
       <div
-        onClick={() => handleFunc(!inputData)}
-        className={`w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors cursor-pointer border
-        ${inputData ? "bg-primary text-primary-black border-primary" : "border-inactive text-transparent"}`}
+        className={`w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors border
+          ${value ? "bg-primary text-primary-black border-primary" : "border-inactive text-transparent"}`}
       >
         <CheckSvg />
       </div>
 
-      <label
-        htmlFor="receiveInfo"
-        className="text-xs ps-2 h-full text-text-inactive select-none cursor-pointer"
-      >
+      <span className="text-xs text-text-inactive">
         Recordarme en este dispositivo
-      </label>
-    </div>
+      </span>
+    </label>
   );
 };
 

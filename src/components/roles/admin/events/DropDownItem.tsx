@@ -7,14 +7,12 @@ import { useEffect, useRef, useState } from "react"
 
 interface DropdownItemProps {
   title: string
-  value: string
-  amount?: string
   isExpanded?: boolean
   onToggle?: () => void
   children?: React.ReactNode
 }
 
-export function DropdownItem({ title, value, amount, isExpanded = false, onToggle, children }: DropdownItemProps) {
+export function DropdownItem({ title, isExpanded = false, onToggle, children }: DropdownItemProps) {
   const [height, setHeight] = useState(0)
   const contentRef = useRef<HTMLDivElement>(null)
 
@@ -35,8 +33,6 @@ export function DropdownItem({ title, value, amount, isExpanded = false, onToggl
           <span className="text-primary-white">{title}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-primary font-medium">{value}</span>
-          {amount && <span className="text-primary text-sm">({amount})</span>}
           {onToggle &&
             (isExpanded ? (
               <ArrowDownSvg className="rotate-180" />

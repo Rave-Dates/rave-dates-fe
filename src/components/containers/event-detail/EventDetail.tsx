@@ -5,46 +5,97 @@ import EventHero from './EventHero';
 import EventInfo from './EventInfo';
 import EventLocation from './EventLocation';
 import TicketSelector from './TicketSelector';
-import { events } from '@/template-data';
-import { redirect } from 'next/navigation';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
+import { useQuery } from '@tanstack/react-query';
+import { getClientEventById, getClientEventImagesById, getClientImageById, getEventClientTickets } from '@/services/clients-events';
+import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
+import { formatDateToColombiaTime } from '@/utils/formatDate';
 
-const EventDetails = ({ eventName, isTicketList = false } : { eventName: IEventCard['name'], isTicketList?: boolean }) => {
-  const selectedEvent = events.find(event => event.name === eventName);
-  if (!selectedEvent) return redirect("/")
+const EventDetails = ({ eventId } : { eventId: number }) => {
+  const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
+    queryKey: [`selectedEvent-${eventId}`],
+    queryFn: () => getClientEventById(eventId),
+    enabled: !!eventId,
+  });
+  
+  const { data: eventTickets, isLoading: isTicketsLoading } = useQuery<IEventTicket[]>({
+    queryKey: ["eventTickets"],
+    queryFn: () => getEventClientTickets(eventId),
+    enabled: !!eventId,
+  });
+  
+  const { data: eventImages } = useQuery<IEventImages[]>({
+    queryKey: [`eventImages-${eventId}`],
+    queryFn: () => getClientEventImagesById(eventId),
+    enabled: !!eventId,
+  });
+
+  const { data: servedImages, isLoading: isImagesLoading } = useQuery<{ id: string, url: string }[]>({
+    queryKey: [`servedImages-${eventId}`, eventImages?.map(img => img.imageId)],
+    enabled: !!eventImages,
+    queryFn: async () => {
+      if (!eventImages) return [];
+      const processedImages = await Promise.all(
+        eventImages?.map(async (img) => {
+          const blob = await getClientImageById(img.imageId);
+          const url = URL.createObjectURL(blob);
+          
+          return {
+            id: String(img.imageId),
+            url,
+          };
+        })
+      );
+
+      return processedImages;
+    },
+  });
   
   return (
-    <div className="min-h-screen bg-primary-black text-white pb-20 sm:pt-[6.7rem]">
+    <div className="min-h-screen bg-primary-black text-white pb-20 md:pt-[6.7rem]">
       <div className="max-w-7xl mx-auto pt-0 pb-20 md:px-6 md:py-8 animate-fade-in">
         {/* Web view */}
-        <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-x-8">
+        <div className="hidden md:grid grid-cols-2 gap-x-8">
           {/* Title */}
-          <div className="mb-4 col-span-2">
-            <h1 className="text-4xl font-semibold text-white mb-0.5 uppercase">{selectedEvent.name}</h1>
-            <p className="text-text-inactive">Extended set</p>
-          </div>
+          {
+            isEventLoading ? <HeaderSkeleton />
+            :
+            <div className="mb-4 col-span-2">
+              <h1 className="text-4xl font-semibold text-white mb-0.5 uppercase">
+                {selectedEvent?.title}
+              </h1>
+              <p className="text-text-inactive">{selectedEvent?.subtitle}</p>
+            </div>
+          }
           {/* Left Column */}
           <div className="space-y-8">
-            <EventHero eventImages={selectedEvent.images} />
-            <EventInfo artist={selectedEvent.artist} labels={selectedEvent.labels} genres={selectedEvent.genres} />
+            <EventHero isImagesLoading={isImagesLoading} eventImages={servedImages} />
+            <EventInfo
+              description={selectedEvent?.description || ""}
+              isLoading={isEventLoading}
+              labels={selectedEvent?.labels}
+              eventCategoryValues={selectedEvent?.eventCategoryValues}
+            />
           </div>
           
           {/* Right Column */}
           <div className="space-y-8">
-            <EventLocation event={selectedEvent} />
-            <TicketSelector ticketStatus={selectedEvent.status} isTicketList={isTicketList} />
+            {
+              selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
+            }
+            <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} />
           </div>
         </div>
 
         {/* Mobile view */}
         <div className="grid md:hidden grid-cols-1 gap-x-8 relative">
           <GoBackButton className="absolute z-30 top-20 left-5 px-2 py-2" />
-          <EventHero eventImages={selectedEvent.images} />
+          <EventHero isImagesLoading={isImagesLoading} eventImages={servedImages} />
 
           {/* Title */}
           <div className='px-6'>
             <div className="mb-4 text-center">
-              <h1 className="text-4xl font-semibold text-white mb-0.5 uppercase">{selectedEvent.name}</h1>
+              <h1 className="text-4xl font-semibold text-white mb-0.5 uppercase">{selectedEvent?.title}</h1>
               <p className="text-text-inactive">Extended set</p>
             </div>
             
@@ -52,21 +103,28 @@ const EventDetails = ({ eventName, isTicketList = false } : { eventName: IEventC
             <div className='mb-8'>
               <h3 className="text-lg mb-2">Fecha</h3>
               <p className="text-body bg-cards-container px-4 py-3 rounded-lg">
-                {selectedEvent.date}
+                {
+                  selectedEvent?.date &&
+                  <>{formatDateToColombiaTime(selectedEvent.date).date} {formatDateToColombiaTime(selectedEvent.date).time}hs (COL)</>
+                }
               </p>
             </div>
 
-            {
-              !isTicketList && <TicketSelector />
-            }
+            <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} />
 
-            <EventLocation event={selectedEvent} />
 
-            <EventInfo artist={selectedEvent.artist} labels={selectedEvent.labels} genres={selectedEvent.genres} />
-          
             {
-              isTicketList && <TicketSelector ticketStatus={selectedEvent.status} isTicketList={isTicketList} />
+              selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
             }
+            
+            {selectedEvent && selectedEvent.eventCategoryValues.length > 0 && (
+              <EventInfo
+                description={selectedEvent?.description || ""}
+                isLoading={isEventLoading}
+                labels={selectedEvent?.labels}
+                eventCategoryValues={selectedEvent?.eventCategoryValues}
+              />
+            )}            
           </div>
         </div>
       </div>

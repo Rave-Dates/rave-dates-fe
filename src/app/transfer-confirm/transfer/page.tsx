@@ -1,6 +1,6 @@
 "use client"
 
-import EventDetails from "@/components/containers/checkout/EventDetails"
+// import EventDetails from "@/components/containers/checkout/EventDetails"
 import TitleCard from "@/components/common/TitleCard"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import Link from "next/link"
@@ -17,7 +17,7 @@ export default function Verification() {
           <h2 className="font-light text-sm">Viernes, 11 de junio - 08:00 PM</h2>
         </div>
 
-        <EventDetails className="sm:hidden mb-3 block w-full" />
+        {/* <EventDetails className="sm:hidden mb-3 block w-full" /> */}
 
         <h2 className="text-start w-full">Entradas</h2>
 

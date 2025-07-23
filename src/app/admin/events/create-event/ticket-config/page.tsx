@@ -3,49 +3,165 @@
 import { TicketCard } from "@/components/roles/admin/TicketCard"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import FormInput from "@/components/ui/inputs/FormInput";
-import { useState } from "react"
+import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
+import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
+import { useCreateEventStore } from "@/store/createEventStore";
+import { combineDateAndTimeToISO, formatColombiaTimeToUTC } from "@/utils/formatDate";
+import { onInvalid } from "@/utils/onInvalidFunc";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 export default function TicketConfiguration() {
-  const [formData, setFormData] = useState({
-    rdComission: "",
-    discountCode: "",
-    maxTicketsPerPerson: "",
-    timeToBuy: "",
-    discount: "",
-    transferCost: "",
-    commission: ""
+  const { eventFormData, updateEventFormData, hasLoadedEvent } = useCreateEventStore();
+  const { register, handleSubmit, setValue, getValues, control, reset} = useForm<IEventFormData>({
+    defaultValues: eventFormData
+  });
+  const { mutate: createFullEvent } = useCreateFullEvent(reset);
+  const router = useRouter()
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "tickets",
+  });
+  register("piggyBank");
+  const watchedPiggyBank = useWatch({ name: "piggyBank", control });
+
+  useEffect(() => {
+    setValue("commission", undefined)
+  }, [watchedPiggyBank, setValue]);
+
+  useEffect(() => {
+    setValue("piggyBank", false);
+  }, [setValue]);
+
+  useEffect(() => {
+    console.log(eventFormData)
+  }, [eventFormData]);
+
+  useEffect(() => {
+    if (!hasLoadedEvent) {
+      notifyError("Por favor vuelva a crear un ticket")
+      router.push(`/admin/events/create-event`)
+    }
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const onSubmit = (data: IEventFormData) => {
+    const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
+      console.log(ticketId, ticketTypeId)
+      if (rest.stages.length === 1) return { ...rest, maxDate: rest.stages[0].dateMax };
+      const lastStageMaxDate = rest.stages.at(-1)?.dateMax || "";
+      return {
+        ...rest,
+        maxDate: lastStageMaxDate,
+      }
+    });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-  };
-  const [tickets, setTickets] = useState([
-    { id: 1, stagesEnabled: false },
-    { id: 2, stagesEnabled: true },
-    { id: 3, stagesEnabled: false },
-  ])
-  const [piggyBankEnabled, setPiggyBankEnabled] = useState(false)
+    const formattedGeo = `${data.geo};${data.place?.trim()}`;
 
-  const handleToggleStages = (ticketId: number, enabled: boolean) => {
-    setTickets((prev) =>
-      prev.map((ticket) => (ticket.id === ticketId ? { ...ticket, stagesEnabled: enabled } : ticket)),
-    )
-  }
+    updateEventFormData({
+      ...eventFormData,
+      ...data,
+      tickets: validTickets,
+    });
+
+    if (!data.date || !data.time) return
+    const validDate = combineDateAndTimeToISO(data.date, data.time)
+
+    const cleanedEventData = {
+      eventCategoryValues: data.eventCategoryValues,
+      title: data.title,
+      subtitle: data.subtitle,
+      date: formatColombiaTimeToUTC(validDate),
+      geo: formattedGeo,
+      description: data.description,
+      type: data.type,
+      isActive: data.isActive,
+      feeRD: data.feeRD,
+      feePB: data.feePB,
+      transferCost: data.transferCost,
+      discountCode: data.discountCode,
+      discountType: data.discountType,
+      discount: data.discount,
+      piggyBank: data.piggyBank,
+      maxPurchase: data.maxPurchase,
+      images: data.images,
+      timeOut: data.timeOut,
+      labels: data.labels,
+      tickets: validTickets,
+    };
+
+    notifyPending(
+      new Promise((resolve, reject) => {
+        createFullEvent(cleanedEventData, {
+          onSuccess: resolve,
+          onError: reject,
+        });
+      }),
+      {
+        loading: "Creando evento...",
+        success: "Evento creado correctamente",
+        error: "Error al crear el evento",
+      }
+    );
+  };
 
   const handleAddTicket = () => {
-    setTickets((prev) => [...prev, { id: tickets[tickets.length - 1]?.id + 1, stagesEnabled: false }])
-  }
+    const formTickets = getValues("tickets") || [];
 
-  const handleDeleteTicket = (ticketId: number) => {
-    if (tickets.length === 1) return
-    setTickets((prev) => prev.filter((ticket) => ticket.id !== ticketId))
-  }
+    const newId = (formTickets.at(-1)?.ticketId ?? 0) + 1;
+
+    const newTicket: IEventTicket = {
+      ticketId: newId,
+      name: '',
+      maxDate: "",
+      stages: [
+        {
+          stageId: 1, // stageId comienza en 1
+          date: "",
+          dateMax: "",
+          price: 0,
+          quantity: 0,
+          promoterFee: 0,
+          feeType: "percentage",
+        },
+      ],
+    };
+
+    // 1. Agregar al formulario
+    append(newTicket);
+
+    // 2. Agregar al estado global (Zustand)
+    const updatedTickets = [...(eventFormData.tickets || []), newTicket];
+
+    updateEventFormData({
+      ...eventFormData,
+      tickets: updatedTickets,
+    });
+  };
+
+
+  const handleDeleteTicket = (index: number) => {
+    if (fields.length === 1) return;
+
+    // 1. Obtener el ticketId del formulario
+    const formTickets = getValues("tickets");
+    const ticketIdToDelete = formTickets?.[index]?.ticketId;
+
+    // 2. Eliminar del formulario (React Hook Form)
+    remove(index);
+
+    // 3. Eliminar del estado global (Zustand)
+    const updatedTickets = eventFormData?.tickets?.filter(
+      (ticket) => ticket.ticketId !== ticketIdToDelete
+    );
+
+    updateEventFormData({
+      ...eventFormData,
+      tickets: updatedTickets,
+    });
+  };
+  
 
   return (
     <div className="bg-primary-black text-primary-white min-h-screen px-6 pt-28 pb-44">
@@ -55,13 +171,14 @@ export default function TicketConfiguration() {
 
         {/* Ticket Cards */}
         <div className="space-y-4">
-          {tickets.map((ticket) => (
+          {fields?.map((ticket, index) => (
             <TicketCard
-              key={ticket.id}
-              ticketNumber={ticket.id}
-              stagesEnabled={ticket.stagesEnabled}
-              onToggleStages={(enabled) => handleToggleStages(ticket.id, enabled)}
-              onDelete={() => handleDeleteTicket(ticket.id)}
+              getValues={getValues}
+              register={register}
+              index={index}
+              key={ticket?.ticketId}
+              ticketNumber={ticket.ticketId}
+              onDelete={() => handleDeleteTicket(index)}
             />
           ))}
         </div>
@@ -76,81 +193,76 @@ export default function TicketConfiguration() {
 
         {/* Configuration Options */}
         <div className="space-y-1 pt-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
             <div className="flex flex-col xs:flex-row gap-x-5">
               <FormInput
-                handleFunc={handleChange}
                 title="Comisión RD"
-                formName={formData.rdComission}
-                inputName="rdComission"
+                inputName="feeRD"
+                register={register("feeRD", {required: "La comisión RD es obligatoria", valueAsNumber: true})}
               />
               <FormInput
-                handleFunc={handleChange}
                 title="Costo transferencia de ticket"
-                formName={formData.transferCost}
                 inputName="transferCost"
+                register={register("transferCost", {required: "El costo de transferencia es obligatorio", valueAsNumber: true})}
               />
             </div>
             <div className="flex flex-col xs:flex-row gap-x-5">
               <FormInput
-                handleFunc={handleChange}
                 title="Código de descuento"
-                formName={formData.discountCode}
                 inputName="discountCode"
+                register={register("discountCode")}
               />
               <FormInput
-                handleFunc={handleChange}
                 title="Descuento"
-                formName={formData.discount}
                 inputName="discount"
+                register={register("discount", { valueAsNumber: true })}
               />
             </div>
             <div className="flex flex-col xs:flex-row gap-x-5">
               <FormInput
-                handleFunc={handleChange}
+                type="number"
                 title="Máx. de tickets p/ persona"
-                formName={formData.maxTicketsPerPerson}
-                inputName="maxTicketsPerPerson"
+                inputName="maxPurchase"
+                register={register("maxPurchase", {valueAsNumber: true})}
               />
               <FormInput
-                handleFunc={handleChange}
-                title="Tiempo de compra"
-                formName={formData.timeToBuy}
-                inputName="timeToBuy"
+                type="number"
+                title="Tiempo de compra (minutos)"
+                inputName="timeOut"
+                register={register("timeOut", {required: "El tiempo de compra es obligatorio", valueAsNumber: true})}
               />
             </div>
-          </form>
+              <div className="flex items-center justify-between mt-5">
+                <span className="text-white text-lg">Alcancía</span>
+                <button
+                  type="button"
+                  onClick={() => setValue("piggyBank", !watchedPiggyBank)}
+                  className="w-12 h-6 rounded-full transition-colors pointer-events-auto bg-cards-container"
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full transition-transform ${
+                      watchedPiggyBank ? "translate-x-6 bg-primary" : "translate-x-0.5 bg-text-inactive"
+                    }`}
+                  />
+                </button>
+              </div>
 
-          {/* Piggy Bank Toggle */}
-          <div className="flex items-center justify-between mt-5">
-            <span className="text-white text-lg">Alcancía</span>
-            <button
-              onClick={() => setPiggyBankEnabled(!piggyBankEnabled)}
-              className="w-12 h-6 rounded-full transition-colors pointer-events-auto bg-cards-container"
-            >
-              <div
-                className={`w-5 h-5 rounded-full transition-transform ${
-                  piggyBankEnabled ? "translate-x-6 bg-primary" : "translate-x-0.5 bg-text-inactive"
-                }`}
-              />
-            </button>
+              {/* <div className={`${piggyBank ? "block" : "hidden"}`}>
+                <FormInput
+                  title="Comisión"
+                  inputName="commission"
+                  register={register("commission")}
+                />
+              </div> */}
+
+              <button
+                type="submit"
+                className="w-full bg-primary text-black font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
+              >
+                Crear evento
+              </button>
+            </form>
           </div>
-
-          <div className={`${piggyBankEnabled ? "block" : "hidden"}`}>
-            <FormInput
-              handleFunc={handleChange}
-              title="Comisión"
-              formName={formData.commission}
-              inputName="commission"
-            />
-          </div>
-
-          <button
-            className="w-full bg-primary text-black font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
-          >
-            Crear evento
-          </button>
-        </div>
       </div>
     </div>
   )

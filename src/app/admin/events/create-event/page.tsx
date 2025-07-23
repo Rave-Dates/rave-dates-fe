@@ -5,138 +5,214 @@ import FilterTagButton from "@/components/ui/buttons/FilterTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
-import Link from "next/link";
-// import { redirect } from "next/navigation";
+import { defaultEventFormData } from "@/constants/defaultEventFormData";
+import { getAllCategories } from "@/services/admin-categories";
+import { getAllLabels } from "@/services/admin-labels";
+import { useCreateEventStore } from "@/store/createEventStore";
+import { validateDateYyyyMmDd } from "@/utils/formatDate";
+import { onInvalid } from "@/utils/onInvalidFunc";
+import { useQuery } from "@tanstack/react-query";
+import { useReactiveCookiesNext } from "cookies-next";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import type React from "react";
+import { useEffect } from "react";
 
-import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+
+const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/GeoAutocomplete"), { ssr: false });
+
 
 export default function Page() {
-  const organizers = ['Estacionamiento', 'Baños', 'Alcancía', '+21', 'Al aire libre'];
-  const eventTypes = ['Gratuito', 'Pago'];
+  const { eventFormData, updateEventFormData, setHasLoadedEvent } = useCreateEventStore();
+  const router = useRouter()
+  const { register, handleSubmit, watch, setValue, control } = useForm<IEventFormData>({
+    defaultValues: defaultEventFormData
+  });
+  const { getCookie } = useReactiveCookiesNext();
 
-
-  const [filters, setFilters] = useState({
-    location: 'Bogotá',
-    eventType: 'Gratuito',
-    organizers: ['Alcancía'],
-    genres: ['Hard Techno']
+  const token = getCookie("token");
+  
+  register("labels", {
+    validate: (value) =>
+      value && value.length > 0 ? true : "Debes seleccionar al menos una etiqueta",
   });
 
-  const [formData, setFormData] = useState({
-    title: "",
-    date: "",
-    place: "",
-    geo: "",
-    info: "",
-    receiveInfo: false,
+  register("images", {
+    validate: (value) =>
+      value && value.length > 0 ? true : "Debes subir al menos una imagen",
+  });
+  
+  const type = ['free', 'paid'];
+  
+  const { data: categories } = useQuery<IEventCategories[]>({
+    queryKey: ["roles"],
+    queryFn: () => getAllCategories({ token }),
+    enabled: !!token, // solo se ejecuta si hay token
+  });
+    
+  const { data: labelsTypes } = useQuery<IEventLabel[]>({
+    queryKey: ["labelsTypes"],
+    queryFn: () => getAllLabels({ token }),
+    enabled: !!token, // solo se ejecuta si hay token
   });
 
-  console.log(filters.eventType)
+  useEffect(() => {
+    register("geo", {
+      required: "Debes seleccionar una ubicación válida",
+      validate: (value) => {
+        const parts = value?.split(";");
+        if (parts?.length !== 2) return "Ubicación inválida";
+        return true;
+      },
+    });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+    register("editPlace");
+  }, [register]);
 
-   const handleOrganizerToggle = (organizer: string) => {
-    setFilters(prev => ({
-      ...prev,
-      organizers: prev.organizers.includes(organizer)
-        ? prev.organizers.filter(o => o !== organizer)
-        : [...prev.organizers, organizer]
-    }));
-  };
+  useEffect(() => {
+    if (!eventFormData) return;
 
-  const handleEventTypeChange = (eventType: string) => {
-    setFilters(prev => ({ ...prev, eventType }));
-  };
+    const setters = {
+      title: eventFormData.title,
+      subtitle: eventFormData.subtitle,
+      place: eventFormData.place,
+      date: eventFormData.date,
+      time: eventFormData.time,
+      geo: eventFormData.geo,
+      editPlace: eventFormData.editPlace,
+      description: eventFormData.description,
+      type: eventFormData.type,
+      labels: eventFormData.labels,
+      images: eventFormData.images,
+    };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    // redirect("/admin/events/create-event/ticket-config");
+    Object.entries(setters).forEach(([key, value]) => {
+      setValue(key as keyof IEventFormData, value);
+    });
+  }, [eventFormData, setValue]);
+  
+  useEffect(() => {
+  }, [eventFormData]);
+    
+  const watchedLabels = useWatch({ name: "labels", control });
+  const watchedImages = useWatch({ name: "images", control });
+
+  // creamos el evento 
+  const onSubmit = (data: IEventFormData) => {
+    const parsedCategories = data.categories?.map((category: string) => JSON.parse(category))
+    
+    const formattedData = {
+      ...data,
+      eventCategoryValues: parsedCategories?.map((category: IEventCategoryValue) => ({
+        ...category,
+        valueId: category.valueId,
+        categoryId: category.categoryId,
+        value: category.value,
+      })),
+    }
+
+    delete formattedData.categories;
+
+    console.log(formattedData)
+    updateEventFormData({
+      ...eventFormData,
+      ...formattedData,
+    })
+
+    setHasLoadedEvent(true)
+
+    router.push(
+      watch("type") === "free" ? 
+      "/admin/events/create-event/free-ticket-config" 
+      : "/admin/events/create-event/ticket-config"
+    )
   };
 
   return (
-    <DefaultForm handleSubmit={handleSubmit} title="Nuevo evento">
+    <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Nuevo evento">
       <FormInput
-        handleFunc={handleChange}
         title="Título del evento*"
-        formName={formData.title}
         inputName="title"
+        register={register("title", { required: "El titulo es obligatorio"  })}
       />
       <FormInput
-        handleFunc={handleChange}
-        title="Fecha y hora*"
-        formName={formData.date}
-        inputName="date"
+        title="Subtítulo del evento*"
+        inputName="subtitle"
+        register={register("subtitle", { required: "El subtítulo es obligatorio"  })}
       />
+      <div className="w-full gap-x-5 flex justify-between">
+        <FormInput
+          title="Fecha*"
+          inputName="date"
+          placeholder="yyyy-mm-dd"
+          register={register("date", { 
+            required: "La fecha es obligatoria", 
+            validate: validateDateYyyyMmDd
+          })}
+        />
+
+        <FormInput
+          title="Hora (COL)*"
+          inputName="time"
+          placeholder="00:00"
+          register={register("time", { 
+            required: "La fecha es obligatoria", 
+          })}
+        />
+      </div>
       <FormInput
-        handleFunc={handleChange}
         title="Lugar*"
-        formName={formData.place}
         inputName="place"
-      />
-      <FormInput
-        handleFunc={handleChange}
-        title="Geolocalización*"
-        formName={formData.geo}
-        inputName="geo"
+        register={register("place", {required: "El lugar es obligatorio"  })}
       />
 
-      <EventImageSwiper />
+      <GeoAutocomplete
+        setValue={setValue}
+        defaultGeo={eventFormData.editPlace}
+      />
+
+      <EventImageSwiper setImages={setValue} images={watchedImages} />
 
       <FormInput
-        handleFunc={handleChange}
         title="Información general*"
-        formName={formData.info}
-        inputName="info"
+        inputName="description"
+        register={register("description", { required: "La descripción es obligatoria"  })}
       />
 
-      <FormDropDown
-        title="Organizador*"
-        handleFunc={handleChange}
-      >
-        <option value="organizador">Organizador</option>
-        <option value="promotor">Promotor</option>
-        <option value="controlador">Controlador</option>
-      </FormDropDown>
-      <FormDropDown
-        title="Categoría 1*"
-        handleFunc={handleChange}
-      >
-        <option value="subcategoria1">Subcategoría 1</option>
-        <option value="subcategoria2">Subcategoría 2</option>
-        <option value="subcategoria3">Subcategoría 3</option>
-      </FormDropDown>
-      <FormDropDown
-        title="Categoría 2*"
-        handleFunc={handleChange}
-      >
-        <option value="subcategoria1">Subcategoría 1</option>
-        <option value="subcategoria2">Subcategoría 2</option>
-        <option value="subcategoria3">Subcategoría 3</option>
-      </FormDropDown>
-      <FormDropDown
-        title="Categoría 3*"
-        handleFunc={handleChange}
-      >
-        <option value="subcategoria1">Subcategoría 1</option>
-        <option value="subcategoria2">Subcategoría 2</option>
-        <option value="subcategoria3">Subcategoría 3</option>
-      </FormDropDown>
-
+       { 
+        categories?.map((category) => (
+            <FormDropDown
+              key={category.categoryId}
+              title={category.name}
+              register={register(`categories.${category.categoryId}` as "categories", { required: true })}
+            >
+              {
+                category.values?.map((value) => (
+                  <option 
+                  key={value.valueId}   
+                  value={JSON.stringify({
+                    valueId: value.valueId,
+                    categoryId: value.categoryId,
+                    value: value.value
+                  })}>
+                    {value.value}
+                  </option>
+                ))
+              }
+            </FormDropDown>
+          ))
+        }
       <br />
 
+    {labelsTypes && watchedLabels && (
       <FilterTagButton
-        items={organizers}
-        type="organizers"
-        handleFunc={handleOrganizerToggle}
-        filters={filters}
+        setValue={setValue}
+        watchedLabels={watchedLabels}
+        labelsTypes={labelsTypes}
         title="Etiquetas"
       />
-
+    )}
       <br />
 
       <div>
@@ -144,7 +220,7 @@ export default function Page() {
           Tipo de evento
         </h3>
         <div className="px-4 flex rounded-xl gap-x-5">
-          {eventTypes.map((item) => (
+          {type.map((item) => (
             <label
               key={item}
               className="flex gap-x-3 items-center py-3 justify-between cursor-pointer group"
@@ -152,38 +228,36 @@ export default function Page() {
               <div className="relative">
                 <input
                   type="radio"
-                  name="location"
-                  checked={filters["eventType"] === item}
-                  onChange={() => handleEventTypeChange(item)}
+                  value={item}
+                  {...register("type", { required: true })}
                   className="sr-only"
                 />
                 <div
                   className={`w-6 h-6 rounded-full border-1 flex items-center justify-center transition-colors ${
-                    filters["eventType"] === item
+                    watch("type") === item
                       ? "border-inactive bg-primary-black"
                       : "border-inactive group-hover:border-primary/20"
                   }`}
                 >
-                  {filters["eventType"] === item && (
+                  {watch("type") === item && (
                     <div className="w-3.5 h-3.5 bg-primary rounded-full"></div>
                   )}
                 </div>
               </div>
               <span className="text-primary-white group-hover:text-lime-200 transition-colors">
-                {item}
+                {item === 'free' ? 'Gratuito' : 'Pago'}
               </span>
             </label>
           ))}
         </div>
       </div>
 
-      <Link
-        href={`${filters.eventType === "Gratuito" ? "/admin/events/create-event/free-ticket-config" : "/admin/events/create-event/ticket-config"}`}
-        // type="submit"
+      <button
+        type="submit"
         className="bg-primary block text-center text-black input-button"
       >
         Continuar
-      </Link>
+      </button>
     </DefaultForm>
   );
 }

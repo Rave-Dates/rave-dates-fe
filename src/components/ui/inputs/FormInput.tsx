@@ -1,32 +1,33 @@
-import React, { ChangeEvent } from "react";
+import React from "react";
+import { UseFormRegisterReturn } from "react-hook-form";
 
-const FormInput = ({
-  handleFunc,
-  title,
-  formName,
-  type = "text",
-  inputName,
-  className = ""
-}: {
-  type?: string;
-  handleFunc: (item: ChangeEvent<HTMLInputElement>) => void;
+type FormInputProps = {
   title: string;
-  formName: string;
+  type?: string;
   inputName: string;
   className?: string;
-}) => {
+  placeholder?: string;
+  register: UseFormRegisterReturn;
+};
+
+const FormInput = ({
+  title,
+  type = "text",
+  inputName,
+  className = "",
+  placeholder,
+  register,
+}: FormInputProps) => {
   return (
-    <div>
+    <div className="w-full">
       <label htmlFor={inputName} className="text-xs">
         {title}
       </label>
       <input
         id={inputName}
-        name={inputName}
+        placeholder={placeholder}
         type={type}
-        required
-        value={formName}
-        onChange={handleFunc}
+        {...register}
         className={`${className} w-full mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white`}
       />
     </div>

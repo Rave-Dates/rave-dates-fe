@@ -57,7 +57,7 @@ const NavbarMobile: React.FC = () => {
       },
       {
         id: 'auth',
-        href: "/auth",
+        href: "/admin/parameters",
         label: 'Parámetros',
         icon: <GraphSvg className='w-6 h-6' />,
       },
@@ -108,7 +108,7 @@ const NavbarMobile: React.FC = () => {
             <Link
               key={item.id}
               href={item.href}
-              className={`${(item.href !== "/" && pathname.startsWith(item.href)) || pathname === item.href ? "text-primary" : "text-text-inactive"} flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 active:scale-95 hover:text-primary-white`}
+              className={`${(item.href !== "/" && pathname.startsWith(item.href)) || pathname === item.href ? "text-primary" : "text-text-inactive"} flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 active:scale-95 hover:text-primary will-change-transform`}
             >
               {item.icon}
               <span className="text-xs">

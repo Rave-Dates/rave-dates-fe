@@ -1,6 +1,5 @@
 "use client"
 
-import FormInput from "@/components/ui/inputs/FormInput"
 import { useState } from "react"
 
 interface StageCardProps {
@@ -14,14 +13,14 @@ export function UserStageInfo({
   stageNumber,
   stagePrice,
 }: StageCardProps) {
-  const [formData, setFormData] = useState({
+  const [formData] = useState({
     commission: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev) => ({ ...prev, [name]: value }));
+  // };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,13 +40,13 @@ export function UserStageInfo({
 
       {/* Input Fields */}
       <div onSubmit={handleSubmit} className="gap-3">
-        <FormInput
+        {/* <FormInput
           className="!bg-cards-container"
           handleFunc={handleChange}
           title="Comisión promotor"
           formName={formData.commission}
           inputName="commission"
-        />
+        /> */}
       </div>
 
     </div>

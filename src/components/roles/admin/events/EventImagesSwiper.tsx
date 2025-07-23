@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useEffect, useRef } from "react"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Navigation, Pagination } from "swiper/modules"
 
@@ -13,18 +13,27 @@ import "swiper/css/pagination"
 import AddSvg from "@/components/svg/AddSvg"
 import ArrowDownSvg from "@/components/svg/ArrowDown"
 import FileSvg from "@/components/svg/FileSvg"
+import SpinnerSvg from "@/components/svg/SpinnerSvg"
+import Image from "next/image"
+import { notifyError } from "@/components/ui/toast-notifications"
+import { UseFormSetValue } from "react-hook-form"
 
 interface ImageData {
   id: string
   url: string
-  file: File
+  file?: File
 }
 
-export default function EventImageSwiper() {
-  const [images, setImages] = useState<ImageData[]>([])
+export default function EventImageSwiper({ setImages, images, isLoading, isError, isErrorEventImages }: { setImages: UseFormSetValue<IEventFormData>, images: IImageData[], isLoading?: boolean, isError?: boolean, isErrorEventImages?: boolean }) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const prevRef = useRef<HTMLButtonElement | null>(null)
   const nextRef = useRef<HTMLButtonElement | null>(null)
+
+  useEffect(() => {
+    if (isErrorEventImages || isError) {
+      notifyError("Error cargando imágenes")
+    }
+  }, [isErrorEventImages, isError])
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
@@ -42,18 +51,19 @@ export default function EventImageSwiper() {
         })
       }
     })
-
-    setImages((prev) => [...prev, ...newImages])
+    if (!images) return
+    setImages("images", [...images, ...newImages])
   }
 
   const removeImage = (id: string) => {
-    setImages((prev) => {
-      const imageToRemove = prev.find((img) => img.id === id)
-      if (imageToRemove) {
-        URL.revokeObjectURL(imageToRemove.url)
-      }
-      return prev.filter((img) => img.id !== id)
-    })
+    const imageToRemove = images?.find((img) => img.id === id)
+    if (imageToRemove?.file) {
+      URL.revokeObjectURL(imageToRemove.url)
+    }
+    const filteredImages = images?.filter((img) => img.id !== id)
+
+    if (!filteredImages) return
+    setImages("images",  [...filteredImages])
   }
 
   const triggerFileInput = () => {
@@ -86,7 +96,7 @@ export default function EventImageSwiper() {
           />
         </div>
 
-        {images.length > 0 ? (
+        {images && images?.length > 0 ? (
           <div>
             {/* Main Swiper */}
             <div className="relative max-w-40 text-xl max-h-40">
@@ -127,7 +137,9 @@ export default function EventImageSwiper() {
                 {images.map((image) => (
                   <SwiperSlide key={image.id} className="relative">
                     <div className="relative  aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                      <img
+                      <Image
+                        width={1000}
+                        height={1000}
                         src={image.url}
                         alt="Uploaded"
                         className="w-full h-full object-cover"
@@ -148,7 +160,9 @@ export default function EventImageSwiper() {
           </div>
         ) : (
           <div className="text-center min-w-40 flex flex-col items-center justify-center h-40 border-2 border-dashed border-inactive text-text-inactive rounded-lg">
-            <FileSvg />
+            {
+              isLoading ? <SpinnerSvg className="p-14 text-inactive fill-primary" /> : <FileSvg className={`${(isError || isErrorEventImages) && "text-system-error"}`} />
+            }
           </div>
         )}
       </div>

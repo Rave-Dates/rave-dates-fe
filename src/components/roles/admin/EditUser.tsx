@@ -1,42 +1,90 @@
 "use client"
 
-import React, { useState } from 'react';
-import { users } from '@/template-data';
+import React, { useEffect } from 'react';
 import DefaultForm from '@/components/ui/forms/DefaultForm';
 import FormInput from '@/components/ui/inputs/FormInput';
-import { redirect, usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import FormDropDown from '@/components/ui/inputs/FormDropDown';
 import Link from 'next/link';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
 import DefaultButton from '@/components/ui/buttons/DefaultButton';
 import DeleteUserModal from '@/components/ui/modals/DeleteUserModal';
+import { useReactiveCookiesNext } from 'cookies-next';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { editUserById, getUserById } from '@/services/admin-users';
+import { useForm } from 'react-hook-form';
+import { jwtDecode } from 'jwt-decode';
+import { notifyError, notifySuccess } from '@/components/ui/toast-notifications';
+import { getAllRoles } from '@/services/admin-roles';
 
 const EditUser = ({ userId } : { userId: number }) => {
-  const selectedUser = users.find(user => user.id === userId);
   const pathname = usePathname();
-  
-  if (!selectedUser) {
-    alert("No se encontró el usuario")
-    redirect("/")
-  }
+  const { register, handleSubmit, reset} = useForm();
+  const { getCookie } = useReactiveCookiesNext();
+  const router = useRouter();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    idNumber: "",
-    role: "",
-    commission: "",
-    tickets: "",
+  const token = getCookie("token");
+  
+  // obtenemos user por id
+  const { data, isPending } = useQuery({
+    queryKey: ["user"],
+    queryFn: () => getUserById({ token, id: userId }),
+    enabled: !!token, // solo se ejecuta si hay token
   });
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
+  const { data: roles } = useQuery({
+    queryKey: ["roles"],
+    queryFn: () => getAllRoles({ token }),
+    enabled: !!token, // solo se ejecuta si hay token
+  });
+
+  // resetea los campos cuando llegan los datos
+  useEffect(() => {
+    if (data) {
+      reset({
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        roleId: data.roleId,
+      });
+    }
+  }, [data, reset]);
+
+  // editamos el usuario 
+  const { mutate } = useMutation({
+    mutationFn: editUserById,
+    onSuccess: () => {
+
+      const decoded: IUserLogin = jwtDecode(`${token}`);
+
+      if (decoded.role !== 'ADMIN') {
+        notifyError("No tienes permiso para editar un usuario.");
+        // setLoginError("No tienes permiso para acceder.");
+        return
+      }
+      notifySuccess('Usuario editado correctamente');
+      router.back();
+    },
+    onError: (error) => {
+      console.log(error)
+      // setLoginError("Credenciales incorrectas.");
+      notifyError("Credenciales incorrectas.");
+    },
+  });
+
+  // editamos el usuario 
+  const onSubmit = (data: Partial<IUser>) => {
+    console.log(data)
+    mutate({
+      token,
+      id: userId,
+      formData: {
+        name: data?.name,
+        phone: data?.phone,
+        email: data?.email,
+        roleId: data?.roleId,
+      },
+    });
   };
 
   return (
@@ -45,50 +93,50 @@ const EditUser = ({ userId } : { userId: number }) => {
         <GoBackButton className="px-3 rounded-xl py-3 sm:opacity-0" />
         <div className='flex items-center gap-x-3'>
           <DefaultButton className="px-12 rounded-xl py-3" text='Cuenta' href={`${pathname}/balance`} />
-          <DeleteUserModal />
+          <DeleteUserModal userId={userId} />
         </div>
       </div>
-      <DefaultForm goBackButton={false} handleSubmit={handleSubmit} title={`${selectedUser?.name} - ${selectedUser?.role}`}>
+      <DefaultForm isPending={isPending} goBackButton={false} handleSubmit={handleSubmit(onSubmit)} title={`${data?.name}`}>
         <FormInput
-          handleFunc={handleChange}
           title="Nombre completo*"
-          formName={formData.name}
           inputName="name"
+          register={register("name", { required: true, value: data?.name })}
         />
         <FormInput
-          handleFunc={handleChange}
-          title="Número de cédula*"
-          formName={formData.idNumber}
-          inputName="idNumber"
-        />
+          type='number'
+          title="Número de celular*"
+          inputName="phone"
+          register={register("phone", { required: true, valueAsNumber: true })}
+          />
         <FormInput
           type="email"
-          handleFunc={handleChange}
           title="Mail*"
-          formName={formData.email}
           inputName="email"
+          register={register("email", { required: true, value: data?.email })}
         />
         <FormDropDown
           title="Rol*"
-          handleFunc={handleChange}
+          register={register("roleId", { required: true, valueAsNumber: true })}
         >
-          <option value="organizador">Organizador</option>
-          <option value="promotor">Promotor</option>
-          <option value="controlador">Controlador</option>
+          {
+            roles?.map((role: IRole) => (
+              <option key={role.roleId} value={role.roleId}>
+                {role.name}
+              </option>
+            ))
+          }
         </FormDropDown>
         <FormInput
           type="number"
-          handleFunc={handleChange}
           title="Comisión (%)*"
-          formName={formData.commission}
           inputName="commission"
+          register={register("commission")}
         />
         <FormInput
           type="number"
-          handleFunc={handleChange}
           title="Entradas cortesia (una cada)*" 
-          formName={formData.tickets}
           inputName="tickets"
+          register={register("tickets")}
         />
 
         <Link

@@ -2,54 +2,150 @@
 
 import { StageCard } from "@/components/roles/admin/StageCard";
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
-import { useState } from "react"
+import { notifySuccess } from "@/components/ui/toast-notifications";
+import { useCreateEventStore } from "@/store/createEventStore";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 
 export default function StageConfig() {
-  const [tickets, setTickets] = useState([
-    { id: 1, stagesEnabled: false },
-    { id: 2, stagesEnabled: true },
-    { id: 3, stagesEnabled: false },
-  ])
+ const { eventFormData, updateEventFormData, editingTicketId } = useCreateEventStore();
+
+  const router = useRouter()
+
+  const currentTicketIndex = eventFormData.tickets?.findIndex(
+    (t) => t.ticketId === editingTicketId
+  );
+
+  const currentStages = eventFormData.tickets?.[currentTicketIndex!]?.stages || [];
+
+  const { control, register, handleSubmit, getValues, reset } = useForm<IEventTicket>({
+    defaultValues: { stages: currentStages }
+  });
+
+  useEffect(() => {
+  if (currentStages.length) {
+    reset({ stages: currentStages });
+  }
+}, [currentStages]);
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "stages",
+  });
+
+  const onSubmit = (data: IEventTicket) => {
+    if (!eventFormData.tickets) return
+    const updatedTickets = [...eventFormData.tickets];
+    updatedTickets[currentTicketIndex!] = {
+      ...updatedTickets[currentTicketIndex!],
+      stages: data.stages
+    };
+
+    updateEventFormData({
+      ...eventFormData, // ← esto mantiene title, images, etc.
+      tickets: updatedTickets,
+    });
+    notifySuccess('Etapa actualizada correctamente');
+    router.back()
+  };
 
   const handleAddStage = () => {
-    setTickets((prev) => [...prev, { id: tickets[tickets.length - 1]?.id + 1, stagesEnabled: false }])
-  }
+    const currentStages = getValues("stages");
+    const newId = currentStages?.at(-1)?.stageId ?? 0 + 1;
 
-  const handleDeleteTicket = (ticketId: number) => {
-    if (tickets.length === 1) return
-    setTickets((prev) => prev.filter((ticket) => ticket.id !== ticketId))
-  }
+    const today = new Date();
+    const yyyyMmDd = today.toISOString().split('T')[0];
+
+    const newStage: IEventStages = {
+      stageId: newId,
+      dateMax: "",
+      price: 0,
+      quantity: 0,
+      date: yyyyMmDd,
+      feeType: "percentage",
+      promoterFee: 0
+    };
+
+    // Agrega el stage al hook de formulario (React Hook Form)
+    append(newStage);
+
+    // También actualiza el estado global (Zustand)
+    if (!eventFormData.tickets) return
+    const updatedTickets = [...eventFormData.tickets];
+    const ticketIndex = updatedTickets.findIndex(t => t.ticketId === editingTicketId);
+
+    if (ticketIndex !== -1) {
+      updatedTickets[ticketIndex] = {
+        ...updatedTickets[ticketIndex],
+        stages: [...(updatedTickets[ticketIndex].stages || []), newStage],
+      };
+
+      updateEventFormData({
+        ...eventFormData, // ← esto mantiene title, images, etc.
+        tickets: updatedTickets,
+      });
+    }
+  };
+
+  const handleDeleteStage = (index: number) => {
+    if (fields.length === 1) return;
+
+    // 1. Eliminar del form (React Hook Form)
+    remove(index);
+
+    // 2. Eliminar del estado global (Zustand)
+    if (!eventFormData.tickets) return
+    const updatedTickets = [...eventFormData.tickets];
+    const ticketIndex = updatedTickets.findIndex(t => t.ticketId === editingTicketId);
+
+    if (ticketIndex !== -1) {
+      const updatedStages = [...(updatedTickets[ticketIndex].stages || [])];
+      updatedStages.splice(index, 1); // eliminar stage por índice
+
+      updatedTickets[ticketIndex] = {
+        ...updatedTickets[ticketIndex],
+        stages: updatedStages,
+      };
+
+      updateEventFormData({ tickets: updatedTickets });
+    }
+  };
 
   return (
     <div className="bg-primary-black text-primary-white min-h-screen px-6 pt-28 pb-44">
       <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
+
       <div className="max-w-md mx-auto space-y-4">
-        <h1 className="text-title font-bold mb-6">Configurar etapas</h1>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <h1 className="text-title font-bold mb-6">Configurar etapas</h1>
 
-        {/* Ticket Cards */}
-        <div className="space-y-4">
-          {tickets.map((ticket) => (
-            <StageCard
-              key={ticket.id}
-              stageNumber={ticket.id}
-              onDelete={() => handleDeleteTicket(ticket.id)}
-            />
-          ))}
-        </div>
+          {/* Ticket Cards */}
+          <div className="space-y-4">
+            {fields.map((stage, index) => (
+              <StageCard
+                register={register}
+                key={stage.id}
+                index={index}
+                onDelete={() => handleDeleteStage(index)}
+              />
+            ))}
+          </div>
 
-        <button
-          onClick={() => handleAddStage()}
-          className="w-full border outline-none border-primary text-primary font-medium py-5 rounded-lg flex items-center justify-center gap-2"
-        >
-          Agregar etapa
-        </button>
+          <button
+            type="button"
+            onClick={() => handleAddStage()}
+            className="w-full border outline-none border-primary text-primary font-medium py-5 rounded-lg flex items-center justify-center gap-2"
+          >
+            Agregar etapa
+          </button>
 
-        <button
-          onClick={() => alert("Guardado")}
-          className="w-full bg-primary text-black font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
-        >
-          Guardar
-        </button>
+          <button
+            className="w-full bg-primary text-black font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
+          >
+            Guardar
+          </button>
+        </form>
       </div>
     </div>
   )

@@ -1,35 +1,33 @@
+"use client"
+
 import EditSvg from "@/components/svg/EditSvg";
 import InfoSvg from "@/components/svg/InfoSvg";
+import { defaultEventFormData } from "@/constants/defaultEventFormData";
+import { getAllEvents } from "@/services/admin-events";
+import { useCreateEventStore } from "@/store/createEventStore";
+import { formatDateToColombiaTime } from "@/utils/formatDate";
+import { extractPlaceFromGeo } from "@/utils/formatGeo";
+import { useQuery } from "@tanstack/react-query";
+import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
-
-const sampleData = [
-  {
-    id: 1,
-    title: "Evento 1",
-    date: "10/5",
-    place: "Lugar 1"
-  },
-  {
-    id: 2,
-    title: "Evento 2",
-    date: "10/7",
-    place: "Lugar 2"
-  },
-  {
-    id: 3,
-    title: "Evento 3",
-    date: "10/8",
-    place: "Lugar 3"
-  },
-  {
-    id: 4,
-    title: "Evento 4",
-    date: "10/9",
-    place: "Lugar 4"
-  },
-]
+import { useEffect } from "react";
 
 export default function Page() {
+  const { getCookie } = useReactiveCookiesNext();
+  const { updateEventFormData } = useCreateEventStore();
+
+  useEffect(() => {
+    updateEventFormData(defaultEventFormData);
+  }, []);
+
+  const token = getCookie("token");
+  
+  const { data: events, isLoading, isError } = useQuery<IEvent[]>({
+    queryKey: ["events"],
+    queryFn: () => getAllEvents({ token }),
+    enabled: !!token, // solo se ejecuta si hay token
+  });
+
   return (
     <div className="w-full flex flex-col gap-y-5 bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
       <Link
@@ -45,30 +43,32 @@ export default function Page() {
           {/* Table Header */}
           <div className="grid grid-cols-[1fr_1fr_1fr_1.5fr] border-b border-divider text-text-inactive gap-x-2 text-xs py-2 px-3">
             <div className="text-start">Fecha</div>
-            <div className="text-start">Título</div>
-            <div className="text-end">Lugar</div>
+            <div className="text-center">Título</div>
+            <div className="text-center">Lugar</div>
             <div className="text-end">Acciones</div>
           </div>
 
           {/* Table Body */}
           <div className="divide-y divide-divider w-full">
-            {sampleData.map((data) => (
+            {events?.map((data) => (
               <div
-                key={data.id}
+                key={data.eventId}
                 className="grid grid-cols-[1fr_1fr_1fr_1.5fr] items-center py-3 px-3 gap-x-2 text-xs"
               >
-                <div className="text-start">{data.date}</div>
-                <div className="text-start tabular-nums">{data.title}</div>
-                <div className="text-end tabular-nums">{data.place}</div>
+                <div className="text-start flex flex-col">
+                  <h3>{formatDateToColombiaTime(data.date).date} {formatDateToColombiaTime(data.date).time}hs</h3>
+                </div>
+                <div className="text-center tabular-nums">{data.title}</div>
+                <div className="text-center tabular-nums">{extractPlaceFromGeo(data.geo) || data.geo}</div>
                 <div className="flex justify-end gap-x-2">
                   <Link
-                    href="/admin/events/create-event"
+                    href={`/admin/events/edit-event/${data.eventId}`}
                     className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-black"
                   >
                     <EditSvg className="text-xl" />
                   </Link>
                   <Link
-                    href="/admin/events/event-info"
+                    href={`/admin/events/event-info/${data.eventId}`}
                     className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end border border-primary text-primary"
                   >
                     <InfoSvg className="text-xl" />
@@ -79,10 +79,32 @@ export default function Page() {
           </div>
         </div>
 
-          {/* Empty State */}
-          {sampleData.length === 0 && (
-            <div className="text-center py-8 text-neutral-400">
-              No se encontraron usuarios
+          {!events &&!isError && (
+            Array.from(Array(6).keys()).map((user) => (
+            <div
+              key={user}
+              className="grid grid-cols-[1fr_1fr_1fr_1.5fr] items-center py-3 px-3 gap-x-2 text-sm"
+            >
+              <div className="text-start w-20 h-4 rounded animate-pulse bg-inactive"></div>
+              <div className="justify-self-center w-14 h-4 rounded animate-pulse bg-inactive"></div>
+              <div className="justify-self-center w-14 h-4 rounded animate-pulse bg-inactive"></div>
+              <div className="justify-self-end flex gap-x-2">
+                <div className="w-8 h-8 rounded animate-pulse bg-inactive"></div>
+                <div className="w-8 h-8 rounded animate-pulse bg-inactive"></div>
+              </div>
+            </div>
+            ))
+          )}
+
+          {!isLoading && Array.isArray(events) && events?.length === 0 &&  (
+            <div className="text-center py-8 text-text-inactive">
+              No se encontraron eventos
+            </div>
+          )}
+
+          {isError &&  (
+            <div className="text-center text-sm py-8 text-system-error">
+              Error cargando eventos
             </div>
           )}
         </div>

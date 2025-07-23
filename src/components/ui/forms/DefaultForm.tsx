@@ -4,6 +4,16 @@ import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import type React from "react";
 import DefaultTitledButton from "../buttons/DefaultTitledButton";
 
+type Props = {
+  children: React.ReactNode;
+  handleSubmit: React.FormEventHandler<HTMLFormElement>;
+  title: string;
+  goBackButton?: boolean;
+  ticketButtons?: boolean;
+  className?: string;
+  isPending?: boolean;
+};
+
 export default function DefaultForm({
   children,
   handleSubmit,
@@ -11,14 +21,8 @@ export default function DefaultForm({
   goBackButton = true,
   ticketButtons = false,
   className = "min-h-screen pb-40 sm:pb-32 px-6",
-}: {
-  children: React.ReactNode;
-  handleSubmit: React.FormEventHandler<HTMLFormElement>;
-  title: string;
-  goBackButton?: boolean;
-  ticketButtons?: boolean;
-  className?: string;
-}) {
+  isPending,
+}: Props) {
   return (
     <div className={`${className} pt-14 sm:pt-44 bg-primary-black sm:justify-center sm:items-center text-white flex`}>
       {goBackButton && (
@@ -40,7 +44,9 @@ export default function DefaultForm({
             </div>
           </div>
         ) : (
-          <h1 className="text-title font-bold mb-6">{title}</h1>
+          <h1 className={`${isPending && "bg-inactive text-inactive w-fit rounded-lg animate-pulse"} text-title font-bold mb-6`}> 
+            {title}
+          </h1>
         )}
         <form onSubmit={handleSubmit} className="space-y-4">
           {children}

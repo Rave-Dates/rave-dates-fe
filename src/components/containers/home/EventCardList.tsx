@@ -1,17 +1,72 @@
-import React from 'react';
-import EventCard from './EventCard';
-import { events } from '@/template-data';
+"use client"
+
+import React, { useEffect, useState } from "react";
+import EventCard from "./EventCard";
+import { useQuery } from "@tanstack/react-query";
+import { getAllClientEvents } from "@/services/clients-events";
+import EventCardSkeleton from "@/utils/skeletons/event-skeletons/EventCardSkeleton";
 
 const EventCardList: React.FC = () => {
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const {
+    data,
+    isLoading,
+    isError,
+    isFetching,
+  } = useQuery<IEvent[], Error>({
+    queryKey: ["clientEvents", page],
+    queryFn: () => getAllClientEvents(page, limit),
+  });
+
+  const clientEvents = (data ?? []) as IEvent[];
+
+  useEffect(() => {
+    console.log(clientEvents);
+  }, [clientEvents]);
 
   return (
-    <div className="py-8 pb-32 sm:pb-8 sm:pt-[7.5rem] bg-primary-black mx-auto px-6">
-      <div className="space-y-4 animate-fade-in">
-        {events.map((event) => (
-          <div key={event.id} className="flex justify-center">
-            <EventCard {...event} />
+    <div className="py-8 pb-40 sm:pb-8 sm:pt-[7.5rem] bg-primary-black mx-auto px-6">
+      <div className="animate-fade-in">
+        {!isError ? (
+          <>
+            {isLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <EventCardSkeleton key={i} />
+              ))
+            ) : (
+              clientEvents?.map((event) => (
+                <div key={event.eventId} className="flex justify-center">
+                  <EventCard {...event} />
+                </div>
+              ))
+            )}
+          </>
+        ) : (
+          <div className="text-center h-screen py-8 text-system-error">
+            Error cargando eventos
           </div>
-        ))}
+        )}
+      </div>
+
+      {/* Controles de paginado */}
+      <div className="flex justify-center items-center mt-6 gap-4">
+        <button
+          disabled={page === 1}
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          className="px-4 py-2 text-primary-white bg-divider rounded disabled:opacity-50 disabled:pointer-events-none"
+        >
+          Anterior
+        </button>
+        <span className="text-white">{page}</span>
+        <button
+          onClick={() => setPage((prev) => prev + 1)}
+          className="px-4 py-2 text-primary-white bg-divider rounded"
+          disabled={isFetching || (clientEvents?.length || 0) < limit}
+        >
+          Siguiente
+        </button>
       </div>
     </div>
   );

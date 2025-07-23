@@ -6,13 +6,11 @@ import Link from "next/link";
 
 export default function UsersList({
   children,
-  filteredUsers,
   createHref,
   setSearchQuery,
   searchQuery,
 }: {
   children: React.ReactNode;
-  filteredUsers: IUser[];
   createHref: string;
   searchQuery: string;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
@@ -38,13 +36,6 @@ export default function UsersList({
 
         {/* Users Table/List */}
         {children}
-
-        {/* Empty State */}
-        {filteredUsers.length === 0 && (
-          <div className="text-center py-8 text-neutral-400">
-            No se encontraron usuarios
-          </div>
-        )}
       </div>
     </div>
   );
