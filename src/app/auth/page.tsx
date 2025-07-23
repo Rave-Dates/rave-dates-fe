@@ -30,7 +30,7 @@ export default function ClientAuth() {
     if (clientToken) {
       redirect('/my-data');
     }
-  }, [tempToken, clientToken]);
+  }, [tempToken, clientToken, router]);
   
   const {
     watch,

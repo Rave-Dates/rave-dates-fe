@@ -35,7 +35,7 @@ export default function Checkout() {
       notifyError("Por favor vuelva a seleccionar los tickets")
       router.replace('/')
     }
-  }, [selectedMethod]);
+  }, [selectedMethod, eventId]);
 
   const { data: selectedEvent } = useQuery<IEvent>({
     queryKey: [`selectedEvent-${eventId}`],

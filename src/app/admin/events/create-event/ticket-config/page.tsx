@@ -29,11 +29,11 @@ export default function TicketConfiguration() {
 
   useEffect(() => {
     setValue("commission", undefined)
-  }, [watchedPiggyBank]);
+  }, [watchedPiggyBank, setValue]);
 
   useEffect(() => {
     setValue("piggyBank", false);
-  }, []);
+  }, [setValue]);
 
   useEffect(() => {
     console.log(eventFormData)
