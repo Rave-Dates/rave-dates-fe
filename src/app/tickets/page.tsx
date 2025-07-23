@@ -15,7 +15,7 @@ const TicketsEventList: React.FC = () => {
 
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("clientToken");
-  const decoded = token && jwtDecode(token.toString());
+  const decoded: {id: number} = (token && jwtDecode(token.toString())) || {id: 0};
   const clientId = Number(decoded?.id);
   
   const { data: purchasedTickets, isLoading, isError } = useQuery<IPurchaseTicket[]>({
@@ -27,16 +27,31 @@ const TicketsEventList: React.FC = () => {
     enabled: !!token && !!clientId,
   });
 
-  const activeTickets = useMemo(
-    () => purchasedTickets?.filter(ticket => ticket.status === "PENDING") || [],
-    [purchasedTickets]
-  );
+  const activeEvents = useMemo(() => {
+    const map = new Map<number, IEvent>();
+    purchasedTickets?.forEach(ticket => {
+      if (ticket.status === "PENDING") {
+        const eventId = ticket.ticketType.eventId;
+        if (!map.has(eventId)) {
+          map.set(eventId, ticket.ticketType.event);
+        }
+      }
+    });
+    return Array.from(map.values());
+  }, [purchasedTickets]);
 
-  const pendingTickets = useMemo(
-    () => purchasedTickets?.filter(ticket => ticket.status === "READ" || ticket.status === "DEFEATED") || [],
-    [purchasedTickets]
-  );
-
+  const finishedEvents = useMemo(() => {
+    const map = new Map<number, IEvent>();
+    purchasedTickets?.forEach(ticket => {
+      if (ticket.status === "READ" || ticket.status === "DEFEATED") {
+        const eventId = ticket.ticketType.eventId;
+        if (!map.has(eventId)) {
+          map.set(eventId, ticket.ticketType.event);
+        }
+      }
+    });
+    return Array.from(map.values());
+  }, [purchasedTickets]);
 
   useEffect(() => {
     setFade(false);
@@ -46,12 +61,6 @@ const TicketsEventList: React.FC = () => {
     }, 200);
     return () => clearTimeout(timer);
   }, [isUpcoming]);
-
-  useEffect(() => {
-    console.log("cargando",isLoading)
-  }, [isLoading]);
-
-  console.log(purchasedTickets)
 
   return (
     <div className="py-8 pb-32 min-h-screen flex flex-col sm:pb-8 sm:pt-[7.5rem] text-primary-white bg-primary-black px-6">
@@ -91,13 +100,13 @@ const TicketsEventList: React.FC = () => {
           }
           {!isLoading && !isError && currentView === "upcoming" ? (
             <div className="space-y-4 animate-fade-in">
-              {activeTickets?.map((event) => (
-                <div key={event.purchaseId} className="flex justify-center">
-                  <EventCard isTicketList={true} text="Detalles" href="/tickets/event-ticket" {...event.ticketType.event} />
+              {activeEvents?.map((event) => (
+                <div key={event.eventId} className="flex justify-center">
+                  <EventCard isTicketList={true} text="Detalles" href="/tickets/event-ticket" {...event} />
                 </div>
               ))}
               { 
-                activeTickets?.length === 0 && 
+                activeEvents?.length === 0 && 
                 <div className="text-center py-8 text-neutral-400">
                   No se encontraron tickets
                 </div>
@@ -105,13 +114,13 @@ const TicketsEventList: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-4 animate-fade-in">
-              {pendingTickets?.map((event) => (
-                <div key={event.purchaseId || 0} className="flex justify-center">
-                  <EventCard isTicketList={true} text="Detalles" href="/tickets/event-ticket" {...event.ticketType.event} />
+              {finishedEvents?.map((event) => (
+                <div key={event.eventId} className="flex justify-center">
+                  <EventCard isTicketList={true} text="Detalles" href="/tickets/event-ticket" {...event} />
                 </div>
               ))}
               { 
-                pendingTickets?.length === 0 && 
+                finishedEvents?.length === 0 && 
                 <div className="text-center py-8 text-neutral-400">
                   No se encontraron tickets
                 </div>

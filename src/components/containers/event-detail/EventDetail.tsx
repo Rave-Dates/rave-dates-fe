@@ -15,16 +15,19 @@ const EventDetails = ({ eventId } : { eventId: number }) => {
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
     queryKey: [`selectedEvent-${eventId}`],
     queryFn: () => getClientEventById(eventId),
+    enabled: !!eventId,
   });
   
   const { data: eventTickets, isLoading: isTicketsLoading } = useQuery<IEventTicket[]>({
     queryKey: ["eventTickets"],
     queryFn: () => getEventClientTickets(eventId),
+    enabled: !!eventId,
   });
-
+  
   const { data: eventImages } = useQuery<IEventImages[]>({
     queryKey: [`eventImages-${eventId}`],
     queryFn: () => getClientEventImagesById(eventId),
+    enabled: !!eventId,
   });
 
   const { data: servedImages, isLoading: isImagesLoading } = useQuery<{ id: string, url: string }[]>({
@@ -61,7 +64,7 @@ const EventDetails = ({ eventId } : { eventId: number }) => {
               <h1 className="text-4xl font-semibold text-white mb-0.5 uppercase">
                 {selectedEvent?.title}
               </h1>
-              <p className="text-text-inactive">Extended set</p>
+              <p className="text-text-inactive">{selectedEvent?.subtitle}</p>
             </div>
           }
           {/* Left Column */}

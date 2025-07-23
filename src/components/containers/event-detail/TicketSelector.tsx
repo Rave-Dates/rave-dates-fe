@@ -10,6 +10,7 @@ const TicketSelector = ({isTicketList = false, ticketStatus, tickets, isLoading}
   const { selected } = useTicketStore();
   const { getCookie } = useReactiveCookiesNext();
   const tempToken = getCookie("tempToken");
+  const clientToken = getCookie("clientToken");
 
   const totalQuantity = Object.values(selected).reduce((acc, curr) => acc + curr.quantity, 0);
   const totalPrice = Object.values(selected).reduce(
@@ -53,7 +54,7 @@ const TicketSelector = ({isTicketList = false, ticketStatus, tickets, isLoading}
         <Link
           tabIndex={totalQuantity === 0 ? -1 : undefined}
           aria-disabled={totalQuantity === 0}
-          href={tempToken ? "/checkout" : "/personal-data"}
+          href={(tempToken || clientToken) ? "/checkout" : "/personal-data"}
           className={`w-full md:w-1/2 text-center py-3 rounded-lg transition-colors ${
             totalQuantity > 0
               ? 'bg-primary hover:bg-primary/70 text-black'

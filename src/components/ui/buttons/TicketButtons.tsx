@@ -29,7 +29,15 @@ const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {
         <div className="w-[100px] sm:w-[170px]">
           <div className="font-semibold text-center xs:text-start text-body">{ticket.name}</div>
           <div className="text-body lg:text-subtitle text-primary-white/50">
-            {validStage ? `$${validStage.price.toLocaleString()} COP` : "No disponible"}
+            {validStage ? 
+              validStage.price > 0 
+                ?
+                `$${validStage.price.toLocaleString()} COP` 
+                :
+                "Gratuito"
+              : 
+              "No disponible"
+            }
           </div>
         </div>
 
@@ -37,8 +45,8 @@ const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {
           <button
             onClick={() => subtract(ticket.ticketTypeId)}
             disabled={currentQuantity === 0}
-            className={`p-3 rounded-l-xl ${
-              currentQuantity > 0 ? "bg-primary" : "bg-inactive text-text-inactive"
+            className={`p-3 rounded-l-xl hover:opacity-75 transition-opacity ${
+              currentQuantity > 0 ? "bg-primary-white text-black" : "bg-inactive text-text-inactive"
             }`}
           >
             <SubtractSvg />

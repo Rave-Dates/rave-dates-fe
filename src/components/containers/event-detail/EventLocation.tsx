@@ -1,7 +1,7 @@
 import { extractLatAndLng, extractPlaceFromGeo } from '@/utils/formatGeo';
 import React from 'react';
 import EventMap from './EventMap';
-import { parseISODate } from '@/utils/formatDate';
+import { formatDateToColombiaTime } from '@/utils/formatDate';
 
 const EventLocation = ({ event, isLoading } : { event: IEvent, isLoading: boolean }) => {
   const geoParts = extractLatAndLng(event.geo).split(",").map(Number);
@@ -18,7 +18,7 @@ const EventLocation = ({ event, isLoading } : { event: IEvent, isLoading: boolea
           </div>
           :
           <p className="text-body bg-cards-container px-4 py-3 rounded-lg">
-            {parseISODate(event.date).date} {parseISODate(event.date).time}hs (UTC)
+            {formatDateToColombiaTime(event.date).date} {formatDateToColombiaTime(event.date).time}hs (COL)
           </p>
         }
       </div>

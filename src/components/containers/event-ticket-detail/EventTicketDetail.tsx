@@ -17,7 +17,7 @@ import { parseISODate } from '@/utils/formatDate';
 const EventTicketDetails = ({ eventId } : { eventId: number }) => {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("clientToken");
-  const decoded = token && jwtDecode(token.toString());
+  const decoded: {id: number} = (token && jwtDecode(token.toString())) || {id: 0};
   const clientId = Number(decoded?.id);
 
   const { data: purchasedTickets, isLoading: isPurchasedTicketsLoading } = useQuery<IPurchaseTicket[]>({
@@ -29,9 +29,10 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
     enabled: !!token && !!clientId,
   });
 
-
   const selectedTicket = purchasedTickets?.find(ticket => ticket.ticketType.event.eventId === eventId)
   const selectedEvent = selectedTicket?.ticketType.event;
+
+  console.log(selectedEvent)
 
   const { data: eventTickets, isLoading: isTicketsLoading } = useQuery<IEventTicket[]>({
     queryKey: ["eventTickets"],
@@ -77,7 +78,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
               <h1 className="text-4xl font-semibold text-white mb-0.5 uppercase">
                 {selectedEvent?.title}
               </h1>
-              <p className="text-text-inactive">Extended set</p>
+              <p className="text-text-inactive">{selectedEvent?.subtitle}</p>
             </div>
           }
           {/* Left Column */}
