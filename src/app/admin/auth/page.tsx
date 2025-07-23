@@ -9,8 +9,7 @@ import { onInvalid } from "@/utils/onInvalidFunc";
 import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from 'cookies-next';
 import { jwtDecode } from "jwt-decode";
-import { redirect, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 type LoginForm = {
@@ -31,14 +30,6 @@ export default function Page() {
 
   const receiveInfo = watch("receiveInfo", false);
 
-  const token = getCookie('token');
-
-  useEffect(() => {
-    if (token) {
-      redirect('/admin/users');
-    }
-  }, [token])
-  
   const { mutate, isPending } = useMutation({
     mutationFn: loginAdmin,
     onSuccess: (data) => {

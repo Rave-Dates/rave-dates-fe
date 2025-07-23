@@ -12,6 +12,11 @@ export function middleware(req: NextRequest) {
   if (isAdminRoute && path.startsWith("/admin/auth") && !token) {
     return NextResponse.next();
   }
+  
+  // si esta en /admin/auth y hay token, redirigir a /admin/users
+  if (isAdminRoute && path.startsWith("/admin/auth") && token) {
+    return NextResponse.redirect(new URL("/admin/users", req.url));
+  }
 
   // permitir ruta pública sin token
   if (!isAdminRoute && !token) {
