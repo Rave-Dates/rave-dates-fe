@@ -5,6 +5,7 @@ import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyPending } from "@/components/ui/toast-notifications";
 import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
+import { combineDateAndTimeToISO, formatColombiaTimeToUTC, validateDateYyyyMmDd } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useForm } from "react-hook-form";
 
@@ -16,36 +17,48 @@ export default function FreeTicketConfiguration() {
   const { mutate: createFullEvent } = useCreateFullEvent(reset);
 
   const onSubmit = (data: IEventFormData) => {
-    const validTickets = data.tickets.map(({ ticketId, stages, ...rest }) => {
-      console.log(ticketId)
-      const maxDate = stages?.[0]?.dateMax ?? null;
+    const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
+      console.log(ticketId, ticketTypeId)
+      if (rest.stages.length === 1) return { ...rest, maxDate: rest.stages[0].dateMax };
+      const lastStageMaxDate = rest.stages.at(-1)?.dateMax || "";
       return {
         ...rest,
-        stages,
-        maxDate,
-      };
+        maxDate: lastStageMaxDate,
+      }
     });
 
-    const firstTicket = validTickets.length > 0 ? [validTickets[0]] : [];
+    const formattedGeo = `${data.geo};${data.place?.trim()}`;
 
     updateEventFormData({
       ...eventFormData,
       ...data,
-      tickets: data.tickets,
+      tickets: [validTickets[0]],
     });
 
-    const yyyyMmDd = data.date && (new Date(data.date))?.toISOString().split('T')[0];
+    if (!data.date || !data.time) return
+    const validDate = combineDateAndTimeToISO(data.date, data.time)
 
     const cleanedEventData = {
+      eventCategoryValues: data.eventCategoryValues,
       title: data.title,
-      date: yyyyMmDd,
-      geo: data.geo,
+      subtitle: data.subtitle,
+      date: formatColombiaTimeToUTC(validDate),
+      geo: formattedGeo,
       description: data.description,
       type: data.type,
       isActive: data.isActive,
+      feeRD: data.feeRD,
+      feePB: data.feePB,
+      transferCost: data.transferCost,
+      discountCode: data.discountCode,
+      discountType: data.discountType,
+      discount: data.discount,
+      piggyBank: data.piggyBank,
+      maxPurchase: data.maxPurchase,
       images: data.images,
+      timeOut: data.timeOut,
       labels: data.labels,
-      tickets: firstTicket,
+      tickets: [validTickets[0]],
     };
 
     notifyPending(
@@ -61,8 +74,6 @@ export default function FreeTicketConfiguration() {
         error: "Error al crear el evento",
       }
     );
-
-    // onSucces borrar los datos del form y del estado
   };
 
   return (
@@ -79,13 +90,13 @@ export default function FreeTicketConfiguration() {
                 className="!bg-cards-container"
                 title="Nombre"
                 inputName="ticketName"
-                register={register("tickets.0.name", { required: true })}
+                register={register("tickets.0.name", { required: "El nombre es obligatorio"  })}
               />
               <FormInput
                 className="!bg-cards-container"
                 title="Cantidad"
                 inputName="quantity"
-                register={register("tickets.0.stages.0.quantity", { required: true, valueAsNumber: true })}
+                register={register("tickets.0.stages.0.quantity", { required: "La cantidad es obligatoria", valueAsNumber: true })}
               />
             </div>
             <div className="flex gap-x-5">
@@ -94,14 +105,14 @@ export default function FreeTicketConfiguration() {
                 title="Fecha inicio"
                 placeholder="yyyy-mm-dd"
                 inputName="date"
-                register={register("tickets.0.stages.0.date", { required: true, valueAsDate: true })}
+                register={register("tickets.0.stages.0.date", { required: "La fecha es obligatoria", validate: validateDateYyyyMmDd })}
               />
               <FormInput
                 className="!bg-cards-container"
                 title="Fecha máx."
                 placeholder="yyyy-mm-dd"
                 inputName="dateMax"
-                register={register(`tickets.0.stages.0.dateMax`, { required: true })}
+                register={register(`tickets.0.stages.0.dateMax`, { required: "La fecha máx. es obligatoria", validate: validateDateYyyyMmDd })}
               />
             </div>
               <button

@@ -90,6 +90,8 @@ export default function EditTicketConfiguration() {
         dateMax: formatDate(stage.dateMax),
         quantity: stage.quantity,
         price: stage.price,
+        promoterFee: stage.promoterFee,
+        feeType: stage.feeType,
       })),
     }));
 

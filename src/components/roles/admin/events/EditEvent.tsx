@@ -161,7 +161,6 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       const same = JSON.stringify(eventFormData.images) === JSON.stringify(eventImages);
       if (!same) {
       updateEventFormData({
-        ...eventFormData,
         images: imagesData ?? [],
       });
       }
@@ -268,7 +267,7 @@ useEffect(() => {
         />
 
         <FormInput
-          title="Hora (UTC)*"
+          title="Hora (COL)*"
           inputName="time"
           placeholder="00:00"
           register={register("time", { 

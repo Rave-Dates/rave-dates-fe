@@ -24,8 +24,6 @@ export default function TicketConfiguration() {
     control,
     name: "tickets",
   });
-
-    
   register("piggyBank");
   const watchedPiggyBank = useWatch({ name: "piggyBank", control });
 
@@ -106,8 +104,6 @@ export default function TicketConfiguration() {
         error: "Error al crear el evento",
       }
     );
-
-    // onSucces borrar los datos del form y del estado
   };
 
   const handleAddTicket = () => {
@@ -115,7 +111,7 @@ export default function TicketConfiguration() {
 
     const newId = (formTickets.at(-1)?.ticketId ?? 0) + 1;
 
-    const newTicket = {
+    const newTicket: IEventTicket = {
       ticketId: newId,
       name: '',
       maxDate: "",
@@ -126,6 +122,8 @@ export default function TicketConfiguration() {
           dateMax: "",
           price: 0,
           quantity: 0,
+          promoterFee: 0,
+          feeType: "percentage",
         },
       ],
     };

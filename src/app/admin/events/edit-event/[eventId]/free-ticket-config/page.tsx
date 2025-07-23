@@ -6,15 +6,15 @@ import { notifyError, notifyPending } from "@/components/ui/toast-notifications"
 import { useEditEvent } from "@/hooks/useEditEvent";
 import { getTicketTypesById } from "@/services/admin-events";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { formatDate } from "@/utils/formatDate";
+import { combineDateAndTimeToISO, formatColombiaTimeToUTC, formatDate } from "@/utils/formatDate";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 export default function FreeTicketConfiguration() {
-  const { eventFormData, updateEventFormData } = useCreateEventStore();
+  const { eventFormData, updateEventFormData, setHasLoadedTickets, hasLoadedTickets } = useCreateEventStore();
   const { register, handleSubmit, reset , setValue} = useForm<IEventFormData>({
     defaultValues: eventFormData
   });
@@ -23,6 +23,7 @@ export default function FreeTicketConfiguration() {
   const token = getCookie("token");
   const params = useParams();
   const eventId = Number(params.eventId)
+  const router = useRouter()
 
   // 🟢 Traemos tickets del evento
   const { data: ticketsData } = useQuery<IEventTicket[]>({
@@ -32,71 +33,90 @@ export default function FreeTicketConfiguration() {
   })
   
   useEffect(() => {
-    if (ticketsData) {
+    if (ticketsData && !hasLoadedTickets) {
       const formattedTickets = ticketsData.map((ticket) => ({
-        ticketTypeId: ticket.ticketTypeId,
-        name: ticket.name,
+        ...ticket,
         maxDate: formatDate(ticket.maxDate),
         stages: ticket.stages.map((stage) => ({
-          price: stage.price,
+          ...stage,
           date: formatDate(stage.date),
           dateMax: formatDate(stage.dateMax),
-          quantity: stage.quantity,
         })),
       }));
 
-      console.log("formattedTickets",formattedTickets)
-
       const updatedData = {
         ...eventFormData,
-        tickets: formattedTickets,
+        tickets: [formattedTickets[0]],
       };
 
+      setValue("tickets", formattedTickets);
       updateEventFormData(updatedData);
-      setValue("tickets", ticketsData);
+      setHasLoadedTickets(true);
     }
-  }, [ticketsData]);
+  }, [ticketsData, eventFormData]);
 
   const onSubmit = (data: IEventFormData) => {
-    console.log("ticketsDATA",ticketsData)
-    console.log("eventFormData",eventFormData)
-    const formattedTickets: IEventTicket[] = data.tickets.map((ticket) => ({
+    const formattedTickets = data.tickets.map((ticket) => ({
       ticketTypeId: ticket.ticketTypeId,
       eventId: eventId,
       name: ticket.name,
       maxDate: formatDate(ticket.maxDate),
       stages: ticket.stages.map((stage) => ({
-        price: stage.price,
         date: formatDate(stage.date),
         dateMax: formatDate(stage.dateMax),
         quantity: stage.quantity,
+        price: stage.price,
+        promoterFee: stage.promoterFee,
+        feeType: stage.feeType,
       })),
     }));
 
+    if (!data.date || !data.time) return
+    const validDate = combineDateAndTimeToISO(data.date, data.time)
+    const formattedTimeUTC = formatColombiaTimeToUTC(validDate)
+    
     updateEventFormData({
       ...eventFormData,
       ...data,
       tickets: data.tickets,
-    });
+    })
 
     const cleanedEventData = {
-      eventId: eventId,
+      eventId: eventFormData.eventId,
       title: data.title,
-      date: formatToISO(data.date),
+      subtitle: data.subtitle,
+      date: formattedTimeUTC,
       geo: data.geo,
       description: data.description,
       type: data.type,
       isActive: data.isActive,
+      feeRD: data.feeRD,
+      feePB: data.feePB,
+      categoriesToUpdate: data.categoriesToUpdate,
+      transferCost: data.transferCost,
+      discountCode: data.discountCode,
+      discountType: data.discountType,
+      discount: data.discount,
+      maxPurchase: data.maxPurchase,
       images: data.images,
+      timeOut: data.timeOut,
       labels: data.labels,
-      tickets: formattedTickets,
-    };
+      tickets: [formattedTickets[0]],
+    }
+
 
     notifyPending(
       new Promise((resolve, reject) => {
         editEvent(cleanedEventData, {
-          onSuccess: resolve,
-          onError: reject,
+          onSuccess: () => {
+            resolve("");
+            router.push("/admin/events");
+          },
+          onError: (err) => {
+            console.log(err)
+            reject(err);
+            router.push("/admin/events");
+          },
         });
       }),
       {
@@ -105,8 +125,6 @@ export default function FreeTicketConfiguration() {
         error: "Error al editar el evento",
       }
     );
-
-    // onSucces borrar los datos del form y del estado
   };
 
   const onInvalid = () => {
@@ -156,7 +174,7 @@ export default function FreeTicketConfiguration() {
                 type="submit"
                 className="w-full bg-primary text-black font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
               >
-                Crear evento
+                Editar evento
               </button>
             </form>
           </div>

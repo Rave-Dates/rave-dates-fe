@@ -153,7 +153,7 @@ export default function Page() {
         />
 
         <FormInput
-          title="Hora (UTC)*"
+          title="Hora (COL)*"
           inputName="time"
           placeholder="00:00"
           register={register("time", { 
