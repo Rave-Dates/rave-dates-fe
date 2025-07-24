@@ -48,6 +48,13 @@ const EventCardList: React.FC = () => {
             Error cargando eventos
           </div>
         )}
+        {!isLoading && !isError && clientEvents?.length === 0 &&
+          <div className="space-y-4 h-screen animate-fade-in">
+            <div className="text-center py-8 text-neutral-400">
+              No se encontraron tickets
+            </div>
+          </div>
+        }
       </div>
 
       {/* Controles de paginado */}
