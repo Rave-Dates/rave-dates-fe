@@ -230,16 +230,16 @@ export default function EditTicketConfiguration() {
         <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4 pt-4">
           {/* Inputs de configuración */}
           <div className="flex flex-col xs:flex-row gap-x-5">
-            <FormInput title="Comisión RD" inputName="feeRD" register={register("feeRD", { valueAsNumber: true, required: "La comisión RD es obligatoria", max: 100 })} />
-            <FormInput title="Comisión PB" inputName="feePB" register={register("feePB", { valueAsNumber: true, required: "La comisión PB es obligatoria", max: 100 })} />
+            <FormInput title="Comisión Rave Dates" typeOfValue="%" inputName="feeRD" register={register("feeRD", { valueAsNumber: true, required: "La comisión de rave dates es obligatoria (Max: 100%)", max: 100 })} />
+            <FormInput title="Comisión de Alcancía" typeOfValue="%" inputName="feePB" register={register("feePB", { valueAsNumber: true, required: "La comisión de alcancía es obligatoria (Max: 100%)", max: 100 })} />
           </div>
           <div className="flex flex-col xs:flex-row gap-x-5">
             <FormInput title="Costo transferencia de ticket" inputName="transferCost" register={register("transferCost", { valueAsNumber: true, required: "El costo de transferencia es obligatorio" })} />
-            <FormInput title="Descuento" inputName="discount" register={register("discount", { valueAsNumber: true, required: "El descuento es obligatorio" })} />
+            <FormInput title="Descuento" typeOfValue="%" inputName="discount" register={register("discount", { valueAsNumber: true, max: 100 })} />
           </div>
           <div className="flex flex-col xs:flex-row gap-x-5">
             <FormInput type="number" title="Máx. de tickets p/ persona" inputName="maxPurchase" register={register("maxPurchase", { valueAsNumber: true, required: "El máximo de tickets es obligatorio" })} />
-            <FormInput title="Tiempo de compra (minutos)" inputName="timeOut" register={register("timeOut", { required: "El tiempo de compra es obligatorio", valueAsNumber: true })} />
+            <FormInput title="Tiempo de compra (minutos)" typeOfValue="min" inputName="timeOut" register={register("timeOut", { required: "El tiempo de compra es obligatorio", valueAsNumber: true })} />
           </div>
           <FormInput title="Código de descuento" inputName="discountCode" register={register("discountCode")} />
 

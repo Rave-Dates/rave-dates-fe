@@ -196,26 +196,30 @@ export default function TicketConfiguration() {
           <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
             <div className="flex flex-col xs:flex-row gap-x-5">
               <FormInput
-                title="Comisión RD"
+                title="Comisión Rave Dates"
                 inputName="feeRD"
-                register={register("feeRD", {required: "La comisión RD es obligatoria", valueAsNumber: true})}
+                typeOfValue="%"
+                register={register("feeRD", {required: "La comisión RD es obligatoria (Max: 100%)", valueAsNumber: true, max: 100})}
               />
+              <FormInput 
+                type="number"
+                title="Comisión de Alcancía" 
+                inputName="feePB" 
+                typeOfValue="%"
+                register={register("feePB", { valueAsNumber: true, required: "La comisión de alcancía es obligatoria (Max: 100%)", max: 100 })} 
+              />
+            </div>
+            <div className="flex flex-col xs:flex-row gap-x-5">
               <FormInput
                 title="Costo transferencia de ticket"
                 inputName="transferCost"
                 register={register("transferCost", {required: "El costo de transferencia es obligatorio", valueAsNumber: true})}
               />
-            </div>
-            <div className="flex flex-col xs:flex-row gap-x-5">
-              <FormInput
-                title="Código de descuento"
-                inputName="discountCode"
-                register={register("discountCode")}
-              />
               <FormInput
                 title="Descuento"
                 inputName="discount"
-                register={register("discount", { valueAsNumber: true })}
+                typeOfValue="%"
+                register={register("discount", { valueAsNumber: true, max: 100 })}
               />
             </div>
             <div className="flex flex-col xs:flex-row gap-x-5">
@@ -229,9 +233,16 @@ export default function TicketConfiguration() {
                 type="number"
                 title="Tiempo de compra (minutos)"
                 inputName="timeOut"
+                typeOfValue="min"
                 register={register("timeOut", {required: "El tiempo de compra es obligatorio", valueAsNumber: true})}
               />
             </div>
+            <FormInput
+              title="Código de descuento"
+              inputName="discountCode"
+              register={register("discountCode")}
+            />
+
               <div className="flex items-center justify-between mt-5">
                 <span className="text-white text-lg">Alcancía</span>
                 <button
