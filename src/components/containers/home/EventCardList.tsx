@@ -38,7 +38,7 @@ const EventCardList: React.FC = () => {
             ) : (
               clientEvents?.map((event) => (
                 <div key={event.eventId} className="flex justify-center">
-                  <EventCard {...event} />
+                  <EventCard href="event" {...event} />
                 </div>
               ))
             )}

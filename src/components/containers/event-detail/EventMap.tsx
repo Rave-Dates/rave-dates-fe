@@ -18,6 +18,15 @@ L.Icon.Default.mergeOptions({
   shadowUrl: undefined
 });
 
+const customIcon = new L.Icon({
+  iconUrl: '/markers/marker.png',
+  iconRetinaUrl: '/markers/marker.png',
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
+  shadowUrl: undefined,
+});
+
 export default function EventMap({ position, place }: { position: [number, number], place: string }) {
   if (position.length !== 2) return null;
 
@@ -28,7 +37,7 @@ export default function EventMap({ position, place }: { position: [number, numbe
           attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Marker position={position}>
+        <Marker position={position} icon={customIcon}>
           <Popup>{place}</Popup>
         </Marker>
       </MapContainer>

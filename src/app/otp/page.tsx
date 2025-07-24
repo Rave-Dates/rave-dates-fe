@@ -26,7 +26,7 @@ export default function Verification() {
 
   const { getCookie, setCookie, deleteCookie } = useReactiveCookiesNext();
   const { sendCode, validateCode } = useVerification();
-  const { emailOrWhatsapp } = useClientAuthStore()
+  const { emailOrWhatsapp, redirectToCheckout } = useClientAuthStore()
   const router = useRouter();
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -118,7 +118,11 @@ export default function Verification() {
         });
         
         deleteCookie("tempToken")
-        router.push("/tickets");
+        if (redirectToCheckout) {
+          router.replace("/checkout");
+        } else {
+          router.replace("/tickets");
+        }
       })
       .catch((err) => {
         if (err.response.data.message === "Client not found") {

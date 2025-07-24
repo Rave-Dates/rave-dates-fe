@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ImagesSwiper from './ImagesSwiper';
 import Link from 'next/link';
 import CalendarSvg from '@/components/svg/CalendarSvg';
@@ -8,9 +8,10 @@ import { getClientEventImagesById, getClientImageById } from '@/services/clients
 import SpinnerSvg from '@/components/svg/SpinnerSvg';
 import { formatDateToColombiaTime } from '@/utils/formatDate';
 import { extractPlaceFromGeo } from '@/utils/formatGeo';
+import { useTicketStore } from '@/store/useTicketStore';
 
-const EventCard: React.FC<IEvent & { href?: string, text?: string, isTicketList?: boolean}> = ({
-  href = "/event/",
+const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?: boolean}> = ({
+  href,
   text = "Comprar tickets",
   eventId,
   // isTicketList = false,
@@ -19,6 +20,12 @@ const EventCard: React.FC<IEvent & { href?: string, text?: string, isTicketList?
   geo,
   // piggyBank
 }) => {
+  const { resetSelected } = useTicketStore();
+
+  useEffect(() => {
+    resetSelected()
+  }, []);
+
   const { data: eventImages } = useQuery<IEventImages[]>({
     queryKey: [`eventImages-${eventId}`],
     queryFn: () => getClientEventImagesById(Number(eventId)),

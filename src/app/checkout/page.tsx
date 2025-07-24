@@ -57,7 +57,7 @@ export default function Checkout() {
       })),
       isPartial: false,
       clientId: (decoded && decoded.id ) || (decodedTemp && decodedTemp.id) || 0,
-      returnUrl: "https://ravedates.proxising.com/checkout",
+      returnUrl: "https://ravedates.proxising.com/otp",
       boldMethod: "CREDIT_CARD"
     };
 
