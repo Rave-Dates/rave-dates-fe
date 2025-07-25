@@ -1,26 +1,20 @@
 "use client"
 
 import EditSvg from "@/components/svg/EditSvg";
-import InfoSvg from "@/components/svg/InfoSvg";
 import UserSvg from "@/components/svg/UserSvg";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
-import { getAllEvents } from "@/services/admin-events";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
-import { useQuery } from "@tanstack/react-query";
-import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
 import { useEffect } from "react";
 
 export default function Page() {
-  const { getCookie } = useReactiveCookiesNext();
   const { updateEventFormData } = useCreateEventStore();
 
   useEffect(() => {
     updateEventFormData(defaultEventFormData);
   }, []);
 
-  const token = getCookie("token");
   
   // const { data: events, isLoading, isError } = useQuery<IEvent[]>({
   //   queryKey: ["events"],

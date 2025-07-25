@@ -10,7 +10,6 @@ import Link from 'next/link';
 import CalendarSvg from '@/components/svg/CalendarSvg';
 import GraphSvg from '@/components/svg/GraphSvg';
 import FileSvg from '@/components/svg/FileSvg';
-import DollarSvg from '@/components/svg/DollarSvg';
 
 const NavbarMobile: React.FC = () => {
   const pathname = usePathname();

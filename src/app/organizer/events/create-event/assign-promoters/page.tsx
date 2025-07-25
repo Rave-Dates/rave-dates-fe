@@ -1,19 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import DefaultButton from "@/components/ui/buttons/DefaultButton";
-import { getAllUsers } from "@/services/admin-users";
-import { useQuery } from "@tanstack/react-query";
-import { useReactiveCookiesNext } from "cookies-next";
-import EditSvg from "@/components/svg/EditSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 
 export default function UserManagement() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const { getCookie } = useReactiveCookiesNext();
-
-  const token = getCookie("token");
-  
   // const { data, isLoading, isError } = useQuery({
   //   queryKey: ["users"],
   //   queryFn: () => getAllUsers({ token }),
@@ -36,10 +25,6 @@ export default function UserManagement() {
     }
   ]
 
-  const filteredUsers = data?.filter((user) =>
-    user?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
     <div className="rounded-md bg-primary-black min-h-screen overflow-hidden text-primary-white px-4">
       <div className="flex justify-start items-center gap-x-3 pt-8">
@@ -56,7 +41,7 @@ export default function UserManagement() {
 
       {/* Table Body */}
       <div className="divide-y divide-divider w-full">
-        {filteredUsers?.map((user) => (
+        {data?.map((user) => (
           <div
             key={user?.userId}
             className="grid grid-cols-[1fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
@@ -69,7 +54,7 @@ export default function UserManagement() {
             </div>
           </div>
         ))}
-        {!filteredUsers && (
+        {!data && (
           Array.from(Array(10).keys()).map((user) => (
           <div
             key={user}
@@ -80,7 +65,7 @@ export default function UserManagement() {
           </div>
           ))
         )}
-        {!isLoading && Array.isArray(data) && filteredUsers?.length === 0 &&  (
+        {!isLoading && Array.isArray(data) && data?.length === 0 &&  (
           <div className="text-center py-8 text-text-inactive">
             No se encontraron usuarios
           </div>

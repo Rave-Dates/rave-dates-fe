@@ -1,10 +1,6 @@
 "use client";
 
 import UsersList from "@/components/containers/users-list/UsersList";
-import DefaultButton from "@/components/ui/buttons/DefaultButton";
-import { getAllUsers } from "@/services/admin-users";
-import { useQuery } from "@tanstack/react-query";
-import EditSvg from "@/components/svg/EditSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 
 export default function OrganizerPromoterEvents({promoterId}: {promoterId: number}) {

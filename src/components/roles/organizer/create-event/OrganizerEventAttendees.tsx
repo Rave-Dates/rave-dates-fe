@@ -3,16 +3,15 @@
 import { useState } from "react"
 import { CircularProgress } from "./ProgressCircular"
 import { ProgressBar } from "./ProgressBar"
-import SearchSvg from "@/components/svg/SearchSvg"
 import AddSvg from "@/components/svg/AddSvg"
 import EditSvg from "@/components/svg/EditSvg"
-import ArrowSvg from "@/components/svg/ArrowSvg"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import SearchInput from "@/components/ui/inputs/SearchInput"
 
 export default function OrganizerEventAttendees({eventId}: {eventId: number}) {
   console.log(eventId)
   const [searchQuery, setSearchQuery] = useState("Gimenez")
+  console.log(searchQuery)
 
   const attendees = [
     { id: 1, name: "Juan Gimenez" },

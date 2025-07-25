@@ -2,8 +2,6 @@
 
 import UsersList from "@/components/containers/users-list/UsersList";
 import DefaultButton from "@/components/ui/buttons/DefaultButton";
-import { getAllUsers } from "@/services/admin-users";
-import { useQuery } from "@tanstack/react-query";
 import EditSvg from "@/components/svg/EditSvg";
 
 export default function UserManagement() {
