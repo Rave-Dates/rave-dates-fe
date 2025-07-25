@@ -70,6 +70,12 @@ const NavbarMobile: React.FC = () => {
     ],
     "organizer": [
       {
+        id: 'home',
+        href: "/organizer",
+        label: 'Inicio',
+        icon: <HomeSvg className='w-6 h-6' />,
+      },
+      {
         id: 'promoters',
         href: "/organizer/promoters",
         label: 'Promotores',
@@ -80,12 +86,6 @@ const NavbarMobile: React.FC = () => {
         href: "/organizer/events",
         label: 'Eventos',
         icon: <CalendarSvg type='thin' className='w-6 h-6' />,
-      },
-      {
-        id: 'balance',
-        href: "/organizer/balance",
-        label: 'Saldo',
-        icon: <DollarSvg className='w-6 h-6' />,
       },
     ]
   };
