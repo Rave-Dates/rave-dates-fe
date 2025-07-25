@@ -50,6 +50,8 @@ const EventDetails = ({ eventId } : { eventId: number }) => {
       return processedImages;
     },
   });
+
+  console.log(selectedEvent)
   
   return (
     <div className="min-h-screen bg-primary-black text-white pb-20 md:pt-[6.7rem]">
@@ -75,6 +77,7 @@ const EventDetails = ({ eventId } : { eventId: number }) => {
               isLoading={isEventLoading}
               labels={selectedEvent?.labels}
               eventCategoryValues={selectedEvent?.eventCategoryValues}
+              organizerName="Nombre custom"
             />
           </div>
           
@@ -112,7 +115,6 @@ const EventDetails = ({ eventId } : { eventId: number }) => {
 
             <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} />
 
-
             {
               selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
             }
@@ -123,6 +125,7 @@ const EventDetails = ({ eventId } : { eventId: number }) => {
                 isLoading={isEventLoading}
                 labels={selectedEvent?.labels}
                 eventCategoryValues={selectedEvent?.eventCategoryValues}
+                organizerName="Nombre custom"
               />
             )}            
           </div>

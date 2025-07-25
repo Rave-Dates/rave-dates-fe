@@ -1,19 +1,12 @@
 "use client";
 
 import UsersList from "@/components/containers/users-list/UsersList";
-import { useState } from "react";
 import DefaultButton from "@/components/ui/buttons/DefaultButton";
 import { getAllUsers } from "@/services/admin-users";
 import { useQuery } from "@tanstack/react-query";
-import { useReactiveCookiesNext } from "cookies-next";
 import EditSvg from "@/components/svg/EditSvg";
 
 export default function UserManagement() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const { getCookie } = useReactiveCookiesNext();
-
-  const token = getCookie("token");
-  
   // const { data, isLoading, isError } = useQuery({
   //   queryKey: ["users"],
   //   queryFn: () => getAllUsers({ token }),
@@ -36,15 +29,11 @@ export default function UserManagement() {
     }
   ]
 
-  const filteredUsers = data?.filter((user) =>
-    user?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
     <UsersList
-      createHref="users/create-user"
-      setSearchQuery={setSearchQuery}
-      searchQuery={searchQuery}
+      createHref="promoters/create-promoter"
+      hasSearch={false}
+      searchQuery="Nuevo promotor"
     >
       <div className="rounded-md overflow-hidden">
         {/* Table Header */}
@@ -55,19 +44,19 @@ export default function UserManagement() {
 
         {/* Table Body */}
         <div className="divide-y divide-divider w-full">
-          {filteredUsers?.map((user) => (
+          {data?.map((user) => (
             <div
               key={user?.userId}
               className="grid grid-cols-[2fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
             >
               <div className="text-start">{user?.name}</div>
               <div className="flex justify-end gap-x-2">
-                <DefaultButton className="text-xl border bg-transparent border-primary" icon={<EditSvg className="text-primary" />} href={`users/edit-user/${user?.userId}`} />
-                <DefaultButton href={`organizer/promoters/edit-promoter/${user?.userId}`} />
+                <DefaultButton className="text-xl border bg-transparent border-primary" icon={<EditSvg className="text-primary" />} href={`promoters/edit-promoter/${user?.userId}`} />
+                <DefaultButton href={`promoters/${user?.userId}/promoter-events`} />
               </div>
             </div>
           ))}
-          {!filteredUsers && (
+          {!data && (
             Array.from(Array(10).keys()).map((user) => (
             <div
               key={user}
@@ -78,7 +67,7 @@ export default function UserManagement() {
             </div>
             ))
           )}
-          {!isLoading && Array.isArray(data) && filteredUsers?.length === 0 &&  (
+          {!isLoading && Array.isArray(data) && data?.length === 0 &&  (
             <div className="text-center py-8 text-text-inactive">
               No se encontraron usuarios
             </div>
