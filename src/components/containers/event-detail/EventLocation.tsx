@@ -53,9 +53,6 @@ const EventLocation = ({ event, isLoading } : { event: IEvent, isLoading: boolea
               }
             </>
         }
-        {/* <div className="relative h-[256px] bg-neutral-800 rounded-lg overflow-hidden">
-          <Image src="/images/map-example.png" alt="map" fill className="absolute inset-0 w-full h-full object-cover" />
-        </div> */}
       </div>
     </div>
   );

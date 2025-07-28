@@ -24,8 +24,6 @@ export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid
     enabled: !!token && !!clientId,
   });
 
-  console.log(purchasedTickets)
-
   const transferredTickets = purchasedTickets?.filter(ticket => ticket.isTransferred)
   const nonTransferredTickets = purchasedTickets?.filter(ticket => !ticket.isTransferred)
 

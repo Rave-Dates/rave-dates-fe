@@ -1,8 +1,15 @@
 import InfoSkeleton from '@/utils/skeletons/event-skeletons/InfoSkeleton';
 import React, { useMemo } from 'react';
 
+type Props = {
+  labels?: IEventLabel[];
+  eventCategoryValues?: IEventCategoryValue[];
+  isLoading?: boolean;
+  description: string;
+  organizerName: string | null | undefined;
+};
 
-const EventInfo= ({ labels, eventCategoryValues, isLoading, description } : { labels?: IEventLabel[], eventCategoryValues?: IEventCategoryValue[], isLoading?: boolean, description: string }) => {
+const EventInfo= ({ labels, eventCategoryValues, isLoading, description, organizerName } : Props) => {
   const categories = useMemo(() => {
     if (!eventCategoryValues || !Array.isArray(eventCategoryValues)) return [];
 
@@ -15,11 +22,7 @@ const EventInfo= ({ labels, eventCategoryValues, isLoading, description } : { la
   const genre = categories.find(
     (category) => category.categoryName.toLowerCase() === "género"
   );
-
-  const organizer = categories.find(
-    (category) => category.categoryName.toLowerCase() === "organizador"
-  );
-
+  
   return (
     <>
       {
@@ -50,7 +53,7 @@ const EventInfo= ({ labels, eventCategoryValues, isLoading, description } : { la
           <div>
             <h3 className="text-small-title font-semibold text-white mb-2">Organizador</h3>
             <p className="text-primary-white text-body bg-cards-container px-4 py-3 rounded-lg">
-              {organizer?.categoryValue || "Organizador no disponible"}
+              {organizerName || "Organizador no disponible"}
             </p>
           </div>
 

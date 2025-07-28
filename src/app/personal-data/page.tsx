@@ -5,11 +5,13 @@ import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { createClient } from "@/services/clients-login";
+import { useClientAuthStore } from "@/store/useClientAuthStore";
 import { useTicketStore } from "@/store/useTicketStore";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
@@ -26,6 +28,7 @@ export type ClientForm = {
 export default function DataForm() {
   const { setCookie, getCookie } = useReactiveCookiesNext();
   const { selected } = useTicketStore()
+  const { setRedirectToCheckout } = useClientAuthStore()
   const router = useRouter()
   const tempToken = getCookie("tempToken");
   const clientToken = getCookie("clientToken");
@@ -37,7 +40,7 @@ export default function DataForm() {
       router.push('/');
     } else if ((tempToken || clientToken) && !withoutTickets) {
       notifySuccess("Tenes cuenta y seleccionaste tickets");
-      router.push('/checkout');
+      router.replace("/checkout");
     } else if ((!tempToken || !clientToken) && !withoutTickets) {
       return
     }
@@ -68,7 +71,11 @@ export default function DataForm() {
     },
     onError: (error: { response: { data: { message: string } } }) => {
       if (error.response.data.message === "Client already exists") {
-        notifyError("El cliente ya existe.");
+        notifyError(
+          <span>
+            El cliente ya existe, inicie sesión <Link onClick={() => setRedirectToCheckout(true)} href="/auth" className="underline decoration-primary underline-offset-2">AQUI</Link>.
+          </span>
+        );      
       } else {
         notifyError("Error al crear cliente.");
       }

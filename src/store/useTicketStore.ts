@@ -13,11 +13,13 @@ type TicketStore = {
   setEventId: (eventId: number) => void;
   add: (ticket: TicketStage) => void;
   subtract: (ticketTypeId: number | undefined) => void;
+  resetSelected: () => void;
 };
 
 export const useTicketStore = create<TicketStore>((set, get) => ({
   selected: {},
   eventId: 0,
+  resetSelected: () => set({ selected: {} }),
   setEventId: (eventId) => set({ eventId }),
   add: (stage) => {
     const current = get().selected[stage.ticketTypeId || 0];

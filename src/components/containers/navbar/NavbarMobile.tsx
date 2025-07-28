@@ -10,7 +10,6 @@ import Link from 'next/link';
 import CalendarSvg from '@/components/svg/CalendarSvg';
 import GraphSvg from '@/components/svg/GraphSvg';
 import FileSvg from '@/components/svg/FileSvg';
-import DollarSvg from '@/components/svg/DollarSvg';
 
 const NavbarMobile: React.FC = () => {
   const pathname = usePathname();
@@ -70,6 +69,12 @@ const NavbarMobile: React.FC = () => {
     ],
     "organizer": [
       {
+        id: 'home',
+        href: "/organizer",
+        label: 'Inicio',
+        icon: <HomeSvg className='w-6 h-6' />,
+      },
+      {
         id: 'promoters',
         href: "/organizer/promoters",
         label: 'Promotores',
@@ -80,12 +85,6 @@ const NavbarMobile: React.FC = () => {
         href: "/organizer/events",
         label: 'Eventos',
         icon: <CalendarSvg type='thin' className='w-6 h-6' />,
-      },
-      {
-        id: 'balance',
-        href: "/organizer/balance",
-        label: 'Saldo',
-        icon: <DollarSvg className='w-6 h-6' />,
       },
     ]
   };

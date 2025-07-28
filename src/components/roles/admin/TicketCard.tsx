@@ -5,7 +5,7 @@ import FormInput from "@/components/ui/inputs/FormInput"
 import { useCreateEventStore } from "@/store/createEventStore"
 import { validateDateYyyyMmDd } from "@/utils/formatDate"
 import { useRouter, useParams } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { UseFormGetValues, UseFormRegister } from "react-hook-form"
 
 interface TicketCardProps {
@@ -30,6 +30,12 @@ export function TicketCard({
 
   const [stagesEnabled, setStagesEnabled] = useState(false)
   const { eventFormData, updateEventFormData, setEditingTicketId } = useCreateEventStore();
+
+  useEffect(() => {
+    if (isEditing) {
+      setStagesEnabled(true)
+    }
+  }, [isEditing, setStagesEnabled]);
 
   const onEditStages = () => {
     const formValues = getValues(); // obtiene todos los datos del formulario

@@ -25,11 +25,7 @@ export default function Checkout() {
   const { getCookie } = useReactiveCookiesNext();
   const clientToken = getCookie("clientToken");
   const tempToken = getCookie("tempToken");
-
-  // const searchParams = useSearchParams();
-  // const transactionId = searchParams.get("transactionId");
-  // const status = searchParams.get("status");
-
+  
   useEffect(() => {
     if (!eventId) {
       notifyError("Por favor vuelva a seleccionar los tickets")
@@ -42,7 +38,7 @@ export default function Checkout() {
     queryFn: () => getClientEventById(eventId),
     enabled: !!eventId,
   });
-    
+
   const handleContinue = () => {
     if (!clientToken && !tempToken) return
     if (selectedMethod === "Nequi") {
@@ -61,7 +57,7 @@ export default function Checkout() {
       })),
       isPartial: false,
       clientId: (decoded && decoded.id ) || (decodedTemp && decodedTemp.id) || 0,
-      returnUrl: "https://ravedates.proxising.com/checkout",
+      returnUrl: "https://ravedates.proxising.com/otp",
       boldMethod: "CREDIT_CARD"
     };
 

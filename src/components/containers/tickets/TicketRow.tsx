@@ -37,8 +37,7 @@ export function TicketRow({
   return (
     <div className="bg-cards-container rounded-lg p-4 gap-x-5 flex items-center justify-between">
       <div>
-        <div className="font-medium text-sm mb-1">{ticketType}</div>
-        <div className="text-sm">algo aca</div>
+        <div className="font-medium mb-1">{ticketType}</div>
       </div>
       <div className="flex gap-2">
         {["send", "download", "view"].map((action) => (

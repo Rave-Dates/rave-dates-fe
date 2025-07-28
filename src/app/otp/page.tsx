@@ -9,9 +9,10 @@ import { useClientAuthStore } from "@/store/useClientAuthStore";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import TokenGuard from "./TokenGuard";
 
 type VerificationForm = {
   emailOrWhatsapp: string;
@@ -25,10 +26,9 @@ export default function Verification() {
 
   const { getCookie, setCookie, deleteCookie } = useReactiveCookiesNext();
   const { sendCode, validateCode } = useVerification();
-  const { emailOrWhatsapp } = useClientAuthStore()
+  const { emailOrWhatsapp, redirectToCheckout } = useClientAuthStore()
   const router = useRouter();
-  const clientToken = getCookie("clientToken");
-
+  
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const {
     register,
@@ -42,26 +42,19 @@ export default function Verification() {
       code: ["", "", "", ""],
     },
   });
-
+  
   const code = watch("code");
-
+  const tempToken = getCookie("tempToken");
+  
   useEffect(() => {
-    const data = getCookie("tempToken");
-    if (data) {
-      const decoded: { id: number; email: string, whatsapp: string; exp: number; iat: number } = jwtDecode(data.toString());
-      setValue("emailOrWhatsapp", decoded.email)
+    if (tempToken) {
+      const decoded: { id: number; email: string, whatsapp: string; exp: number; iat: number } = jwtDecode(tempToken.toString());
+      setValue("emailOrWhatsapp", decoded.email);
     } else if (emailOrWhatsapp) {
-      setValue("emailOrWhatsapp", emailOrWhatsapp)
-    } else {
-      router.replace('/');
+      setValue("emailOrWhatsapp", emailOrWhatsapp);
     }
-  });
+  }, [tempToken, emailOrWhatsapp]);
 
-  useEffect(() => {
-    if (clientToken) {
-      redirect('/my-data');
-    }
-  }, [clientToken]);
 
   const handleInputChange = (index: number, value: string) => {
     if (value.length > 1) return;
@@ -125,7 +118,11 @@ export default function Verification() {
         });
         
         deleteCookie("tempToken")
-        router.replace("/");
+        if (redirectToCheckout) {
+          router.replace("/checkout");
+        } else {
+          router.replace("/tickets");
+        }
       })
       .catch((err) => {
         if (err.response.data.message === "Client not found") {
@@ -142,6 +139,8 @@ export default function Verification() {
   const codeFieldNames = ["code.0", "code.1", "code.2", "code.3"] as const;
 
   return (
+    <>
+    <TokenGuard emailOrWhatsapp={emailOrWhatsapp} />
     <div className="min-h-screen pb-40 pt-28 sm:pb-24 sm:pt-36 bg-primary-black text-white flex px-6">
       <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3" />
       <div className="max-w-md mx-auto space-y-6 animate-fade-in">
@@ -211,5 +210,6 @@ export default function Verification() {
         </form>
       </div>
     </div>
+    </>
   );
 }

@@ -38,7 +38,7 @@ const EventCardList: React.FC = () => {
             ) : (
               clientEvents?.map((event) => (
                 <div key={event.eventId} className="flex justify-center">
-                  <EventCard {...event} />
+                  <EventCard href="event" {...event} />
                 </div>
               ))
             )}
@@ -48,6 +48,13 @@ const EventCardList: React.FC = () => {
             Error cargando eventos
           </div>
         )}
+        {!isLoading && !isError && clientEvents?.length === 0 &&
+          <div className="space-y-4 h-screen animate-fade-in">
+            <div className="text-center py-8 text-neutral-400">
+              No se encontraron tickets
+            </div>
+          </div>
+        }
       </div>
 
       {/* Controles de paginado */}
