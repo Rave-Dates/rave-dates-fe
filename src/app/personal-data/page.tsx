@@ -40,7 +40,7 @@ export default function DataForm() {
       router.push('/');
     } else if ((tempToken || clientToken) && !withoutTickets) {
       notifySuccess("Tenes cuenta y seleccionaste tickets");
-      router.replace("/");
+      router.replace("/checkout");
     } else if ((!tempToken || !clientToken) && !withoutTickets) {
       return
     }
