@@ -2,11 +2,14 @@
 
 import { TicketRow } from "./TicketRow"
 import Link from "next/link"
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useQuery } from "@tanstack/react-query";
 import { getTicketsFromClient } from "@/services/clients-tickets";
+import { getClientEventImagesById, getClientImageById } from "@/services/clients-events";
+import { formatDateToColombiaTime } from "@/utils/formatDate";
+import { generateTicketImage } from "./generateTicketImage";
 
 export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid" | "pending" }) {
   const pathname = usePathname();
@@ -14,6 +17,9 @@ export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid
   const token = getCookie("clientToken");
   const decoded: {id: number} = (token && jwtDecode(token.toString())) || {id: 0};
   const clientId = Number(decoded?.id);
+
+  const params = useParams();
+  const eventId = Number(params.eventId);
 
   const { data: purchasedTickets } = useQuery<IPurchaseTicket[]>({
     queryKey: ["purchasedTickets", clientId], // agregamos clientId por seguridad
@@ -24,18 +30,34 @@ export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid
     enabled: !!token && !!clientId,
   });
 
-  const transferredTickets = purchasedTickets?.filter(ticket => ticket.isTransferred)
-  const nonTransferredTickets = purchasedTickets?.filter(ticket => !ticket.isTransferred)
+  console.log(purchasedTickets)
 
-  const handleAction = (action: string, ticketType: string) => {
-    console.log(`Action: ${action}, Ticket: ${ticketType}`)
-    // Implement action logic here
-  }
+  const transferredTickets = purchasedTickets?.filter(ticket => ticket.isTransferred && ticket.ticketType.eventId === eventId)
+  const nonTransferredTickets = purchasedTickets?.filter(ticket => !ticket.isTransferred && ticket.ticketType.eventId === eventId)
 
-  const handleDownloadAll = () => {
-    console.log("Download all tickets")
-    // Implement download all logic
-  }
+  const handleDownloadAll = async () => {
+    if (!nonTransferredTickets?.length) return;
+
+    for (const [i, ticket] of nonTransferredTickets.entries()) {
+      const eventInfo = ticket.purchase.meta.event;
+      const eventId = ticket.ticketType.eventId;
+      
+      const images = await getClientEventImagesById(eventId);
+      const blob = await getClientImageById(Number(images[0].imageId));
+      const servedImageUrl = URL.createObjectURL(blob);
+
+      await generateTicketImage({
+        bgImage: "/images/ticket-bg-ravedates.jpg",
+        qrUrl: "/images/testQR.png",
+        name: eventInfo.title,
+        time: `${formatDateToColombiaTime(eventInfo.date).date}, ${formatDateToColombiaTime(eventInfo.date).time}hs`,
+        ticketType: ticket.ticketType.name,
+        eventImage: servedImageUrl,
+        logoRD: "/logo.svg",
+        fileName: `ticket-${ticket.ticketType.name}-${i + 1}.jpg`,
+      });
+    }
+  };
 
   return (
     <div className="w-full mb-6">
@@ -51,11 +73,11 @@ export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid
           <div className="space-y-3">
             {nonTransferredTickets?.map((ticket) => (
               <TicketRow
+                eventInfo={ticket.purchase.meta.event}
                 href="transfer"
                 purchaseTicketId={ticket.purchaseTicketId}
                 key={ticket.purchaseTicketId}
-                ticketType={ticket.ticketType.name}
-                onAction={handleAction}
+                ticketType={ticket.ticketType}
               />
             ))}
             {
@@ -73,11 +95,11 @@ export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid
           <div className="space-y-3">
             {transferredTickets?.map((ticket) => (
               <TicketRow
+                eventInfo={ticket.purchase.meta.event}
                 href="transfer"
                 purchaseTicketId={ticket.purchaseTicketId}
                 key={ticket.purchaseTicketId}
-                ticketType={ticket.ticketType.name}
-                onAction={handleAction}
+                ticketType={ticket.ticketType}
               />
             ))}
             {
