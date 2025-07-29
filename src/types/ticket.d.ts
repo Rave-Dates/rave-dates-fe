@@ -46,6 +46,9 @@ interface IPurchaseData {
   purchaseDate: string;
   createdAt: string;
   updatedAt: string;
+  meta: {
+    event: IEvent
+  }
 }
 
 interface IClientPurchaseTicket {

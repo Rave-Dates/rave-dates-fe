@@ -3,8 +3,10 @@
 import EditSvg from "@/components/svg/EditSvg";
 import UserSvg from "@/components/svg/UserSvg";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
+import { getAllClientEvents } from "@/services/clients-events";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -14,157 +16,11 @@ export default function Page() {
   useEffect(() => {
     updateEventFormData(defaultEventFormData);
   }, []);
-
   
-  // const { data: events, isLoading, isError } = useQuery<IEvent[]>({
-  //   queryKey: ["events"],
-  //   queryFn: () => getAllEvents({ token }),
-  //   enabled: !!token, // solo se ejecuta si hay token
-  // });
-
-  const isLoading = false;
-  const isError = false;
-
-  const events =  [
-    {
-      "eventId": 1,
-      "title": "Summer Festival 2025",
-      "subtitle": "Extended set",
-      "date": "2025-08-15T20:00:00.000Z",
-      "piggyBank": true,
-      "geo": "4.649408704755897;-74.07725663267983;Movistar Arena",
-      "description": "Join us for the biggest summer festival of 2025!",
-      "type": "paid",
-      "feeRD": 5,
-      "feeRDInPromoter": 100,
-      "transferCost": 100,
-      "feePB": 200,
-      "discountCode": "SUMMER2025",
-      "discountType": "percentage",
-      "discount": 10,
-      "maxPurchase": 5,
-      "timeOut": 10,
-      "isActive": true,
-      "createdAt": "2025-07-23T22:26:23.800Z",
-      "updatedAt": "2025-07-23T22:26:23.800Z",
-      "eventCategoryValues": [
-        {
-          "id": 1,
-          "eventId": 1,
-          "valueId": 1,
-          "categoryId": 1,
-          "createdAt": "2025-07-23T22:26:24.005Z",
-          "updatedAt": "2025-07-23T22:26:24.005Z",
-          "value": {
-            "valueId": 1,
-            "value": "Bogotá",
-            "categoryId": 1,
-            "createdAt": "2025-07-23T22:26:23.589Z",
-            "updatedAt": "2025-07-23T22:26:23.589Z"
-          },
-          "category": {
-            "categoryId": 1,
-            "name": "Ubicación",
-            "createdAt": "2025-07-23T22:26:23.172Z",
-            "updatedAt": "2025-07-23T22:26:23.172Z"
-          }
-        },
-        {
-          "id": 2,
-          "eventId": 1,
-          "valueId": 2,
-          "categoryId": 1,
-          "createdAt": "2025-07-23T22:26:24.090Z",
-          "updatedAt": "2025-07-23T22:26:24.090Z",
-          "value": {
-            "valueId": 2,
-            "value": "Medellín",
-            "categoryId": 1,
-            "createdAt": "2025-07-23T22:26:23.610Z",
-            "updatedAt": "2025-07-23T22:26:23.610Z"
-          },
-          "category": {
-            "categoryId": 1,
-            "name": "Ubicación",
-            "createdAt": "2025-07-23T22:26:23.172Z",
-            "updatedAt": "2025-07-23T22:26:23.172Z"
-          }
-        },
-        {
-          "id": 3,
-          "eventId": 1,
-          "valueId": 3,
-          "categoryId": 2,
-          "createdAt": "2025-07-23T22:26:24.181Z",
-          "updatedAt": "2025-07-23T22:26:24.181Z",
-          "value": {
-            "valueId": 3,
-            "value": "Rave",
-            "categoryId": 2,
-            "createdAt": "2025-07-23T22:26:23.621Z",
-            "updatedAt": "2025-07-23T22:26:23.621Z"
-          },
-          "category": {
-            "categoryId": 2,
-            "name": "Tipo de evento",
-            "createdAt": "2025-07-23T22:26:23.274Z",
-            "updatedAt": "2025-07-23T22:26:23.274Z"
-          }
-        },
-        {
-          "id": 4,
-          "eventId": 1,
-          "valueId": 6,
-          "categoryId": 3,
-          "createdAt": "2025-07-23T22:26:24.269Z",
-          "updatedAt": "2025-07-23T22:26:24.269Z",
-          "value": {
-            "valueId": 6,
-            "value": "HaMelodic Techno",
-            "categoryId": 3,
-            "createdAt": "2025-07-23T22:26:23.664Z",
-            "updatedAt": "2025-07-23T22:26:23.664Z"
-          },
-          "category": {
-            "categoryId": 3,
-            "name": "Género",
-            "createdAt": "2025-07-23T22:26:23.472Z",
-            "updatedAt": "2025-07-23T22:26:23.472Z"
-          }
-        }
-      ],
-      "organizer": [
-        {
-          "organizerId": 1,
-          "userId": 2,
-          "createdAt": "2025-07-23T22:26:22.621Z",
-          "updatedAt": "2025-07-23T22:26:22.621Z",
-          "OrganizerEvent": {
-            "organizerId": 1,
-            "eventId": 1,
-            "createdAt": "2025-07-23T22:26:24.635Z",
-            "updatedAt": "2025-07-23T22:26:24.635Z"
-          }
-        }
-      ],
-      "labels": [
-        {
-          "labelId": 1,
-          "name": "Estacionamiento",
-          "icon": null,
-          "createdAt": "2025-07-23T22:26:23.717Z",
-          "updatedAt": "2025-07-23T22:26:23.717Z"
-        },
-        {
-          "labelId": 2,
-          "name": "Baños",
-          "icon": null,
-          "createdAt": "2025-07-23T22:26:23.736Z",
-          "updatedAt": "2025-07-23T22:26:23.736Z"
-        }
-      ] 
-    } 
-  ]
+  const { data: events, isLoading, isError } = useQuery<IEvent[]>({
+    queryKey: ["events"],
+    queryFn: () => getAllClientEvents(1, 1000),
+  });
 
   return (
     <div className="w-full flex flex-col gap-y-5 bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
