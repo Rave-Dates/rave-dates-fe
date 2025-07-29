@@ -10,17 +10,19 @@ import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { GenerateJPGButton } from "./GenerateJPGButton";
 
 interface TicketRowProps {
-  purchaseTicketId: number;
+  index: number;
   href: string;
-  ticketType: IPurchaseTicket["ticketType"];
+  ticket: IPurchaseTicket;
   eventInfo: IEvent;
+  isTransferred?: boolean;
 }
 
 export function TicketRow({
-  purchaseTicketId,
+  index,
   href,
-  ticketType,
+  ticket,
   eventInfo,
+  isTransferred = false,
 }: TicketRowProps) {
   const pathname = usePathname();
   const params = useParams();
@@ -58,17 +60,20 @@ export function TicketRow({
     }
   };
 
+  const actions = isTransferred ? ["view"] : ["send", "download", "view"];
+
   return (
     <div className="bg-cards-container rounded-lg p-4 gap-x-5 flex items-center justify-between">
-      <div>
-        <div className="font-medium mb-1">{ticketType.name}</div>
+      <div className="flex items-center justify-center font-medium mb-1 gap-x-2">
+        <div>{ticket.ticketType.name}</div>
+        <div className="text-text-inactive">{index + 1}</div>
       </div>
       <div className="flex gap-2">
-        {["send", "download", "view"].map((action) => (
+        {actions.map((action) => (
           <DefaultTitledButton
             key={action}
             className={`${action === "view" ? "block" : "hidden sm:block"} ${action === "download" ? "!p-0" : ""}`}
-            href={action === "view" ? `${pathname}/${href}/${purchaseTicketId}` : undefined}
+            href={action === "view" ? `${pathname}/${href}/${ticket.purchaseTicketId}` : undefined}
           >
             {getActionIcon(action)}
             <h2 className="text-[10px]">
@@ -79,7 +84,7 @@ export function TicketRow({
                   name={eventInfo.title}
                   eventImage={servedImageUrl ?? "/images/event-placeholder.png"}
                   time={`${formatDateToColombiaTime(eventInfo.date).date}, ${formatDateToColombiaTime(eventInfo.date).time}hs`}
-                  ticketType={ticketType.name}
+                  ticketType={ticket.ticketType.name}
                   logoRD="/logo.svg"
                 />
               }

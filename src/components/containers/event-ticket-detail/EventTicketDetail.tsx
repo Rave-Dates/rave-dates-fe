@@ -76,7 +76,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
               isLoading={isEventLoading}
               labels={selectedEvent?.labels}
               eventCategoryValues={selectedEvent?.eventCategoryValues}
-              organizerName="Nombre custom"
+              organizerName={selectedEvent?.organizer?.[0]?.user?.name}
             />
           </div>
           
@@ -118,7 +118,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
                 isLoading={isEventLoading}
                 labels={selectedEvent?.labels}
                 eventCategoryValues={selectedEvent?.eventCategoryValues}
-                organizerName="Nombre custom"
+                organizerName={selectedEvent?.organizer?.[0]?.user?.name}
               />
             )}            
             <TicketSelector isLoading={isTicketsLoading} ticketStatus="paid" isTicketList={true} />

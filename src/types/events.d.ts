@@ -24,7 +24,16 @@ interface IEvent {
     userId: number;
     organizerId: number;
     events: IOrganizerEvent[];
-  };
+    user: {
+      userId: number;
+      name: string;
+      email: string;
+      isActive: boolean;
+      password: string;
+      phone: string;
+      roleId: number;
+    }
+  }[];
   promoters?: {
     promoterId?: number;
     userId: number;

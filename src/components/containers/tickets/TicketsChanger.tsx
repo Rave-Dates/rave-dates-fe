@@ -22,7 +22,7 @@ export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid
   const eventId = Number(params.eventId);
 
   const { data: purchasedTickets } = useQuery<IPurchaseTicket[]>({
-    queryKey: ["purchasedTickets", clientId], // agregamos clientId por seguridad
+    queryKey: ["purchasedTickets", clientId],
     queryFn: async () => {
       if (!token) throw new Error("Token missing");
       return await getTicketsFromClient(clientId, token);
@@ -32,8 +32,11 @@ export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid
 
   console.log(purchasedTickets)
 
-  const transferredTickets = purchasedTickets?.filter(ticket => ticket.isTransferred && ticket.ticketType.eventId === eventId)
-  const nonTransferredTickets = purchasedTickets?.filter(ticket => !ticket.isTransferred && ticket.ticketType.eventId === eventId)
+  const transferredTickets = purchasedTickets?.filter(ticket => ticket.isTransferred && ticket.transferredClientId !== clientId && ticket.ticketType.eventId === eventId)
+  const nonTransferredTickets = purchasedTickets?.filter(ticket => ticket.transferredClientId !== clientId ? (!ticket.isTransferred && !ticket.transferredClientId && ticket.ticketType.eventId === eventId) : true)
+
+  console.log("nonTransferredTickets", nonTransferredTickets)
+  console.log("transferredTickets", transferredTickets)
 
   const handleDownloadAll = async () => {
     if (!nonTransferredTickets?.length) return;
@@ -71,13 +74,13 @@ export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid
             </button>
           </div>
           <div className="space-y-3">
-            {nonTransferredTickets?.map((ticket) => (
+            {nonTransferredTickets?.map((ticket, index) => (
               <TicketRow
+                index={index}
+                ticket={ticket}
                 eventInfo={ticket.purchase.meta.event}
                 href="transfer"
-                purchaseTicketId={ticket.purchaseTicketId}
                 key={ticket.purchaseTicketId}
-                ticketType={ticket.ticketType}
               />
             ))}
             {
@@ -93,13 +96,14 @@ export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid
         <div>
           <h2 className="text-lg font-medium mb-4">Tickets transferidos</h2>
           <div className="space-y-3">
-            {transferredTickets?.map((ticket) => (
+            {transferredTickets?.map((ticket, index) => (
               <TicketRow
+                index={index}
+                isTransferred={true}
+                ticket={ticket}
                 eventInfo={ticket.purchase.meta.event}
                 href="transfer"
-                purchaseTicketId={ticket.purchaseTicketId}
                 key={ticket.purchaseTicketId}
-                ticketType={ticket.ticketType}
               />
             ))}
             {
