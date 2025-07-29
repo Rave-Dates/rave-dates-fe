@@ -9,10 +9,11 @@ import { useClientAuthStore } from "@/store/useClientAuthStore";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import TokenGuard from "./TokenGuard";
+import TokenGuard from "../../components/containers/otp/TokenGuard";
+import { useTicketStore } from "@/store/useTicketStore";
 
 type VerificationForm = {
   emailOrWhatsapp: string;
@@ -27,6 +28,7 @@ export default function Verification() {
   const { getCookie, setCookie, deleteCookie } = useReactiveCookiesNext();
   const { sendCode, validateCode } = useVerification();
   const { emailOrWhatsapp, redirectToCheckout } = useClientAuthStore()
+  const { setEventId } = useTicketStore();
   const router = useRouter();
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -45,6 +47,9 @@ export default function Verification() {
   
   const code = watch("code");
   const tempToken = getCookie("tempToken");
+  const searchParams = useSearchParams()
+  const whereRedirect = searchParams.get('redirect')
+  const eventId = searchParams.get('eid')
   
   useEffect(() => {
     if (tempToken) {
@@ -120,6 +125,9 @@ export default function Verification() {
         deleteCookie("tempToken")
         if (redirectToCheckout) {
           router.replace("/checkout");
+        } else if (whereRedirect === "transfer") {
+          if (eventId) setEventId(Number(eventId));
+          router.replace("/transfer-confirm");
         } else {
           router.replace("/tickets");
         }

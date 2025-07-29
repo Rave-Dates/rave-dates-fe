@@ -1,10 +1,22 @@
 "use client"
 
 import ArrowSvg from "@/components/svg/ArrowSvg"
+import { useTicketStore } from "@/store/useTicketStore"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import type React from "react"
+import { useEffect } from "react"
 
 export default function Verification() {
+  const eventId = useSearchParams().get('eid')
+  const { setEventId } = useTicketStore()
+
+  useEffect(() => {
+    if (eventId) {
+      setEventId(Number(eventId))
+    }
+  }, [eventId])
+
   return (
     <div className="min-h-screen pb-40 pt-20 sm:pb-24 sm:pt-36 bg-primary-black sm:justify-center sm:items-center text-white flex px-6">
       <div className="flex animate-fade-in w-xl mx-auto flex-col items-center sm:justify-center">        
