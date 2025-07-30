@@ -68,7 +68,7 @@ export default function Checkout() {
       isPartial: false,
       clientId: (decoded && decoded.id ) || (decodedTemp && decodedTemp.id) || 0,
       returnUrl: urlToReturn,
-      boldMethod: "CREDIT_CARD"
+      boldMethod: ["CREDIT_CARD", "PSE"]
     };
 
     console.log(formattedTicketData)

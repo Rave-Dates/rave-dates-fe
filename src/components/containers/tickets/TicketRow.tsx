@@ -81,7 +81,7 @@ export function TicketRow({
               :
               <DefaultTitledButton
                 className={`${action === "view" ? "block" : "hidden sm:block"} ${action === "download" ? "!p-0" : ""}`}
-                href={action === "view" ? `${pathname}/${href}/${ticket.purchaseTicketId}` : undefined}
+                href={action === "send" ? `${pathname}/${href}/${ticket.purchaseTicketId}` : undefined}
               >
                 {getActionIcon(action)}
                 <h2 className="text-[10px]">

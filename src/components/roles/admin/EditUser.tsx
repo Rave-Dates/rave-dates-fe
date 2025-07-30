@@ -54,7 +54,6 @@ const EditUser = ({ userId } : { userId: number }) => {
   const { mutate } = useMutation({
     mutationFn: editUserById,
     onSuccess: () => {
-
       const decoded: IUserLogin = jwtDecode(`${token}`);
 
       if (decoded.role !== 'ADMIN') {
