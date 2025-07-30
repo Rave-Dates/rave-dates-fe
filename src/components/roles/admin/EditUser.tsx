@@ -92,8 +92,15 @@ const EditUser = ({ userId } : { userId: number }) => {
       <div className='absolute flex w-full px-5 gap-x-2 pt-10 items-center justify-between top-0 sm:top-20 z-20'>
         <GoBackButton className="px-3 rounded-xl py-3 sm:opacity-0" />
         <div className='flex items-center gap-x-3'>
-          <DefaultButton className="px-12 rounded-xl py-3" text='Cuenta' href={`${pathname}/balance`} />
-          <DeleteUserModal userId={userId} />
+          {
+            (data?.role.name === "ORGANIZER" || data?.role.name === "PROMOTER") && (
+              <DefaultButton className="px-12 rounded-xl py-3" text='Cuenta' href={`${pathname}/balance`} />
+            )
+          }
+          {
+            data?.role.name !== "ADMIN" &&
+            <DeleteUserModal userId={userId} />
+          }
         </div>
       </div>
       <DefaultForm isPending={isPending} goBackButton={false} handleSubmit={handleSubmit(onSubmit)} title={`${data?.name}`}>
@@ -108,12 +115,15 @@ const EditUser = ({ userId } : { userId: number }) => {
           inputName="password"
           register={register("password")}
         />
-        <FormInput
-          type='number'
-          title="Número de celular*"
-          inputName="phone"
-          register={register("phone", { required: true, valueAsNumber: true })}
+        {
+          data?.role.name !== "ADMIN" &&
+          <FormInput
+            type='number'
+            title="Número de celular*"
+            inputName="phone"
+            register={register("phone", { required: true, valueAsNumber: true })}
           />
+        }
         <FormInput
           type="email"
           title="Mail*"
@@ -132,25 +142,30 @@ const EditUser = ({ userId } : { userId: number }) => {
             ))
           }
         </FormDropDown>
-        <FormInput
+        {/* <FormInput
           type="number"
           title="Comisión (%)*"
           inputName="commission"
           register={register("commission")}
-        />
-        <FormInput
-          type="number"
-          title="Entradas cortesia (una cada)*" 
-          inputName="tickets"
-          register={register("tickets")}
-        />
-
-        <Link
-          href={`${pathname}/user-events`}
-          className="text-primary-white mb-0 py-5 text-center w-full block"
-        >
-          Ver eventos asignados
-        </Link>
+        /> */}
+        {
+          data?.role.name === "ORGANIZER" && 
+          <FormInput
+            type="number"
+            title="Entradas cortesia (una cada)*" 
+            inputName="tickets"
+            register={register("tickets")}
+          />
+        }
+        {
+          data?.role.name !== "ADMIN" &&
+          <Link
+            href={`${pathname}/user-events`}
+            className="text-primary-white mb-0 py-5 text-center w-full block"
+          >
+            Ver eventos asignados
+          </Link>
+        }
         <button
           type="submit"
           className="bg-primary text-black input-button"
