@@ -74,12 +74,15 @@ const EditUser = ({ userId } : { userId: number }) => {
   // editamos el usuario 
   const onSubmit = (data: Partial<IUser>) => {
     console.log(data)
+    if (!data.password) {
+      delete data.password
+    }
     mutate({
       token,
       id: userId,
       formData: {
         name: data?.name,
-        phone: data?.phone,
+        phone: data?.phone?.toString(),
         password: data?.password,
         email: data?.email,
         roleId: data?.roleId,
