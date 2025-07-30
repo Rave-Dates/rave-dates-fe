@@ -4,10 +4,18 @@ import SubtractSvg from "@/components/svg/SubtractSvg";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useParams } from "next/navigation";
 
-const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {  
+type Props = {
+  ticket: IEventTicket;
+  maxPurchase?: number;
+  totalQuantity: number;
+};
+
+const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
   const { add, subtract, selected, setEventId } = useTicketStore();
   const params = useParams();
   const eventId = Number(params.eventId);
+
+  let controlledMaxPurchase = maxPurchase || 1;
 
   useEffect(() => {
     if (eventId) {
@@ -19,6 +27,10 @@ const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {
     const now = Date.now();
     return new Date(stage.dateMax).getTime() > now && stage.quantity > 0;
   });
+
+  if (validStage?.price === 0) {
+    controlledMaxPurchase = 1;
+  }
 
   if (typeof ticket.ticketTypeId !== "number") return null;
   const currentQuantity =  selected[ticket.ticketTypeId]?.quantity || 0;
@@ -58,9 +70,15 @@ const TicketButtons = ({ ticket }: { ticket: IEventTicket }) => {
 
           <button
             onClick={() => validStage && add({ ticketTypeId: ticket.ticketTypeId, stageId: validStage.stageId, price: validStage.price, quantity: validStage.quantity })}
-            disabled={!validStage || currentQuantity >= validStage.quantity}
+            disabled={
+              !validStage ||
+              currentQuantity >= validStage.quantity ||
+              totalQuantity >= controlledMaxPurchase
+            }            
             className={`p-3 rounded-r-xl flex items-center justify-center text-black transition-colors ${
-              validStage && currentQuantity < validStage.quantity
+              validStage &&
+              currentQuantity < validStage.quantity &&
+              totalQuantity < controlledMaxPurchase
                 ? "bg-primary hover:bg-primary/70"
                 : "bg-inactive text-text-inactive"
             }`}

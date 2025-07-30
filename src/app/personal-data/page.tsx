@@ -4,11 +4,13 @@ import DefaultForm from "@/components/ui/forms/DefaultForm";
 import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
+import { getClientEventById } from "@/services/clients-events";
 import { createClient } from "@/services/clients-login";
+import { purchaseFreeTicket } from "@/services/clients-tickets";
 import { useClientAuthStore } from "@/store/useClientAuthStore";
 import { useTicketStore } from "@/store/useTicketStore";
 import { onInvalid } from "@/utils/onInvalidFunc";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
@@ -16,6 +18,7 @@ import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export type ClientForm = {
   name: string;
@@ -27,11 +30,17 @@ export type ClientForm = {
 
 export default function DataForm() {
   const { setCookie, getCookie } = useReactiveCookiesNext();
-  const { selected } = useTicketStore()
-  const { setRedirectToCheckout } = useClientAuthStore()
+  const { selected, eventId } = useTicketStore();
+  const { setRedirectToCheckout } = useClientAuthStore();
   const router = useRouter()
   const tempToken = getCookie("tempToken");
   const clientToken = getCookie("clientToken");
+
+  const { data: selectedEvent } = useQuery<IEvent>({
+    queryKey: [`selectedEvent-${eventId}`],
+    queryFn: () => getClientEventById(eventId),
+    enabled: !!eventId,
+  });
   
   useEffect(() => {
     const withoutTickets = Object.keys(selected).length < 1
@@ -53,6 +62,12 @@ export default function DataForm() {
   } = useForm<ClientForm>();
   
   const receiveInfo = watch("receiveInfo", false);
+
+  const handleRedirectClick = () => {
+    setRedirectToCheckout(true);
+    toast.dismiss();
+    router.push('/auth');
+  }
   
   const { mutate, isPending } = useMutation({
     mutationFn: createClient,
@@ -66,6 +81,21 @@ export default function DataForm() {
         maxAge: decoded.exp - Math.floor(Date.now() / 1000),
       });
 
+      if (selectedEvent?.type === "free") {
+        purchaseFreeTicketMutation({
+          ticketData: {
+            clientId: decoded.id,
+            eventId: eventId,
+            tickets: Object.keys(selected).map((ticketTypeId) => ({
+              quantity: selected[ticketTypeId].quantity,
+              ticketTypeId: Number(ticketTypeId),
+            })),
+          },
+          clientToken: data,
+        });
+        return
+      }
+
       notifySuccess("Logueado correctamente");
       router.push('/checkout');
     },
@@ -73,12 +103,26 @@ export default function DataForm() {
       if (error.response.data.message === "Client already exists") {
         notifyError(
           <span>
-            El cliente ya existe, inicie sesión <Link onClick={() => setRedirectToCheckout(true)} href="/auth" className="underline decoration-primary underline-offset-2">AQUI</Link>.
+            El cliente ya existe, inicie sesión <Link onClick={handleRedirectClick} href="/auth" className="underline decoration-primary underline-offset-2">AQUI</Link>.
           </span>
+          ,
+          Infinity
         );      
       } else {
         notifyError("Error al crear cliente.");
       }
+    },
+  });
+
+  const { mutate: purchaseFreeTicketMutation } = useMutation({
+    mutationFn: purchaseFreeTicket,
+    onSuccess: () => {
+      notifySuccess("Compra gratuita realizada correctamente");
+      router.push('/otp');
+    },
+    onError: (e) => {
+      console.log(e)
+      notifyError("Error al realizar la compra gratuita");
     },
   });
   

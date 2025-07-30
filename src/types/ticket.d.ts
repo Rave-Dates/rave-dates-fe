@@ -21,7 +21,10 @@ interface IPurchaseTicket {
   createdAt: string;
   updatedAt: string;
   purchase: IPurchaseData;
+  qr: string;
+  transferredClientId: number | null;
   ticketType: {
+    count: number;
     ticketTypeId: number;
     eventId: number;
     name: string;
@@ -46,6 +49,9 @@ interface IPurchaseData {
   purchaseDate: string;
   createdAt: string;
   updatedAt: string;
+  meta: {
+    event: IEvent
+  }
 }
 
 interface IClientPurchaseTicket {
@@ -61,6 +67,15 @@ interface IClientPurchaseTicket {
   eventId: number;
   boldMethod: string;
   returnUrl: string;
+}
+
+interface IClientPurchaseFreeTicket {
+  clientId: number;
+  eventId: number;
+  tickets: {
+    quantity: number;
+    ticketTypeId: number;
+  }[];
 }
 
 

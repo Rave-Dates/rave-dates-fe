@@ -7,15 +7,17 @@ import { notifyError } from "@/components/ui/toast-notifications";
 
 interface Props {
   emailOrWhatsapp?: string;
+  loadingValidate?: boolean;
 }
 
-export default function TokenGuard({ emailOrWhatsapp }: Props) {
+export default function TokenGuard({ emailOrWhatsapp, loadingValidate }: Props) {
   const router = useRouter();
 
   const tempToken = getCookie("tempToken");
   const clientToken = getCookie("clientToken");
 
   useEffect(() => {
+    if (loadingValidate) return;
     const hasTemp = !!tempToken;
     const hasClient = !!clientToken;
 

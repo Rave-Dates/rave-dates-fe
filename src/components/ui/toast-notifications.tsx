@@ -18,7 +18,7 @@ export const notifySuccess = (message: string) => {
   });
 };
 
-export const notifyError = (message: string | React.ReactNode) => {
+export const notifyError = (message: string | React.ReactNode, duration?: number) => {
   toast(message, {
     className: "bg-primary-black",
     style: {
@@ -26,7 +26,7 @@ export const notifyError = (message: string | React.ReactNode) => {
       color: "#FFFFFF",
       borderColor: "#ff2e2e40"
     },
-    duration: 5000,
+    duration: duration || 5000,
     icon: <AddSvg className="text-red-500 text-xl rotate-45" />,
   });
 };

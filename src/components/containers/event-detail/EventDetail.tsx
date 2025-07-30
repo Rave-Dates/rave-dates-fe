@@ -77,7 +77,7 @@ const EventDetails = ({ eventId } : { eventId: number }) => {
               isLoading={isEventLoading}
               labels={selectedEvent?.labels}
               eventCategoryValues={selectedEvent?.eventCategoryValues}
-              organizerName="Nombre custom"
+              organizerName={selectedEvent?.organizer?.[0]?.user?.name}
             />
           </div>
           
@@ -86,7 +86,7 @@ const EventDetails = ({ eventId } : { eventId: number }) => {
             {
               selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
             }
-            <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} />
+            <TicketSelector maxPurchase={selectedEvent?.maxPurchase} isLoading={isTicketsLoading} tickets={eventTickets} />
           </div>
         </div>
 
@@ -113,7 +113,7 @@ const EventDetails = ({ eventId } : { eventId: number }) => {
               </p>
             </div>
 
-            <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} />
+            <TicketSelector maxPurchase={selectedEvent?.maxPurchase} isLoading={isTicketsLoading} tickets={eventTickets} />
 
             {
               selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
@@ -125,7 +125,7 @@ const EventDetails = ({ eventId } : { eventId: number }) => {
                 isLoading={isEventLoading}
                 labels={selectedEvent?.labels}
                 eventCategoryValues={selectedEvent?.eventCategoryValues}
-                organizerName="Nombre custom"
+                organizerName={selectedEvent?.organizer?.[0]?.user?.name}
               />
             )}            
           </div>

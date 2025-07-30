@@ -81,6 +81,7 @@ const EditUser = ({ userId } : { userId: number }) => {
       formData: {
         name: data?.name,
         phone: data?.phone,
+        password: data?.password,
         email: data?.email,
         roleId: data?.roleId,
       },
@@ -101,6 +102,12 @@ const EditUser = ({ userId } : { userId: number }) => {
           title="Nombre completo*"
           inputName="name"
           register={register("name", { required: true, value: data?.name })}
+        />
+        <FormInput
+          type='password'
+          title="Contraseña*"
+          inputName="password"
+          register={register("password")}
         />
         <FormInput
           type='number'

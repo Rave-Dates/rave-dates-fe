@@ -1,50 +1,173 @@
-"use client"
+"use client";
 
 // import EventDetails from "@/components/containers/checkout/EventDetails"
-import TitleCard from "@/components/common/TitleCard"
-import GoBackButton from "@/components/ui/buttons/GoBackButton"
-import Link from "next/link"
-import type React from "react"
+import TitleCard from "@/components/common/TitleCard";
+import SpinnerSvg from "@/components/svg/SpinnerSvg";
+import GoBackButton from "@/components/ui/buttons/GoBackButton";
+import {
+  getClientEventById,
+  getClientEventImagesById,
+  getClientImageById,
+} from "@/services/clients-events";
+import { getTicketsFromClient } from "@/services/clients-tickets";
+import { useTicketStore } from "@/store/useTicketStore";
+import { formatDateToColombiaTime } from "@/utils/formatDate";
+import { useQuery } from "@tanstack/react-query";
+import { useReactiveCookiesNext } from "cookies-next";
+import { jwtDecode } from "jwt-decode";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useEffect } from "react";
 
 export default function Verification() {
+  const { getCookie } = useReactiveCookiesNext();
+  const { eventId } = useTicketStore();
+  const token = getCookie("clientToken");
+  const decoded: { id: number } = (token && jwtDecode(token.toString())) || {id: 0};
+  const clientId = Number(decoded?.id);
+  const router = useRouter();
+
+  const { data: purchasedTickets, isLoading: isTicketsLoading } = useQuery<
+    IPurchaseTicket[]
+  >({
+    queryKey: ["purchasedTickets", clientId], // agregamos clientId por seguridad
+    queryFn: async () => {
+      if (!token) throw new Error("Token missing");
+      return await getTicketsFromClient(clientId, token);
+    },
+    enabled: !!token && !!clientId,
+  });
+
+  const { data: event, isLoading: isEventLoading } = useQuery<IEvent>({
+    queryKey: ["event", eventId], // agregamos clientId por seguridad
+    queryFn: async () => {
+      if (!token) throw new Error("Token missing");
+      return await getClientEventById(eventId);
+    },
+    enabled: !!token && !!eventId,
+  });
+
+  const { data: eventImages } = useQuery<IEventImages[]>({
+    queryKey: [`eventImages-${eventId}`],
+    queryFn: async () => {
+      const images = await getClientEventImagesById(eventId);
+      return images;
+    },
+    enabled: !!eventId,
+  });
+
+  const { data: servedImageUrl, isLoading: isImageLoading } = useQuery<
+    string | null
+  >({
+    queryKey: [`servedImageUrl-${eventId}`],
+    queryFn: async () => {
+      if (!eventImages) return null;
+      const blob = await getClientImageById(Number(eventImages[0].imageId));
+      return URL.createObjectURL(blob);
+    },
+    enabled: !!eventImages,
+  });
+
+  useEffect(() => {
+    if (!eventId) {
+      router.replace("/")
+    }
+  }, [eventId]);
+
+  const nonTransferredTickets = purchasedTickets?.filter(
+    (ticket) => !ticket.isTransferred && ticket.ticketType.eventId === eventId
+  );
+
   return (
     <div className="min-h-screen pb-40 pt-28 sm:pb-24 sm:pt-36 bg-primary-black sm:justify-center sm:items-center text-white flex px-6">
       <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
       <div className="flex w-xl animate-fade-in mx-auto flex-col gap-y-2 items-center sm:justify-center">
-        <TitleCard className="sm:flex hidden w-full mb-2 px-3 py-2 rounded-md" title="DYEN" description="Extended set" />
-        
-        <div className="sm:flex hidden bg-cards-container w-full rounded-md px-5 py-3 gap-x-4 mb-3">
-          <h2 className="font-light text-sm">Viernes, 11 de junio - 08:00 PM</h2>
-        </div>
+        {isEventLoading || !event ? (
+          <div className="w-full bg-cards-container h-18 rounded-xl gap-x-5 px-4 py-3 flex items-center justify-start">
+            <div className="w-14 h-14 animate-pulse bg-inactive rounded-lg"></div>
+            <div className="flex flex-col gap-y-2 items-start justify-center">
+              <div className="w-44 h-6 animate-pulse bg-inactive rounded-lg"></div>
+              <div className="w-28 h-4 animate-pulse bg-inactive rounded-lg"></div>
+            </div>
+          </div>
+        ) : (
+          event && (
+            <TitleCard
+              className="w-full px-3 py-2 rounded-md"
+              title={event.title}
+              description={event.subtitle}
+            >
+              {isImageLoading ? (
+                <div className="w-14 h-14 flex items-center justify-center">
+                  <SpinnerSvg className="fill-primary text-inactive w-5" />
+                </div>
+              ) : (
+                <Image
+                  className="w-14 h-14 rounded-full"
+                  src={servedImageUrl ?? "/images/event-placeholder.png"}
+                  width={1000}
+                  height={1000}
+                  alt="logo"
+                />
+              )}
+            </TitleCard>
+          )
+        )}
 
-        {/* <EventDetails className="sm:hidden mb-3 block w-full" /> */}
+        {event?.date ? (
+          <div className="sm:flex hidden bg-cards-container w-full rounded-md px-5 py-3 gap-x-4 mb-3">
+            <h2 className="font-light text-sm">
+              {formatDateToColombiaTime(event.date).date} -{" "}
+              {formatDateToColombiaTime(event.date).time}hs
+            </h2>
+          </div>
+        ) : (
+          <div className="w-full bg-cards-container h-11 rounded-md gap-x-5 px-4 py-3 flex items-center justify-start mb-3">
+            <div className="w-1/3 h-4 animate-pulse bg-inactive rounded-md"></div>
+          </div>
+        )}
 
         <h2 className="text-start w-full">Entradas</h2>
 
-        <div className="flex w-full">
-          <div
-            className="w-full flex justify-center flex-col items-start text-sm bg-cards-container outline-none rounded-l-lg ps-4"
-            >
-            <h2>GENERAL</h2>
-            <h3 className="text-text-inactive">Juan Gómez</h3>
-          </div>
-          <div className="bg-cards-container pe-4 py-5 rounded-r-lg">
-            <Link href="transfer/receiver-data" className="block text-center bg-primary hover:opacity-80 text-black rounded px-4 py-2 text-sm transition-opacity">Transferir</Link>
-          </div>
-        </div>
+        {isTicketsLoading || !nonTransferredTickets ? (
+          <div className="w-full bg-cards-container h-19 rounded-xl gap-x-5 px-4 py-3 flex items-center justify-between">
+            <div className="w-[100px] sm:w-[170px]">
+              <div className="bg-inactive animate-pulse h-6 mb-1 w-20 rounded"></div>
+              <div className="bg-inactive animate-pulse h-4 w-28 rounded"></div>
+            </div>
 
-        <div className="flex w-full">
-          <div
-            className="w-full flex justify-center flex-col items-start text-sm bg-cards-container outline-none rounded-l-lg ps-4"
-            >
-            <h2>VIP</h2>
-            <h3 className="text-text-inactive">Juan Gómez</h3>
+            <div className="flex flex-col gap-y-2 items-start justify-center">
+              <div className="w-24 h-9 animate-pulse bg-inactive rounded"></div>
+            </div>
           </div>
-          <div className="bg-cards-container pe-4 py-5 rounded-r-lg">
-            <Link href="transfer/receiver-data" className="block text-center bg-primary hover:opacity-80 text-black rounded px-4 py-2 text-sm transition-opacity">Transferir</Link>
+        ) : (
+          <>
+            {nonTransferredTickets?.map((ticket) => (
+              <div key={ticket.purchaseTicketId} className="flex w-full">
+                <div className="w-full flex justify-center flex-col items-start bg-cards-container outline-none rounded-l-lg ps-4">
+                  <h2>{ticket.ticketType.name}</h2>
+                </div>
+                <div className="bg-cards-container pe-4 py-5 rounded-r-lg">
+                  <Link
+                    href={`transfer/${ticket.purchaseTicketId}/receiver-data`}
+                    className="block text-center bg-primary hover:opacity-80 text-black rounded px-4 py-2 text-sm transition-opacity"
+                  >
+                    Transferir
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        {nonTransferredTickets?.length === 0 && (
+          <div className="text-center pb-4 text-neutral-400">
+            No se encontraron tickets
           </div>
-        </div>
+        )}
       </div>
     </div>
-  )
+  );
 }

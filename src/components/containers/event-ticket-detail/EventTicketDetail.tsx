@@ -21,7 +21,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
     enabled: !!eventId,
   });
 
-  const { data: eventTickets, isLoading: isTicketsLoading } = useQuery<IEventTicket[]>({
+  const { isLoading: isTicketsLoading } = useQuery<IEventTicket[]>({
     queryKey: ["eventTickets"],
     queryFn: () => getEventClientTickets(eventId),
   });
@@ -76,7 +76,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
               isLoading={isEventLoading}
               labels={selectedEvent?.labels}
               eventCategoryValues={selectedEvent?.eventCategoryValues}
-              organizerName="Nombre custom"
+              organizerName={selectedEvent?.organizer?.[0]?.user?.name}
             />
           </div>
           
@@ -85,7 +85,10 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
             {
               selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
             }
-            <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} isTicketList={true} />
+            {
+              selectedEvent &&
+              <TicketSelector eventInfo={{date: selectedEvent.date, title: selectedEvent.title}} isLoading={isTicketsLoading} ticketStatus="paid" isTicketList={true} />
+            }     
           </div>
         </div>
 
@@ -118,10 +121,13 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
                 isLoading={isEventLoading}
                 labels={selectedEvent?.labels}
                 eventCategoryValues={selectedEvent?.eventCategoryValues}
-                organizerName="Nombre custom"
+                organizerName={selectedEvent?.organizer?.[0]?.user?.name}
               />
             )}            
-            <TicketSelector isLoading={isTicketsLoading} ticketStatus="paid" isTicketList={true} />
+            {
+              selectedEvent &&
+              <TicketSelector eventInfo={{date: selectedEvent.date, title: selectedEvent.title}} isLoading={isTicketsLoading} ticketStatus="paid" isTicketList={true} />
+            } 
           </div>
         </div>
       </div>
