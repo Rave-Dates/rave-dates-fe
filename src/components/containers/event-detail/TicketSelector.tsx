@@ -1,16 +1,23 @@
 import TicketButtons from "@/components/ui/buttons/TicketButtons";
-import Link from "next/link";
 import React from "react";
 import TicketsChanger from "../tickets/TicketsChanger";
 import TicketsSkeleton from "@/utils/skeletons/event-skeletons/TicketsSkeleton";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useReactiveCookiesNext } from "cookies-next";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { purchaseFreeTicket } from "@/services/clients-tickets";
+import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
+import { useParams, useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
+import { getClientEventById } from "@/services/clients-events";
 
 type Props = {
   isTicketList?: boolean;
   ticketStatus?: "paid" | "pending";
   tickets?: IEventTicket[];
   isLoading: boolean;
+  maxPurchase?: number;
+  eventInfo?: { date: string, title: string };
 };
 
 const TicketSelector = ({
@@ -18,11 +25,16 @@ const TicketSelector = ({
   ticketStatus,
   tickets,
   isLoading,
+  maxPurchase,
+  eventInfo,
 }: Props) => {
   const { selected } = useTicketStore();
   const { getCookie } = useReactiveCookiesNext();
   const tempToken = getCookie("tempToken");
   const clientToken = getCookie("clientToken");
+  const router = useRouter();
+  const params = useParams();
+  const eventId = Number(params.eventId);
 
   const totalQuantity = Object.values(selected).reduce(
     (acc, curr) => acc + curr.quantity,
@@ -33,6 +45,45 @@ const TicketSelector = ({
     0
   );
 
+  const { data: selectedEvent } = useQuery<IEvent>({
+    queryKey: [`selectedEvent-${eventId}`],
+    queryFn: () => getClientEventById(eventId),
+    enabled: !!eventId,
+  });
+  
+  const { mutate: purchaseFreeTicketMutation } = useMutation({
+    mutationFn: purchaseFreeTicket,
+    onSuccess: () => {
+      notifySuccess("Compra gratuita realizada correctamente");
+      router.push('/tickets');
+    },
+    onError: (e) => {
+      console.log(e)
+      notifyError("Error al realizar la compra gratuita");
+    },
+  });
+
+  const handleClick = () => {
+    if (selectedEvent?.type === "free") {
+      if (!clientToken) return
+      const decoded: {id: number, email: string, iat: number, exp: number} = jwtDecode(clientToken);
+      
+      purchaseFreeTicketMutation({
+        ticketData: {
+          clientId: decoded.id,
+          eventId: eventId,
+          tickets: Object.keys(selected).map((ticketTypeId) => ({
+            quantity: selected[ticketTypeId].quantity,
+            ticketTypeId: Number(ticketTypeId),
+          })),
+        },
+        clientToken: clientToken,
+      });
+      return
+    }
+    router.push(tempToken || clientToken ? "/checkout" : "/personal-data");
+  }
+
   return (
     <div>
       <h3
@@ -40,10 +91,12 @@ const TicketSelector = ({
           isTicketList && "hidden"
         } text-lg font-semibold text-white mb-2`}
       >
-        Entradas disponibles
+        Entradas disponibles <span className="text-sm text-text-inactive">(Máximo {maxPurchase})</span>
       </h3>
       {isTicketList ? (
-        <TicketsChanger ticketStatus={ticketStatus} />
+        <>
+          { eventInfo && <TicketsChanger eventInfo={eventInfo} ticketStatus={ticketStatus} />}
+        </>
       ) : (
         <>
           {isLoading ? (
@@ -51,7 +104,7 @@ const TicketSelector = ({
           ) : (
             <>
               {tickets?.map((ticket) => (
-                <TicketButtons key={ticket.ticketTypeId} ticket={ticket} />
+                <TicketButtons totalQuantity={totalQuantity} maxPurchase={maxPurchase} key={ticket.ticketTypeId} ticket={ticket} />
               ))}
             </>
           )}
@@ -69,10 +122,10 @@ const TicketSelector = ({
               </div>
             </div>
 
-            <Link
+            <button
               tabIndex={totalQuantity === 0 ? -1 : undefined}
               aria-disabled={totalQuantity === 0}
-              href={tempToken || clientToken ? "/checkout" : "/personal-data"}
+              onClick={handleClick}
               className={`w-full md:w-1/2 text-center py-3 rounded-lg transition-colors ${
                 totalQuantity > 0
                   ? "bg-primary hover:bg-primary/70 text-black"
@@ -80,7 +133,7 @@ const TicketSelector = ({
               }`}
             >
               {totalQuantity > 0 ? "Comprar tickets" : "Selecciona tickets"}
-            </Link>
+            </button>
           </div>
         </>
       )}

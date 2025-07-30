@@ -85,7 +85,10 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
             {
               selectedEvent && <EventLocation isLoading={isEventLoading} event={selectedEvent} />
             }
-            <TicketSelector isLoading={isTicketsLoading} tickets={eventTickets} isTicketList={true} />
+            {
+              selectedEvent &&
+              <TicketSelector eventInfo={{date: selectedEvent.date, title: selectedEvent.title}} isLoading={isTicketsLoading} ticketStatus="paid" isTicketList={true} />
+            }     
           </div>
         </div>
 
@@ -121,7 +124,10 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
                 organizerName={selectedEvent?.organizer?.[0]?.user?.name}
               />
             )}            
-            <TicketSelector isLoading={isTicketsLoading} ticketStatus="paid" isTicketList={true} />
+            {
+              selectedEvent &&
+              <TicketSelector eventInfo={{date: selectedEvent.date, title: selectedEvent.title}} isLoading={isTicketsLoading} ticketStatus="paid" isTicketList={true} />
+            } 
           </div>
         </div>
       </div>

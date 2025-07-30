@@ -148,7 +148,7 @@ export default function Verification() {
 
   return (
     <>
-    <TokenGuard emailOrWhatsapp={emailOrWhatsapp} />
+    <TokenGuard loadingValidate={loadingValidate} emailOrWhatsapp={emailOrWhatsapp} />
     <div className="min-h-screen pb-40 pt-28 sm:pb-24 sm:pt-36 bg-primary-black text-white flex px-6">
       <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3" />
       <div className="max-w-md mx-auto space-y-6 animate-fade-in">

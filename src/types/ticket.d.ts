@@ -68,6 +68,15 @@ interface IClientPurchaseTicket {
   returnUrl: string;
 }
 
+interface IClientPurchaseFreeTicket {
+  clientId: number;
+  eventId: number;
+  tickets: {
+    quantity: number;
+    ticketTypeId: number;
+  }[];
+}
+
 
 interface ITransferUser {
   name: string;
