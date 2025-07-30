@@ -3,7 +3,7 @@
 import React from 'react';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
 import { useQuery } from '@tanstack/react-query';
-import { getClientEventById, getClientEventImagesById, getClientImageById, getEventClientTickets } from '@/services/clients-events';
+import { getClientEventById, getClientEventImagesById, getClientImageById } from '@/services/clients-events';
 import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
 import EventHero from '../event-detail/EventHero';
 import EventLocation from '../event-detail/EventLocation';
@@ -19,11 +19,6 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
       return await getClientEventById(eventId);
     },
     enabled: !!eventId,
-  });
-
-  const { isLoading: isTicketsLoading } = useQuery<IEventTicket[]>({
-    queryKey: ["eventTickets"],
-    queryFn: () => getEventClientTickets(eventId),
   });
 
   const { data: eventImages } = useQuery<IEventImages[]>({
@@ -87,7 +82,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
             }
             {
               selectedEvent &&
-              <TicketSelector eventInfo={{date: selectedEvent.date, title: selectedEvent.title}} isLoading={isTicketsLoading} ticketStatus="paid" isTicketList={true} />
+              <TicketSelector eventInfo={{date: selectedEvent.date, title: selectedEvent.title}} ticketStatus="paid" isTicketList={true} />
             }     
           </div>
         </div>
@@ -126,7 +121,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
             )}            
             {
               selectedEvent &&
-              <TicketSelector eventInfo={{date: selectedEvent.date, title: selectedEvent.title}} isLoading={isTicketsLoading} ticketStatus="paid" isTicketList={true} />
+              <TicketSelector eventInfo={{date: selectedEvent.date, title: selectedEvent.title}} ticketStatus="paid" isTicketList={true} />
             } 
           </div>
         </div>

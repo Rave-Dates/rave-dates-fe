@@ -17,6 +17,7 @@ export default function Page() {
   const { updateEventFormData } = useCreateEventStore();
 
   useEffect(() => {
+    console.log("campos resetados")
     updateEventFormData(defaultEventFormData);
   }, []);
 

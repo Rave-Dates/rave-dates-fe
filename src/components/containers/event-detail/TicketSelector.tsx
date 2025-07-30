@@ -15,7 +15,7 @@ type Props = {
   isTicketList?: boolean;
   ticketStatus?: "paid" | "pending";
   tickets?: IEventTicket[];
-  isLoading: boolean;
+  isLoading?: boolean;
   maxPurchase?: number;
   eventInfo?: { date: string, title: string };
 };
