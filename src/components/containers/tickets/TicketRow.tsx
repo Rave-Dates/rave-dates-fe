@@ -52,7 +52,7 @@ export function TicketRow({
       case "download":
         return null;
       case "view":
-        return <EyeSvg />;
+        return <EyeSvg className="w-6 h-6" />;
       default:
         return null;
     }
@@ -67,28 +67,30 @@ export function TicketRow({
       </div>
       <div className="flex gap-2">
         {actions.map((action) => (
-          <DefaultTitledButton
-            key={action}
-            className={`${action === "view" ? "block" : "hidden sm:block"} ${action === "download" ? "!p-0" : ""}`}
-            href={action === "view" ? `${pathname}/${href}/${ticket.purchaseTicketId}` : undefined}
-          >
-            {getActionIcon(action)}
-            <h2 className="text-[10px]">
-              {action === "download" && 
-                <GenerateJPGButton
-                  bgImage="/images/ticket-bg-ravedates.jpg"
-                  qrData="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aWNrZXRJZCI6MSwiZXZlbnRJZCI6MSwiY2xpZW50SWQiOjEsImlhdCI6MTc1MzgyNTQyNn0.lqgYFLUVC042fHEuKaB9Fy_6EnMn8UVRK5s0QBDXHXM"
-                  name={eventInfo.title}
-                  eventImage={servedImageUrl ?? "/images/event-placeholder.png"}
-                  time={`${formatDateToColombiaTime(eventInfo.date).date}, ${formatDateToColombiaTime(eventInfo.date).time}hs`}
-                  ticketType={ticket.ticketType.name}
-                  logoRD="/logo.svg"
-                />
-              }
-              {action === "send" && "Enviar"}
-              {action === "view" && "Ver"}
-            </h2>
-          </DefaultTitledButton>
+          <div key={action}>
+            {action === "download" ? 
+              <GenerateJPGButton
+                bgImage="/images/ticket-bg-ravedates.jpg"
+                qrData={ticket.qr}
+                name={eventInfo.title}
+                eventImage={servedImageUrl ?? "/images/event-placeholder.png"}
+                time={`${formatDateToColombiaTime(eventInfo.date).date}, ${formatDateToColombiaTime(eventInfo.date).time}hs`}
+                ticketType={ticket.ticketType.name}
+                logoRD="/logo.svg"
+              />
+              :
+              <DefaultTitledButton
+                className={`${action === "view" ? "block" : "hidden sm:block"} ${action === "download" ? "!p-0" : ""}`}
+                href={action === "view" ? `${pathname}/${href}/${ticket.purchaseTicketId}` : undefined}
+              >
+                {getActionIcon(action)}
+                <h2 className="text-[10px]">
+                  {action === "send" && "Enviar"}
+                  {action === "view" && "Ver"}
+                </h2>
+              </DefaultTitledButton>
+            }
+          </div>
         ))}
       </div>
     </div>

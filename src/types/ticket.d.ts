@@ -21,6 +21,7 @@ interface IPurchaseTicket {
   createdAt: string;
   updatedAt: string;
   purchase: IPurchaseData;
+  qr: string;
   transferredClientId: number | null;
   ticketType: {
     count: number;

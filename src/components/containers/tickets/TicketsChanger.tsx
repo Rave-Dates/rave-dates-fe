@@ -56,7 +56,7 @@ export default function TicketsChanger({ ticketStatus, eventInfo } : Props) {
       if (!eventInfo) return
       await generateTicketImage({
         bgImage: "/images/ticket-bg-ravedates.jpg",
-        qrData: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aWNrZXRJZCI6MSwiZXZlbnRJZCI6MSwiY2xpZW50SWQiOjEsImlhdCI6MTc1MzgyNTQyNn0.lqgYFLUVC042fHEuKaB9Fy_6EnMn8UVRK5s0QBDXHXM",
+        qrData: ticket.qr, 
         name: eventInfo.title,
         time: `${formatDateToColombiaTime(eventInfo.date).date}, ${formatDateToColombiaTime(eventInfo.date).time}hs`,
         ticketType: ticket.ticketType.name,

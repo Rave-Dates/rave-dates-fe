@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export type ClientForm = {
   name: string;
@@ -61,6 +62,12 @@ export default function DataForm() {
   } = useForm<ClientForm>();
   
   const receiveInfo = watch("receiveInfo", false);
+
+  const handleRedirectClick = () => {
+    setRedirectToCheckout(true);
+    toast.dismiss();
+    router.push('/auth');
+  }
   
   const { mutate, isPending } = useMutation({
     mutationFn: createClient,
@@ -96,8 +103,10 @@ export default function DataForm() {
       if (error.response.data.message === "Client already exists") {
         notifyError(
           <span>
-            El cliente ya existe, inicie sesión <Link onClick={() => setRedirectToCheckout(true)} href="/auth" className="underline decoration-primary underline-offset-2">AQUI</Link>.
+            El cliente ya existe, inicie sesión <Link onClick={handleRedirectClick} href="/auth" className="underline decoration-primary underline-offset-2">AQUI</Link>.
           </span>
+          ,
+          Infinity
         );      
       } else {
         notifyError("Error al crear cliente.");
