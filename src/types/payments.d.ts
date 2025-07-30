@@ -1,4 +1,4 @@
-export interface EventPaymentSummary {
+interface EventPaymentSummary {
   eventId: number;
   total: string;
   feePromoter: string;
@@ -10,18 +10,18 @@ export interface EventPaymentSummary {
   movements: Movement[];
 }
 
-export interface StageGroup {
+interface StageGroup {
   eventId: number;
   stages: StageDetail[];
 }
 
-export interface StageDetail {
+interface StageDetail {
   quantity: number;
   ticketTypeId: number;
   activeStage: ActiveStage;
 }
 
-export interface ActiveStage {
+interface ActiveStage {
   date: string; // formato YYYY-MM-DD
   price: number;
   dateMax: string; // formato YYYY-MM-DD
@@ -30,14 +30,28 @@ export interface ActiveStage {
   promoterFee: number;
 }
 
-export interface Movement {
+interface ICreatePayment {
+  eventId: number;
+  organizerId: number;
+  promoterId?: number;
+  paymentAmount: number;
+  imageUrl: string;
+}
+interface IPaymentData {
   paymentId: number;
   eventId: number;
   organizerId: number;
-  promoterId: number;
-  userId: number;
+  promoterId?: number;
   paymentAmount: number;
   imageUrl: string;
-  createdAt: string; // formato ISO
-  updatedAt: string; // formato ISO
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface IPaymentForm {
+  eventId: number | string;
+  organizerId: number;
+  promoterId?: number;
+  paymentAmount: number;
+  image: File | undefined;
 }

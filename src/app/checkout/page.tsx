@@ -40,11 +40,21 @@ export default function Checkout() {
   });
 
   const handleContinue = () => {
+    // router.push(tempToken && !clientToken ? `/otp?redirect=transfer?eid=${eventId}` : `/transfer-confirm?eid=${eventId}`)
     if (!clientToken && !tempToken) return
     if (selectedMethod === "Nequi") {
       notifyError("Método no creado")
       return
     }
+
+    let urlToReturn = ""
+
+    if (tempToken && !clientToken) {
+      urlToReturn = `https://ravedates.proxising.com/otp?redirect=transfer?eid=${eventId}`
+    } else if (!tempToken && clientToken) {
+      urlToReturn = `https://ravedates.proxising.com/transfer-confirm?eid=${eventId}`
+    }
+
     const decoded: {id: number} | null = clientToken && jwtDecode(clientToken?.toString()) || null;
     const decodedTemp: {id: number} | null = tempToken && jwtDecode(tempToken?.toString()) || null;
 
@@ -57,9 +67,11 @@ export default function Checkout() {
       })),
       isPartial: false,
       clientId: (decoded && decoded.id ) || (decodedTemp && decodedTemp.id) || 0,
-      returnUrl: "https://ravedates.proxising.com/otp",
+      returnUrl: urlToReturn,
       boldMethod: "CREDIT_CARD"
     };
+
+    console.log(formattedTicketData)
 
     notifyPending(
       new Promise((resolve, reject) => {
