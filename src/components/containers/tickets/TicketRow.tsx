@@ -10,15 +10,13 @@ import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { GenerateJPGButton } from "./GenerateJPGButton";
 
 interface TicketRowProps {
-  index: number;
   href: string;
   ticket: IPurchaseTicket;
-  eventInfo: IEvent;
+  eventInfo: { date: string, title: string };
   isTransferred?: boolean;
 }
 
 export function TicketRow({
-  index,
   href,
   ticket,
   eventInfo,
@@ -66,7 +64,6 @@ export function TicketRow({
     <div className="bg-cards-container rounded-lg p-4 gap-x-5 flex items-center justify-between">
       <div className="flex items-center justify-center font-medium mb-1 gap-x-2">
         <div>{ticket.ticketType.name}</div>
-        <div className="text-text-inactive">{index + 1}</div>
       </div>
       <div className="flex gap-2">
         {actions.map((action) => (
@@ -80,7 +77,7 @@ export function TicketRow({
               {action === "download" && 
                 <GenerateJPGButton
                   bgImage="/images/ticket-bg-ravedates.jpg"
-                  qrUrl="/images/testQR.png"
+                  qrData="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aWNrZXRJZCI6MSwiZXZlbnRJZCI6MSwiY2xpZW50SWQiOjEsImlhdCI6MTc1MzgyNTQyNn0.lqgYFLUVC042fHEuKaB9Fy_6EnMn8UVRK5s0QBDXHXM"
                   name={eventInfo.title}
                   eventImage={servedImageUrl ?? "/images/event-placeholder.png"}
                   time={`${formatDateToColombiaTime(eventInfo.date).date}, ${formatDateToColombiaTime(eventInfo.date).time}hs`}

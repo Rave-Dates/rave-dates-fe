@@ -11,7 +11,12 @@ import { getClientEventImagesById, getClientImageById } from "@/services/clients
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { generateTicketImage } from "./generateTicketImage";
 
-export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid" | "pending" }) {
+type Props = {
+  ticketStatus?: "paid" | "pending";
+  eventInfo: { date: string, title: string };
+};
+
+export default function TicketsChanger({ ticketStatus, eventInfo } : Props) {
   const pathname = usePathname();
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("clientToken");
@@ -42,16 +47,16 @@ export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid
     if (!nonTransferredTickets?.length) return;
 
     for (const [i, ticket] of nonTransferredTickets.entries()) {
-      const eventInfo = ticket.purchase.meta.event;
       const eventId = ticket.ticketType.eventId;
       
       const images = await getClientEventImagesById(eventId);
       const blob = await getClientImageById(Number(images[0].imageId));
       const servedImageUrl = URL.createObjectURL(blob);
 
+      if (!eventInfo) return
       await generateTicketImage({
         bgImage: "/images/ticket-bg-ravedates.jpg",
-        qrUrl: "/images/testQR.png",
+        qrData: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aWNrZXRJZCI6MSwiZXZlbnRJZCI6MSwiY2xpZW50SWQiOjEsImlhdCI6MTc1MzgyNTQyNn0.lqgYFLUVC042fHEuKaB9Fy_6EnMn8UVRK5s0QBDXHXM",
         name: eventInfo.title,
         time: `${formatDateToColombiaTime(eventInfo.date).date}, ${formatDateToColombiaTime(eventInfo.date).time}hs`,
         ticketType: ticket.ticketType.name,
@@ -74,11 +79,10 @@ export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid
             </button>
           </div>
           <div className="space-y-3">
-            {nonTransferredTickets?.map((ticket, index) => (
+            {nonTransferredTickets?.map((ticket) => (
               <TicketRow
-                index={index}
                 ticket={ticket}
-                eventInfo={ticket.purchase.meta.event}
+                eventInfo={eventInfo}
                 href="transfer"
                 key={ticket.purchaseTicketId}
               />
@@ -96,12 +100,11 @@ export default function TicketsChanger({ ticketStatus } : { ticketStatus?: "paid
         <div>
           <h2 className="text-lg font-medium mb-4">Tickets transferidos</h2>
           <div className="space-y-3">
-            {transferredTickets?.map((ticket, index) => (
+            {transferredTickets?.map((ticket) => (
               <TicketRow
-                index={index}
                 isTransferred={true}
                 ticket={ticket}
-                eventInfo={ticket.purchase.meta.event}
+                eventInfo={eventInfo}
                 href="transfer"
                 key={ticket.purchaseTicketId}
               />
