@@ -53,7 +53,7 @@ const ChangeTicketsView = () => {
           <h3 className="text-subtitle font-semibold mb-2">
             Entradas disponibles
           </h3>
-          <TicketButtons ticket={sampleTicket} />
+          <TicketButtons totalQuantity={sampleTicket.count || 0} ticket={sampleTicket} />
           <h1 className="sm:hidden block text-start w-full text-primary mt-6">
             Crédito disponible $1000 COP
           </h1>

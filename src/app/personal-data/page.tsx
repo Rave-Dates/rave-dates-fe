@@ -36,7 +36,7 @@ export default function DataForm() {
   const tempToken = getCookie("tempToken");
   const clientToken = getCookie("clientToken");
 
-  const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
+  const { data: selectedEvent } = useQuery<IEvent>({
     queryKey: [`selectedEvent-${eventId}`],
     queryFn: () => getClientEventById(eventId),
     enabled: !!eventId,

@@ -35,7 +35,7 @@ export function TicketRow({
     enabled: !!eventId,
   });
 
-  const { data: servedImageUrl, isLoading: isImageLoading } = useQuery<string | null>({
+  const { data: servedImageUrl } = useQuery<string | null>({
     queryKey: [`servedImageUrl-${eventId}`],
     queryFn: async () => {
       if (!eventImages) return null;

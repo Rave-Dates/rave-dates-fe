@@ -21,7 +21,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
     enabled: !!eventId,
   });
 
-  const { data: eventTickets, isLoading: isTicketsLoading } = useQuery<IEventTicket[]>({
+  const { isLoading: isTicketsLoading } = useQuery<IEventTicket[]>({
     queryKey: ["eventTickets"],
     queryFn: () => getEventClientTickets(eventId),
   });

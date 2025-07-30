@@ -30,7 +30,7 @@ export const generateTicketImage = async ({
 
   const font = new FontFace("Inter", "url(/fonts/Inter_28pt-Regular.ttf)")
   await font.load()
-  ;(document as any).fonts.add(font)
+  ;(document).fonts.add(font)
 
   const loadImage = (src: string): Promise<HTMLImageElement> =>
     new Promise((resolve, reject) => {
