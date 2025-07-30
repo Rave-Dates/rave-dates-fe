@@ -27,7 +27,7 @@ export default function Page() {
 
   const { register, handleSubmit, setValue, control } = useForm<IPaymentForm>({
     defaultValues: {
-      eventId: "", // <- Esto es clave
+      eventId: "",
       paymentAmount: 0,
     }
   });
@@ -35,13 +35,13 @@ export default function Page() {
   const { data: allEvents } = useQuery<IEvent[]>({
     queryKey: ["allEvents"],
     queryFn: () => getAllEvents({ token }),
-    enabled: !!token, // solo se ejecuta si hay token
+    enabled: !!token,
   });
 
   const { data: selectedUser } = useQuery({
     queryKey: ["user"],
     queryFn: () => getUserById({ token, id: userId }),
-    enabled: !!token && !!userId, // solo se ejecuta si hay token
+    enabled: !!token && !!userId,
   });
 
   const watchedImage = useWatch({ name: "image", control });
@@ -88,7 +88,7 @@ export default function Page() {
             if (!isNaN(id)) setSelectedEventId(id);
           }}
         >
-          <option value="" disabled hidden>Seleccioná un evento</option>
+          <option value="" disabled hidden>Selecciona un evento</option>
           {
             allEvents?.map((event) => (
               <option key={event.eventId} value={String(event.eventId)}>

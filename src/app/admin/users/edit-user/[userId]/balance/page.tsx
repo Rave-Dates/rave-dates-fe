@@ -3,22 +3,32 @@
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { getAllEvents } from "@/services/admin-events";
 import { getAllPayments } from "@/services/admin-payments";
+import { getUserById } from "@/services/admin-users";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 
 export default function Balance() {
   const pathname = usePathname();
+  const params = useParams();
+  const userId = Number(params.userId)
+
   const { getCookie } = useReactiveCookiesNext();
 
   const token = getCookie("token");
   
-  const { data: payments } = useQuery({
+  const { data: payments } = useQuery<IPaymentData[]>({
     queryKey: ["users"],
     queryFn: () => getAllPayments({ token }),
-    enabled: !!token, // solo se ejecuta si hay token
+    enabled: !!token,
+  });
+
+  const { data: user } = useQuery({
+    queryKey: ["user"],
+    queryFn: () => getUserById({ token, id: userId }),
+    enabled: !!token && !!userId,
   });
 
   const { data: allEvents } = useQuery({
@@ -27,7 +37,10 @@ export default function Balance() {
     enabled: !!token,
   });
 
-  console.log(payments)
+  const filteredPayments = payments?.filter(
+    (payment) =>
+      payment.organizerId === user?.organizer?.organizerId
+  );
   const eventMap = new Map(allEvents?.map(event => [event.eventId, event.title]));
 
   return (
@@ -60,7 +73,7 @@ export default function Balance() {
 
           {/* Table Body */}
           <div className="divide-y divide-divider w-full">
-            {payments?.map((data: IPaymentData) => (
+            {filteredPayments?.map((data) => (
               <div
                 key={data.paymentId}
                 className="grid grid-cols-[1fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-xs"
@@ -77,7 +90,7 @@ export default function Balance() {
         </div>
 
           {/* Empty State */}
-          {payments?.length === 0 && (
+          {filteredPayments?.length === 0 && (
             <div className="text-center py-8 text-neutral-400">
               No se encontraron movimientos
             </div>

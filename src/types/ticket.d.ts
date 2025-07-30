@@ -65,7 +65,7 @@ interface IClientPurchaseTicket {
   amount?: number;
   promoterId?: number;
   eventId: number;
-  boldMethod: string;
+  boldMethod: string | string[];
   returnUrl: string;
 }
 
