@@ -8,14 +8,17 @@ type Props = {
   ticket: IEventTicket;
   maxPurchase?: number;
   totalQuantity: number;
+  overrideMaxTotalSelectable?: number;
+  fixedQuantity?: number; 
 };
 
-const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
+const TicketButtons = ({ ticket, maxPurchase, totalQuantity, overrideMaxTotalSelectable, fixedQuantity }: Props) => {
   const { add, subtract, selected, setEventId } = useTicketStore();
   const params = useParams();
   const eventId = Number(params.eventId);
-
-  let controlledMaxPurchase = maxPurchase || 1;
+  
+  let controlledMaxPurchase = overrideMaxTotalSelectable ?? maxPurchase ?? 1;
+  const currentQuantity = fixedQuantity ?? selected[ticket.ticketTypeId || 0]?.quantity ?? 0;
 
   useEffect(() => {
     if (eventId) {
@@ -33,7 +36,6 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
   }
 
   if (typeof ticket.ticketTypeId !== "number") return null;
-  const currentQuantity =  selected[ticket.ticketTypeId]?.quantity || 0;
 
   return (
     <div className="space-y-2 mb-3">
@@ -56,9 +58,9 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
         <div className="flex items-center font-light text-subtitle">
           <button
             onClick={() => subtract(ticket.ticketTypeId)}
-            disabled={currentQuantity === 0}
-            className={`p-3 rounded-l-xl hover:opacity-75 transition-opacity ${
-              currentQuantity > 0 ? "bg-primary-white text-black" : "bg-inactive text-text-inactive"
+            disabled={currentQuantity === 0 || !!fixedQuantity}
+            className={`p-3 rounded-l-xl transition-opacity ${
+              currentQuantity > 0 && !fixedQuantity ? "bg-primary-white text-black hover:opacity-75" : "bg-inactive text-text-inactive pointer-events-none"
             }`}
           >
             <SubtractSvg />
@@ -69,7 +71,7 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
           </span>
 
           <button
-            onClick={() => validStage && add({ ticketTypeId: ticket.ticketTypeId, stageId: validStage.stageId, price: validStage.price, quantity: validStage.quantity })}
+            onClick={() => validStage && add({ ticketTypeId: ticket.ticketTypeId, price: validStage.price, quantity: validStage.quantity })}
             disabled={
               !validStage ||
               currentQuantity >= validStage.quantity ||
@@ -80,7 +82,7 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
               currentQuantity < validStage.quantity &&
               totalQuantity < controlledMaxPurchase
                 ? "bg-primary hover:bg-primary/70"
-                : "bg-inactive text-text-inactive"
+                : "bg-inactive text-text-inactive pointer-events-none"
             }`}
           >
             <AddSvg />

@@ -19,14 +19,9 @@ import type React from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
-export type ClientForm = {
-  name: string;
-  idCard: string;
-  email: string;
-  whatsapp: string;
+interface ClientForm extends Partial<IClient> {
   receiveInfo?: boolean;
-};
+}
 
 export default function DataForm() {
   const { setCookie, getCookie } = useReactiveCookiesNext();

@@ -12,6 +12,8 @@ import EventInfo from '../event-detail/EventInfo';
 import { parseISODate } from '@/utils/formatDate';
 
 const EventTicketDetails = ({ eventId } : { eventId: number }) => {
+  const isClient = typeof window !== "undefined";
+
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
     queryKey: ["selectedEvent"],
     queryFn: async () => {
@@ -28,7 +30,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
 
   const { data: servedImages, isLoading: isImagesLoading } = useQuery<{ id: string, url: string }[]>({
     queryKey: [`servedImages-${eventId}`, eventImages?.map(img => img.imageId)],
-    enabled: !!eventImages,
+    enabled: !!eventImages && isClient,  // 👈 IMPORTANTE: solo ejecuta en cliente
     queryFn: async () => {
       if (!eventImages) return [];
       const processedImages = await Promise.all(

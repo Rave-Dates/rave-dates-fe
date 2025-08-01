@@ -43,6 +43,15 @@ interface ICreateUser {
   roleId: number;
 }
 
+interface IClient {
+  name: string;
+  email: string;
+  whatsapp: string;
+  idCard: string;
+  balance: number;
+  firstLogin: boolean;
+}
+
 interface IOrganizerEvent extends Partial<IEvent> {
   OrganizerEvent: {
     organizerId: number;

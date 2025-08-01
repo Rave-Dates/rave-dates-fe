@@ -1,7 +1,11 @@
 import { extractLatAndLng, extractPlaceFromGeo } from '@/utils/formatGeo';
 import React from 'react';
-import EventMap from './EventMap';
 import { formatDateToColombiaTime } from '@/utils/formatDate';
+import dynamic from "next/dynamic";
+
+const LeafletMap = dynamic(() => import('./EventMap'), {
+  ssr: false,
+});
 
 const EventLocation = ({ event, isLoading } : { event: IEvent, isLoading: boolean }) => {
   const geoParts = extractLatAndLng(event.geo).split(",").map(Number);
@@ -49,7 +53,7 @@ const EventLocation = ({ event, isLoading } : { event: IEvent, isLoading: boolea
             <>
               {
                 position &&
-                <EventMap place={extractPlaceFromGeo(event?.geo)} position={position} />
+                <LeafletMap place={extractPlaceFromGeo(event?.geo)} position={position} />
               }
             </>
         }

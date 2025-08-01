@@ -8,6 +8,12 @@ import { useQuery } from "@tanstack/react-query";
 import { getClientEventImagesById, getClientImageById } from "@/services/clients-events";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { GenerateJPGButton } from "./GenerateJPGButton";
+import CheckSvg from "@/components/svg/CheckSvg";
+import { getClientById } from "@/services/clients-login";
+import { useReactiveCookiesNext } from "cookies-next";
+import QRCode from "qrcode";
+import { useEffect, useRef, useState } from "react";
+import AddSvg from "@/components/svg/AddSvg";
 
 interface TicketRowProps {
   href: string;
@@ -22,9 +28,23 @@ export function TicketRow({
   eventInfo,
   isTransferred = false,
 }: TicketRowProps) {
+  const [showQR, setShowQR] = useState(false);
+
+  const { getCookie } = useReactiveCookiesNext();
   const pathname = usePathname();
   const params = useParams();
   const eventId = Number(params.eventId);
+  const clientToken = getCookie("clientToken");
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (canvasRef.current && showQR) {
+      QRCode.toCanvas(canvasRef.current, ticket.qr, { width: 256 }, function (error) {
+        if (error) console.error(error);
+      });
+    }
+  }, [showQR, ticket.qr]);
 
   const { data: eventImages } = useQuery<IEventImages[]>({
     queryKey: [`eventImages-${eventId}`],
@@ -45,6 +65,15 @@ export function TicketRow({
     enabled: !!eventImages,
   });
 
+  const { data: transferredClientData } = useQuery<IClient | null>({
+    queryKey: ['transferredClient', ticket.transferredClientId],
+    queryFn: async () => {
+      if (!ticket.transferredClientId) return null;
+      return await getClientById({id: ticket.transferredClientId, token: clientToken});
+    },
+    enabled: !!ticket.transferredClientId,
+  });
+
   const getActionIcon = (action: string) => {
     switch (action) {
       case "send":
@@ -53,46 +82,134 @@ export function TicketRow({
         return null;
       case "view":
         return <EyeSvg className="w-6 h-6" />;
+      case "resend":
+        return <SendSvg className="w-6 h-6" />;
       default:
         return null;
     }
   };
 
-  const actions = isTransferred ? ["view"] : ["send", "download", "view"];
+  const actions = isTransferred ? ["resend"] : ["send", "download", "view"];
 
   return (
-    <div className="bg-cards-container rounded-lg p-4 gap-x-5 flex items-center justify-between">
-      <div className="flex items-center justify-center font-medium mb-1 gap-x-2">
+    <div className="bg-cards-container flex-wrap rounded-lg py-3 px-4 gap-x-2 sm:gap-x-5 flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-start font-medium mb-1 gap-x-2">
         <div>{ticket.ticketType.name}</div>
+        {
+          ticket.isTransferred && !isTransferred &&
+          <div className="text-xs text-primary/70 mt-1 italic">
+            Recibido
+          </div>
+        }
       </div>
       <div className="flex gap-2">
-        {actions.map((action) => (
-          <div key={action}>
-            {action === "download" ? 
-              <GenerateJPGButton
-                bgImage="/images/ticket-bg-ravedates.jpg"
-                qrData={ticket.qr}
-                name={eventInfo.title}
-                eventImage={servedImageUrl ?? "/images/event-placeholder.png"}
-                time={`${formatDateToColombiaTime(eventInfo.date).date}, ${formatDateToColombiaTime(eventInfo.date).time}hs`}
-                ticketType={ticket.ticketType.name}
-                logoRD="/logo.svg"
-              />
-              :
-              <DefaultTitledButton
-                className={`${action === "view" ? "block" : "hidden sm:block"} ${action === "download" ? "!p-0" : ""}`}
-                href={action === "send" ? `${pathname}/${href}/${ticket.purchaseTicketId}` : undefined}
-              >
-                {getActionIcon(action)}
-                <h2 className="text-[10px]">
-                  {action === "send" && "Enviar"}
-                  {action === "view" && "Ver"}
-                </h2>
-              </DefaultTitledButton>
-            }
+        {
+          ticket.status === "READ" &&
+          <div className="flex items-center text-primary justify-center font-medium mb-1 gap-x-2">
+            <h2>Ticket leido</h2>
+            <CheckSvg className="text-primary" />
           </div>
-        ))}
+        }
+        {
+          ticket.status === "DEFEATED" &&
+          <div className="flex items-center text-system-error justify-center font-medium mb-1 gap-x-2">
+            <h2>Ticket vencido</h2>
+          </div>
+        }
+        {ticket.status === "PENDING" &&
+          actions.map((action) => {
+            if (action === "download") {
+              return (
+                <div key={action}>
+                  <GenerateJPGButton
+                    bgImage="/images/ticket-bg-ravedates.jpg"
+                    qrData={ticket.qr}
+                    name={eventInfo.title}
+                    eventImage={servedImageUrl ?? "/images/event-placeholder.png"}
+                    time={`${formatDateToColombiaTime(eventInfo.date).date}, ${formatDateToColombiaTime(eventInfo.date).time}hs`}
+                    ticketType={ticket.ticketType.name}
+                    logoRD="/logo.svg"
+                  />
+                </div>
+              );
+            }
+
+            if (action === "view") {
+              return (
+                <div key={action}>
+                  {isTransferred && transferredClientData?.firstLogin ? (
+                    <div className="text-xs text-primary/80 italic">
+                      Ticket ya leído por el destinatario
+                    </div>
+                  ) : (
+                    <DefaultTitledButton handleOnClick={() => setShowQR((prev) => !prev)} className="block">
+                      {getActionIcon(action)}
+                      <h2 className="text-[10px]">Ver</h2>
+                    </DefaultTitledButton>
+                  )}
+                </div>
+              );
+            }
+
+            if (action === "resend") {
+              if (isTransferred && transferredClientData && !transferredClientData.firstLogin) {
+                return (
+                  <div key={action}>
+                    <DefaultTitledButton
+                      className="block"
+                      href={`${pathname}/${href}/${ticket.purchaseTicketId}`}
+                    >
+                      {getActionIcon(action)}
+                      <h2 className="text-[10px]">Reenviar</h2>
+                    </DefaultTitledButton>
+                  </div>
+                );
+              }
+              return (
+                <div key={action} className="text-xs py-3 px-4 text-primary/80 italic">
+                  Ticket ya leído por el destinatario
+                </div>
+                );
+            }
+
+            // default: "send"
+            if (action === "send") {
+              if (ticket.isTransferred) return null;
+              return (
+                <div key={action}>
+                  <DefaultTitledButton
+                    href={`${pathname}/${href}/${ticket.purchaseTicketId}`}
+                  >
+                    {getActionIcon(action)}
+                    <h2 className="text-[10px]">Enviar</h2>
+                  </DefaultTitledButton>
+                </div>
+              );
+            }
+          })}
       </div>
+      {showQR && (
+        <div
+          className="fixed inset-0 bg-black/70 text-primary-black backdrop-blur-sm z-50 flex items-center justify-center"
+          onClick={() => setShowQR(false)}
+        >
+          <div
+            className="bg-primary-white p-6 rounded-lg relative w-[90%] max-w-sm flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del modal
+          >
+            <button
+              className="absolute top-4 right-4 text-xl font-bold"
+              onClick={() => setShowQR(false)}
+              aria-label="Cerrar"
+            >
+              <AddSvg className="rotate-45" />
+            </button>
+            <h2 className="mb-2 font-semibold text-center">Código QR del ticket</h2>
+            <canvas ref={canvasRef} className="w-64 h-64" />
+            <p className="mt-4 text-xs font-medium break-all text-center">{ticket.ticketType.name} - {eventInfo.title} - {`${formatDateToColombiaTime(eventInfo.date).date}, ${formatDateToColombiaTime(eventInfo.date).time}hs`}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

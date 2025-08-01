@@ -35,13 +35,21 @@ export default function TicketsChanger({ ticketStatus, eventInfo } : Props) {
     enabled: !!token && !!clientId,
   });
 
-  console.log(purchasedTickets)
+  const transferredTickets = purchasedTickets?.filter(ticket =>
+    ticket.isTransferred &&
+    ticket.transferredClientId !== null &&
+    ticket.transferredClientId !== clientId &&
+    ticket.ticketType.eventId === eventId
+  );
 
-  const transferredTickets = purchasedTickets?.filter(ticket => ticket.isTransferred && ticket.transferredClientId !== clientId && ticket.ticketType.eventId === eventId)
-  const nonTransferredTickets = purchasedTickets?.filter(ticket => ticket.transferredClientId !== clientId ? (!ticket.isTransferred && !ticket.transferredClientId && ticket.ticketType.eventId === eventId) : true)
-
-  console.log("nonTransferredTickets", nonTransferredTickets)
-  console.log("transferredTickets", transferredTickets)
+  const nonTransferredTickets = purchasedTickets?.filter(ticket =>
+    (
+      !ticket.isTransferred ||
+      ticket.transferredClientId === null ||
+      ticket.transferredClientId === clientId
+    ) &&
+    ticket.ticketType.eventId === eventId
+  );
 
   const handleDownloadAll = async () => {
     if (!nonTransferredTickets?.length) return;
@@ -105,7 +113,7 @@ export default function TicketsChanger({ ticketStatus, eventInfo } : Props) {
                 isTransferred={true}
                 ticket={ticket}
                 eventInfo={eventInfo}
-                href="transfer"
+                href="transferred"
                 key={ticket.purchaseTicketId}
               />
             ))}

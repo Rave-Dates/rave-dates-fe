@@ -54,7 +54,7 @@ const NavbarWeb: React.FC = () => {
           <Link href="/tickets" className={`${pathname.includes("/tickets") ? "text-primary" : "text-text-inactive"} md:block hidden min-w-[81px] hover:text-primary-white transition-colors`}>
             Mis tickets
           </Link>
-          <Link href="/auth" className={`${pathname === "/auth" ? "text-primary" : "text-text-inactive"} md:block hidden min-w-[75px] hover:text-primary-white transition-colors`}>
+          <Link href="/auth" className={`${pathname === "/auth" || pathname === "/my-data" ? "text-primary" : "text-text-inactive"} md:block hidden min-w-[75px] hover:text-primary-white transition-colors`}>
             Mis datos
           </Link>
         </div>
