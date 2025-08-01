@@ -1,6 +1,6 @@
 "use client";
 
-import SearchInput from "@/components/ui/inputs/SearchInput";
+import SearchInput from "@/components/ui/inputs/search-input/SearchInput";
 import AddSvg from "@/components/svg/AddSvg";
 import Link from "next/link";
 import { useState } from "react";

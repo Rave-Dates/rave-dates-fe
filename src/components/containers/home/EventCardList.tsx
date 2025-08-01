@@ -7,7 +7,7 @@ import { useClientAllEvents } from "@/hooks/client/queries/useClientData";
 import { useEventStore } from "@/store/useEventStore";
 
 const EventCardList: React.FC = () => {
-  const { filters } = useEventStore();
+  const { filters, setEvents } = useEventStore();
 
   useEffect(() => {
     console.log(filters)
@@ -27,6 +27,15 @@ const EventCardList: React.FC = () => {
   useEffect(() => {
     console.log(clientEvents);
   }, [clientEvents]);
+
+  useEffect(() => {
+    if (!data) return;
+    async function loadEvents() {
+      setEvents({ events: data! });
+    }
+
+    loadEvents();
+  }, [data]);
 
   useEffect(() => {
     setPage(1);

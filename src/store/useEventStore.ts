@@ -9,10 +9,17 @@ type EventStore = {
   setFilters: (filters: Filters) => void;
 };
 
-export const useEventStore = create<EventStore>((set) => ({
+export const useEventStore = create<EventStore>((set, get) => ({
   events: undefined,
   filters: {},
   setEvents: ({ events }) => set({ events }),
   setFilters: (filters) => set({ filters }),
+    searchEvents: (term: string) => {
+    const search = term.toLowerCase();
+    const filtered = get().events?.filter((event) =>
+      event.title.toLowerCase().includes(search)
+    );
+    set({ events: filtered });
+  },
 }));
 

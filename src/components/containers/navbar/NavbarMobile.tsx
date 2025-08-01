@@ -104,12 +104,13 @@ const NavbarMobile: React.FC = () => {
       <div className="flex justify-around items-center max-w-md mx-auto">
         {getNavItems(pathname)?.map((item) => {
           const isActive = (
-          item.href === "/"
-            ? pathname === "/"
-            : item.href === "/auth"
-              ? ["/auth", "/my-data"].some((path) => pathname.startsWith(path))
-              : pathname.startsWith(item.href)
+            item.href === "/"
+              ? pathname === "/" || /^\/event\/\d+/.test(pathname)
+              : item.href === "/auth"
+                ? ["/auth", "/my-data"].some((p) => pathname.startsWith(p))
+                : pathname.startsWith(item.href)
           );
+
 
           return (
             <Link

@@ -13,6 +13,7 @@ import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import { useParams, useRouter } from "next/navigation";
 import { useTicketStore } from "@/store/useTicketStore";
+import { useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
 
 const ChangeTicketsView = () => {
   const { getCookie } = useReactiveCookiesNext();
@@ -25,15 +26,7 @@ const ChangeTicketsView = () => {
   const eventId = Number(params.eventId);
   const [activeTab, setActiveTab] = useState<number | null>(null);
 
-  const { data: purchasedTickets } = useQuery({
-    queryKey: ["purchasedTickets", clientId],
-    queryFn: async () => {
-      if (!clientToken) throw new Error("clientToken missing");
-      if (!clientId) throw new Error("clientId missing");
-      return await getTicketsFromClient(clientId, clientToken);
-    },
-    enabled: !!clientToken && !!clientId,
-  });
+  const { purchasedTickets } = useClientPurchasedTickets({clientId, clientToken: clientToken});
 
   const { data: ticketTypes } = useQuery({
     queryKey: ["ticketTypes"],
@@ -74,7 +67,6 @@ const ChangeTicketsView = () => {
   console.log("oldTickets", oldTickets)
   console.log("purchaseIds", purchaseIds)
   console.log("purchasedTickets", purchasedTickets)
-  
 
 
   useEffect(() => {
@@ -84,7 +76,9 @@ const ChangeTicketsView = () => {
   }, [purchaseIds, activeTab]);
 
 
-  const handleClick = async () => {
+  const handleConfirm = async () => {
+    console.log(selected)
+    console.log(oldTickets)
     // al checkout cuando el ticket nuevo es mas caro
 
     // se suma al balance cuando los tickets nuevos son mas baratos que los antiguos
@@ -101,7 +95,7 @@ const ChangeTicketsView = () => {
   );
 
   const maxPurchase = oldTickets
-    .filter((ticket) => ticket.purchaseId === activeTab)
+    .filter((ticket) => ticket?.purchaseId === activeTab)
     .reduce((acc, curr) => acc + curr.quantity, 0);
 
   return (
@@ -199,7 +193,7 @@ const ChangeTicketsView = () => {
           </div>
 
           <button
-            onClick={handleClick}
+            onClick={handleConfirm}
             disabled={
               !(
                 activeTab &&

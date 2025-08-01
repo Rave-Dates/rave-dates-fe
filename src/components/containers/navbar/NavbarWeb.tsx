@@ -5,12 +5,33 @@ import InstagramSvg from '@/components/svg/InstagramSvg';
 import WhatsappSvg from '@/components/svg/WhatsappSvg';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
 import FilterModal from '../../ui/modals/FilterModal';
-import SearchInput from '@/components/ui/inputs/SearchInput';
+import SearchInput from '@/components/ui/inputs/search-input/SearchInput';
 import Image from 'next/image';
+import { useEventStore } from '@/store/useEventStore';
 
 const NavbarWeb: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [results, setResults] = useState<IEvent[]>([]);
+  const { events } = useEventStore(); // lista completa de eventos
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+
+    if (term.length === 0) {
+      setResults([]);
+      return;
+    }
+
+    const filtered = events?.filter((event) =>
+      event.title.toLowerCase().includes(term.toLowerCase())
+    ) || [];
+
+    setResults(filtered);
+  };
+
   const contactItems = [
     {
       id: 'whatsapp',
@@ -48,8 +69,17 @@ const NavbarWeb: React.FC = () => {
             <Image className='w-14 h-14' src="/logo.svg" width={1000} height={1000} alt="logo" />
           </Link>
           <div className='flex w-full md:w-[54%]'>
-            <SearchInput placeholder="Busca un evento" />
-            <FilterModal />
+            <SearchInput
+              placeholder="Busca un evento"
+              value={searchTerm}
+              handleFunc={handleSearch}
+              results={results}
+              setSearchTerm={setSearchTerm}
+            />
+            {
+              isHome &&
+              <FilterModal />
+            }
           </div>
           <Link href="/tickets" className={`${pathname.includes("/tickets") ? "text-primary" : "text-text-inactive"} md:block hidden min-w-[81px] hover:text-primary-white transition-colors`}>
             Mis tickets
