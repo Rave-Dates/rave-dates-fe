@@ -75,7 +75,7 @@ export const getTicketsByPurchaseId = async ({pruchaseId, clientId, clientToken}
       "Authorization": `Bearer ${clientToken}`,
     },
   });
-  const data: { purchaseId: number, ticketType: string, price: number, quantity: number }[] = res.data;
+  const data: { ticketType: string, price: number, quantity: number }[] = res.data;
   return data;
 };
 
