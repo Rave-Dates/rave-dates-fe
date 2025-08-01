@@ -45,7 +45,6 @@ export default function DataForm() {
     }
   }, [isHydrated, clientToken]);
 
-  
   const { data: client } = useQuery<ClientForm>({
     queryKey: ["client", clientToken],
     queryFn: async () => {

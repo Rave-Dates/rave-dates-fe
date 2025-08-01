@@ -4,7 +4,6 @@ import SpinnerSvg from '@/components/svg/SpinnerSvg';
 import Image from 'next/image';
 
 const EventHero = ({ eventImages, isImagesLoading } : { eventImages: { id: string, url: string }[] | undefined, isImagesLoading: boolean }) => {
-  
   return (
     <div className="relative !mb-4">
       <div className="relative h-full md:h-1/2 rounded-sm overflow-hidden">

@@ -9,11 +9,11 @@ import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { initTicketPurchase } from "@/services/clients-tickets";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useTicketStore } from "@/store/useTicketStore";
 import { jwtDecode } from "jwt-decode";
 import { notifyError, notifyPending, notifySuccess } from "@/components/ui/toast-notifications";
-import { getClientEventById } from "@/services/clients-events";
+import { useClientEvent } from "@/hooks/client/queries/useClientData";
 
 export default function Checkout() {
   const [selectedPayment, setSelectedPayment] = useState("Pago total");
@@ -33,11 +33,7 @@ export default function Checkout() {
     }
   }, [selectedMethod, eventId]);
 
-  const { data: selectedEvent } = useQuery<IEvent>({
-    queryKey: [`selectedEvent-${eventId}`],
-    queryFn: () => getClientEventById(eventId),
-    enabled: !!eventId,
-  });
+  const { selectedEvent } = useClientEvent(eventId);
 
   const handleContinue = () => {
     // router.push(tempToken && !clientToken ? `/otp?redirect=transfer?eid=${eventId}` : `/transfer-confirm?eid=${eventId}`)
@@ -68,7 +64,8 @@ export default function Checkout() {
       isPartial: false,
       clientId: (decoded && decoded.id ) || (decodedTemp && decodedTemp.id) || 0,
       returnUrl: urlToReturn,
-      boldMethod: ["CREDIT_CARD", "PSE"]
+      boldMethod: ["CREDIT_CARD", "PSE"],
+      payWithBalance: false,
     };
 
     console.log(formattedTicketData)

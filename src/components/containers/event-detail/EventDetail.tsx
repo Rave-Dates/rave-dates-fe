@@ -6,52 +6,14 @@ import EventInfo from './EventInfo';
 import EventLocation from './EventLocation';
 import TicketSelector from './TicketSelector';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
-import { useQuery } from '@tanstack/react-query';
-import { getClientEventById, getClientEventImagesById, getClientImageById, getEventClientTickets } from '@/services/clients-events';
 import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
 import { formatDateToColombiaTime } from '@/utils/formatDate';
+import { useClientEvent, useClientEventServedImages, useClientEventTickets } from '@/hooks/client/queries/useClientData';
 
 const EventDetails = ({ eventId } : { eventId: number }) => {
-  const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
-    queryKey: [`selectedEvent-${eventId}`],
-    queryFn: () => getClientEventById(eventId),
-    enabled: !!eventId,
-  });
-  
-  const { data: eventTickets, isLoading: isTicketsLoading } = useQuery<IEventTicket[]>({
-    queryKey: ["eventTickets"],
-    queryFn: () => getEventClientTickets(eventId),
-    enabled: !!eventId,
-  });
-  
-  const { data: eventImages } = useQuery<IEventImages[]>({
-    queryKey: [`eventImages-${eventId}`],
-    queryFn: () => getClientEventImagesById(eventId),
-    enabled: !!eventId,
-  });
-
-  const { data: servedImages, isLoading: isImagesLoading } = useQuery<{ id: string, url: string }[]>({
-    queryKey: [`servedImages-${eventId}`, eventImages?.map(img => img.imageId)],
-    enabled: !!eventImages,
-    queryFn: async () => {
-      if (!eventImages) return [];
-      const processedImages = await Promise.all(
-        eventImages?.map(async (img) => {
-          const blob = await getClientImageById(img.imageId);
-          const url = URL.createObjectURL(blob);
-          
-          return {
-            id: String(img.imageId),
-            url,
-          };
-        })
-      );
-
-      return processedImages;
-    },
-  });
-
-  console.log(selectedEvent)
+  const { selectedEvent, isEventLoading } = useClientEvent(eventId);
+  const { servedImages, isImagesLoading } = useClientEventServedImages(eventId);
+  const { eventTickets, isTicketsLoading } = useClientEventTickets(eventId);
   
   return (
     <div className="min-h-screen bg-primary-black text-white pb-20 md:pt-[6.7rem]">

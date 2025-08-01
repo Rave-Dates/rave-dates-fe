@@ -4,9 +4,9 @@ import DefaultForm from "@/components/ui/forms/DefaultForm";
 import type React from "react";
 import TitleCard from "../../common/TitleCard";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import FormInput from "@/components/ui/inputs/FormInput";
-import { getTicketFromClientById, getTicketsFromClient, transferTickets } from "@/services/clients-tickets";
+import { transferTickets } from "@/services/clients-tickets";
 import { useReactiveCookiesNext } from "cookies-next";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import {
@@ -14,15 +14,10 @@ import {
   notifySuccess,
 } from "@/components/ui/toast-notifications";
 import { useParams, useRouter } from "next/navigation";
-import {
-  getClientEventById,
-  getClientEventImagesById,
-  getClientImageById,
-} from "@/services/clients-events";
 import Image from "next/image";
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
 import { useEffect } from "react";
-import { getClientById } from "@/services/clients-login";
+import { useClientEvent, useClientEventServedOneImage, useClientPurchasedOneTicket, useClientTransferred } from "@/hooks/client/queries/useClientData";
 
 const TicketTransferredForm = ({
   purchaseTicketId,
@@ -37,64 +32,21 @@ const TicketTransferredForm = ({
   const params = useParams();
   const eventId = Number(params.eventId);
 
-  const { data: purchasedTicket } = useQuery<IPurchaseTicket>({
-    queryKey: ["purchasedTicket"],
-    queryFn: async () => {
-      if (!clientToken) throw new Error("Token missing");
-      return await getTicketFromClientById({pruchaseTicketId: purchaseTicketId, token: clientToken});
-    },
-    enabled: !!clientToken && !!purchaseTicketId,
-  });
-
-  const { data: transferredClientData } = useQuery<IClient | null>({
-    queryKey: ['transferredClient', purchasedTicket?.transferredClientId],
-    queryFn: async () => {
-      if (!purchasedTicket?.transferredClientId) return null;
-      return await getClientById({id: purchasedTicket?.transferredClientId, token: clientToken});
-    },
-    enabled: !!purchasedTicket?.transferredClientId,
-  });
-
-  const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
-    queryKey: ["selectedEvent"],
-    queryFn: async () => {
-      if (!eventId) throw new Error("EventId missing");
-      return await getClientEventById(eventId);
-    },
-    enabled: !!eventId && !afterCheckout,
-  });
-
-  const { data: eventImages } = useQuery<IEventImages[]>({
-    queryKey: [`eventImages-${eventId}`],
-    queryFn: async () => {
-      const images = await getClientEventImagesById(eventId);
-      return images;
-    },
-    enabled: !!eventId && !afterCheckout,
-  });
-
-  const { data: servedImageUrl, isLoading: isImageLoading } = useQuery<
-    string | null
-  >({
-    queryKey: [`servedImageUrl-${eventId}`],
-    queryFn: async () => {
-      if (!eventImages) return null;
-      const blob = await getClientImageById(Number(eventImages[0].imageId));
-      return URL.createObjectURL(blob);
-    },
-    enabled: !!eventImages && !afterCheckout,
-  });
+  const { purchasedTicket } = useClientPurchasedOneTicket({pruchaseTicketId: purchaseTicketId, clientToken});
+  const { clientData } = useClientTransferred({transferredClientId: purchasedTicket?.transferredClientId, clientToken}); 
+  const { selectedEvent, isEventLoading } = useClientEvent(eventId);
+  const { servedImageUrl, isImageLoading } = useClientEventServedOneImage(eventId);
 
   const { register, handleSubmit, reset } = useForm<ITransferUser>();
 
   useEffect(() => {
     reset({
-      name: transferredClientData?.name,
-      email: transferredClientData?.email,
-      whatsapp: transferredClientData?.whatsapp,
-      idCard: transferredClientData?.idCard,
+      name: clientData?.name,
+      email: clientData?.email,
+      whatsapp: clientData?.whatsapp,
+      idCard: clientData?.idCard,
     });
-  }, [reset, transferredClientData]);
+  }, [reset, clientData]);
 
   const { mutate } = useMutation({
     mutationFn: transferTickets,

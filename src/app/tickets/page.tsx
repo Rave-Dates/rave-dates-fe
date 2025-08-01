@@ -3,11 +3,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import EventCard from '@/components/containers/home/EventCard';
 import { useReactiveCookiesNext } from 'cookies-next';
-import { useQuery } from '@tanstack/react-query';
-import { getTicketsFromClient } from '@/services/clients-tickets';
 import { jwtDecode } from 'jwt-decode';
 import EventCardSkeleton from '@/utils/skeletons/event-skeletons/EventCardSkeleton';
 import { getClientEventById } from '@/services/clients-events';
+import { useClientPurchasedTickets } from '@/hooks/client/queries/useClientData';
 
 const TicketsEventList: React.FC = () => {
   const [isUpcoming, setIsUpcoming] = useState(true);
@@ -20,14 +19,7 @@ const TicketsEventList: React.FC = () => {
   const decoded: { id: number } = (token && jwtDecode(token.toString())) || { id: 0 };
   const clientId = Number(decoded?.id);
 
-  const { data: purchasedTickets, isLoading, isError } = useQuery<IPurchaseTicket[]>({
-    queryKey: ["purchasedTickets", clientId],
-    queryFn: async () => {
-      if (!token) throw new Error("Token missing");
-      return await getTicketsFromClient(clientId, token);
-    },
-    enabled: !!token && !!clientId,
-  });
+  const { purchasedTickets, isTicketsLoading, isTicketsError } = useClientPurchasedTickets({clientId, clientToken: token});
 
   // Obtener los eventos asociados a los eventId de los tickets
   useEffect(() => {
@@ -113,16 +105,16 @@ const TicketsEventList: React.FC = () => {
         </button>
       </div>
       <div className={`transition-opacity duration-200 mt-5 ${fade ? "opacity-100" : "opacity-0"}`}>
-        {isLoading &&
+        {isTicketsLoading &&
           Array.from({ length: 3 }).map((_, i) => (
             <EventCardSkeleton key={i} />
           ))}
-        {isError && !isLoading && (
+        {isTicketsError && !isTicketsLoading && (
           <div className="text-center h-screen py-8 text-system-error">
             Error cargando tickets
           </div>
         )}
-        {!isLoading && !isError && currentView === "upcoming" ? (
+        {!isTicketsLoading && !isTicketsError && currentView === "upcoming" ? (
           <div className="space-y-4 animate-fade-in">
             {activeEvents?.map((event) => (
               <div key={event.eventId} className="flex justify-center">

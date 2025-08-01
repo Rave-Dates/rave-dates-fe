@@ -5,11 +5,10 @@ import Link from "next/link"
 import { useParams, usePathname } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { useReactiveCookiesNext } from "cookies-next";
-import { useQuery } from "@tanstack/react-query";
-import { getTicketsFromClient } from "@/services/clients-tickets";
 import { getClientEventImagesById, getClientImageById } from "@/services/clients-events";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { generateTicketImage } from "./generateTicketImage";
+import { useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
 
 type Props = {
   ticketStatus?: "paid" | "pending";
@@ -17,23 +16,16 @@ type Props = {
 };
 
 export default function TicketsChanger({ ticketStatus, eventInfo } : Props) {
-  const pathname = usePathname();
   const { getCookie } = useReactiveCookiesNext();
+  const pathname = usePathname();
   const token = getCookie("clientToken");
   const decoded: {id: number} = (token && jwtDecode(token.toString())) || {id: 0};
   const clientId = Number(decoded?.id);
+  const { purchasedTickets } = useClientPurchasedTickets({clientId, clientToken: token});
 
   const params = useParams();
   const eventId = Number(params.eventId);
 
-  const { data: purchasedTickets } = useQuery<IPurchaseTicket[]>({
-    queryKey: ["purchasedTickets", clientId],
-    queryFn: async () => {
-      if (!token) throw new Error("Token missing");
-      return await getTicketsFromClient(clientId, token);
-    },
-    enabled: !!token && !!clientId,
-  });
 
   const transferredTickets = purchasedTickets?.filter(ticket =>
     ticket.isTransferred &&

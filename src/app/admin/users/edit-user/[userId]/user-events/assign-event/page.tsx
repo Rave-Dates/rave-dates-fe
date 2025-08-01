@@ -4,10 +4,10 @@ import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
-import { assignOrganizerToEvent, assignPromoterToEvent, getAllEvents, getEventById } from "@/services/admin-events";
-import { getUserById } from "@/services/admin-users";
+import { useAdminAllEvents, useAdminEvent, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
+import { assignOrganizerToEvent, assignPromoterToEvent } from "@/services/admin-events";
 import { onInvalid } from "@/utils/onInvalidFunc";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useParams, useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -43,24 +43,10 @@ export default function Page() {
       queryClient.invalidateQueries({ queryKey: [`assignedEvent-${userId}`] });
     },
   });
-
-  const { data: allEvents } = useQuery<IEvent[]>({
-    queryKey: ["allEvents"],
-    queryFn: () => getAllEvents({ token }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
   
-  const { data: selectedUser } = useQuery<IUser>({
-    queryKey: ["user"],
-    queryFn: () => getUserById({ token, id: userId }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
-    
-  const { data: eventById } = useQuery<IEvent>({
-    queryKey: ["eventById", selectedEventId],
-    queryFn: () => getEventById({ token, id: selectedEventId! }),
-    enabled: !!token && selectedEventId !== null,
-  });
+  const { data: selectedUser } = useAdminUserById({ token, userId });
+  const { allEvents } = useAdminAllEvents({ token });
+  const { selectedEvent: eventById } = useAdminEvent({ token, eventId: selectedEventId! });
 
   const onSubmit = (data: FormValues) => {
     if (!selectedUser) return;

@@ -1,11 +1,8 @@
 "use client";
 
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
-import { getAllEvents } from "@/services/admin-events";
-import { getAllPayments } from "@/services/admin-payments";
-import { getUserById } from "@/services/admin-users";
+import { useAdminAllEvents, useAdminAllPayments, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
-import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -18,24 +15,11 @@ export default function Balance() {
   const { getCookie } = useReactiveCookiesNext();
 
   const token = getCookie("token");
-  
-  const { data: payments } = useQuery<IPaymentData[]>({
-    queryKey: ["users"],
-    queryFn: () => getAllPayments({ token }),
-    enabled: !!token,
-  });
 
-  const { data: user } = useQuery({
-    queryKey: ["user"],
-    queryFn: () => getUserById({ token, id: userId }),
-    enabled: !!token && !!userId,
-  });
+  const { allEvents } = useAdminAllEvents({ token });
+  const { payments } = useAdminAllPayments({ token });
+  const { data: user } = useAdminUserById({ token, userId });
 
-  const { data: allEvents } = useQuery({
-    queryKey: ["allEvents"],
-    queryFn: () => getAllEvents({ token }),
-    enabled: !!token,
-  });
 
   const filteredPayments = payments?.filter(
     (payment) =>

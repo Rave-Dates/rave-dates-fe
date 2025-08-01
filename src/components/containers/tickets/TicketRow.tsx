@@ -4,16 +4,14 @@ import EyeSvg from "@/components/svg/EyeSvg";
 import SendSvg from "@/components/svg/SendSvg";
 import DefaultTitledButton from "@/components/ui/buttons/DefaultTitledButton";
 import { useParams, usePathname } from 'next/navigation';
-import { useQuery } from "@tanstack/react-query";
-import { getClientEventImagesById, getClientImageById } from "@/services/clients-events";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { GenerateJPGButton } from "./GenerateJPGButton";
 import CheckSvg from "@/components/svg/CheckSvg";
-import { getClientById } from "@/services/clients-login";
 import { useReactiveCookiesNext } from "cookies-next";
 import QRCode from "qrcode";
 import { useEffect, useRef, useState } from "react";
 import AddSvg from "@/components/svg/AddSvg";
+import { useClientEventServedOneImage, useClientTransferred } from "@/hooks/client/queries/useClientData";
 
 interface TicketRowProps {
   href: string;
@@ -35,6 +33,8 @@ export function TicketRow({
   const params = useParams();
   const eventId = Number(params.eventId);
   const clientToken = getCookie("clientToken");
+  const { servedImageUrl } = useClientEventServedOneImage(eventId);
+  const { clientData } = useClientTransferred({transferredClientId: ticket.transferredClientId, clientToken});
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -45,34 +45,6 @@ export function TicketRow({
       });
     }
   }, [showQR, ticket.qr]);
-
-  const { data: eventImages } = useQuery<IEventImages[]>({
-    queryKey: [`eventImages-${eventId}`],
-    queryFn: async () => {
-      const images = await getClientEventImagesById(eventId);
-      return images
-    },
-    enabled: !!eventId,
-  });
-
-  const { data: servedImageUrl } = useQuery<string | null>({
-    queryKey: [`servedImageUrl-${eventId}`],
-    queryFn: async () => {
-      if (!eventImages) return null;
-      const blob = await getClientImageById(Number(eventImages[0].imageId));
-      return URL.createObjectURL(blob);
-    },
-    enabled: !!eventImages,
-  });
-
-  const { data: transferredClientData } = useQuery<IClient | null>({
-    queryKey: ['transferredClient', ticket.transferredClientId],
-    queryFn: async () => {
-      if (!ticket.transferredClientId) return null;
-      return await getClientById({id: ticket.transferredClientId, token: clientToken});
-    },
-    enabled: !!ticket.transferredClientId,
-  });
 
   const getActionIcon = (action: string) => {
     switch (action) {
@@ -137,7 +109,7 @@ export function TicketRow({
             if (action === "view") {
               return (
                 <div key={action}>
-                  {isTransferred && transferredClientData?.firstLogin ? (
+                  {isTransferred && clientData?.firstLogin ? (
                     <div className="text-xs text-primary/80 italic">
                       Ticket ya leído por el destinatario
                     </div>
@@ -152,7 +124,7 @@ export function TicketRow({
             }
 
             if (action === "resend") {
-              if (isTransferred && transferredClientData && !transferredClientData.firstLogin) {
+              if (isTransferred && clientData && !clientData.firstLogin) {
                 return (
                   <div key={action}>
                     <DefaultTitledButton

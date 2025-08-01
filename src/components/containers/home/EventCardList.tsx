@@ -2,24 +2,19 @@
 
 import React, { useEffect, useState } from "react";
 import EventCard from "./EventCard";
-import { useQuery } from "@tanstack/react-query";
-import { getAllClientEvents } from "@/services/clients-events";
 import EventCardSkeleton from "@/utils/skeletons/event-skeletons/EventCardSkeleton";
+import { useClientAllEvents } from "@/hooks/client/queries/useClientData";
 
 const EventCardList: React.FC = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
-
-  const {
+  const { 
     data,
     isLoading,
     isError,
-    isFetching,
-  } = useQuery<IEvent[], Error>({
-    queryKey: ["clientEvents", page],
-    queryFn: () => getAllClientEvents(page, limit),
-  });
-
+    isFetching
+  } = useClientAllEvents({page, limit}); 
+  
   const clientEvents = (data ?? []) as IEvent[];
 
   useEffect(() => {

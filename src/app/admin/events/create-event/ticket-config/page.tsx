@@ -4,7 +4,7 @@ import { TicketCard } from "@/components/roles/admin/TicketCard"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
-import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
+import { useCreateFullEvent } from "@/hooks/admin/mutations/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { combineDateAndTimeToISO, formatColombiaTimeToUTC } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";

@@ -2,9 +2,8 @@
 
 import EditSvg from "@/components/svg/EditSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
-import { getUserById } from "@/services/admin-users";
+import { useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { parseISODate } from "@/utils/formatDate";
-import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -19,12 +18,7 @@ export default function Page() {
   
   const token = getCookie("token");
 
-  // obtenemos user por id
-  const { data } = useQuery<IUser>({
-    queryKey: ["user"],
-    queryFn: () => getUserById({ token, id: userId }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
+  const { data } = useAdminUserById({ token, userId });
 
   useEffect(() => {
     if (data?.role.name === "ORGANIZER" && data.organizer) {

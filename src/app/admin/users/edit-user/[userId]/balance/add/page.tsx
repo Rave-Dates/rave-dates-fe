@@ -5,7 +5,7 @@ import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyPending } from "@/components/ui/toast-notifications";
-import { useCreatePayment } from "@/hooks/useCreatePayment";
+import { useCreatePayment } from "@/hooks/admin/mutations/useCreatePayment";
 import { getAllEvents } from "@/services/admin-events";
 import { getUserById } from "@/services/admin-users";
 import { onInvalid } from "@/utils/onInvalidFunc";

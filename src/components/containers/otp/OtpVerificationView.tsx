@@ -4,7 +4,7 @@ import VerificationTypeSelector from "@/components/containers/otp/VerificationTy
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { notifyError } from "@/components/ui/toast-notifications";
-import { useVerification } from "@/hooks/useVerification";
+import { useVerification } from "@/hooks/admin/mutations/useVerification";
 import { useClientAuthStore } from "@/store/useClientAuthStore";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";

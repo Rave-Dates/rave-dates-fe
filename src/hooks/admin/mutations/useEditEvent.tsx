@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createImage, editEvent, editEventCategories, editTicketTypes } from "../services/admin-events";
+import { createImage, editEvent, editEventCategories, editTicketTypes } from "../../../services/admin-events";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";

@@ -1,20 +1,14 @@
-import { getEventClientTickets } from "@/services/clients-events";
+import { useClientEventTickets } from "@/hooks/client/queries/useClientData";
 import { useTicketStore } from "@/store/useTicketStore";
-import { useQuery } from "@tanstack/react-query";
 
 export default function PricingDetails() {
   const { selected, eventId } = useTicketStore();
-
-  const { data: selectedTickets } = useQuery<IEventTicket[]>({
-    queryKey: [`selectedTickets`, eventId],
-    queryFn: () => getEventClientTickets(eventId),
-    enabled: !!eventId,
-  });
+  const { eventTickets } = useClientEventTickets(eventId);
 
   const mergedTickets = Object.entries(selected).map(([ticketTypeIdStr, selectedData]) => {
     const ticketTypeId = Number(ticketTypeIdStr);
 
-    const eventTicket = selectedTickets?.find(t => t.ticketTypeId === ticketTypeId);
+    const eventTicket = eventTickets?.find(t => t.ticketTypeId === ticketTypeId);
 
     return {
       name: eventTicket?.name || 'Ticket',
