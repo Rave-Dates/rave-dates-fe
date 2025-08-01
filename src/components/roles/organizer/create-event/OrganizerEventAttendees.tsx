@@ -6,7 +6,7 @@ import { ProgressBar } from "./ProgressBar"
 import AddSvg from "@/components/svg/AddSvg"
 import EditSvg from "@/components/svg/EditSvg"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
-import SearchInput from "@/components/ui/inputs/SearchInput"
+import SearchInput from "@/components/ui/inputs/search-input/SearchInput"
 
 export default function OrganizerEventAttendees({eventId}: {eventId: number}) {
   console.log(eventId)

@@ -1,44 +1,32 @@
 "use client"
 
 import { OrganizerEventCard } from "@/components/roles/organizer/organizer-event/OrganizerEventCard"
-
-interface Event {
-  eventId: number
-  title: string
-  subtitle: string
-  date: string
-  location: string
-  price: string
-  amountSold: string
-  avatar?: string
-  avatarBg?: string
-}
+import { useAdminBinnacles, useAdminUserById } from "@/hooks/admin/queries/useAdminData"
+import { useReactiveCookiesNext } from "cookies-next"
+import { jwtDecode } from "jwt-decode"
 
 export default function OrganizerHome() {
-  const events: Event[] = [
-    {
-      eventId: 1,
-      title: "DYEN - Extended set",
-      subtitle: "Extended set",
-      date: "2025-09-24 08:00hs",
-      location: "Movistar Arena",
-      price: "COP 250.000",
-      amountSold: "230",
-      avatar: "D",
-      avatarBg: "bg-red-900",
-    },
-    {
-      eventId: 2,
-      title: "DYEN - Extended set",
-      subtitle: "Extended set",
-      date: "2025-09-24 08:00hs",
-      location: "Movistar Arena",
-      price: "COP 250.000",
-      amountSold: "230",
-      avatar: "R",
-      avatarBg: "bg-blue-900",
-    },
-  ]
+  
+  const { getCookie } = useReactiveCookiesNext();
+  const token = getCookie("token");
+  const decoded: { id: number } = (token && jwtDecode(token.toString())) || {id: 0};
+  
+  // obtenemos user por id
+  const { data: user, isPending: isUserLoading } = useAdminUserById({ token, userId: decoded.id }); 
+  
+  const organizerId = user?.organizer?.organizerId;
+
+  const { organizerBinnacles } = useAdminBinnacles({ organizerId: organizerId ?? 0, token: token?.toString() });
+
+  const getTotalAvalible = () => {
+    let total = 0;
+    if (organizerBinnacles) {
+      organizerBinnacles.forEach((binnacle) => {
+        total += Number(binnacle.total);
+      });
+    }
+    return total.toLocaleString('es-CO');
+  }
 
   return (
     <div className="bg-primary-black pt-14 text-primary-white min-h-screen p-4">
@@ -46,25 +34,28 @@ export default function OrganizerHome() {
         {/* Available Balance Header */}
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold ">Disponible</h1>
-          <p className="text-primary text-2xl">COP 55.000,00</p>
+          <p className="text-primary text-2xl">COP ${getTotalAvalible()}</p>
         </div>
 
         {/* Event Cards */}
         <div className="space-y-3">
-          {events.map((event) => (
+          {!isUserLoading && user?.organizer?.events && user.organizer.events.map((event) => (
             <OrganizerEventCard
               key={event.eventId}
-              eventId={event.eventId}
-              title={event.title}
-              subtitle={event.subtitle}
-              date={event.date}
-              location={event.location}
-              price={event.price}
-              amountSold={event.amountSold}
-              avatar={event.avatar}
-              avatarBg={event.avatarBg}
+              event={event}
             />
           ))}
+          {
+            isUserLoading || !user &&
+            <div className="w-full bg-cards-container h-23 rounded-xl gap-x-1 p-4 flex items-center justify-start">
+              <div className="w-14 h-14 animate-pulse bg-inactive rounded-full"></div>
+              <div className="flex flex-col gap-y-2 items-start justify-center">
+                <div className="w-44 h-4 animate-pulse bg-inactive rounded"></div>
+                <div className="w-28 h-3 animate-pulse bg-inactive rounded"></div>
+                <div className="w-28 h-3 animate-pulse bg-inactive rounded"></div>
+              </div>
+            </div>
+          }
         </div>
       </div>
     </div>

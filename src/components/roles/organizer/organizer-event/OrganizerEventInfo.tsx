@@ -4,8 +4,7 @@ import { DropdownItem } from "@/components/roles/admin/events/DropDownItem"
 import { StageItem } from "@/components/roles/admin/events/StageItem"
 import EditSvg from "@/components/svg/EditSvg"
 import EyeSvg from "@/components/svg/EyeSvg"
-import { getEventClientTickets } from "@/services/clients-events"
-import { useQuery } from "@tanstack/react-query"
+import { useClientEventTickets } from "@/hooks/client/queries/useClientData"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
@@ -13,10 +12,7 @@ export default function OrganizerEventInfo({ eventId }: { eventId: number }) {
   const [expandedSections, setExpandedSections] = useState<string[]>([])
   const [globalExpandedSections, setGlobalExpandedSections] = useState<string[]>([])
 
-  const { data: ticketTypes } = useQuery<IEventTicket[]>({
-    queryKey: ["ticketTypes"],
-    queryFn: () => getEventClientTickets(eventId),
-  });
+  const { eventTickets: ticketTypes } = useClientEventTickets(eventId);
 
   // useEffect(() => {
   //   if (ticketTypes && ticketTypes.length > 0) {
