@@ -4,62 +4,117 @@ import { jwtDecode } from "jwt-decode";
 export function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const isAdminRoute = path.startsWith("/admin");
+  const isOrganizerRoute = path.startsWith("/organizer");
 
-  const tokenName = isAdminRoute ? "token" : "tempToken";
-  const token = req.cookies.get(tokenName)?.value;
+  const token = req.cookies.get("token")?.value;
+  const tempToken = req.cookies.get("tempToken")?.value;
+  const clientToken = req.cookies.get("clientToken")?.value;
 
-  // permitir /admin/auth sin token
-  if (isAdminRoute && path.startsWith("/admin/auth") && !token) {
-    return NextResponse.next();
-  }
-  
-  // si esta en /admin/auth y hay token, redirigir a /admin/users
-  if (isAdminRoute && path.startsWith("/admin/auth") && token) {
-    return NextResponse.redirect(new URL("/admin/users", req.url));
-  }
-
-  // permitir ruta pública sin token
-  if (!isAdminRoute && !token) {
+  // Rutas públicas sin token
+  if (!isAdminRoute && !isOrganizerRoute) {
     return NextResponse.next();
   }
 
-  if (isAdminRoute && !token) {
-    // si no hay token, redirigir
-    return NextResponse.redirect(new URL("/admin/auth", req.url));
-  }
+  // Revisar que el token no haya expirado
+  const validToken = token || tempToken || clientToken;
 
-  if (path === "/admin")  {
-    return NextResponse.redirect(new URL("/admin/auth", req.url));
-  }
+  if (validToken) {
+    try {
+      const decoded: IUserLogin = jwtDecode(validToken);
+      const now = Math.floor(Date.now() / 1000);
 
-  if (!token) {
-    // si no hay token, redirigir
-    return NextResponse.redirect(new URL("/", req.url));
-  }
+      if (decoded.exp < now) {
+        const res = NextResponse.redirect(new URL("/", req.url));
 
-  try {
-    const decoded: IUserLogin = jwtDecode(token);
+        if (token) res.cookies.delete("token");
+        if (tempToken) res.cookies.delete("tempToken");
+        if (clientToken) res.cookies.delete("clientToken");
 
-    const now = Math.floor(Date.now() / 1000); // tiempo actual en segundos
-
-    if (decoded.exp < now) {
-      // token expirado → borrar cookie y redirigir
-      console.log("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+        return res;
+      }
+    } catch {
       const res = NextResponse.redirect(new URL("/", req.url));
-      res.cookies.delete(tokenName);
+
+      if (token) res.cookies.delete("token");
+      if (tempToken) res.cookies.delete("tempToken");
+      if (clientToken) res.cookies.delete("clientToken");
+
       return res;
     }
-    
-    if (isAdminRoute && decoded.role !== "ADMIN") {
+  }
+
+
+  // ------------------------------------------
+  // ADMIN AREA
+  // ------------------------------------------
+  if (isAdminRoute) {
+    if (!token) {
+      if (path === "/admin/auth") {
+        return NextResponse.next();
+      }
+      return NextResponse.redirect(new URL("/admin/auth", req.url));
+    }
+
+    try {
+      const decoded: IUserLogin = jwtDecode(token);
+      const now = Math.floor(Date.now() / 1000);
+
+      if (decoded.exp < now) {
+        const res = NextResponse.redirect(new URL("/", req.url));
+        res.cookies.delete("token");
+        return res;
+      }
+
+      if (decoded.role !== "ADMIN") {
+        const res = NextResponse.redirect(new URL("/", req.url));
+        return res;
+      }
+
+      // Si ya está logueado y entra a /admin/auth, redirigir al dashboard
+      if (path === "/admin/auth") {
+        return NextResponse.redirect(new URL("/admin/users", req.url));
+      }
+      
+      if (path === "/admin") {
+        return NextResponse.redirect(new URL("/admin/users", req.url));
+      }
+
+    } catch {
+      const res = NextResponse.redirect(new URL("/", req.url));
+      res.cookies.delete("token");
+      return res;
+    }
+  }
+
+  // ------------------------------------------
+  // ORGANIZER AREA
+  // ------------------------------------------
+  if (isOrganizerRoute) {
+    if (!token) {
       return NextResponse.redirect(new URL("/", req.url));
     }
-    
-    return NextResponse.next();
-  } catch {
-    // token inválido → borrar cookie y redirigir
-    console.log("Token inválido. Por favor, inicia sesión nuevamente.");
-    const res = NextResponse.redirect(new URL("/", req.url));
-    res.cookies.delete(tokenName);
-    return res;
+
+    try {
+      const decoded: IUserLogin = jwtDecode(token);
+      const now = Math.floor(Date.now() / 1000);
+
+      if (decoded.exp < now) {
+        const res = NextResponse.redirect(new URL("/", req.url));
+        res.cookies.delete("token");
+        return res;
+      }
+
+      if (decoded.role !== "ORGANIZER") {
+        const res = NextResponse.redirect(new URL("/", req.url));
+        return res;
+      }
+
+    } catch {
+      const res = NextResponse.redirect(new URL("/", req.url));
+      res.cookies.delete("token");
+      return res;
+    }
   }
+
+  return NextResponse.next();
 }
