@@ -1,6 +1,6 @@
 import { UseFormSetValue } from "react-hook-form";
 
-const FilterTagButton = ({
+const LabelTagButton = ({
   watchedLabels,
   labelsTypes,
   title,
@@ -43,4 +43,4 @@ const FilterTagButton = ({
   );
 };
 
-export default FilterTagButton;
+export default LabelTagButton

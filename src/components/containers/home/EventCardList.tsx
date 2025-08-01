@@ -4,8 +4,15 @@ import React, { useEffect, useState } from "react";
 import EventCard from "./EventCard";
 import EventCardSkeleton from "@/utils/skeletons/event-skeletons/EventCardSkeleton";
 import { useClientAllEvents } from "@/hooks/client/queries/useClientData";
+import { useEventStore } from "@/store/useEventStore";
 
 const EventCardList: React.FC = () => {
+  const { filters } = useEventStore();
+
+  useEffect(() => {
+    console.log(filters)
+  }, [filters])
+  
   const [page, setPage] = useState(1);
   const limit = 10;
   const { 
@@ -20,6 +27,10 @@ const EventCardList: React.FC = () => {
   useEffect(() => {
     console.log(clientEvents);
   }, [clientEvents]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filters]);
 
   return (
     <div className="py-8 pb-40 sm:pb-8 sm:pt-[7.5rem] bg-primary-black mx-auto px-6">
@@ -46,7 +57,7 @@ const EventCardList: React.FC = () => {
         {!isLoading && !isError && clientEvents?.length === 0 &&
           <div className="space-y-4 h-screen animate-fade-in">
             <div className="text-center py-8 text-neutral-400">
-              No se encontraron tickets
+              No se encontraron eventos
             </div>
           </div>
         }

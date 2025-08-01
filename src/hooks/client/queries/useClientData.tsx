@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import {
+  getAllClientCategories,
   getAllClientEvents,
   getClientEventById,
   getClientEventImagesById,
@@ -9,6 +10,7 @@ import {
 import { getClientById } from "@/services/clients-login";
 import { CookieValueTypes } from "cookies-next";
 import { getTicketFromClientById, getTicketsFromClient } from "@/services/clients-tickets";
+import { useEventStore } from "@/store/useEventStore";
 
 export function useClientEvent(eventId?: number) {
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery({
@@ -59,17 +61,25 @@ export function useClientPurchasedOneTicket({pruchaseTicketId, clientToken} : { 
   return { purchasedTicket, isTicketLoading, isTicketError };
 }
 
-export function useClientAllEvents({page, limit} : { page: number, limit: number }) {
+export function useClientAllEvents({
+  page,
+  limit,
+}: {
+  page: number;
+  limit: number;
+}) {
+  const { filters } = useEventStore();
+
   const {
     data,
     isLoading,
     isError,
     isFetching,
   } = useQuery<IEvent[], Error>({
-    queryKey: ["clientEvents", page],
-    queryFn: () => getAllClientEvents(page, limit),
+    queryKey: ["clientEvents", page, filters],
+    queryFn: () => getAllClientEvents(page, limit, filters),
   });
-  
+
   return { data, isLoading, isError, isFetching };
 }
 
@@ -142,4 +152,13 @@ export function useClientEventServedOneImage(eventId?: number) {
     servedImageUrl: servedImageUrl,
     isImageLoading,
   };
+}
+
+export function useClientAllCategories() {
+  const { data: clientCategories, isLoading: isCategoriesLoading } = useQuery<IEventCategories[]>({
+    queryKey: ["clientCategories"],
+    queryFn: () => getAllClientCategories(),
+  });
+
+  return { clientCategories, isCategoriesLoading };
 }

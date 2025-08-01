@@ -1,81 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import FilterSvg from '@/components/svg/FilterSvg';
-import CheckFilterInput from '@/components/ui/inputs/CheckFilterInput';
-// import FilterTagButton from '@/components/ui/buttons/FilterTagButton';
 import AddSvg from '@/components/svg/AddSvg';
-
-export interface FilterState {
-  location: string;
-  eventType: string;
-  organizers: string[];
-  genres: string[];
-}
+import { useForm } from 'react-hook-form';
+import { useClientAllCategories } from '@/hooks/client/queries/useClientData';
+import CheckFilterInput from '@/components/ui/inputs/CheckFilterInput';
+import { useEventStore } from '@/store/useEventStore';
 
 function FilterModal() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [filters, setFilters] = useState<FilterState>({
-    location: 'Bogotá',
-    eventType: 'Rave',
-    organizers: ['Organizador 1', 'Organizador 5'],
-    genres: ['Hard Techno']
-  });
+  const { clientCategories } = useClientAllCategories();
+  const { setFilters } = useEventStore();
+  const { register, handleSubmit, reset, watch } = useForm();
 
-  // no scroll when modal is open
+  // Evitar scroll del body cuando está abierto el modal
   useEffect(() => {
-    if (isModalOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
+    document.body.style.overflow = isModalOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
   }, [isModalOpen]);
 
-  const locations = ['Bogotá', 'Medellín'];
-  const eventTypes = ['Rave', 'Club'];
-  // const organizers = ['Organizador 1', 'Organizador 2', 'Organizador 3', 'Organizador 4', 'Organizador 5'];
-  // const genres = ['Hard Techno', 'Melodic Techno', 'Drum & Bass', 'Raw Techno', 'Hardcore'];
-
-  const handleLocationChange = (location: string) => {
-    setFilters(prev => ({ ...prev, location }));
-  };
-
-  const handleEventTypeChange = (eventType: string) => {
-    setFilters(prev => ({ ...prev, eventType }));
-  };
-
-  // const handleOrganizerToggle = (organizer: string) => {
-  //   setFilters(prev => ({
-  //     ...prev,
-  //     organizers: prev.organizers.includes(organizer)
-  //       ? prev.organizers.filter(o => o !== organizer)
-  //       : [...prev.organizers, organizer]
-  //   }));
-  // };
-
-  // const handleGenreToggle = (genre: string) => {
-  //   setFilters(prev => ({
-  //     ...prev,
-  //     genres: prev.genres.includes(genre)
-  //       ? prev.genres.filter(g => g !== genre)
-  //       : [...prev.genres, genre]
-  //   }));
-  // };
+  const applyFilters = handleSubmit((data) => {
+    setFilters(data); // guarda los valores seleccionados por categoría
+    setIsModalOpen(false);
+  });
 
   const clearFilters = () => {
-    setFilters({
-      location: '',
-      eventType: '',
-      organizers: [],
-      genres: []
-    });
-  };
-
-  const applyFilters = () => {
-    console.log('Applying filters:', filters);
-    setIsModalOpen(false);
+    reset(); // limpia los campos
+    setFilters({});
   };
 
   return (
@@ -86,72 +36,61 @@ function FilterModal() {
       >
         <FilterSvg />
       </button>
+
       {isModalOpen && (
-        <div onClick={() => setIsModalOpen(false)} className="animate-fade-in fixed inset-0 bg-black/60 bg-opacity-75 flex items-center justify-center md:py-8 z-50">
-          <div onClick={(e) => e.stopPropagation()} className="bg-[#050505] flex flex-col justify-between rounded-2xl w-full md:h-fit max-h-full md:max-w-md overflow-hidden shadow-2xl">
+        <div
+          onClick={() => setIsModalOpen(false)}
+          className="animate-fade-in fixed inset-0 bg-black/60 flex items-center justify-center md:py-8 z-50"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#050505] flex flex-col rounded-2xl w-full md:max-w-md max-h-[85vh] shadow-2xl"
+          >
             {/* Header */}
-            <div className='flex flex-col justify-between items-start overflow-y-scroll'>
-              <div className="flex flex-row-reverse md:flex-row justify-end gap-5 items-center md:justify-between pt-8 px-6"> 
-                <h2 className="text-title">Filtros</h2>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="bg-primary text-primary-black transition-colors rounded-xl p-1.5"
-                >
-                  <AddSvg className='rotate-45 w-7 h-7' />
-                </button>
-              </div>
-
-              {/* Body */}
-              <div className="py-6 space-y-8 font-light px-6">
-                {/* Location Filter */}
-                <CheckFilterInput
-                  items={locations}
-                  type="location"
-                  handleFunc={handleLocationChange}
-                  filters={filters}
-                  title="Ubicación"
-                />
-
-                {/* Event Type Filter */}
-                <CheckFilterInput
-                  items={eventTypes}
-                  type="eventType"
-                  handleFunc={handleEventTypeChange}
-                  filters={filters}
-                  title="Tipo de evento"
-                />
-
-                {/* Organizer Filter */}
-                {/* <FilterTagButton
-                  items={organizers}
-                  type="organizers"
-                  handleFunc={handleOrganizerToggle}
-                  filters={filters}
-                  title="Organizador"
-                /> */}
-
-                {/* Genre Filter */}
-                {/* <FilterTagButton
-                  items={genres}
-                  type="genres"
-                  handleFunc={handleGenreToggle}
-                  filters={filters}
-                  title="Género"
-                /> */}
-              </div>
+            <div className="flex w-full flex-row-reverse md:flex-row justify-end gap-5 items-center md:justify-between pt-8 px-6">
+              <h2 className="text-title">Filtros</h2>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-primary text-primary-black rounded-xl p-1.5"
+              >
+                <AddSvg className="rotate-45 w-7 h-7" />
+              </button>
             </div>
 
-            {/* Footer */}
-            <div className="p-6 pt-2 border-t bg-main-container border-divider">
+            {/* Contenido con scroll */}
+            <form
+              onSubmit={applyFilters}
+              className="flex-1 overflow-y-auto py-6 px-6 space-y-8 font-light"
+            >
+              {clientCategories?.map((category) => (
+                <CheckFilterInput
+                  key={category.categoryId}
+                  name={`category-${category.categoryId}`}
+                  title={category.name}
+                  items={category.values.map((v) => ({
+                    label: v.value,
+                    value: v.value,
+                  }))}
+                  register={register}
+                  selected={watch(`category-${category.categoryId}`)}
+                />
+              ))}
+            </form>
+
+            {/* Footer fijo abajo */}
+            <div className="border-t rounded-b-2xl border-divider px-6 py-4 bg-[#050505] sticky bottom-0">
               <button
+                type="button"
                 onClick={clearFilters}
-                className="w-full py-3 text-primary-white font-medium hover:opacity-85 transition-opacity"
+                className="w-full py-3 text-primary-white font-medium hover:opacity-85 transition-opacity mb-2"
               >
                 Eliminar filtros
               </button>
               <button
-                onClick={applyFilters}
+                type="submit"
+                form="filter-form"
                 className="w-full bg-primary text-black py-3 rounded-lg font-medium hover:opacity-85 transition-opacity"
+                onClick={applyFilters}
               >
                 Aplicar filtros
               </button>

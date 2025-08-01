@@ -1,37 +1,43 @@
 import React from "react";
-import { FilterState } from "../modals/FilterModal";
 
-const CheckFilterInput = ({ items, type, handleFunc, filters, title }: { items: string[], type: "location" | "eventType", handleFunc: (item: string) => void, filters: FilterState, title: string }) => {
+type Props = {
+  name: string;
+  title: string;
+  items: { label: string; value: string }[];
+  register: any;
+  selected: string;
+};
+
+const CheckFilterInput = ({ name, title, items, register, selected }: Props) => {
   return (
     <div>
       <h3 className="text-white text-sm font-medium mb-4">
-        {title} <span className="text-gray-500 text-xs">(2)</span>
+        {title}
       </h3>
       <div className="px-4 rounded-xl bg-cards-container">
         {items.map((item) => (
           <label
-            key={item}
+            key={item.value}
             className="flex items-center py-3 not-last:border-b not-last:border-divider justify-between cursor-pointer group"
           >
             <span className="text-primary-white group-hover:text-lime-200 transition-colors">
-              {item}
+              {item.label}
             </span>
             <div className="relative">
               <input
                 type="radio"
-                name="location"
-                checked={filters[type] === item}
-                onChange={() => handleFunc(item)}
+                value={item.value}
+                {...register(name)}
                 className="sr-only"
               />
               <div
                 className={`w-6 h-6 rounded-full border-1 flex items-center justify-center transition-colors ${
-                  filters[type] === item
+                  selected === item.value
                     ? "border-inactive bg-primary-black"
                     : "border-inactive group-hover:border-primary/20"
                 }`}
               >
-                {filters[type] === item && (
+                {selected === item.value && (
                   <div className="w-3.5 h-3.5 bg-primary rounded-full"></div>
                 )}
               </div>

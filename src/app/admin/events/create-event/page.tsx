@@ -1,7 +1,7 @@
 "use client";
 
 import EventImageSwiper from "@/components/roles/admin/events/EventImagesSwiper";
-import FilterTagButton from "@/components/ui/buttons/FilterTagButton";
+import LabelTagButton from "@/components/ui/buttons/LabelTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
@@ -194,7 +194,7 @@ export default function Page() {
       <br />
 
     {labelsTypes && watchedLabels && (
-      <FilterTagButton
+      <LabelTagButton
         setValue={setValue}
         watchedLabels={watchedLabels}
         labelsTypes={labelsTypes}

@@ -25,9 +25,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${mainFont.className} bg-main-container`}>
-        <NavbarWeb />
         <CookiesNextProvider pollingOptions={{ enabled: true, intervalMs: 1000 }}>
           <ReactQueryProvider>
+            <NavbarWeb />
             {children}
           </ReactQueryProvider>
         </CookiesNextProvider>

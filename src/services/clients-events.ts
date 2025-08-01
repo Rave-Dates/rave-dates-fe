@@ -1,12 +1,22 @@
 import { BASE_URL } from "@/utils/envHelper";
 import axios from "axios";
 
-export const getAllClientEvents = async (page: number, limit: number) => {
-  const res = await axios.get(`${BASE_URL}/app/events?page=${page}&limit=${limit}`, {
-    headers: {
-      "Accept": "application/json",
-    },
-  });
+export const getAllClientEvents = async (
+  page: number,
+  limit: number,
+  filters?: { [key: string]: string }
+) => {
+  const filterValues = filters ? Object.values(filters).filter(Boolean) : [];
+  const filterQuery = filterValues.length > 0 ? `&filters=${filterValues.join(",")}` : "";
+
+  const res = await axios.get(
+    `${BASE_URL}/app/events?page=${page}&limit=${limit}${filterQuery}`,
+    {
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
 
   return res.data.data;
 };
@@ -45,3 +55,14 @@ export const getClientImageById = async (imageId: number) => {
 
   return res.data as Blob;
 };
+
+export const getAllClientCategories = async () => {
+  const res = await axios.get(`${BASE_URL}/app/categories`, {
+    headers: {
+      "Accept": "application/json",
+    },
+  });
+  
+  return res.data;
+};
+
