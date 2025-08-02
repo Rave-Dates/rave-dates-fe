@@ -7,7 +7,7 @@ import { getAllCategories } from "@/services/admin-categories";
 import { getAllLabels } from "@/services/admin-labels";
 import { getAllUsers, getUserById } from "@/services/admin-users";
 import { getAllRoles } from "@/services/admin-roles";
-import { getAllPayments } from "@/services/admin-payments";
+import { servedMovementImage } from "@/services/admin-payments";
 
 export function useAdminEvent({ eventId, token }: { eventId: number; token: CookieValueTypes }) {
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
@@ -180,12 +180,12 @@ export function useAdminAllRoles({ token }: { token: CookieValueTypes }) {
   return { roles };
 }
 
-export function useAdminAllPayments({ token }: { token: CookieValueTypes }) {
-  const { data: payments } = useQuery<IPaymentData[]>({
-    queryKey: ["users"],
-    queryFn: () => getAllPayments({ token }),
-    enabled: !!token,
+export function useServeMovementImage({ token, url }: { token: CookieValueTypes, url?: string  }) {
+  const { data: movementImage, isError: isErrorMovementImage, isLoading: isLoadingMovementImage } = useQuery({
+    queryKey: ["movementImage", url],
+    queryFn: () => servedMovementImage({ token, url: url! }),
+    enabled: !!token && !!url,
   });
 
-  return { payments };
+  return { movementImage, isErrorMovementImage, isLoadingMovementImage };
 }

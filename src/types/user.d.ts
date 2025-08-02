@@ -72,4 +72,6 @@ interface IUserLogin {
   exp: number;
   iat: number;
   role: string ;
+  organizerId?: number | null;
+  promoterId?: number | null;
 }

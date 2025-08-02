@@ -91,7 +91,7 @@ export function middleware(req: NextRequest) {
   // ------------------------------------------
   if (isOrganizerRoute) {
     if (!token) {
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.redirect(new URL("/admin/auth", req.url));
     }
 
     try {

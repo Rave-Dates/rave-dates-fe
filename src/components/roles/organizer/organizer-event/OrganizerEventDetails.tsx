@@ -14,7 +14,6 @@ export function OrganizerEventDetails({ eventId }: { eventId: number }) {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const { servedImageUrl, isImageLoading } = useEventImage({ eventId, token: token?.toString() });
-  // const { organizerBinnacles } = useAdminBinnacles({ organizerId: organizerId ?? 0, token: token?.toString() });
 
   const { selectedEvent, isEventLoading } = useAdminEvent({ eventId, token: token?.toString() });
 
@@ -58,7 +57,7 @@ export function OrganizerEventDetails({ eventId }: { eventId: number }) {
         </div>
       </div>
 
-      <OrganizerEventInfo eventId={eventId} />
+      <OrganizerEventInfo token={token} eventId={eventId} />
     </div>
   )
 }

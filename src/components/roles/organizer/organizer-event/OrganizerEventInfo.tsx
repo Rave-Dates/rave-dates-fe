@@ -4,21 +4,26 @@ import { DropdownItem } from "@/components/roles/admin/events/DropDownItem"
 import { StageItem } from "@/components/roles/admin/events/StageItem"
 import EditSvg from "@/components/svg/EditSvg"
 import EyeSvg from "@/components/svg/EyeSvg"
+import { useAdminBinnacles } from "@/hooks/admin/queries/useAdminData"
 import { useClientEventTickets } from "@/hooks/client/queries/useClientData"
+import { CookieValueTypes } from "cookies-next"
+import { jwtDecode } from "jwt-decode"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
-export default function OrganizerEventInfo({ eventId }: { eventId: number }) {
+export default function OrganizerEventInfo({ eventId, token }: { eventId: number, token: CookieValueTypes }) {
   const [expandedSections, setExpandedSections] = useState<string[]>([])
   const [globalExpandedSections, setGlobalExpandedSections] = useState<string[]>([])
+  const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
 
   const { eventTickets: ticketTypes } = useClientEventTickets(eventId);
 
-  // useEffect(() => {
-  //   if (ticketTypes && ticketTypes.length > 0) {
-  //     setExpandedSections([ticketTypes[0].name]);
-  //   }
-  // }, [ticketTypes]);
+  const { organizerBinnacles } = useAdminBinnacles({
+    organizerId: decoded?.organizerId ?? 0,
+    token: token?.toString() ?? "",
+  });
+
+  const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
 
   useEffect(() => {
     setGlobalExpandedSections(["Vendidas y dinero generado"]);
@@ -81,17 +86,17 @@ export default function OrganizerEventInfo({ eventId }: { eventId: number }) {
                   <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
                     <div className="flex text-sm justify-between items-center">
                       <h2>Total</h2>
-                      <h2 className="text-primary text-base text-end">COP 55.000,00</h2>
+                      <h2 className="text-primary text-base text-end tabular-nums">COP ${Number(selectedBinnacle?.total).toLocaleString()}</h2>
                     </div>
 
                     <div className="flex text-sm justify-between items-center">
                       <h2>Dinero entregado</h2>
-                      <h2 className="text-primary text-base text-end">COP 55.000,00</h2>
+                      <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedBinnacle?.alreadyPaid.toLocaleString()}</h2>
                     </div>
 
                     <div className="flex text-sm justify-between items-center">
                       <h2>Dinero disponible</h2>
-                      <h2 className="text-primary text-base text-end">COP 55.000,00</h2>
+                      <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedBinnacle?.pendingPayment.toLocaleString()}</h2>
                     </div>
 
                     <Link href={`/organizer/event/${eventId}/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-black bg-primary">
