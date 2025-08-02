@@ -78,7 +78,7 @@ function FilterModal() {
             </form>
 
             {/* Footer fijo abajo */}
-            <div className="border-t rounded-b-2xl border-divider px-6 py-4 bg-[#050505] sticky bottom-0">
+            <div className="border-t rounded-b-2xl border-divider pt-2 px-6 py-4 bg-[#050505] sticky bottom-0">
               <button
                 type="button"
                 onClick={clearFilters}

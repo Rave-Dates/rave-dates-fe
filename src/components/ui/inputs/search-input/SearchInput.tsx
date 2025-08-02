@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import SearchSvg from "../../../svg/SearchSvg";
-import Link from "next/link";
 import SearchResultItem from "./SearchInputItem";
 
 const SearchInput = ({

@@ -1,10 +1,15 @@
 import React from "react";
+import { UseFormRegister } from "react-hook-form";
+
+type FilterFormValues = {
+  [key: string]: string;
+};
 
 type Props = {
   name: string;
   title: string;
   items: { label: string; value: string }[];
-  register: any;
+  register: UseFormRegister<FilterFormValues>;
   selected: string;
 };
 
