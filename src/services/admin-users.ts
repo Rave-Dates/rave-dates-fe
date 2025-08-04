@@ -19,6 +19,17 @@ export const getAllUsers = async ({token}: { token: CookieValueTypes }) => {
   return data;
 };
 
+export const getAllPromoters = async ({token}: { token: CookieValueTypes }) => {
+  const res = await axios.get(`${BASE_URL}/admin/users/promoters`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  const data: IUser[] = res.data;
+  return data;
+};
+
 export const getUserById = async ({token, id}: { token: CookieValueTypes, id: IUser["userId"] }) => {
   const res = await axios.get(`${BASE_URL}/admin/users/${id}`, {
     headers: {

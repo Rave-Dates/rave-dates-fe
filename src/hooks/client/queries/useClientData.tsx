@@ -76,12 +76,19 @@ export function useClientAllEvents({
     isError,
     isFetching,
   } = useQuery<IEvent[], Error>({
-    queryKey: ["clientEvents", page, filters],
+    queryKey: ["clientEvents", limit, filters],
     queryFn: () => getAllClientEvents(page, limit, filters),
   });
 
   return { data, isLoading, isError, isFetching };
 }
+
+export const useClientAllRawEvents = () => {
+  return useQuery<IEvent[]>({
+    queryKey: ['raw-events'],
+    queryFn: () => getAllClientEvents(1, 1000),
+  });
+};
 
 export function useClientEventTickets(eventId?: number) {
   const { data: eventTickets, isLoading: isTicketsLoading } = useQuery<IEventTicket[]>({

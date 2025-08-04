@@ -9,12 +9,15 @@ import React, { useState } from 'react';
 import FilterModal from '../../ui/modals/FilterModal';
 import SearchInput from '@/components/ui/inputs/search-input/SearchInput';
 import Image from 'next/image';
-import { useEventStore } from '@/store/useEventStore';
+import { useClientAllRawEvents } from '@/hooks/client/queries/useClientData';
 
 const NavbarWeb: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<IEvent[]>([]);
-  const { events } = useEventStore(); // lista completa de eventos
+
+  const { data: events} = useClientAllRawEvents();
+
+  console.log("data", events)
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;

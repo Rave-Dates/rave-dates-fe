@@ -171,7 +171,7 @@ export const assignOrganizerToEvent = async (token: CookieValueTypes, data: { or
   return res.data;
 }
 
-export const assignPromoterToEvent = async (token: CookieValueTypes, data: { promoters: { promoterId: number, fee: number }[] }, eventId: number) => {
+export const assignPromoterToEvent = async (token: CookieValueTypes, data: { promoters: { promoterId: number }[] }, eventId: number) => {
   const res = await axios.put(`${BASE_URL}/admin/events/${eventId}/promoter`, data, {
     headers: {
       "Accept": "application/json",
@@ -182,7 +182,7 @@ export const assignPromoterToEvent = async (token: CookieValueTypes, data: { pro
   return res.data;
 }
 
-export const deletePromoterEvent = async (token: CookieValueTypes, data: { promoters: { promoterId: number, fee: number }[] }, eventId: number) => {
+export const deletePromoterEvent = async (token: CookieValueTypes, data: { promoters: { promoterId: number }[] }, eventId: number) => {
   const res = await axios.delete(`${BASE_URL}/admin/events/${eventId}/promoter`, {
     data,
     headers: {

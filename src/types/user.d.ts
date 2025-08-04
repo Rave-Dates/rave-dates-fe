@@ -30,7 +30,6 @@ interface IUser {
 
 type FormValues = {
   [key: `assignedEvent-${number}`]: string;
-  assignedCommission: string;
 };
 
 interface ICreateUser {
