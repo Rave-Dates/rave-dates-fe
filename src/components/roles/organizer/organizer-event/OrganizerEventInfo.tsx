@@ -11,7 +11,7 @@ import { jwtDecode } from "jwt-decode"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
-export default function OrganizerEventInfo({ eventId, token }: { eventId: number, token: CookieValueTypes }) {
+export default function OrganizerEventInfo({ eventId, token, isPromoter }: { eventId: number, token: CookieValueTypes, isPromoter?: boolean }) {
   const [expandedSections, setExpandedSections] = useState<string[]>([])
   const [globalExpandedSections, setGlobalExpandedSections] = useState<string[]>([])
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
@@ -43,7 +43,7 @@ export default function OrganizerEventInfo({ eventId, token }: { eventId: number
     <div className="rounded-lg text-white w-full flex items-start justify-center mb-44 h-full">
       <div className="w-full">
         {
-          types.map((type) => (
+          !isPromoter && types.map((type) => (
             <DropdownItem
               key={type}
               title={type}
@@ -129,6 +129,33 @@ export default function OrganizerEventInfo({ eventId, token }: { eventId: number
               </div>
             </DropdownItem>
           ))
+        }
+
+        {
+          isPromoter &&
+          <div className="bg-input mt-2 rounded-lg px-3 py-2">
+            <h1 className="font-medium px-2 my-2">Dinero</h1>
+            <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
+              <div className="flex text-sm justify-between items-center">
+                <h2>Total</h2>
+                <h2 className="text-primary text-base text-end tabular-nums">COP ${Number(selectedBinnacle?.total).toLocaleString()}</h2>
+              </div>
+
+              <div className="flex text-sm justify-between items-center">
+                <h2>Dinero entregado</h2>
+                <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedBinnacle?.alreadyPaid.toLocaleString()}</h2>
+              </div>
+
+              <div className="flex text-sm justify-between items-center">
+                <h2>Dinero disponible</h2>
+                <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedBinnacle?.pendingPayment.toLocaleString()}</h2>
+              </div>
+
+              <Link href={`/promoter/event/${eventId}/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-black bg-primary">
+                Ver dinero entregado
+              </Link>
+            </div> 
+          </div>
         }
 
 

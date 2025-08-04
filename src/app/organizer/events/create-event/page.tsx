@@ -30,7 +30,7 @@ export default function Page() {
     defaultValues: defaultEventFormData
   });
 
-  const { mutate: createFullEvent } = useCreateFullEvent(reset);
+  const { mutate: createFullEvent } = useCreateFullEvent({reset, errorHref: "/organizer/events", successHref: "/organizer/events"});
   const { getCookie } = useReactiveCookiesNext();
 
   const token = getCookie("token");
@@ -89,7 +89,12 @@ export default function Page() {
   const watchedLabels = useWatch({ name: "labels", control });
   const watchedImages = useWatch({ name: "images", control });
 
-  const handleGoToPromoters = () => {
+  const handleGoToPromoters = (data: IEventFormData) => {
+    updateEventFormData({
+      ...eventFormData,
+      ...data,
+    });
+    
     router.push("create-event/assign-promoters");
   }
 
@@ -105,6 +110,16 @@ export default function Page() {
       }
     });
 
+    const parsedCategories = data.categories?.map((category: string) => JSON.parse(category))
+    
+    const formattedCategoryValues = 
+      parsedCategories?.map((category: IEventCategoryValue) => ({
+        ...category,
+        valueId: category.valueId,
+        categoryId: category.categoryId,
+        value: category.value,
+      }))
+
     const formattedGeo = `${data.geo};${data.place?.trim()}`;
 
     updateEventFormData({
@@ -117,7 +132,7 @@ export default function Page() {
     const validDate = combineDateAndTimeToISO(data.date, data.time)
 
     const cleanedEventData = {
-      eventCategoryValues: data.eventCategoryValues,
+      eventCategoryValues: formattedCategoryValues,
       title: data.title,
       subtitle: data.subtitle,
       date: formatColombiaTimeToUTC(validDate),
@@ -140,19 +155,19 @@ export default function Page() {
     };
 
     console.log(cleanedEventData)
-    //  notifyPending(
-    //   new Promise((resolve, reject) => {
-    //     createFullEvent(cleanedEventData, {
-    //       onSuccess: resolve,
-    //       onError: reject,
-    //     });
-    //   }),
-    //   {
-    //     loading: "Creando evento...",
-    //     success: "Evento creado correctamente",
-    //     error: "Error al crear el evento",
-    //   }
-    // );
+     notifyPending(
+      new Promise((resolve, reject) => {
+        createFullEvent(cleanedEventData, {
+          onSuccess: resolve,
+          onError: reject,
+        });
+      }),
+      {
+        loading: "Creando evento...",
+        success: "Evento creado correctamente",
+        error: "Error al crear el evento",
+      }
+    );
   };
 
   return (
@@ -274,7 +289,7 @@ export default function Page() {
 
       <button
         type="button"
-        onClick={handleGoToPromoters}
+        onClick={handleSubmit(handleGoToPromoters, onInvalid)}
         className="border border-primary text-primary mt-10 input-button"
       >
         Promotores

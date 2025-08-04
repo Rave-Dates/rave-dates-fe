@@ -23,7 +23,6 @@ export default function OrganizerEventAttendees({eventId}: {eventId: number}) {
     totalRegistered: 228,
     progress1: { current: 114, total: 228 },
     progress2: { current: 114, total: 228 },
-    eliminated: 12,
   }
 
   return (

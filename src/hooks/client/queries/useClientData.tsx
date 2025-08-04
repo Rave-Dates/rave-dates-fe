@@ -22,14 +22,14 @@ export function useClientEvent(eventId?: number) {
   return { selectedEvent, isEventLoading };
 }
 
-export function useClientTransferred({transferredClientId, clientToken} : { transferredClientId: IPurchaseTicket["transferredClientId"] | undefined, clientToken: CookieValueTypes }) {
+export function useClientGetById({clientId, clientToken} : { clientId: number | undefined | null, clientToken: CookieValueTypes }) {
   const { data: clientData } = useQuery<IClient | null>({
-    queryKey: ['clientData', transferredClientId],
+    queryKey: ['clientData', clientId],
     queryFn: async () => {
-      if (!transferredClientId) return null;
-      return await getClientById({id: transferredClientId, token: clientToken});
+      if (!clientId) return null;
+      return await getClientById({id: clientId, token: clientToken});
     },
-    enabled: !!transferredClientId,
+    enabled: !!clientId,
   });
   
   return { clientData };
@@ -83,7 +83,7 @@ export function useClientAllEvents({
   return { data, isLoading, isError, isFetching };
 }
 
-export const useClientAllRawEvents = () => {
+export function useClientAllRawEvents() {
   return useQuery<IEvent[]>({
     queryKey: ['raw-events'],
     queryFn: () => getAllClientEvents(1, 1000),

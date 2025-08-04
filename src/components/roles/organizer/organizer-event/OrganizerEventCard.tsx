@@ -8,7 +8,7 @@ import { useReactiveCookiesNext } from "cookies-next";
 import Image from "next/image";
 import Link from "next/link"
 
-export function OrganizerEventCard({event}: { event: IOrganizerEvent }) {
+export function OrganizerEventCard({event}: { event: IOrganizerEvent | IPromoterEvent }) {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const { eventId, title, subtitle, date, geo } = event;

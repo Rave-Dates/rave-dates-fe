@@ -5,7 +5,7 @@ import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 
-export function useCreateFullEvent(reset: (data: IEventFormData) => void) {
+export function useCreateFullEvent({reset, successHref = "/admin/events", errorHref = "/admin/events"}: {reset: (data: IEventFormData) => void, successHref?: string, errorHref?: string}) {
   const { updateEventFormData, setHasLoadedTickets } = useCreateEventStore();
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
@@ -65,11 +65,11 @@ export function useCreateFullEvent(reset: (data: IEventFormData) => void) {
       return createdEvent;
     },
     onSuccess: () => {
-      router.push("/admin/events");
+      router.push(successHref);
     },
     onError: (error) => {
       console.error("Error creando evento:", error);
-      router.push("/admin/events");
+      router.push(errorHref);
     },
   });
 }

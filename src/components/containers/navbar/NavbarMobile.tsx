@@ -86,6 +86,20 @@ const NavbarMobile: React.FC = () => {
         label: 'Eventos',
         icon: <CalendarSvg type='thin' className='w-6 h-6' />,
       },
+    ],
+    "promoter": [
+      {
+        id: 'home',
+        href: "/promoter",
+        label: 'Inicio',
+        icon: <HomeSvg className='w-6 h-6' />,
+      },
+      {
+        id: 'events',
+        href: "/promoter/events",
+        label: 'Eventos',
+        icon: <CalendarSvg type='thin' className='w-6 h-6' />,
+      },
     ]
   };
 
@@ -94,6 +108,8 @@ const NavbarMobile: React.FC = () => {
       return navItems["admin"];
     } else if (pathname.startsWith("/organizer")) {
       return navItems["organizer"];
+    } else if (pathname.startsWith("/promoter")) {
+      return navItems["promoter"];
     } else {
       return navItems["/"];
     }

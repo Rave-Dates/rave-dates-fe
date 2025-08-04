@@ -11,7 +11,7 @@ import { useReactiveCookiesNext } from "cookies-next";
 import QRCode from "qrcode";
 import { useEffect, useRef, useState } from "react";
 import AddSvg from "@/components/svg/AddSvg";
-import { useClientEventServedOneImage, useClientTransferred } from "@/hooks/client/queries/useClientData";
+import { useClientEventServedOneImage, useClientGetById } from "@/hooks/client/queries/useClientData";
 
 interface TicketRowProps {
   href: string;
@@ -34,7 +34,7 @@ export function TicketRow({
   const eventId = Number(params.eventId);
   const clientToken = getCookie("clientToken");
   const { servedImageUrl } = useClientEventServedOneImage(eventId);
-  const { clientData } = useClientTransferred({transferredClientId: ticket.transferredClientId, clientToken});
+  const { clientData } = useClientGetById({clientId: ticket.transferredClientId, clientToken});
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 

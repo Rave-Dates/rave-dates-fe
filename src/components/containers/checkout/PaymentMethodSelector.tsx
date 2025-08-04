@@ -3,13 +3,14 @@ import CheckSvg from "@/components/svg/CheckSvg";
 import { SetStateAction } from "react";
 
 type Props = {
+  clientData: IClient | null | undefined;
   selected: string;
   setSelected: React.Dispatch<SetStateAction<"Nequi" | "Bold">>;
   check: boolean;
   setCheck: (value: boolean) => void;
 };
 
-export default function PaymentMethodSelector({ selected, setSelected, check, setCheck }: Props) {
+export default function PaymentMethodSelector({ clientData, selected, setSelected, check, setCheck }: Props) {
   const methods: ["Nequi", "Bold"] = ["Nequi", "Bold"];
 
   return (
@@ -57,20 +58,41 @@ export default function PaymentMethodSelector({ selected, setSelected, check, se
         </label>
       ))}
 
-
       <div className="flex items-center pt-3 pb-1 select-none">
-        <input type="checkbox" id="receiveInfo" checked={check} onChange={() => setCheck(!check)} className="hidden" />
+        <input 
+          disabled={clientData?.balance! <= 0}
+          type="checkbox" 
+          id="receiveInfo" 
+          checked={check} 
+          onChange={() => setCheck(!check)} 
+          className="hidden" 
+        />
         <div
           onClick={() => setCheck(!check)}
           className={`w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors cursor-pointer border
-          ${check ? "bg-primary text-primary-black border-primary" : "border-inactive text-transparent"}`}
+            ${check ? "bg-primary text-primary-black border-primary" : "border-inactive text-transparent"}
+            ${clientData?.balance! <= 0 && "pointer-events-none"}
+          `}
         >
           <CheckSvg />
         </div>
-        <label htmlFor="receiveInfo" className="w-full flex items-center justify-between px-4 select-none cursor-pointer">
+        <label htmlFor="receiveInfo" className={`w-full flex items-center justify-between px-4 select-none cursor-pointer ${clientData?.balance! <= 0 && "pointer-events-none text-primary-white/50"}`}>
           <div className="flex font-light flex-col items-start justify-center">
             Usar crédito disponible
-            <h3 className="text-xs text-primary-white/45">Dinero disponible: $70</h3>
+            {
+              clientData?.balance && clientData.balance < 0 ?
+              <div className="flex text-sm text-primary-white/40 font-light items-end justify-center">
+                Tienes saldo pendiente. Balance: ${clientData?.balance.toLocaleString()}
+              </div>
+              : clientData?.balance === 0 ?
+              <div className="flex text-sm text-primary-white/40 font-light flex-col items-start justify-center">
+                No tienes crédito disponible
+              </div>
+              : 
+              <h3 className="text-sm text-primary-white/45">
+                Dinero disponible: ${clientData?.balance.toLocaleString()}
+              </h3>
+            }
           </div>
         </label>
       </div>

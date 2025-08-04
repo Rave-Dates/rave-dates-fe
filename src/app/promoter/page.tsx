@@ -11,22 +11,21 @@ export default function OrganizerHome() {
   const token = getCookie("token");
   const decoded: { id: number } = (token && jwtDecode(token.toString())) || {id: 0};
   
-  // obtenemos user por id
   const { data: user, isPending: isUserLoading } = useAdminUserById({ token, userId: decoded.id }); 
   
-  const organizerId = user?.organizer?.organizerId;
+  // const organizerId = user?.promoter?.promoterId;
 
-  const { organizerBinnacles } = useAdminBinnacles({ organizerId: organizerId ?? 0, token: token?.toString() });
+  // const { organizerBinnacles } = useAdminBinnacles({ organizerId: organizerId ?? 0, token: token?.toString() });
 
-  const getTotalAvalible = () => {
-    let total = 0;
-    if (organizerBinnacles) {
-      organizerBinnacles.forEach((binnacle) => {
-        total += Number(binnacle.total);
-      });
-    }
-    return total.toLocaleString('es-CO');
-  }
+  // const getTotalAvalible = () => {
+  //   let total = 0;
+  //   if (organizerBinnacles) {
+  //     organizerBinnacles.forEach((binnacle) => {
+  //       total += Number(binnacle.total);
+  //     });
+  //   }
+  //   return total.toLocaleString('es-CO');
+  // }
 
   return (
     <div className="bg-primary-black pt-14 text-primary-white min-h-screen p-4">
@@ -34,18 +33,19 @@ export default function OrganizerHome() {
         {/* Available Balance Header */}
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold ">Disponible</h1>
-          <p className="text-primary text-2xl">COP ${getTotalAvalible()}</p>
+          {/* <p className="text-primary text-2xl">COP ${getTotalAvalible()}</p> */}
+          <p className="text-primary text-2xl">COP $500</p>
         </div>
 
         {/* Event Cards */}
         <div className="space-y-3">
           {
-            !user?.organizer?.events &&
+            !user?.promoter?.events &&
             <div className="w-full text-text-inactive h-23 rounded-xl gap-x-1 p-4 flex items-center justify-center">
               No tienes eventos asignados
             </div>
           }
-          {!isUserLoading && user?.organizer?.events && user.organizer.events.map((event) => (
+          {!isUserLoading && user?.promoter?.events && user.promoter.events.map((event) => (
             <OrganizerEventCard
               key={event.eventId}
               event={event}
