@@ -42,9 +42,9 @@ export default function Page() {
           {/* Users Table/List */}
           <div className="rounded-md overflow-hidden mt-5">
           {/* Table Header */}
-          <div className="grid grid-cols-[1fr_1fr_2fr] border-b border-divider text-text-inactive gap-x-2 text-xs py-2 px-3">
+          <div className="grid grid-cols-[1fr_1fr_1.3fr] border-b border-divider text-text-inactive gap-x-2 text-xs py-2 px-3">
             <div className="text-start">Evento</div>
-            <div className="text-end">Fecha</div>
+            <div className="text-center">Fecha</div>
             <div className="text-end">Acciones</div>
           </div>
 
@@ -53,10 +53,10 @@ export default function Page() {
             {assignedEvents?.map((event) => (
               <div
                 key={event.eventId}
-                className="grid grid-cols-[1fr_1fr_2fr] items-center py-3 px-3 gap-x-2 text-xs"
+                className="grid grid-cols-[1fr_1fr_1.3fr] items-center py-3 px-3 gap-x-2 text-xs"
               >
                 <div className="text-start">{event.title}</div>
-                <div className="text-end tabular-nums flex flex-col">
+                <div className="text-center tabular-nums flex flex-col">
                   <h2>{event.date && parseISODate(event.date).date}</h2>
                   <h2>{event.date && parseISODate(event.date).time}hs</h2>
                 </div>

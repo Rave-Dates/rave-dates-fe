@@ -3,9 +3,9 @@ import EditPromoter from "@/components/roles/organizer/EditPromoter";
 export default async function Page({
   params,
 }: {
-  params: Promise<{ promoterId: number }>
+  params: Promise<{ userId: number }>
 }) {
-  const { promoterId } = await params
-  const promoterIdNumber = Number(promoterId);
+  const { userId } = await params
+  const promoterIdNumber = Number(userId);
   return <EditPromoter userId={promoterIdNumber} />
 }

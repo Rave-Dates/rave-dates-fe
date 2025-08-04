@@ -5,7 +5,7 @@ import { getAllBinnaclesFromOrganizer } from "@/services/admin-binnacles";
 import { getEventImages, getImageById } from "@/services/admin-events";
 import { getAllCategories } from "@/services/admin-categories";
 import { getAllLabels } from "@/services/admin-labels";
-import { getAllUsers, getUserById } from "@/services/admin-users";
+import { getAllPromoters, getAllUsers, getUserById } from "@/services/admin-users";
 import { getAllRoles } from "@/services/admin-roles";
 import { servedMovementImage } from "@/services/admin-payments";
 
@@ -160,6 +160,16 @@ export function useAdminAllUsers({ token }: { token: CookieValueTypes }) {
   return { data, isLoading, isError };
 }
 
+export function useAdminAllPromoters({ token }: { token: CookieValueTypes }) {
+  const { data: promoters, isLoading, isError } = useQuery({
+    queryKey: ["promoters"],
+    queryFn: () => getAllPromoters({ token }),
+    enabled: !!token,
+  });
+
+  return { promoters, isLoading, isError };
+}
+
 export function useAdminUserById({ token, userId }: { token: CookieValueTypes, userId: number }) {
   const { data, isPending } = useQuery({
     queryKey: ["user"],
@@ -171,7 +181,7 @@ export function useAdminUserById({ token, userId }: { token: CookieValueTypes, u
 }
 
 export function useAdminAllRoles({ token }: { token: CookieValueTypes }) {
-  const { data: roles } = useQuery({
+  const { data: roles } = useQuery<IRole[]>({
     queryKey: ["roles"],
     queryFn: () => getAllRoles({ token }),
     enabled: !!token,
