@@ -151,8 +151,8 @@ export default function OtpVerificationView() {
     <TokenGuard loadingValidate={loadingValidate} emailOrWhatsapp={emailOrWhatsapp} />
     <div className="min-h-screen pb-40 pt-28 sm:pb-24 sm:pt-36 bg-primary-black text-white flex px-6">
       <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3" />
-      <div className="max-w-md mx-auto space-y-6 animate-fade-in">
-        <h1 className="text-3xl font-bold">Valida tus datos</h1>
+      <div className="max-w-md mx-auto space-y-6">
+        <h1 className="text-3xl font-bold animate-fade-in">Valida tus datos</h1>
 
         <VerificationTypeSelector
           selected={selectedVerification}
@@ -168,14 +168,14 @@ export default function OtpVerificationView() {
           type="button"
           onClick={handleSendCode}
           disabled={loadingSend}
-          className={`${loadingSend ? "opacity-70 pointer-events-none" : "opacity-100 pointer-events-auto"} w-full bg-primary text-center flex items-center justify-center text-black py-3 rounded-lg transition-all`}
+          className={`${loadingSend ? "opacity-70 pointer-events-none" : "opacity-100 pointer-events-auto"} w-full bg-primary text-center flex items-center justify-center text-black py-3 rounded-lg transition-all animate-fade-in`}
         >
           {
             loadingSend ? <i><SpinnerSvg className="text-primary fill-inactive w-6" /></i> : <p>Enviar código de validación</p>
           }
         </button>
 
-        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4 animate-fade-in">
           <p className="text-sm">Ingresa el código de 4 dígitos</p>
 
           <div className="flex gap-3 justify-center">

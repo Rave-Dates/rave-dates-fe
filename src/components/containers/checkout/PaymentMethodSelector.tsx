@@ -47,7 +47,7 @@ export default function PaymentMethodSelector({ clientData, selected, setSelecte
           </div>
           <div className="flex w-full items-center justify-between px-4">
             <div className="flex flex-col items-start justify-center">
-              <span className="group-hover:text-lime-200 font-light transition-colors">{item} {item === "Bold" && "(Tarjeta o PSE)"}</span>
+              <span className="group-hover:text-lime-200 font-light transition-colors">{item} {item === "Bold" && "(Tarjeta)"}</span>
             </div>
             <Image
               className="w-16 h-5 object-cover"

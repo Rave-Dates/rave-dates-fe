@@ -8,11 +8,13 @@ import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyPending } from "@/components/ui/toast-notifications";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { useCreateFullEvent } from "@/hooks/admin/mutations/useCreateEventFull";
+import { useCreateOrganizerFreeEvent } from "@/hooks/admin/mutations/useCreateOrganizerFreeEvent";
 import { useAdminAllCategories, useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { combineDateAndTimeToISO, formatColombiaTimeToUTC, validateDateYyyyMmDd } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
+import { jwtDecode } from "jwt-decode";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import type React from "react";
@@ -30,10 +32,11 @@ export default function Page() {
     defaultValues: defaultEventFormData
   });
 
-  const { mutate: createFullEvent } = useCreateFullEvent({reset, errorHref: "/organizer/events", successHref: "/organizer/events"});
+  const { mutate: createFullEvent } = useCreateOrganizerFreeEvent({reset, errorHref: "/organizer/events", successHref: "/organizer/events"});
   const { getCookie } = useReactiveCookiesNext();
 
   const token = getCookie("token");
+  const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
   
   register("labels", {
     validate: (value) =>
@@ -76,6 +79,9 @@ export default function Page() {
       type: "free",
       labels: eventFormData.labels,
       images: eventFormData.images,
+      tickets: eventFormData.tickets,
+      categories: eventFormData.categories,
+      formPromoters: eventFormData.formPromoters,
     };
 
     Object.entries(setters).forEach(([key, value]) => {
@@ -95,6 +101,7 @@ export default function Page() {
       ...data,
     });
     
+
     router.push("create-event/assign-promoters");
   }
 
@@ -151,23 +158,25 @@ export default function Page() {
       images: data.images,
       timeOut: data.timeOut,
       labels: data.labels,
+      organizerId: decoded?.organizerId || 0,
       tickets: [validTickets[0]],
+      formPromoters: data.formPromoters,
     };
 
     console.log(cleanedEventData)
-     notifyPending(
-      new Promise((resolve, reject) => {
-        createFullEvent(cleanedEventData, {
-          onSuccess: resolve,
-          onError: reject,
-        });
-      }),
-      {
-        loading: "Creando evento...",
-        success: "Evento creado correctamente",
-        error: "Error al crear el evento",
-      }
-    );
+    //  notifyPending(
+    //   new Promise((resolve, reject) => {
+    //     createFullEvent(cleanedEventData, {
+    //       onSuccess: resolve,
+    //       onError: reject,
+    //     });
+    //   }),
+    //   {
+    //     loading: "Creando evento...",
+    //     success: "Evento creado correctamente",
+    //     error: "Error al crear el evento",
+    //   }
+    // );
   };
 
   return (

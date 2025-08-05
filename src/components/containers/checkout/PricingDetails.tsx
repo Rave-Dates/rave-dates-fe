@@ -37,7 +37,7 @@ export default function PricingDetails({check, clientData, selectedPayment, part
 
   // Restar pago parcial si corresponde
   if (selectedPayment === "Abonar a la alcancía") {
-    totalWithBalanceDiscount -= partialAmount;
+    totalWithBalanceDiscount = partialAmount;
   }
 
   // No dejar que el total sea negativo

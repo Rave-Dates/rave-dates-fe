@@ -55,6 +55,10 @@ interface IEventFormData extends Partial<IEvent> {
     [key: string]: string; // o más estrictamente: Record<number, string>
   };
   tickets: IEventTicket[]; // solo para el form
+  organizerId?: number;
+  formPromoters?: {
+    promoterId?: number;
+  }[];
 }
 
 interface IEventForUpdate extends Partial<IEventFormData>, Omit<IEventFormData, 'labels'> {

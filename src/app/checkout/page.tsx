@@ -68,13 +68,9 @@ export default function Checkout() {
 
   const handleContinue = () => {
     if (!clientToken && !tempToken) return
-    if (selectedMethod === "Nequi") {
-      notifyError("Método no creado")
-      return
-    }
 
     const formattedTicketData: IClientPurchaseTicket = {
-      method: selectedMethod.toUpperCase() as "NEQUI" | "BOLD",
+      method: "BOLD",
       eventId,
       tickets: Object.keys(selected).map((ticketTypeId) => ({
         quantity: selected[ticketTypeId].quantity,
@@ -84,7 +80,7 @@ export default function Checkout() {
       amount: selectedPayment === "Abonar a la alcancía" ? watchedPartialAmount : 0,
       clientId: (decoded && decoded.id ) || (decodedTemp && decodedTemp.id) || 0,
       returnUrl: urlToReturn,
-      boldMethod: ["CREDIT_CARD", "PSE"],
+      boldMethod: selectedMethod.toUpperCase() === "BOLD" ? ["CREDIT_CARD"] : ["NEQUI"],
       payWithBalance: check,
     };
 

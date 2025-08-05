@@ -1,29 +1,51 @@
 "use client";
 
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
+import { useAdminAllPromoters } from "@/hooks/admin/queries/useAdminData";
+import { useCreateEventStore } from "@/store/createEventStore";
+import { useReactiveCookiesNext } from "cookies-next";
+import { useEffect } from "react";
 
 export default function UserManagement() {
-  // const { data, isLoading, isError } = useQuery({
-  //   queryKey: ["users"],
-  //   queryFn: () => getAllUsers({ token }),
-  //   enabled: !!token, // solo se ejecuta si hay token
-  // });
+  const { getCookie } = useReactiveCookiesNext();
+  const { eventFormData, updateEventFormData } = useCreateEventStore();
+
+  const token = getCookie("token");
+  const { promoters } = useAdminAllPromoters({ token });
 
   const isLoading = false;
   const isError = false;
 
-  const data = [
-    {
-      userId: 1,
-      name: "Juan Gomez",
-      roleId: 1,
-      role: {
-        roleId: 1,
-        name: "Promotor",
-        icon: "🏆",
-      }
-    }
-  ]
+  useEffect(() => {
+    console.log("eventFormData", eventFormData)
+  }, [eventFormData]);
+
+  const promoterAlreadyIn = (promoterId: number | undefined) => {
+    const isIn = eventFormData.formPromoters?.find((promoter) => promoter.promoterId === promoterId);
+    return isIn;
+  }
+
+  const handlePromoterAdd = async (promoterId: number | undefined) => {
+    console.log("promoterId", promoterId)
+
+    if (!promoterId) return;
+
+    const isIn = promoterAlreadyIn(promoterId)  
+    if (isIn) return;
+
+    const prevPromoters = eventFormData.formPromoters?.map((promoter) => ({
+      promoterId: promoter.promoterId,
+    })) || [];
+
+    updateEventFormData({
+      formPromoters: [
+        ...prevPromoters,
+        {
+          promoterId: promoterId,
+        },
+      ],
+    });
+  }
 
   return (
     <div className="rounded-md bg-primary-black min-h-screen overflow-hidden text-primary-white px-4">
@@ -41,20 +63,30 @@ export default function UserManagement() {
 
       {/* Table Body */}
       <div className="divide-y divide-divider w-full">
-        {data?.map((user) => (
-          <div
-            key={user?.userId}
-            className="grid grid-cols-[1fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
-          >
-            <div className="text-start">{user?.name}</div>
-            <div className="flex justify-end gap-x-2">
-              <button className="w-40 font-medium bg-primary rounded-lg text-primary-black py-2">
-                Asignar al evento
-              </button>
+        {promoters?.map((user) => {
+          const isIn = promoterAlreadyIn(user.promoter?.promoterId);
+          console.log("esta?", isIn)
+          return (
+            <div
+              key={user?.userId}
+              className="grid grid-cols-[1fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
+            >
+              <div className="text-start">{user?.name}</div>
+              <div className="flex justify-end gap-x-2">
+                {
+                  !isIn ?
+                  <button onClick={() => handlePromoterAdd(user.promoter?.promoterId)} className="w-40 font-medium bg-primary rounded-lg text-primary-black py-2">
+                    Asignar al evento
+                  </button>
+                  :
+                  <div className="w-40 font-medium border border-primary/70 text-center text-primary rounded-lg bg-primary-black py-2">
+                    Asignado
+                  </div>
+                }
+              </div>
             </div>
-          </div>
-        ))}
-        {!data && (
+        )})}
+        {!promoters && (
           Array.from(Array(10).keys()).map((user) => (
           <div
             key={user}
@@ -65,7 +97,7 @@ export default function UserManagement() {
           </div>
           ))
         )}
-        {!isLoading && Array.isArray(data) && data?.length === 0 &&  (
+        {!isLoading && Array.isArray(promoters) && promoters?.length === 0 &&  (
           <div className="text-center py-8 text-text-inactive">
             No se encontraron usuarios
           </div>

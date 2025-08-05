@@ -9,7 +9,7 @@ export default function VerificationTypeSelector({ selected, setSelected }: Prop
   const methods: ["Email", "Whatsapp"] = ["Email", "Whatsapp"];
 
   return (
-    <div className="bg-cards-container rounded-lg">
+    <div className="bg-cards-container rounded-lg animate-fade-in">
       {methods.map((item) => (
         <label
           key={item}
