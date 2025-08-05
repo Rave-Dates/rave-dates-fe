@@ -8,14 +8,14 @@ import { useReactiveCookiesNext } from "cookies-next";
 import Image from "next/image";
 import Link from "next/link"
 
-export function OrganizerEventCard({event}: { event: IOrganizerEvent | IPromoterEvent }) {
+export function OrganizerEventCard({event, href = "organizer/event"}: { event: IOrganizerEvent | IPromoterEvent, href?: string }) {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const { eventId, title, subtitle, date, geo } = event;
   const { servedImageUrl, isImageLoading } = useEventImage({ eventId, token: token?.toString() });
 
   return (
-    <Link href={`organizer/event/${eventId}`} className="bg-cards-container rounded-lg p-4 flex items-center gap-3">
+    <Link href={`${href}/${eventId}`} className="bg-cards-container rounded-lg p-4 flex items-center gap-3">
       {/* Avatar */}
       <div
         className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg"

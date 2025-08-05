@@ -23,10 +23,10 @@ import { useForm, useWatch } from "react-hook-form";
 const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/GeoAutocomplete"), { ssr: false });
 
 export default function Page() {
-  const { eventFormData, updateEventFormData, setHasLoadedEvent } = useCreateEventStore();
+  const { eventFormData, updateEventFormData } = useCreateEventStore();
   
   const router = useRouter()
-  const { register, handleSubmit, watch, setValue, control, reset } = useForm<IEventFormData>({
+  const { register, handleSubmit, setValue, control, reset } = useForm<IEventFormData>({
     defaultValues: defaultEventFormData
   });
 

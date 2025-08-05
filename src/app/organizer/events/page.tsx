@@ -20,7 +20,7 @@ export default function Page() {
   const decoded: { id: number } = (token && jwtDecode(token.toString())) || {id: 0};
   
   // obtenemos user por id
-  const { data: user, isPending: isUserLoading } = useAdminUserById({ token, userId: decoded.id }); 
+  const { data: user } = useAdminUserById({ token, userId: decoded.id }); 
 
 
   useEffect(() => {

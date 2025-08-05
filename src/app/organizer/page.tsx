@@ -47,6 +47,7 @@ export default function OrganizerHome() {
           }
           {!isUserLoading && user?.organizer?.events && user.organizer.events.map((event) => (
             <OrganizerEventCard
+              href="promoter/event"
               key={event.eventId}
               event={event}
             />

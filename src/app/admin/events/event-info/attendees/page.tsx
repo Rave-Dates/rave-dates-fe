@@ -1,6 +1,5 @@
 "use client";
 
-import SearchInput from "@/components/ui/inputs/search-input/SearchInput";
 import AddSvg from "@/components/svg/AddSvg";
 import Link from "next/link";
 import { useState } from "react";
@@ -22,6 +21,8 @@ export default function UsersList() {
 
   const [searchQuery, setSearchQuery] = useState("");
 
+  console.log(setSearchQuery)
+
   const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -38,11 +39,11 @@ export default function UsersList() {
           >
             <ArrowSvg />
           </Link>
-          <SearchInput
+          {/* <SearchInput
             placeholder="Busca un invitado"
             value={searchQuery}
             handleFunc={(e) => setSearchQuery(e.target.value)}
-          />
+          /> */}
           <Link
             href="/admin/events/event-info/attendees/attendee-data"
             className="border border-primary text-primary text-2xl p-2.5 rounded-lg flex items-center justify-center text-center"

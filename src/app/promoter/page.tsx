@@ -1,7 +1,7 @@
 "use client"
 
 import { OrganizerEventCard } from "@/components/roles/organizer/organizer-event/OrganizerEventCard"
-import { useAdminBinnacles, useAdminUserById } from "@/hooks/admin/queries/useAdminData"
+import { useAdminUserById } from "@/hooks/admin/queries/useAdminData"
 import { useReactiveCookiesNext } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
 

@@ -13,18 +13,42 @@ import { useMutation } from "@tanstack/react-query";
 import { useTicketStore } from "@/store/useTicketStore";
 import { jwtDecode } from "jwt-decode";
 import { notifyError, notifyPending, notifySuccess } from "@/components/ui/toast-notifications";
-import { useClientEvent } from "@/hooks/client/queries/useClientData";
+import { useClientEvent, useClientEventTickets, useClientGetById } from "@/hooks/client/queries/useClientData";
+import PartialAmount from "@/components/containers/checkout/PartialAmount";
+import { useForm } from "react-hook-form";
 
 export default function Checkout() {
-  const [selectedPayment, setSelectedPayment] = useState("Pago total");
+  const [selectedPayment, setSelectedPayment] = useState<"Pago total" | "Abonar a la alcancía">("Pago total");
   const [selectedMethod, setSelectedMethod] = useState<"Nequi" | "Bold">("Bold");
   const { selected, eventId } = useTicketStore();
+  const { eventTickets } = useClientEventTickets(eventId);
+
   const [check, setCheck] = useState(false);
   const router = useRouter();
+  
+  const { register, watch, setValue } = useForm<{ partialAmount: number }>({
+    defaultValues: { partialAmount: 0 }
+  });
+
+  const watchedPartialAmount = watch("partialAmount") || 0;
 
   const { getCookie } = useReactiveCookiesNext();
   const clientToken = getCookie("clientToken");
   const tempToken = getCookie("tempToken");
+
+  const decoded: {id: number} | null = clientToken && jwtDecode(clientToken?.toString()) || null;
+  const decodedTemp: {id: number} | null = tempToken && jwtDecode(tempToken?.toString()) || null;
+
+  const { clientData } = useClientGetById({clientId: decoded?.id, clientToken});
+  const { selectedEvent } = useClientEvent(eventId);
+
+  const totalAmount = Object.entries(selected).reduce((acc, [ticketTypeIdStr, selectedData]) => {
+    const ticketTypeId = Number(ticketTypeIdStr);
+    const ticketInfo = eventTickets?.find(t => t.ticketTypeId === ticketTypeId);
+    const price = selectedData.stage?.price || ticketInfo?.stages[0].price || 0;
+
+    return acc + selectedData.quantity * price;
+  }, 0);
   
   useEffect(() => {
     if (!eventId) {
@@ -33,26 +57,21 @@ export default function Checkout() {
     }
   }, [selectedMethod, eventId]);
 
-  const { selectedEvent } = useClientEvent(eventId);
+
+  let urlToReturn = ""
+
+  if (tempToken && !clientToken) {
+    urlToReturn = `https://ravedates.proxising.com/otp?redirect=transfer?eid=${eventId}`
+  } else if (!tempToken && clientToken) {
+    urlToReturn = `https://ravedates.proxising.com/transfer-confirm?eid=${eventId}`
+  }
 
   const handleContinue = () => {
-    // router.push(tempToken && !clientToken ? `/otp?redirect=transfer?eid=${eventId}` : `/transfer-confirm?eid=${eventId}`)
     if (!clientToken && !tempToken) return
     if (selectedMethod === "Nequi") {
       notifyError("Método no creado")
       return
     }
-
-    let urlToReturn = ""
-
-    if (tempToken && !clientToken) {
-      urlToReturn = `https://ravedates.proxising.com/otp?redirect=transfer?eid=${eventId}`
-    } else if (!tempToken && clientToken) {
-      urlToReturn = `https://ravedates.proxising.com/transfer-confirm?eid=${eventId}`
-    }
-
-    const decoded: {id: number} | null = clientToken && jwtDecode(clientToken?.toString()) || null;
-    const decodedTemp: {id: number} | null = tempToken && jwtDecode(tempToken?.toString()) || null;
 
     const formattedTicketData: IClientPurchaseTicket = {
       method: selectedMethod.toUpperCase() as "NEQUI" | "BOLD",
@@ -61,14 +80,16 @@ export default function Checkout() {
         quantity: selected[ticketTypeId].quantity,
         ticketTypeId: Number(ticketTypeId),
       })),
-      isPartial: false,
+      isPartial: selectedPayment === "Abonar a la alcancía",
+      amount: selectedPayment === "Abonar a la alcancía" ? watchedPartialAmount : 0,
       clientId: (decoded && decoded.id ) || (decodedTemp && decodedTemp.id) || 0,
       returnUrl: urlToReturn,
       boldMethod: ["CREDIT_CARD", "PSE"],
-      payWithBalance: false,
+      payWithBalance: check,
     };
 
     console.log(formattedTicketData)
+    console.log("check",check)
 
     notifyPending(
       new Promise((resolve, reject) => {
@@ -76,9 +97,8 @@ export default function Checkout() {
             ticketData: formattedTicketData,
             clientToken: clientToken || tempToken
           }, {
-          onSuccess: (data) => {
+          onSuccess: () => {
             resolve("");
-            router.push(data)
           },
           onError: (err) => {
             reject(err);
@@ -97,6 +117,12 @@ export default function Checkout() {
     mutationFn: initTicketPurchase,
     onSuccess: (data) => {
       notifySuccess("Transacción iniciada correctamente");
+      console.log("data", data);
+      if (data === "PAY NOT NEEDED") {
+        notifySuccess("No se necesita pagar")
+        router.push(urlToReturn)
+        return
+      }
       router.push(data)
     },
     onError: (error) => {
@@ -113,18 +139,33 @@ export default function Checkout() {
 
         <div className="space-y-4 order-last lg:order-first">
           <PaymentTypeSelector selected={selectedPayment} setSelected={setSelectedPayment} />
-          <PaymentMethodSelector
-            selected={selectedMethod}
-            setSelected={setSelectedMethod}
-            check={check}
-            setCheck={setCheck}
-          />
+          {
+            selectedPayment === "Pago total" ?
+            <PaymentMethodSelector
+              selected={selectedMethod}
+              setSelected={setSelectedMethod}
+              check={check}
+              setCheck={setCheck}
+              clientData={clientData}
+            /> :
+            <PartialAmount 
+              register={register}
+              totalAmount={totalAmount}
+              partialAmount={watchedPartialAmount}
+            />
+          }
         </div>
 
         {/* Right Side */}
         <div className="space-y-4 order-first">
           {selectedEvent && <EventDetails selectedEvent={selectedEvent} eventId={eventId} />}
-          <PricingDetails />
+          <PricingDetails 
+            check={check} 
+            clientData={clientData} 
+            selectedPayment={selectedPayment} 
+            partialAmount={watchedPartialAmount} 
+            totalAmount={totalAmount}
+          />
           <button onClick={() => handleContinue()} className="lg:block hidden w-full order-last bg-primary text-black font-medium py-3 rounded-lg text-lg">
             Continuar
           </button>

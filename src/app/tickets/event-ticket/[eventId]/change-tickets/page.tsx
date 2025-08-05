@@ -1,24 +1,22 @@
 "use client"
 
 import TicketButtons from "@/components/ui/buttons/TicketButtons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import {
   getClientTicketTypesByEventId,
   getTicketsByPurchaseId,
-  getTicketsFromClient,
 } from "@/services/clients-tickets";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
 
 const ChangeTicketsView = () => {
   const { getCookie } = useReactiveCookiesNext();
-  const { selected, resetSelected, setSelected, replaceSelected } = useTicketStore();
-  const router = useRouter();
+  const { selected } = useTicketStore();
   const params = useParams();
   const clientToken = getCookie("clientToken");
   const decoded: { id: number } = (clientToken && jwtDecode(clientToken.toString())) || { id: 0 };
@@ -94,9 +92,9 @@ const ChangeTicketsView = () => {
     0
   );
 
-  const maxPurchase = oldTickets
-    .filter((ticket) => ticket?.purchaseId === activeTab)
-    .reduce((acc, curr) => acc + curr.quantity, 0);
+  // const maxPurchase = oldTickets
+  //   .filter((ticket) => ticket?.purchaseId === activeTab)
+  //   .reduce((acc, curr) => acc + curr.quantity, 0);
 
   return (
     <div className="min-h-screen bg-primary-black flex sm:justify-center sm:items-center text-primary-white">
@@ -173,7 +171,7 @@ const ChangeTicketsView = () => {
                     key={ticket.ticketTypeId}
                     totalQuantity={totalQuantity}
                     ticket={ticket}
-                    overrideMaxTotalSelectable={maxPurchase}
+                    // overrideMaxTotalSelectable={maxPurchase}
                   />
                 );
               })}
@@ -198,8 +196,8 @@ const ChangeTicketsView = () => {
               !(
                 activeTab &&
                 purchaseIds &&
-                totalPrice !== 0 &&
-                totalQuantity === maxPurchase
+                totalPrice !== 0 
+                // && totalQuantity === maxPurchase
               )
             }
             className="w-full text-center py-3 rounded-lg transition-colors text-black bg-primary hover:bg-primary/70 disabled:bg-primary/60 disabled:pointer-events-none"

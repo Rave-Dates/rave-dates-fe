@@ -17,7 +17,7 @@ export default function TicketConfiguration() {
   const { register, handleSubmit, setValue, getValues, control, reset} = useForm<IEventFormData>({
     defaultValues: eventFormData
   });
-  const { mutate: createFullEvent } = useCreateFullEvent(reset);
+  const { mutate: createFullEvent } = useCreateFullEvent({reset});
   const router = useRouter()
 
   const { fields, append, remove } = useFieldArray({

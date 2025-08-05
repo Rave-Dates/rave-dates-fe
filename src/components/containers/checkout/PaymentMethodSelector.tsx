@@ -13,6 +13,8 @@ type Props = {
 export default function PaymentMethodSelector({ clientData, selected, setSelected, check, setCheck }: Props) {
   const methods: ["Nequi", "Bold"] = ["Nequi", "Bold"];
 
+  if (!clientData) return null;
+
   return (
     <div className="bg-cards-container rounded-lg p-4">
       <div className="flex flex-col items-start pb-4 border-b border-inactive">
@@ -60,7 +62,7 @@ export default function PaymentMethodSelector({ clientData, selected, setSelecte
 
       <div className="flex items-center pt-3 pb-1 select-none">
         <input 
-          disabled={clientData?.balance! <= 0}
+          disabled={clientData?.balance <= 0}
           type="checkbox" 
           id="receiveInfo" 
           checked={check} 
@@ -71,12 +73,12 @@ export default function PaymentMethodSelector({ clientData, selected, setSelecte
           onClick={() => setCheck(!check)}
           className={`w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors cursor-pointer border
             ${check ? "bg-primary text-primary-black border-primary" : "border-inactive text-transparent"}
-            ${clientData?.balance! <= 0 && "pointer-events-none"}
+            ${clientData?.balance <= 0 && "pointer-events-none"}
           `}
         >
           <CheckSvg />
         </div>
-        <label htmlFor="receiveInfo" className={`w-full flex items-center justify-between px-4 select-none cursor-pointer ${clientData?.balance! <= 0 && "pointer-events-none text-primary-white/50"}`}>
+        <label htmlFor="receiveInfo" className={`w-full flex items-center justify-between px-4 select-none cursor-pointer ${clientData?.balance <= 0 && "pointer-events-none text-primary-white/50"}`}>
           <div className="flex font-light flex-col items-start justify-center">
             Usar crédito disponible
             {

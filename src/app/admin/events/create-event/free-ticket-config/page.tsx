@@ -14,7 +14,7 @@ export default function FreeTicketConfiguration() {
   const { register, handleSubmit, reset} = useForm<IEventFormData>({
     defaultValues: eventFormData
   });
-  const { mutate: createFullEvent } = useCreateFullEvent(reset);
+  const { mutate: createFullEvent } = useCreateFullEvent({reset});
 
   const onSubmit = (data: IEventFormData) => {
     const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
