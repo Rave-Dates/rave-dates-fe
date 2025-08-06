@@ -133,7 +133,7 @@ export default function EditTicketConfiguration() {
     // // funcion para editar evento
     notifyPending(
       new Promise((resolve, reject) => {
-        editEvent(cleanedEventData, {
+        editEvent({formData: cleanedEventData}, {
           onSuccess: () => {
             resolve("");
             route.push("/admin/events");

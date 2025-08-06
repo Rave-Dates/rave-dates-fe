@@ -108,6 +108,16 @@ interface IEventTicket {
   limit?: number;
 }
 
+interface IEventTicketMetrics {
+  totalTickets: number;
+  ticketsPurchased: number;
+  ticketsTypesMetrics: {
+    name: string;
+    quantity: number;
+    total: number;
+  }[];
+}
+
 interface IEventStages {
   stageId?: number;
   date: string;

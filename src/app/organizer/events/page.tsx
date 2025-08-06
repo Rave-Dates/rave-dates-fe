@@ -14,7 +14,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 
 export default function Page() {
-  const { updateEventFormData } = useCreateEventStore();
+  const { updateEventFormData, eventFormData, setHasLoadedEvent } = useCreateEventStore();
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const decoded: { id: number } = (token && jwtDecode(token.toString())) || {id: 0};
@@ -25,7 +25,12 @@ export default function Page() {
 
   useEffect(() => {
     updateEventFormData(defaultEventFormData);
+    setHasLoadedEvent(false);
   }, []);
+
+  useEffect(() => {
+    console.log("desde la lista",eventFormData)
+  }, [eventFormData]);
   
   const { data: events, isLoading, isError } = useQuery<IEvent[]>({
     queryKey: ["events"],

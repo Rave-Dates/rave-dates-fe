@@ -61,7 +61,10 @@ const TicketSelector = ({
 
   const handleClick = () => {
     if (selectedEvent?.type === "free") {
-      if (!clientToken) return
+      if (!clientToken) {
+        router.push("/personal-data");
+        return
+      }
       const decoded: {id: number, email: string, iat: number, exp: number} = jwtDecode(clientToken);
       
       purchaseFreeTicketMutation({

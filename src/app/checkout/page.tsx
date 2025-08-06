@@ -42,6 +42,10 @@ export default function Checkout() {
   const { clientData } = useClientGetById({clientId: decoded?.id, clientToken});
   const { selectedEvent } = useClientEvent(eventId);
 
+  if (selectedEvent?.type === "free") {
+    router.push("/tickets")
+  }
+
   const totalAmount = Object.entries(selected).reduce((acc, [ticketTypeIdStr, selectedData]) => {
     const ticketTypeId = Number(ticketTypeIdStr);
     const ticketInfo = eventTickets?.find(t => t.ticketTypeId === ticketTypeId);

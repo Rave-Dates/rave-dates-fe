@@ -55,7 +55,9 @@ export default function DataForm() {
   const receiveInfo = watch("receiveInfo", false);
 
   const handleRedirectClick = () => {
-    setRedirectToCheckout(true);
+    if (selectedEvent?.type !== "free") {
+      setRedirectToCheckout(true);
+    }
     toast.dismiss();
     router.push('/auth');
   }

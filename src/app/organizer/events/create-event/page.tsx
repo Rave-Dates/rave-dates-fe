@@ -102,7 +102,7 @@ export default function Page() {
     });
     
 
-    router.push("create-event/assign-promoters");
+    router.push("assign-promoters");
   }
 
   // creamos el evento 
@@ -164,19 +164,19 @@ export default function Page() {
     };
 
     console.log(cleanedEventData)
-    //  notifyPending(
-    //   new Promise((resolve, reject) => {
-    //     createFullEvent(cleanedEventData, {
-    //       onSuccess: resolve,
-    //       onError: reject,
-    //     });
-    //   }),
-    //   {
-    //     loading: "Creando evento...",
-    //     success: "Evento creado correctamente",
-    //     error: "Error al crear el evento",
-    //   }
-    // );
+     notifyPending(
+      new Promise((resolve, reject) => {
+        createFullEvent(cleanedEventData, {
+          onSuccess: resolve,
+          onError: reject,
+        });
+      }),
+      {
+        loading: "Creando evento...",
+        success: "Evento creado correctamente",
+        error: "Error al crear el evento",
+      }
+    );
   };
 
   return (
@@ -241,7 +241,7 @@ export default function Page() {
         <FormInput
           title="Cantidad*"
           inputName="quantity"
-          register={register("tickets.0.stages.0.quantity", { required: "La cantidad es obligatoria"  })}
+          register={register("tickets.0.stages.0.quantity", { required: "La cantidad es obligatoria", valueAsNumber: true })}
         />
        </div>
         <div className="flex gap-x-5">

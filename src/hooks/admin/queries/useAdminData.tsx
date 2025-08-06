@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { CookieValueTypes } from "cookies-next";
-import { getAllEvents, getEventById, getEventCategoriesById, getTicketTypesById } from "@/services/admin-events";
+import { getAllEvents, getEventById, getEventCategoriesById, getTicketMetrics, getTicketTypesById } from "@/services/admin-events";
 import { getAllBinnaclesFromOrganizer } from "@/services/admin-binnacles";
 import { getEventImages, getImageById } from "@/services/admin-events";
 import { getAllCategories } from "@/services/admin-categories";
@@ -90,12 +90,22 @@ export function useAdminLabelsTypes({ token }: { token: CookieValueTypes }) {
 
 export function useAdminTicketTypes({ token, eventId }: { token: CookieValueTypes, eventId: number }) {
   const { data: ticketTypes } = useQuery<IEventTicket[]>({
-    queryKey: ["ticketTypes"],
+    queryKey: ["ticketTypes", eventId],
     queryFn: () => getTicketTypesById(token, eventId),
-    enabled: !!token,
+    enabled: !!token && !!eventId,
   });
 
   return { ticketTypes };
+}
+
+export function useAdminTicketMetrics({ token, eventId }: { token: CookieValueTypes, eventId: number }) {
+  const { data: ticketMetrics } = useQuery<IEventTicketMetrics>({
+    queryKey: ["ticketMetrics", eventId],
+    queryFn: () => getTicketMetrics(token, eventId),
+    enabled: !!token && !!eventId,
+  });
+
+  return { ticketMetrics };
 }
 
 export function useAdminEventImages({

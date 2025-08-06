@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createImage, editEvent, editEventCategories, editTicketTypes } from "../../../services/admin-events";
+import { assignPromoterToEvent, createImage, editEvent, editEventCategories, editTicketTypes } from "../../../services/admin-events";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
@@ -10,10 +10,23 @@ export function useEditEvent(reset: (data: IEventFormData) => void) {
   const token = getCookie("token");
 
   return useMutation({
-    mutationFn: async (formData: IEventFormData) => {
-      const { categoriesToUpdate, tickets, images, eventId, ...eventData } = formData;
+    mutationFn: async ({formData, isOrganizer = false}: { formData: IEventFormData, isOrganizer?: boolean }) => {
+      const { categoriesToUpdate, tickets, images, formPromoters, eventId, ...eventData } = formData;
 
       if (!eventId) return
+
+      if (isOrganizer) {
+        const formattedData = {
+          promoters: 
+            formPromoters?.map((promoter) => ({
+              promoterId: promoter.promoterId || 0,
+            })) || []
+          ,
+        };
+        
+        console.log("formattedData", formattedData)
+        await assignPromoterToEvent(token, formattedData, eventId);
+      }
 
       // 1. Editar el evento
       const validLabels = eventData.labels?.map((label) => (label.labelId));

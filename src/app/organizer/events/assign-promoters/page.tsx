@@ -26,8 +26,6 @@ export default function UserManagement() {
   }
 
   const handlePromoterAdd = async (promoterId: number | undefined) => {
-    console.log("promoterId", promoterId)
-
     if (!promoterId) return;
 
     const isIn = promoterAlreadyIn(promoterId)  
@@ -43,6 +41,18 @@ export default function UserManagement() {
         {
           promoterId: promoterId,
         },
+      ],
+    });
+  }
+
+  const handlePromoterDelete = async (promoterId: number | undefined) => {
+    if (!promoterId) return;
+
+    const newPromoters = eventFormData.formPromoters?.filter((promoter) => promoter.promoterId !== promoterId) || [];
+
+    updateEventFormData({
+      formPromoters: [
+        ...newPromoters,
       ],
     });
   }
@@ -75,13 +85,13 @@ export default function UserManagement() {
               <div className="flex justify-end gap-x-2">
                 {
                   !isIn ?
-                  <button onClick={() => handlePromoterAdd(user.promoter?.promoterId)} className="w-40 font-medium bg-primary rounded-lg text-primary-black py-2">
+                  <button onClick={() => handlePromoterAdd(user.promoter?.promoterId)} className="w-40 font-medium border border-primary bg-primary rounded-lg text-primary-black py-2">
                     Asignar al evento
                   </button>
                   :
-                  <div className="w-40 font-medium border border-primary/70 text-center text-primary rounded-lg bg-primary-black py-2">
+                  <button onClick={() => handlePromoterDelete(user.promoter?.promoterId)} className="w-40 font-medium border border-primary/70 text-center text-primary rounded-lg bg-primary-black py-2">
                     Asignado
-                  </div>
+                  </button>
                 }
               </div>
             </div>

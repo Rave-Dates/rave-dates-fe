@@ -13,7 +13,7 @@ import { getTicketFromClientById, getTicketsFromClient } from "@/services/client
 import { useEventStore } from "@/store/useEventStore";
 
 export function useClientEvent(eventId?: number) {
-  const { data: selectedEvent, isLoading: isEventLoading } = useQuery({
+  const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
     queryKey: [`selectedEvent-${eventId}`],
     queryFn: () => getClientEventById(eventId!),
     enabled: !!eventId,
