@@ -36,6 +36,7 @@ interface IEvent {
   }[];
   promoters?: {
     promoterId?: number;
+    user: IUser;
     userId: number;
     organizerId: null;
     fee: number;

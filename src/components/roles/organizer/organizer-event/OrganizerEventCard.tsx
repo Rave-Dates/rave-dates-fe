@@ -1,6 +1,7 @@
 "use client"
 
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
+import { useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData";
 import { useEventImage } from "@/hooks/admin/queries/useEventImage";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { extractPlaceFromGeo } from "@/utils/formatGeo";
@@ -8,11 +9,18 @@ import { useReactiveCookiesNext } from "cookies-next";
 import Image from "next/image";
 import Link from "next/link"
 
-export function OrganizerEventCard({event, href = "organizer/event"}: { event: IOrganizerEvent | IPromoterEvent, href?: string }) {
+type Props = {
+  event: IOrganizerEvent | IPromoterEvent, 
+  href?: string
+  totalSold?: number;
+}
+
+export function OrganizerEventCard({event, href = "organizer/event", totalSold}: Props) {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const { eventId, title, subtitle, date, geo } = event;
   const { servedImageUrl, isImageLoading } = useEventImage({ eventId, token: token?.toString() });
+  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId: event.eventId! });
 
   return (
     <Link href={`${href}/${eventId}`} className="bg-cards-container rounded-lg p-4 flex items-center gap-3">
@@ -43,7 +51,7 @@ export function OrganizerEventCard({event, href = "organizer/event"}: { event: I
         </p>
         <p className="text-xs">
           {/* {amountSold} vendidos - {price} */}
-          230 vendidos - COP 250.000
+          {ticketMetrics?.ticketsPurchased} vendidos - {event.type === "free" ? "Gratis" : `COP ${totalSold?.toLocaleString() ?? 0}`}
         </p>
       </div>
     </Link>

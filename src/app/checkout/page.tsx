@@ -26,7 +26,7 @@ export default function Checkout() {
   const [check, setCheck] = useState(false);
   const router = useRouter();
   
-  const { register, watch, setValue } = useForm<{ partialAmount: number }>({
+  const { register, watch } = useForm<{ partialAmount: number }>({
     defaultValues: { partialAmount: 0 }
   });
 
@@ -35,11 +35,13 @@ export default function Checkout() {
   const { getCookie } = useReactiveCookiesNext();
   const clientToken = getCookie("clientToken");
   const tempToken = getCookie("tempToken");
+  const token = getCookie("token");
 
   const decoded: {id: number} | null = clientToken && jwtDecode(clientToken?.toString()) || null;
   const decodedTemp: {id: number} | null = tempToken && jwtDecode(tempToken?.toString()) || null;
+  const decodedAdminToken: {id: number, role: string, promoterId: number} | null = token && jwtDecode(token?.toString()) || null;
 
-  const { clientData } = useClientGetById({clientId: decoded?.id, clientToken});
+  const { clientData } = useClientGetById({clientId: decoded?.id, clientToken: clientToken});
   const { selectedEvent } = useClientEvent(eventId);
 
   if (selectedEvent?.type === "free") {
@@ -80,6 +82,7 @@ export default function Checkout() {
         quantity: selected[ticketTypeId].quantity,
         ticketTypeId: Number(ticketTypeId),
       })),
+      promoterId: decodedAdminToken?.role === "PROMOTER" && decodedAdminToken.promoterId || 0,
       isPartial: selectedPayment === "Abonar a la alcancía",
       amount: selectedPayment === "Abonar a la alcancía" ? watchedPartialAmount : 0,
       clientId: (decoded && decoded.id ) || (decodedTemp && decodedTemp.id) || 0,

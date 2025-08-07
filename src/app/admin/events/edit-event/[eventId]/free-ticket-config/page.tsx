@@ -2,7 +2,7 @@
 
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import FormInput from "@/components/ui/inputs/FormInput";
-import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
+import { notifyPending } from "@/components/ui/toast-notifications";
 import { useEditEvent } from "@/hooks/admin/mutations/useEditEvent";
 import { useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";

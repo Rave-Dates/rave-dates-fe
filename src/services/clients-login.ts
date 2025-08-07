@@ -1,9 +1,8 @@
-import { ClientForm } from "@/app/personal-data/page";
 import { BASE_URL } from "@/utils/envHelper";
 import axios from "axios";
 import { CookieValueTypes } from "cookies-next";
 
-export const createClient = async (data: ClientForm) => {
+export const createClient = async (data: IClient) => {
   const res = await axios.post(`${BASE_URL}/app/clients`, data, {
     headers: {
       "Accept": "application/json",
@@ -40,7 +39,7 @@ export const getClientById = async ({id, token}: {id: number, token: CookieValue
   return res.data;
 };
 
-export const editClient = async ({id, formData, token}: {id: number, formData: Partial<ClientForm>, token: CookieValueTypes}) => {
+export const editClient = async ({id, formData, token}: {id: number, formData: Partial<IClient>, token: CookieValueTypes}) => {
   const res = await axios.put(`${BASE_URL}/app/clients/${id}`, formData, {
     headers: {
       "Accept": "application/json",

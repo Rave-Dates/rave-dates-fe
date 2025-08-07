@@ -13,8 +13,6 @@ type Props = {
 export default function PaymentMethodSelector({ clientData, selected, setSelected, check, setCheck }: Props) {
   const methods: ["Nequi", "Bold"] = ["Nequi", "Bold"];
 
-  if (!clientData) return null;
-
   return (
     <div className="bg-cards-container rounded-lg p-4">
       <div className="flex flex-col items-start pb-4 border-b border-inactive">
@@ -60,44 +58,62 @@ export default function PaymentMethodSelector({ clientData, selected, setSelecte
         </label>
       ))}
 
-      <div className="flex items-center pt-3 pb-1 select-none">
-        <input 
-          disabled={clientData?.balance <= 0}
-          type="checkbox" 
-          id="receiveInfo" 
-          checked={check} 
-          onChange={() => setCheck(!check)} 
-          className="hidden" 
-        />
-        <div
-          onClick={() => setCheck(!check)}
-          className={`w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors cursor-pointer border
-            ${check ? "bg-primary text-primary-black border-primary" : "border-inactive text-transparent"}
-            ${clientData?.balance <= 0 && "pointer-events-none"}
-          `}
-        >
-          <CheckSvg />
-        </div>
-        <label htmlFor="receiveInfo" className={`w-full flex items-center justify-between px-4 select-none cursor-pointer ${clientData?.balance <= 0 && "pointer-events-none text-primary-white/50"}`}>
-          <div className="flex font-light flex-col items-start justify-center">
-            Usar crédito disponible
-            {
-              clientData?.balance && clientData.balance < 0 ?
-              <div className="flex text-sm text-primary-white/40 font-light items-end justify-center">
-                Tienes saldo pendiente. Balance: ${clientData?.balance.toLocaleString()}
+      {
+        clientData ?
+          <div className="flex items-center pt-3 pb-1 select-none">
+            <input 
+              disabled={clientData?.balance <= 0}
+              type="checkbox" 
+              id="receiveInfo" 
+              checked={check} 
+              onChange={() => setCheck(!check)} 
+              className="hidden" 
+            />
+            <div
+              onClick={() => setCheck(!check)}
+              className={`w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors cursor-pointer border
+                ${check ? "bg-primary text-primary-black border-primary" : "border-inactive text-transparent"}
+                ${clientData?.balance <= 0 && "pointer-events-none"}
+              `}
+            >
+              <CheckSvg />
+            </div>
+            <label htmlFor="receiveInfo" className={`w-full flex items-center justify-between px-4 select-none cursor-pointer ${clientData?.balance <= 0 && "pointer-events-none text-primary-white/50"}`}>
+              <div className="flex font-light flex-col items-start justify-center">
+                Usar crédito disponible
+                {
+                  clientData.balance < 0 ?
+                  <div className="flex text-sm text-primary-white/40 font-light items-end justify-center">
+                    Tienes saldo pendiente. Balance: ${clientData?.balance.toLocaleString()}
+                  </div>
+                  : clientData?.balance === 0 ?
+                  <div className="flex text-sm text-primary-white/40 font-light flex-col items-start justify-center">
+                    No tienes crédito disponible
+                  </div>
+                  : 
+                  <h3 className="text-sm text-primary-white/45">
+                    Dinero disponible: ${clientData?.balance.toLocaleString()}
+                  </h3>
+                }
               </div>
-              : clientData?.balance === 0 ?
-              <div className="flex text-sm text-primary-white/40 font-light flex-col items-start justify-center">
-                No tienes crédito disponible
-              </div>
-              : 
-              <h3 className="text-sm text-primary-white/45">
-                Dinero disponible: ${clientData?.balance.toLocaleString()}
-              </h3>
-            }
+            </label>
           </div>
-        </label>
-      </div>
+          :
+          <div className="flex items-center pt-3 pb-1 select-none">
+            <div
+              className="w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors cursor-pointer border border-inactive pointer-events-none"
+            >
+            </div>
+            <label htmlFor="receiveInfo" className="w-full flex items-center justify-between px-4 select-none cursor-pointer text-primary-white/60">
+              <div className="flex font-light flex-col items-start justify-center">
+                Usar crédito disponible
+                <h3 className="text-sm text-primary-white/45">
+                  Verifica tu cuenta para desbloquear esta opción
+                </h3>
+              </div>
+            </label>
+          </div>      
+        }
     </div>
   );
 }

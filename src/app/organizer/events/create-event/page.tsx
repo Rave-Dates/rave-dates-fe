@@ -7,7 +7,6 @@ import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyPending } from "@/components/ui/toast-notifications";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
-import { useCreateFullEvent } from "@/hooks/admin/mutations/useCreateEventFull";
 import { useCreateOrganizerFreeEvent } from "@/hooks/admin/mutations/useCreateOrganizerFreeEvent";
 import { useAdminAllCategories, useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";

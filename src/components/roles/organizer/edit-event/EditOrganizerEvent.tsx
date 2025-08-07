@@ -5,7 +5,7 @@ import LabelTagButton from "@/components/ui/buttons/LabelTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
-import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
+import { notifyPending } from "@/components/ui/toast-notifications";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { combineDateAndTimeToISO, formatColombiaTimeToUTC, formatDate, formatDateToColombiaTime, parseISODate, validateDateYyyyMmDd } from "@/utils/formatDate";

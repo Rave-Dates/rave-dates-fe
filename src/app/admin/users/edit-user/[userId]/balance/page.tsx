@@ -1,7 +1,7 @@
 "use client";
 
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
-import { useAdminAllEvents, useAdminAllPayments, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
+import { useAdminAllEvents, useAdminPayments, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
@@ -17,7 +17,7 @@ export default function Balance() {
   const token = getCookie("token");
 
   const { allEvents } = useAdminAllEvents({ token });
-  const { payments } = useAdminAllPayments({ token });
+  const { payments } = useAdminPayments({ token });
   const { data: user } = useAdminUserById({ token, userId });
 
 

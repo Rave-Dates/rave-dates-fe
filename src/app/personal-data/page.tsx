@@ -120,11 +120,15 @@ export default function DataForm() {
   });
   
   const onSubmit = (data: ClientForm) => {
+    if  (!data.name || !data.email || !data.idCard || !data.whatsapp) return;
+
     mutate({
       name: data.name,
       email: data.email,
       idCard: data.idCard,
       whatsapp: data.whatsapp,
+      balance: 0,
+      firstLogin: true,
     });
   };
 

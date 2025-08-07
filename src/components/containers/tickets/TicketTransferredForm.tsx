@@ -17,7 +17,7 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
 import { useEffect } from "react";
-import { useClientEvent, useClientEventServedOneImage, useClientPurchasedOneTicket, useClientTransferred } from "@/hooks/client/queries/useClientData";
+import { useClientEvent, useClientEventServedOneImage, useClientGetById, useClientPurchasedOneTicket } from "@/hooks/client/queries/useClientData";
 
 const TicketTransferredForm = ({
   purchaseTicketId,
@@ -33,7 +33,7 @@ const TicketTransferredForm = ({
   const eventId = Number(params.eventId);
 
   const { purchasedTicket } = useClientPurchasedOneTicket({pruchaseTicketId: purchaseTicketId, clientToken});
-  const { clientData } = useClientTransferred({transferredClientId: purchasedTicket?.transferredClientId, clientToken}); 
+  const { clientData } = useClientGetById({clientId: purchasedTicket?.transferredClientId, clientToken}); 
   const { selectedEvent, isEventLoading } = useClientEvent(eventId);
   const { servedImageUrl, isImageLoading } = useClientEventServedOneImage(eventId);
 

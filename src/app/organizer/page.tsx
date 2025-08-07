@@ -29,7 +29,7 @@ export default function OrganizerHome() {
   }
 
   return (
-    <div className="bg-primary-black pt-14 text-primary-white min-h-screen p-4">
+    <div className="bg-primary-black pt-14 text-primary-white min-h-screen pb-40 p-4">
       <div className="max-w-md mx-auto space-y-4">
         {/* Available Balance Header */}
         <div className="space-y-1">
@@ -40,20 +40,21 @@ export default function OrganizerHome() {
         {/* Event Cards */}
         <div className="space-y-3">
           {
-            !user?.organizer?.events &&
+            !user?.organizer?.events && !isUserLoading &&
             <div className="w-full text-text-inactive h-23 rounded-xl gap-x-1 p-4 flex items-center justify-center">
               No tienes eventos asignados
             </div>
           }
           {!isUserLoading && user?.organizer?.events && user.organizer.events.map((event) => (
             <OrganizerEventCard
-              href="promoter/event"
+              href="organizer/event"
               key={event.eventId}
               event={event}
+              totalSold={Number(organizerBinnacles?.find(b => b.eventId === event.eventId)?.total)}
             />
           ))}
           {
-            isUserLoading || !user &&
+            isUserLoading &&
             <div className="w-full bg-cards-container h-23 rounded-xl gap-x-1 p-4 flex items-center justify-start">
               <div className="w-14 h-14 animate-pulse bg-inactive rounded-full"></div>
               <div className="flex flex-col gap-y-2 items-start justify-center">

@@ -126,7 +126,9 @@ const NavbarMobile: React.FC = () => {
                 ? ["/auth", "/my-data"].some((p) => pathname.startsWith(p))
                 : item.href === "/organizer" 
                   ? pathname === "/organizer" || /^\/organizer\/event\/\d+/.test(pathname) 
-                  : pathname.startsWith(item.href)
+                  : item.href === "/promoter" 
+                    ? pathname === "/promoter" || /^\/promoter\/event\/\d+/.test(pathname) 
+                    : pathname.startsWith(item.href)
           );
 
 

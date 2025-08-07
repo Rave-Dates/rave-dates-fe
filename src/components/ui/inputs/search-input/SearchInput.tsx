@@ -1,20 +1,35 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import SearchSvg from "../../../svg/SearchSvg";
 import SearchResultItem from "./SearchInputItem";
+import SearchGuestItem from "./SearchGuestItem";
+
+type BaseProps = {
+  handleFunc?: (item: ChangeEvent<HTMLInputElement>) => void;
+  value?: string;
+  placeholder: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+};
+
+type GuestProps = BaseProps & {
+  isGuest: true;
+  results: IGuest[];
+};
+
+type EventProps = BaseProps & {
+  isGuest?: false;
+  results: IEvent[];
+};
+
+type Props = GuestProps | EventProps;
 
 const SearchInput = ({
   handleFunc,
   value,
   placeholder,
-  results = [],
+  results,
+  isGuest,
   setSearchTerm,
-}: {
-  handleFunc?: (item: ChangeEvent<HTMLInputElement>) => void;
-  value?: string;
-  placeholder: string;
-  results?: IEvent[];
-  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-}) => {
+}: Props) => {
   const [isFocused, setIsFocused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -52,9 +67,23 @@ const SearchInput = ({
 
       {isFocused && results.length > 0 && (
         <ul className="absolute z-10 space-y-1 mt-2 w-full bg-main-container border border-divider rounded-xl shadow-lg max-h-64 overflow-y-auto">
-          {results.map((event) => (
-            <SearchResultItem key={event.eventId} event={event} onClick={handleSearchClick} />
-          ))}
+          {!isGuest &&
+            results.map((event) => (
+              <SearchResultItem
+                key={event.eventId}
+                event={event}
+                onClick={handleSearchClick}
+              />
+            ))}
+
+          {isGuest &&
+            results.map((guest) => (
+              <SearchGuestItem
+                key={guest.clientId}
+                guest={guest}
+                onClick={handleSearchClick}
+              />
+            ))}
         </ul>
       )}
     </div>

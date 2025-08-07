@@ -51,6 +51,22 @@ interface IClient {
   firstLogin: boolean;
 }
 
+interface IGuest extends IClient {
+  purchaseTickets: Partial<IPurchaseTicket[]>;
+  clientId: number;
+}
+
+interface ICreateGuest {
+  ticketTypeId: number;
+  quantity: number;
+  clientId: number;
+}
+
+interface IFormGuest extends IClient {
+  ticketTypeId: number;
+  quantity: number;
+}
+
 interface IOrganizerEvent extends Partial<IEvent> {
   OrganizerEvent: {
     organizerId: number;

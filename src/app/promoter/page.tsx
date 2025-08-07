@@ -1,7 +1,7 @@
 "use client"
 
 import { OrganizerEventCard } from "@/components/roles/organizer/organizer-event/OrganizerEventCard"
-import { useAdminUserById } from "@/hooks/admin/queries/useAdminData"
+import { useAdminPromoterBinnacles, useAdminUserById } from "@/hooks/admin/queries/useAdminData"
 import { useReactiveCookiesNext } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
 
@@ -13,46 +13,45 @@ export default function OrganizerHome() {
   
   const { data: user, isPending: isUserLoading } = useAdminUserById({ token, userId: decoded.id }); 
   
-  // const organizerId = user?.promoter?.promoterId;
+  const organizerId = user?.organizer?.organizerId;
 
-  // const { organizerBinnacles } = useAdminBinnacles({ organizerId: organizerId ?? 0, token: token?.toString() });
+  const { promoterBinnacles } = useAdminPromoterBinnacles({ promoterId: organizerId ?? 0, token: token?.toString() });
 
-  // const getTotalAvalible = () => {
-  //   let total = 0;
-  //   if (organizerBinnacles) {
-  //     organizerBinnacles.forEach((binnacle) => {
-  //       total += Number(binnacle.total);
-  //     });
-  //   }
-  //   return total.toLocaleString('es-CO');
-  // }
-
+  const getTotalAvalible = () => {
+    let total = 0;
+    if (promoterBinnacles) {
+      promoterBinnacles.forEach((binnacle) => {
+        total += Number(binnacle.total);
+      });
+    }
+    return total.toLocaleString('es-CO');
+  }
   return (
     <div className="bg-primary-black pt-14 text-primary-white min-h-screen p-4">
       <div className="max-w-md mx-auto space-y-4">
         {/* Available Balance Header */}
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold ">Disponible</h1>
-          {/* <p className="text-primary text-2xl">COP ${getTotalAvalible()}</p> */}
-          <p className="text-primary text-2xl">COP $500</p>
+          <p className="text-primary text-2xl">COP ${getTotalAvalible()}</p>
         </div>
 
         {/* Event Cards */}
         <div className="space-y-3">
           {
-            !user?.promoter?.events &&
+            !user?.promoter?.events && !isUserLoading &&
             <div className="w-full text-text-inactive h-23 rounded-xl gap-x-1 p-4 flex items-center justify-center">
               No tienes eventos asignados
             </div>
           }
           {!isUserLoading && user?.promoter?.events && user.promoter.events.map((event) => (
             <OrganizerEventCard
+              href="promoter/event"
               key={event.eventId}
               event={event}
             />
           ))}
           {
-            isUserLoading || !user &&
+            isUserLoading &&
             <div className="w-full bg-cards-container h-23 rounded-xl gap-x-1 p-4 flex items-center justify-start">
               <div className="w-14 h-14 animate-pulse bg-inactive rounded-full"></div>
               <div className="flex flex-col gap-y-2 items-start justify-center">

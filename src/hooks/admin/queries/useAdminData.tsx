@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { CookieValueTypes } from "cookies-next";
 import { getAllEvents, getEventById, getEventCategoriesById, getTicketMetrics, getTicketTypesById } from "@/services/admin-events";
-import { getAllBinnaclesFromOrganizer } from "@/services/admin-binnacles";
+import { getAllBinnaclesFromOrganizer, getAllBinnaclesFromPromoter } from "@/services/admin-binnacles";
 import { getEventImages, getImageById } from "@/services/admin-events";
 import { getAllCategories } from "@/services/admin-categories";
 import { getAllLabels } from "@/services/admin-labels";
-import { getAllPromoters, getAllUsers, getUserById } from "@/services/admin-users";
+import { getAllPromoters, getAllUsers, getGuests, getUserById } from "@/services/admin-users";
 import { getAllRoles } from "@/services/admin-roles";
-import { servedMovementImage } from "@/services/admin-payments";
+import { getAllPayments, servedMovementImage } from "@/services/admin-payments";
 
 export function useAdminEvent({ eventId, token }: { eventId: number; token: CookieValueTypes }) {
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
@@ -32,6 +32,35 @@ export function useAdminAllEvents({ token }: { token: CookieValueTypes }) {
   return { allEvents, isEventLoading, isErrorEvent };
 }
 
+export function useAdminPayments({ token }: { token: CookieValueTypes }) {
+  const { data: payments } = useQuery<IPaymentData[]>({
+    queryKey: ["payments"],
+    queryFn: () => getAllPayments({ token }),
+    enabled: !!token,
+  });
+
+  return { payments };
+}
+
+export function useAdminPromoterBinnacles({
+  promoterId,
+  token,
+}: {
+  promoterId: number | undefined;
+  token: string | undefined;
+}) {
+  const { data: promoterBinnacles, isLoading: isBinnaclesLoading } = useQuery({
+    queryKey: [`promoterBinnacles-${promoterId}`],
+    queryFn: async () => {
+      if (!token || !promoterId) throw new Error("Token or promoterId missing");
+      const binnacles = await getAllBinnaclesFromPromoter({ token, promoterId });
+      return binnacles;
+    },
+    enabled: !!promoterId,
+  });
+
+  return { promoterBinnacles, isBinnaclesLoading };
+}
 export function useAdminBinnacles({
   organizerId,
   token,
@@ -96,16 +125,6 @@ export function useAdminTicketTypes({ token, eventId }: { token: CookieValueType
   });
 
   return { ticketTypes };
-}
-
-export function useAdminTicketMetrics({ token, eventId }: { token: CookieValueTypes, eventId: number }) {
-  const { data: ticketMetrics } = useQuery<IEventTicketMetrics>({
-    queryKey: ["ticketMetrics", eventId],
-    queryFn: () => getTicketMetrics(token, eventId),
-    enabled: !!token && !!eventId,
-  });
-
-  return { ticketMetrics };
 }
 
 export function useAdminEventImages({
@@ -208,4 +227,24 @@ export function useServeMovementImage({ token, url }: { token: CookieValueTypes,
   });
 
   return { movementImage, isErrorMovementImage, isLoadingMovementImage };
+}
+
+export function useAdminTicketMetrics({ token, eventId }: { token: CookieValueTypes, eventId: number }) {
+  const { data: ticketMetrics } = useQuery<IEventTicketMetrics>({
+    queryKey: ["ticketMetrics", eventId],
+    queryFn: () => getTicketMetrics(token, eventId),
+    enabled: !!token && !!eventId,
+  });
+
+  return { ticketMetrics };
+}
+
+export function useAdminGetGuests({ token, eventId }: { token: CookieValueTypes, eventId: number }) {
+  const { data: guests } = useQuery<IGuest[]>({
+    queryKey: ["guests", eventId],
+    queryFn: () => getGuests({ token, eventId }),
+    enabled: !!token && !!eventId,
+  });
+
+  return { guests };
 }
