@@ -5,12 +5,14 @@ import DefaultButton from "@/components/ui/buttons/DefaultButton";
 import EditSvg from "@/components/svg/EditSvg";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useAdminAllPromoters } from "@/hooks/admin/queries/useAdminData";
+import { jwtDecode } from "jwt-decode";
 
 export default function UserManagement() {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
+  const decoded: IUserLogin = token && jwtDecode(token.toString()) || {id: 0, organizerId: 0, email: "", exp: 0, iat: 0, role: ""};
 
-  const { promoters, isError, isLoading } = useAdminAllPromoters({ token: token });
+  const { promoters, isError, isLoading } = useAdminAllPromoters({ token: token, organizerId: decoded?.organizerId });
 
   return (
     <UsersList

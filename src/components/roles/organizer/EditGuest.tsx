@@ -63,7 +63,7 @@ export default function EditGuest({ clientId }: {clientId: number}) {
   };
 
   return (
-    <div className="bg-primary-black flex justify-between flex-col text-primary-white min-h-screen px-5 pb-40">
+    <div className="bg-primary-black flex justify-between flex-col text-primary-white min-h-screen pb-40">
       <DefaultForm className="px-6" handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Editar invitado">
         <FormInput
           title="Nombre completo*"

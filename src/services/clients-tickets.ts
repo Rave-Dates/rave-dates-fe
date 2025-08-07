@@ -90,3 +90,15 @@ export const changeTicketPurchase = async ({ticketData, clientToken}: { ticketDa
 };
 
 
+export const partialPurchase = async ({ticketData, clientToken, purchaseId}: { ticketData: { method: string, boldMethod: string, returnUrl: string }, clientToken: CookieValueTypes, purchaseId: number }) => {
+  const { data } = await axios.post(`${BASE_URL}/app/tickets/partial/${purchaseId}`, ticketData, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${clientToken}`,
+    },
+  });
+  return data;
+};
+
+
+

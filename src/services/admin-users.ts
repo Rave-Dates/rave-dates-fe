@@ -19,8 +19,8 @@ export const getAllUsers = async ({token}: { token: CookieValueTypes }) => {
   return data;
 };
 
-export const getAllPromoters = async ({token}: { token: CookieValueTypes }) => {
-  const res = await axios.get(`${BASE_URL}/admin/users/promoters`, {
+export const getAllPromoters = async ({token, organizerId}: { token: CookieValueTypes, organizerId: number }) => {
+  const res = await axios.get(`${BASE_URL}/admin/users/promoters?organizerId=${organizerId}`, {
     headers: {
       "Accept": "application/json",
       "Authorization": `Bearer ${token}`,

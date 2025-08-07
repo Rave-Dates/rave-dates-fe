@@ -189,11 +189,11 @@ export function useAdminAllUsers({ token }: { token: CookieValueTypes }) {
   return { data, isLoading, isError };
 }
 
-export function useAdminAllPromoters({ token }: { token: CookieValueTypes }) {
+export function useAdminAllPromoters({ token, organizerId }: { token: CookieValueTypes, organizerId?: number | null }) {
   const { data: promoters, isLoading, isError } = useQuery({
     queryKey: ["promoters"],
-    queryFn: () => getAllPromoters({ token }),
-    enabled: !!token,
+    queryFn: () => getAllPromoters({ token, organizerId: organizerId! }),
+    enabled: !!token && !!organizerId,
   });
 
   return { promoters, isLoading, isError };

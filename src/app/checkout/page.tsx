@@ -82,7 +82,7 @@ export default function Checkout() {
         quantity: selected[ticketTypeId].quantity,
         ticketTypeId: Number(ticketTypeId),
       })),
-      promoterId: decodedAdminToken?.role === "PROMOTER" && decodedAdminToken.promoterId || 0,
+      promoterId: decodedAdminToken?.role === "PROMOTER" && decodedAdminToken.promoterId || undefined,
       isPartial: selectedPayment === "Abonar a la alcancía",
       amount: selectedPayment === "Abonar a la alcancía" ? watchedPartialAmount : 0,
       clientId: (decoded && decoded.id ) || (decodedTemp && decodedTemp.id) || 0,

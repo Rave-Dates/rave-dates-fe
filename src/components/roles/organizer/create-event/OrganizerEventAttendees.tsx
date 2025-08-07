@@ -10,6 +10,7 @@ import SearchInput from "@/components/ui/inputs/search-input/SearchInput"
 import { useAdminEvent, useAdminGetGuests, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData"
 import { useReactiveCookiesNext } from "cookies-next"
 import Link from "next/link"
+import { exportGuestsToExcel } from "@/utils/exportExcel"
 
 export default function OrganizerEventAttendees({eventId, isPromoter = false}: {eventId: number, isPromoter?: boolean}) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -126,7 +127,18 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
         </div>
 
         {/* Bottom Actions */}
-        <button className="w-full bg-primary text-primary-black font-medium py-4 rounded-lg">Descargar lista</button>
+        <button
+          onClick={() => {
+            if (guests && guests.length > 0) {
+              exportGuestsToExcel(guests);
+            } else {
+              alert("No hay invitados para exportar.");
+            }
+          }}
+          className="w-full bg-primary text-primary-black font-medium py-4 rounded-lg"
+        >
+          Descargar lista
+        </button>      
       </div>
     </div>
   )

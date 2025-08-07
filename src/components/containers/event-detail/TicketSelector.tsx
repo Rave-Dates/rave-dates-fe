@@ -94,7 +94,7 @@ const TicketSelector = ({
       </h3>
       {isTicketList ? (
         <>
-          { eventInfo && <TicketsChanger eventInfo={eventInfo} ticketStatus={ticketStatus} />}
+          { eventInfo && <TicketsChanger eventInfo={eventInfo} />}
         </>
       ) : (
         <>

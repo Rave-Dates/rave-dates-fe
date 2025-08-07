@@ -7,7 +7,6 @@ import FormInput from '@/components/ui/inputs/FormInput';
 import { onInvalid } from '@/utils/onInvalidFunc';
 import { useMutation } from '@tanstack/react-query';
 import { editUserById } from '@/services/admin-users';
-import { jwtDecode } from 'jwt-decode';
 import { notifyError, notifySuccess } from '@/components/ui/toast-notifications';
 import { useAdminUserById } from '@/hooks/admin/queries/useAdminData';
 import { useReactiveCookiesNext } from 'cookies-next';
@@ -37,20 +36,12 @@ const EditPromoter = ({ userId } : { userId: number }) => {
   const { mutate } = useMutation({
     mutationFn: editUserById,
     onSuccess: () => {
-      const decoded: IUserLogin = jwtDecode(`${token}`);
-
-      if (decoded.role !== 'ORGANIZER') {
-        notifyError("No tienes permiso para editar un usuario.");
-        // setLoginError("No tienes permiso para acceder.");
-        return
-      }
-      notifySuccess('Usuario editado correctamente');
+      notifySuccess('Promotor editado correctamente');
       router.back();
     },
     onError: (error) => {
       console.log(error)
-      // setLoginError("Credenciales incorrectas.");
-      notifyError("Credenciales incorrectas.");
+      notifyError("Credenciales incorrectas o error al editar");
     },
   });
 
