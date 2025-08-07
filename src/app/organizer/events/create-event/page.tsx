@@ -1,20 +1,20 @@
 "use client";
 
 import EventImageSwiper from "@/components/roles/admin/events/EventImagesSwiper";
-import FilterTagButton from "@/components/ui/buttons/FilterTagButton";
+import FilterTagButton from "@/components/ui/buttons/LabelTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
+import { notifyPending } from "@/components/ui/toast-notifications";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
-import { getAllCategories } from "@/services/admin-categories";
-import { getAllLabels } from "@/services/admin-labels";
+import { useCreateOrganizerFreeEvent } from "@/hooks/admin/mutations/useCreateOrganizerFreeEvent";
+import { useAdminAllCategories, useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { validateDateYyyyMmDd } from "@/utils/formatDate";
+import { combineDateAndTimeToISO, formatColombiaTimeToUTC, validateDateYyyyMmDd } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
-import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
+import { jwtDecode } from "jwt-decode";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
@@ -23,16 +23,19 @@ import { useForm, useWatch } from "react-hook-form";
 
 const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/GeoAutocomplete"), { ssr: false });
 
-
 export default function Page() {
-  const { eventFormData, updateEventFormData, setHasLoadedEvent } = useCreateEventStore();
+  const { eventFormData, updateEventFormData } = useCreateEventStore();
+  
   const router = useRouter()
-  const { register, handleSubmit, watch, setValue, control } = useForm<IEventFormData>({
+  const { register, handleSubmit, setValue, control, reset } = useForm<IEventFormData>({
     defaultValues: defaultEventFormData
   });
+
+  const { mutate: createFullEvent } = useCreateOrganizerFreeEvent({reset, errorHref: "/organizer/events", successHref: "/organizer/events"});
   const { getCookie } = useReactiveCookiesNext();
 
   const token = getCookie("token");
+  const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
   
   register("labels", {
     validate: (value) =>
@@ -44,17 +47,8 @@ export default function Page() {
       value && value.length > 0 ? true : "Debes subir al menos una imagen",
   });
   
-  const { data: categories } = useQuery<IEventCategories[]>({
-    queryKey: ["roles"],
-    queryFn: () => getAllCategories({ token }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
-    
-  const { data: labelsTypes } = useQuery<IEventLabel[]>({
-    queryKey: ["labelsTypes"],
-    queryFn: () => getAllLabels({ token }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
+  const { categories } = useAdminAllCategories({ token });
+  const { labelsTypes } = useAdminLabelsTypes({ token });
 
   useEffect(() => {
     register("geo", {
@@ -84,6 +78,9 @@ export default function Page() {
       type: "free",
       labels: eventFormData.labels,
       images: eventFormData.images,
+      tickets: eventFormData.tickets,
+      categories: eventFormData.categories,
+      formPromoters: eventFormData.formPromoters,
     };
 
     Object.entries(setters).forEach(([key, value]) => {
@@ -97,35 +94,88 @@ export default function Page() {
   const watchedLabels = useWatch({ name: "labels", control });
   const watchedImages = useWatch({ name: "images", control });
 
+  const handleGoToPromoters = (data: IEventFormData) => {
+    updateEventFormData({
+      ...eventFormData,
+      ...data,
+    });
+    
+
+    router.push("assign-promoters");
+  }
+
   // creamos el evento 
   const onSubmit = (data: IEventFormData) => {
+    const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
+      console.log(ticketId, ticketTypeId)
+      if (rest.stages.length === 1) return { ...rest, maxDate: rest.stages[0].dateMax };
+      const lastStageMaxDate = rest.stages.at(-1)?.dateMax || "";
+      return {
+        ...rest,
+        maxDate: lastStageMaxDate,
+      }
+    });
+
     const parsedCategories = data.categories?.map((category: string) => JSON.parse(category))
     
-    const formattedData = {
-      ...data,
-      eventCategoryValues: parsedCategories?.map((category: IEventCategoryValue) => ({
+    const formattedCategoryValues = 
+      parsedCategories?.map((category: IEventCategoryValue) => ({
         ...category,
         valueId: category.valueId,
         categoryId: category.categoryId,
         value: category.value,
-      })),
-    }
+      }))
 
-    delete formattedData.categories;
+    const formattedGeo = `${data.geo};${data.place?.trim()}`;
 
-    console.log(formattedData)
     updateEventFormData({
       ...eventFormData,
-      ...formattedData,
-    })
+      ...data,
+      tickets: [validTickets[0]],
+    });
 
-    setHasLoadedEvent(true)
+    if (!data.date || !data.time) return
+    const validDate = combineDateAndTimeToISO(data.date, data.time)
 
-    router.push(
-      watch("type") === "free" ? 
-      "/admin/events/create-event/free-ticket-config" 
-      : "/admin/events/create-event/ticket-config"
-    )
+    const cleanedEventData = {
+      eventCategoryValues: formattedCategoryValues,
+      title: data.title,
+      subtitle: data.subtitle,
+      date: formatColombiaTimeToUTC(validDate),
+      geo: formattedGeo,
+      description: data.description,
+      type: data.type,
+      isActive: data.isActive,
+      feeRD: data.feeRD,
+      feePB: data.feePB,
+      transferCost: data.transferCost,
+      discountCode: data.discountCode,
+      discountType: data.discountType,
+      discount: data.discount,
+      piggyBank: data.piggyBank,
+      maxPurchase: data.maxPurchase,
+      images: data.images,
+      timeOut: data.timeOut,
+      labels: data.labels,
+      organizerId: decoded?.organizerId || 0,
+      tickets: [validTickets[0]],
+      formPromoters: data.formPromoters,
+    };
+
+    console.log(cleanedEventData)
+     notifyPending(
+      new Promise((resolve, reject) => {
+        createFullEvent(cleanedEventData, {
+          onSuccess: resolve,
+          onError: reject,
+        });
+      }),
+      {
+        loading: "Creando evento...",
+        success: "Evento creado correctamente",
+        error: "Error al crear el evento",
+      }
+    );
   };
 
   return (
@@ -190,9 +240,25 @@ export default function Page() {
         <FormInput
           title="Cantidad*"
           inputName="quantity"
-          register={register("tickets.0.stages.0.quantity", { required: "La cantidad es obligatoria"  })}
+          register={register("tickets.0.stages.0.quantity", { required: "La cantidad es obligatoria", valueAsNumber: true })}
         />
        </div>
+        <div className="flex gap-x-5">
+          <FormInput
+            className="!bg-cards-container"
+            title="Fecha inicio"
+            placeholder="yyyy-mm-dd"
+            inputName="date"
+            register={register("tickets.0.stages.0.date", { required: "La fecha es obligatoria", validate: validateDateYyyyMmDd })}
+          />
+          <FormInput
+            className="!bg-cards-container"
+            title="Fecha máx."
+            placeholder="yyyy-mm-dd"
+            inputName="dateMax"
+            register={register(`tickets.0.stages.0.dateMax`, { required: "La fecha máx. es obligatoria", validate: validateDateYyyyMmDd })}
+          />
+        </div>
 
 
        { 
@@ -229,12 +295,13 @@ export default function Page() {
         />
       )}
 
-      <Link
-        href="create-event/assign-promoters"
-        className="border border-primary block text-center text-primary mt-10 input-button"
+      <button
+        type="button"
+        onClick={handleSubmit(handleGoToPromoters, onInvalid)}
+        className="border border-primary text-primary mt-10 input-button"
       >
         Promotores
-      </Link>
+      </button>
       <button
         type="submit"
         className="bg-primary block text-center text-black input-button"

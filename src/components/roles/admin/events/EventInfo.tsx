@@ -4,23 +4,17 @@ import { DropdownItem } from "@/components/roles/admin/events/DropDownItem"
 import { StageItem } from "@/components/roles/admin/events/StageItem"
 import UserSvg from "@/components/svg/UserSvg"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
-import { getTicketTypesById } from "@/services/admin-events"
-import { useQuery } from "@tanstack/react-query"
+import { useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData"
 import { useReactiveCookiesNext } from "cookies-next"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
 export default function EventInfo({ eventId }: { eventId: number }) {
-  const [expandedSections, setExpandedSections] = useState<string[]>([])
-
   const { getCookie } = useReactiveCookiesNext();
+  const [expandedSections, setExpandedSections] = useState<string[]>([])
   const token = getCookie("token");
 
-  const { data: ticketTypes } = useQuery<IEventTicket[]>({
-    queryKey: ["ticketTypes"],
-    queryFn: () => getTicketTypesById(token, eventId),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
+  const { ticketTypes } = useAdminTicketTypes({ token, eventId });
 
   useEffect(() => {
     if (ticketTypes && ticketTypes.length > 0) {

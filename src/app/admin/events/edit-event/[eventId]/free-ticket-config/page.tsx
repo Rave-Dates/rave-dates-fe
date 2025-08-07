@@ -2,12 +2,12 @@
 
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import FormInput from "@/components/ui/inputs/FormInput";
-import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
-import { useEditEvent } from "@/hooks/useEditEvent";
-import { getTicketTypesById } from "@/services/admin-events";
+import { notifyPending } from "@/components/ui/toast-notifications";
+import { useEditEvent } from "@/hooks/admin/mutations/useEditEvent";
+import { useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { combineDateAndTimeToISO, formatColombiaTimeToUTC, formatDate } from "@/utils/formatDate";
-import { useQuery } from "@tanstack/react-query";
+import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -25,16 +25,11 @@ export default function FreeTicketConfiguration() {
   const eventId = Number(params.eventId)
   const router = useRouter()
 
-  // 🟢 Traemos tickets del evento
-  const { data: ticketsData } = useQuery<IEventTicket[]>({
-    queryKey: ["eventTickets", eventId],
-    queryFn: () => getTicketTypesById(token, eventId),
-    enabled: !!token && !!eventId,
-  })
+  const { ticketTypes } = useAdminTicketTypes({ token, eventId });
   
   useEffect(() => {
-    if (ticketsData && !hasLoadedTickets) {
-      const formattedTickets = ticketsData.map((ticket) => ({
+    if (ticketTypes && !hasLoadedTickets) {
+      const formattedTickets = ticketTypes.map((ticket) => ({
         ...ticket,
         maxDate: formatDate(ticket.maxDate),
         stages: ticket.stages.map((stage) => ({
@@ -53,7 +48,7 @@ export default function FreeTicketConfiguration() {
       updateEventFormData(updatedData);
       setHasLoadedTickets(true);
     }
-  }, [ticketsData, eventFormData]);
+  }, [ticketTypes, eventFormData]);
 
   const onSubmit = (data: IEventFormData) => {
     const formattedTickets = data.tickets.map((ticket) => ({
@@ -107,7 +102,7 @@ export default function FreeTicketConfiguration() {
 
     notifyPending(
       new Promise((resolve, reject) => {
-        editEvent(cleanedEventData, {
+        editEvent({formData: cleanedEventData}, {
           onSuccess: () => {
             resolve("");
             router.push("/admin/events");
@@ -126,10 +121,6 @@ export default function FreeTicketConfiguration() {
       }
     );
   };
-
-  const onInvalid = () => {
-    notifyError("Por favor completá todos los campos.")
-  }
 
   return (
     <div className="bg-primary-black text-primary-white min-h-screen px-6 pt-28 pb-44">

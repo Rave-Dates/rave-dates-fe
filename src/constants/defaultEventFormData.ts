@@ -32,4 +32,6 @@ export const defaultEventFormData: IEventFormData = {
   commission: 0,
   isActive: false,
   labels: [],
+  formPromoters: [],
+  promoters: [],
 };

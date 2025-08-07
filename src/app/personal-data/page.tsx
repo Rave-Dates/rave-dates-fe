@@ -4,13 +4,13 @@ import DefaultForm from "@/components/ui/forms/DefaultForm";
 import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
-import { getClientEventById } from "@/services/clients-events";
+import { useClientEvent } from "@/hooks/client/queries/useClientData";
 import { createClient } from "@/services/clients-login";
 import { purchaseFreeTicket } from "@/services/clients-tickets";
 import { useClientAuthStore } from "@/store/useClientAuthStore";
 import { useTicketStore } from "@/store/useTicketStore";
 import { onInvalid } from "@/utils/onInvalidFunc";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
@@ -19,14 +19,9 @@ import type React from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
-export type ClientForm = {
-  name: string;
-  idCard: string;
-  email: string;
-  whatsapp: string;
+interface ClientForm extends Partial<IClient> {
   receiveInfo?: boolean;
-};
+}
 
 export default function DataForm() {
   const { setCookie, getCookie } = useReactiveCookiesNext();
@@ -36,11 +31,7 @@ export default function DataForm() {
   const tempToken = getCookie("tempToken");
   const clientToken = getCookie("clientToken");
 
-  const { data: selectedEvent } = useQuery<IEvent>({
-    queryKey: [`selectedEvent-${eventId}`],
-    queryFn: () => getClientEventById(eventId),
-    enabled: !!eventId,
-  });
+  const { selectedEvent } = useClientEvent(eventId);
   
   useEffect(() => {
     const withoutTickets = Object.keys(selected).length < 1
@@ -64,7 +55,9 @@ export default function DataForm() {
   const receiveInfo = watch("receiveInfo", false);
 
   const handleRedirectClick = () => {
-    setRedirectToCheckout(true);
+    if (selectedEvent?.type !== "free") {
+      setRedirectToCheckout(true);
+    }
     toast.dismiss();
     router.push('/auth');
   }
@@ -127,11 +120,15 @@ export default function DataForm() {
   });
   
   const onSubmit = (data: ClientForm) => {
+    if  (!data.name || !data.email || !data.idCard || !data.whatsapp) return;
+
     mutate({
       name: data.name,
       email: data.email,
       idCard: data.idCard,
       whatsapp: data.whatsapp,
+      balance: 0,
+      firstLogin: true,
     });
   };
 

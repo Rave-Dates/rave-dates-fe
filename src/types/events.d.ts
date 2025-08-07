@@ -36,6 +36,7 @@ interface IEvent {
   }[];
   promoters?: {
     promoterId?: number;
+    user: IUser;
     userId: number;
     organizerId: null;
     fee: number;
@@ -55,6 +56,10 @@ interface IEventFormData extends Partial<IEvent> {
     [key: string]: string; // o más estrictamente: Record<number, string>
   };
   tickets: IEventTicket[]; // solo para el form
+  organizerId?: number;
+  formPromoters?: {
+    promoterId?: number;
+  }[];
 }
 
 interface IEventForUpdate extends Partial<IEventFormData>, Omit<IEventFormData, 'labels'> {
@@ -102,6 +107,16 @@ interface IEventTicket {
   stages: IEventStages[];
   count?: number;
   limit?: number;
+}
+
+interface IEventTicketMetrics {
+  totalTickets: number;
+  ticketsPurchased: number;
+  ticketsTypesMetrics: {
+    name: string;
+    quantity: number;
+    total: number;
+  }[];
 }
 
 interface IEventStages {

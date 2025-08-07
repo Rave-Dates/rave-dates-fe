@@ -2,9 +2,8 @@
 
 import EditSvg from "@/components/svg/EditSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
-import { getUserById } from "@/services/admin-users";
+import { useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { parseISODate } from "@/utils/formatDate";
-import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -19,12 +18,7 @@ export default function Page() {
   
   const token = getCookie("token");
 
-  // obtenemos user por id
-  const { data } = useQuery<IUser>({
-    queryKey: ["user"],
-    queryFn: () => getUserById({ token, id: userId }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
+  const { data } = useAdminUserById({ token, userId });
 
   useEffect(() => {
     if (data?.role.name === "ORGANIZER" && data.organizer) {
@@ -48,9 +42,9 @@ export default function Page() {
           {/* Users Table/List */}
           <div className="rounded-md overflow-hidden mt-5">
           {/* Table Header */}
-          <div className="grid grid-cols-[1fr_1fr_2fr] border-b border-divider text-text-inactive gap-x-2 text-xs py-2 px-3">
+          <div className="grid grid-cols-[1fr_1fr_1.3fr] border-b border-divider text-text-inactive gap-x-2 text-xs py-2 px-3">
             <div className="text-start">Evento</div>
-            <div className="text-end">Fecha</div>
+            <div className="text-center">Fecha</div>
             <div className="text-end">Acciones</div>
           </div>
 
@@ -59,10 +53,10 @@ export default function Page() {
             {assignedEvents?.map((event) => (
               <div
                 key={event.eventId}
-                className="grid grid-cols-[1fr_1fr_2fr] items-center py-3 px-3 gap-x-2 text-xs"
+                className="grid grid-cols-[1fr_1fr_1.3fr] items-center py-3 px-3 gap-x-2 text-xs"
               >
                 <div className="text-start">{event.title}</div>
-                <div className="text-end tabular-nums flex flex-col">
+                <div className="text-center tabular-nums flex flex-col">
                   <h2>{event.date && parseISODate(event.date).date}</h2>
                   <h2>{event.date && parseISODate(event.date).time}hs</h2>
                 </div>

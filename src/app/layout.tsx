@@ -21,13 +21,13 @@ export default function RootLayout({
         />        
         <Script
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
         />
       </head>
       <body className={`${mainFont.className} bg-main-container`}>
-        <NavbarWeb />
         <CookiesNextProvider pollingOptions={{ enabled: true, intervalMs: 1000 }}>
           <ReactQueryProvider>
+            <NavbarWeb />
             {children}
           </ReactQueryProvider>
         </CookiesNextProvider>

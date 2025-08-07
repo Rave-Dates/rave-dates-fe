@@ -1,91 +1,89 @@
 "use client";
 
-import UsersList from "@/components/containers/users-list/UsersList";
+import EditSvg from "@/components/svg/EditSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
+import { useAdminUserById } from "@/hooks/admin/queries/useAdminData";
+import { parseISODate } from "@/utils/formatDate";
+import { useReactiveCookiesNext } from "cookies-next";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function OrganizerPromoterEvents({promoterId}: {promoterId: number}) {
-  // const { data, isLoading, isError } = useQuery({
-  //   queryKey: ["users"],
-  //   queryFn: () => getAllUsers({ token }),
-  //   enabled: !!token, // solo se ejecuta si hay token
-  // });
+export default function OrganizerPromoterEvents({ userId }: {userId: number}) {
+  const [assignedEvents, setAssignedEvents] = useState<IOrganizerEvent[] | IPromoterEvent[]>([]);
+  const { getCookie } = useReactiveCookiesNext();
+  const pathname = usePathname();
+  
+  const token = getCookie("token");
 
-  console.log(promoterId)
+  const { data } = useAdminUserById({ token, userId });
 
-  const isLoading = false;
-  const isError = false;
-
-  const data = [
-    {
-      userId: 1,
-      name: "Juan Gomez",
-      roleId: 1,
-      role: {
-        roleId: 1,
-        name: "Promotor",
-        icon: "🏆",
-      }
+  useEffect(() => {
+    if (data?.role.name === "ORGANIZER" && data.organizer) {
+      setAssignedEvents(data.organizer.events);
+    } else if (data?.role.name === "PROMOTER" && data.promoter) {
+      setAssignedEvents(data.promoter.events);
     }
-  ]
+  }, [data]);
 
+  useEffect(() => {
+    console.log(assignedEvents)
+  }, [assignedEvents]);
+  
   return (
-    <>
-      <div className="flex justify-start text-primary-white items-center gap-x-3 px-4 pt-8">
-        <GoBackButton className="z-30 top-10 left-5 px-3 py-3" />
-        <h1 className="text-3xl font-medium">Nombre</h1>
-      </div>
-      <UsersList
-        createHref={`promoter-events/assign-events`}
-        hasSearch={false}
-        searchQuery="Asignar nuevo evento"
-      >
-        <div className="rounded-md overflow-hidden">
+    <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
+      <div>
+        <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
+        <div className="max-w-xl pt-24 mx-auto animate-fade-in">
+          <h1 className="text-title font-semibold">Eventos asignados</h1>
+          <h1 className="font-light text-sm">{data?.name}</h1> 
+
+          {/* Users Table/List */}
+          <div className="rounded-md overflow-hidden mt-5">
           {/* Table Header */}
-          <div className="grid grid-cols-[1fr_1fr_1fr_1fr] border-b border-divider text-text-inactive gap-x-2 text-sm py-2 px-3">
-            <div className="text-start">Fecha</div>
-            <div className="text-center">Promotor</div>
-            <div className="text-center">Título</div>
-            <div className="text-end">Lugar</div>
+          <div className="grid grid-cols-[1fr_1fr_0.5fr] border-b border-divider text-text-inactive gap-x-2 text-xs py-2 px-3">
+            <div className="text-start">Evento</div>
+            <div className="text-center">Fecha</div>
+            <div className="text-end">Acciones</div>
           </div>
 
           {/* Table Body */}
           <div className="divide-y divide-divider w-full">
-            {data?.map((user) => (
+            {assignedEvents?.map((event) => (
               <div
-                key={user?.userId}
-                className="grid grid-cols-[1fr_1fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
+                key={event.eventId}
+                className="grid grid-cols-[1fr_1fr_0.5fr] items-center py-3 px-3 gap-x-2 text-xs"
               >
-                <div className="text-start">{user?.name}</div>
-                <div className="text-center">{user?.name}</div>
-                <div className="text-center">{user?.name}</div>
-                <div className="text-end">{user?.name}</div>
+                <div className="text-start">{event.title}</div>
+                <div className="text-center tabular-nums flex flex-col">
+                  <h2>{event.date && parseISODate(event.date).date}</h2>
+                  <h2>{event.date && parseISODate(event.date).time}hs</h2>
+                </div>
+                <Link
+                  href={`promoter-events//${event.eventId}/edit-assign-event`}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-black"
+                >
+                  <EditSvg className="text-xl" />
+                </Link>
               </div>
             ))}
-            {!data && (
-              Array.from(Array(10).keys()).map((user) => (
-              <div
-                key={user}
-                className="grid grid-cols-[2fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
-              >
-                <div className="text-start w-20 h-4 rounded animate-pulse bg-inactive"></div>
-                <div className="justify-self-end w-8 h-8 rounded animate-pulse bg-inactive"></div>
-              </div>
-              ))
-            )}
-            {!isLoading && Array.isArray(data) && data?.length === 0 &&  (
-              <div className="text-center py-8 text-text-inactive">
-                No se encontraron usuarios
-              </div>
-            )}
-            {isError &&  (
-              <div className="text-center text-sm py-8 text-system-error">
-                Error cargando usuarios
-              </div>
-            )}
-
           </div>
         </div>
-      </UsersList>
-    </>
+
+          {/* Empty State */}
+          {assignedEvents.length === 0 && (
+            <div className="text-center py-8 text-neutral-400">
+              Sin eventos asignados
+            </div>
+          )}
+        </div>
+      </div>
+      <Link
+        href={`${pathname}/assign-event`}
+        className="bg-primary block text-center max-w-xl self-center text-black input-button"
+      >
+        Asignar nuevo evento
+      </Link>
+    </div>
   );
 }

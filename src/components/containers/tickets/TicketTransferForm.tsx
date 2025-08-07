@@ -4,7 +4,7 @@ import DefaultForm from "@/components/ui/forms/DefaultForm";
 import type React from "react";
 import TitleCard from "../../common/TitleCard";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { transferTickets } from "@/services/clients-tickets";
 import { useReactiveCookiesNext } from "cookies-next";
@@ -14,13 +14,9 @@ import {
   notifySuccess,
 } from "@/components/ui/toast-notifications";
 import { useParams, useRouter } from "next/navigation";
-import {
-  getClientEventById,
-  getClientEventImagesById,
-  getClientImageById,
-} from "@/services/clients-events";
 import Image from "next/image";
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
+import { useClientEvent, useClientEventServedOneImage } from "@/hooks/client/queries/useClientData";
 
 const TicketTransferForm = ({
   purchaseTicketId,
@@ -34,36 +30,8 @@ const TicketTransferForm = ({
   const clientToken = getCookie("clientToken");
   const params = useParams();
   const eventId = Number(params.eventId);
-
-  const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
-    queryKey: ["selectedEvent"],
-    queryFn: async () => {
-      if (!eventId) throw new Error("EventId missing");
-      return await getClientEventById(eventId);
-    },
-    enabled: !!eventId && !afterCheckout,
-  });
-
-  const { data: eventImages } = useQuery<IEventImages[]>({
-    queryKey: [`eventImages-${eventId}`],
-    queryFn: async () => {
-      const images = await getClientEventImagesById(eventId);
-      return images;
-    },
-    enabled: !!eventId && !afterCheckout,
-  });
-
-  const { data: servedImageUrl, isLoading: isImageLoading } = useQuery<
-    string | null
-  >({
-    queryKey: [`servedImageUrl-${eventId}`],
-    queryFn: async () => {
-      if (!eventImages) return null;
-      const blob = await getClientImageById(Number(eventImages[0].imageId));
-      return URL.createObjectURL(blob);
-    },
-    enabled: !!eventImages && !afterCheckout,
-  });
+  const { selectedEvent, isEventLoading } = useClientEvent(eventId);
+  const { servedImageUrl, isImageLoading } = useClientEventServedOneImage(eventId);
 
   const { register, handleSubmit } = useForm<ITransferUser>();
 

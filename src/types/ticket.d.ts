@@ -66,6 +66,7 @@ interface IClientPurchaseTicket {
   promoterId?: number;
   eventId: number;
   boldMethod: string | string[];
+  payWithBalance: boolean;
   returnUrl: string;
 }
 
@@ -77,7 +78,6 @@ interface IClientPurchaseFreeTicket {
     ticketTypeId: number;
   }[];
 }
-
 
 interface ITransferUser {
   name: string;

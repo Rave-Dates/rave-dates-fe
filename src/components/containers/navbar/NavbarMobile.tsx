@@ -86,6 +86,20 @@ const NavbarMobile: React.FC = () => {
         label: 'Eventos',
         icon: <CalendarSvg type='thin' className='w-6 h-6' />,
       },
+    ],
+    "promoter": [
+      {
+        id: 'home',
+        href: "/promoter",
+        label: 'Inicio',
+        icon: <HomeSvg className='w-6 h-6' />,
+      },
+      {
+        id: 'events',
+        href: "/promoter/events",
+        label: 'Eventos',
+        icon: <CalendarSvg type='thin' className='w-6 h-6' />,
+      },
     ]
   };
 
@@ -94,6 +108,8 @@ const NavbarMobile: React.FC = () => {
       return navItems["admin"];
     } else if (pathname.startsWith("/organizer")) {
       return navItems["organizer"];
+    } else if (pathname.startsWith("/promoter")) {
+      return navItems["promoter"];
     } else {
       return navItems["/"];
     }
@@ -103,14 +119,29 @@ const NavbarMobile: React.FC = () => {
     <nav className="md:hidden fixed bottom-0 left-0 right-0 rounded-t-[35px] bg-main-container px-2 py-2 pb-7 z-20">
       <div className="flex justify-around items-center max-w-md mx-auto">
         {getNavItems(pathname)?.map((item) => {
+          const isActive = (
+            item.href === "/"
+              ? pathname === "/" || /^\/event\/\d+/.test(pathname)
+              : item.href === "/auth"
+                ? ["/auth", "/my-data"].some((p) => pathname.startsWith(p))
+                : item.href === "/organizer" 
+                  ? pathname === "/organizer" || /^\/organizer\/event\/\d+/.test(pathname) 
+                  : item.href === "/promoter" 
+                    ? pathname === "/promoter" || /^\/promoter\/event\/\d+/.test(pathname) 
+                    : pathname.startsWith(item.href)
+          );
+
+
           return (
             <Link
               key={item.id}
               href={item.href}
-              className={`${(item.href !== "/" && pathname.startsWith(item.href)) || pathname === item.href ? "text-primary" : "text-text-inactive"} flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 active:scale-95 hover:text-primary will-change-transform`}
+              className={`${
+                isActive ? "text-primary" : "text-text-inactive"
+              } flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 active:scale-95 hover:text-primary will-change-transform`}
             >
               {item.icon}
-              <span className="text-xs">
+              <span className="text-xs text-center">
                 {item.label}
               </span>
             </Link>

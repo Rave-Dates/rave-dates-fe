@@ -42,7 +42,16 @@ export default function Page() {
         maxAge: decoded.exp - Math.floor(Date.now() / 1000), // en segundos
       });
       notifySuccess("Logueado correctamente");
-      router.push('/admin/users');
+      if (decoded.role === "ADMIN") {
+        router.push("/admin/users");
+        return;
+      } else if (decoded.role === "ORGANIZER") {
+        router.push("/organizer");
+        return;
+      } else if (decoded.role === "PROMOTER") {
+        router.push("/promoter");
+        return;
+      }
     },
     onError: () => {
       notifyError("Error al loguear");

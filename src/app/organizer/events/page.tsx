@@ -3,19 +3,34 @@
 import EditSvg from "@/components/svg/EditSvg";
 import UserSvg from "@/components/svg/UserSvg";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
+import { useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { getAllClientEvents } from "@/services/clients-events";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { useQuery } from "@tanstack/react-query";
+import { useReactiveCookiesNext } from "cookies-next";
+import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 import { useEffect } from "react";
 
 export default function Page() {
-  const { updateEventFormData } = useCreateEventStore();
+  const { updateEventFormData, eventFormData, setHasLoadedEvent } = useCreateEventStore();
+  const { getCookie } = useReactiveCookiesNext();
+  const token = getCookie("token");
+  const decoded: { id: number } = (token && jwtDecode(token.toString())) || {id: 0};
+  
+  // obtenemos user por id
+  const { data: user } = useAdminUserById({ token, userId: decoded.id }); 
+
 
   useEffect(() => {
     updateEventFormData(defaultEventFormData);
+    setHasLoadedEvent(false);
   }, []);
+
+  useEffect(() => {
+    console.log("desde la lista",eventFormData)
+  }, [eventFormData]);
   
   const { data: events, isLoading, isError } = useQuery<IEvent[]>({
     queryKey: ["events"],
@@ -43,22 +58,25 @@ export default function Page() {
 
           {/* Table Body */}
           <div className="divide-y divide-divider w-full">
-            {events?.map((data) => (
+            {user?.organizer?.events && user.organizer.events.map((data) => (
               <div
                 key={data.eventId}
                 className="grid grid-cols-[1fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-xs"
               >
                 <div className="text-start flex flex-col">
-                  <h3>{formatDateToColombiaTime(data.date).date} {formatDateToColombiaTime(data.date).time}hs</h3>
+                  <h3>{data.date && formatDateToColombiaTime(data.date).date} {data.date && formatDateToColombiaTime(data.date).time}hs</h3>
                 </div>
                 <div className="text-center tabular-nums">{data.title}</div>
                 <div className="flex justify-end gap-x-2">
-                  <Link
-                    href={`/admin/events/edit-event/${data.eventId}`}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-black"
-                  >
-                    <EditSvg className="text-xl" />
-                  </Link>
+                  {
+                    data.type === "free" &&
+                    <Link
+                      href={`/organizer/events/${data.eventId}/edit-event`}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-black"
+                    >
+                      <EditSvg className="text-xl" />
+                    </Link>
+                  }
                   <Link
                     href={`events/${data.eventId}/attendees`}
                     className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end border border-primary text-primary"

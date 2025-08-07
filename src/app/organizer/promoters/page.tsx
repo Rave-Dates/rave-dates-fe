@@ -3,29 +3,14 @@
 import UsersList from "@/components/containers/users-list/UsersList";
 import DefaultButton from "@/components/ui/buttons/DefaultButton";
 import EditSvg from "@/components/svg/EditSvg";
+import { useReactiveCookiesNext } from "cookies-next";
+import { useAdminAllPromoters } from "@/hooks/admin/queries/useAdminData";
 
 export default function UserManagement() {
-  // const { data, isLoading, isError } = useQuery({
-  //   queryKey: ["users"],
-  //   queryFn: () => getAllUsers({ token }),
-  //   enabled: !!token, // solo se ejecuta si hay token
-  // });
+  const { getCookie } = useReactiveCookiesNext();
+  const token = getCookie("token");
 
-  const isLoading = false;
-  const isError = false;
-
-  const data = [
-    {
-      userId: 1,
-      name: "Juan Gomez",
-      roleId: 1,
-      role: {
-        roleId: 1,
-        name: "Promotor",
-        icon: "🏆",
-      }
-    }
-  ]
+  const { promoters, isError, isLoading } = useAdminAllPromoters({ token: token });
 
   return (
     <UsersList
@@ -42,7 +27,7 @@ export default function UserManagement() {
 
         {/* Table Body */}
         <div className="divide-y divide-divider w-full">
-          {data?.map((user) => (
+          {promoters?.map((user) => (
             <div
               key={user?.userId}
               className="grid grid-cols-[2fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
@@ -54,7 +39,7 @@ export default function UserManagement() {
               </div>
             </div>
           ))}
-          {!data && (
+          {!promoters && (
             Array.from(Array(10).keys()).map((user) => (
             <div
               key={user}
@@ -65,7 +50,7 @@ export default function UserManagement() {
             </div>
             ))
           )}
-          {!isLoading && Array.isArray(data) && data?.length === 0 &&  (
+          {!isLoading && Array.isArray(promoters) && promoters?.length === 0 &&  (
             <div className="text-center py-8 text-text-inactive">
               No se encontraron usuarios
             </div>

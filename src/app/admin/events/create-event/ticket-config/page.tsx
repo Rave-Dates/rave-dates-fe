@@ -4,7 +4,7 @@ import { TicketCard } from "@/components/roles/admin/TicketCard"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
-import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
+import { useCreateFullEvent } from "@/hooks/admin/mutations/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { combineDateAndTimeToISO, formatColombiaTimeToUTC } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
@@ -17,7 +17,7 @@ export default function TicketConfiguration() {
   const { register, handleSubmit, setValue, getValues, control, reset} = useForm<IEventFormData>({
     defaultValues: eventFormData
   });
-  const { mutate: createFullEvent } = useCreateFullEvent(reset);
+  const { mutate: createFullEvent } = useCreateFullEvent({reset});
   const router = useRouter()
 
   const { fields, append, remove } = useFieldArray({

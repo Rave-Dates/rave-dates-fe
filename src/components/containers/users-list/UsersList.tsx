@@ -1,6 +1,6 @@
 "use client";
 
-import SearchInput from "@/components/ui/inputs/SearchInput";
+// import SearchInput from "@/components/ui/inputs/search-input/SearchInput";
 import AddSvg from "@/components/svg/AddSvg";
 import Link from "next/link";
 
@@ -15,7 +15,7 @@ type Props = {
 export default function UsersList({
   children,
   createHref,
-  setSearchQuery,
+  // setSearchQuery,
   searchQuery,
   hasSearch = true,
 }: Props) {
@@ -24,13 +24,13 @@ export default function UsersList({
       <div className="max-w-xl mx-auto animate-fade-in">
         {/* Search and Add User Section */}
         <div className="flex items-center gap-2 mb-4">
-          {hasSearch && setSearchQuery && (
+          {/* {hasSearch && setSearchQuery && (
             <SearchInput
               placeholder="Busca un usuario"
               value={searchQuery}
               handleFunc={(e) => setSearchQuery(e.target.value)}
             />
-          )}
+          )} */}
           <Link
             href={createHref}
             className={`${!hasSearch && "w-full" } bg-primary text-primary-black text-2xl p-2.5 rounded-lg flex items-center justify-center text-center`} 

@@ -19,6 +19,19 @@ export const createPaymentImage = async (
   return res.data.url;
 };
 
+export const servedMovementImage = async ({ token, url }: { token: CookieValueTypes, url: string }) => {
+  const res = await axios.get(`${BASE_URL}/admin/images/movements/${encodeURIComponent(url)}`, {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+    responseType: "blob",
+  });
+
+  const imageBlob = res.data;
+  const imageObjectURL = URL.createObjectURL(imageBlob);
+  return imageObjectURL;
+};
+
 export const createPayment = async (token: CookieValueTypes, data: ICreatePayment) => {
   const res = await axios.post(`${BASE_URL}/admin/payments`, data, {
     headers: {

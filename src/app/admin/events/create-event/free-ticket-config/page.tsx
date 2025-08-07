@@ -3,7 +3,7 @@
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyPending } from "@/components/ui/toast-notifications";
-import { useCreateFullEvent } from "@/hooks/useCreateEventFull";
+import { useCreateFullEvent } from "@/hooks/admin/mutations/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { combineDateAndTimeToISO, formatColombiaTimeToUTC, validateDateYyyyMmDd } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
@@ -14,7 +14,7 @@ export default function FreeTicketConfiguration() {
   const { register, handleSubmit, reset} = useForm<IEventFormData>({
     defaultValues: eventFormData
   });
-  const { mutate: createFullEvent } = useCreateFullEvent(reset);
+  const { mutate: createFullEvent } = useCreateFullEvent({reset});
 
   const onSubmit = (data: IEventFormData) => {
     const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {

@@ -2,7 +2,6 @@ import { create } from 'zustand';
 
 type TicketStage = {
   ticketTypeId: number | undefined;
-  stageId: number | undefined;
   price: number;
   quantity: number;
 };
@@ -14,6 +13,8 @@ type TicketStore = {
   add: (ticket: TicketStage) => void;
   subtract: (ticketTypeId: number | undefined) => void;
   resetSelected: () => void;
+  setSelected: (tickets: TicketStage[]) => void;
+  replaceSelected: (tickets: TicketStage[]) => void;
 };
 
 export const useTicketStore = create<TicketStore>((set, get) => ({
@@ -36,6 +37,36 @@ export const useTicketStore = create<TicketStore>((set, get) => ({
         },
       },
     }));
+  },
+    setSelected: (tickets) => {
+    const selected: TicketStore["selected"] = {};
+
+    for (const ticket of tickets) {
+      const id = ticket.ticketTypeId || 0;
+      if (!selected[id]) {
+        selected[id] = {
+          quantity: 1,
+          stage: ticket,
+        };
+      } else {
+        selected[id].quantity += 1;
+      }
+    }
+
+    set({ selected });
+  },
+    replaceSelected: (tickets) => {
+    const selected: TicketStore["selected"] = {};
+
+    for (const ticket of tickets) {
+      const id = ticket.ticketTypeId || 0;
+      selected[id] = {
+        quantity: ticket.quantity,
+        stage: ticket,
+      };
+    }
+
+    set({ selected });
   },
   subtract: (ticketTypeId) => {
     const current = get().selected[ticketTypeId || 0];

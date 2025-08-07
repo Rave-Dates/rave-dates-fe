@@ -1,10 +1,10 @@
 type Props = {
-  selected: string;
-  setSelected: (value: string) => void;
+  selected: "Pago total" | "Abonar a la alcancía";
+  setSelected: (value: "Pago total" | "Abonar a la alcancía") => void;
 };
 
 export default function PaymentTypeSelector({ selected, setSelected }: Props) {
-  const payments = ["Pago total", "Abonar a la alcancía"];
+  const payments: ["Pago total", "Abonar a la alcancía"] = ["Pago total", "Abonar a la alcancía"];
 
   return (
     <div className="bg-cards-container rounded-lg p-4 pb-1">

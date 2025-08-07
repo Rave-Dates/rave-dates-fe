@@ -2,50 +2,17 @@
 
 import React from 'react';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
-import { useQuery } from '@tanstack/react-query';
-import { getClientEventById, getClientEventImagesById, getClientImageById } from '@/services/clients-events';
 import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
 import EventHero from '../event-detail/EventHero';
 import EventLocation from '../event-detail/EventLocation';
 import TicketSelector from '../event-detail/TicketSelector';
 import EventInfo from '../event-detail/EventInfo';
 import { parseISODate } from '@/utils/formatDate';
+import { useClientEvent, useClientEventServedImages } from '@/hooks/client/queries/useClientData';
 
 const EventTicketDetails = ({ eventId } : { eventId: number }) => {
-  const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
-    queryKey: ["selectedEvent"],
-    queryFn: async () => {
-      if (!eventId) throw new Error("EventId missing");
-      return await getClientEventById(eventId);
-    },
-    enabled: !!eventId,
-  });
-
-  const { data: eventImages } = useQuery<IEventImages[]>({
-    queryKey: [`eventImages-${eventId}`],
-    queryFn: () => getClientEventImagesById(eventId),
-  });
-
-  const { data: servedImages, isLoading: isImagesLoading } = useQuery<{ id: string, url: string }[]>({
-    queryKey: [`servedImages-${eventId}`, eventImages?.map(img => img.imageId)],
-    enabled: !!eventImages,
-    queryFn: async () => {
-      if (!eventImages) return [];
-      const processedImages = await Promise.all(
-        eventImages?.map(async (img) => {
-          const blob = await getClientImageById(img.imageId);
-          const url = URL.createObjectURL(blob);
-          
-          return {
-            id: String(img.imageId),
-            url,
-          };
-        })
-      );
-
-      return processedImages;
-    },
-  });
+  const { selectedEvent, isEventLoading } = useClientEvent(eventId);
+  const { servedImages, isImagesLoading } = useClientEventServedImages(eventId);
   
   return (
     <div className="min-h-screen bg-primary-black text-white pb-20 md:pt-[6.7rem]">

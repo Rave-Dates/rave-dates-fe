@@ -4,9 +4,9 @@ import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
-import { getAllRoles } from "@/services/admin-roles";
+import { useAdminAllRoles } from "@/hooks/admin/queries/useAdminData";
 import { createUser } from "@/services/admin-users";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
@@ -21,11 +21,8 @@ export default function CreateUser() {
   const token = getCookie("token");
 
   // obtenemos todos los roles
-  const { data } = useQuery({
-    queryKey: ["roles"],
-    queryFn: () => getAllRoles({ token }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
+  const { roles } = useAdminAllRoles({ token });
+
 
   // creamos el usuario 
   const { mutate } = useMutation({
@@ -91,7 +88,7 @@ export default function CreateUser() {
         register={register("roleId", { required: true, valueAsNumber: true })}
       >
         {
-          data?.map((role: IRole) => (
+          roles?.map((role: IRole) => (
             <option key={role.roleId} value={role.roleId}>
               {role.name}
             </option>

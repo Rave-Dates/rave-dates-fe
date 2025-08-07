@@ -1,27 +1,23 @@
 "use client";
 
 import EventImageSwiper from "@/components/roles/admin/events/EventImagesSwiper";
-import FilterTagButton from "@/components/ui/buttons/FilterTagButton";
+import LabelTagButton from "@/components/ui/buttons/LabelTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError } from "@/components/ui/toast-notifications";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
-import { getAllCategories } from "@/services/admin-categories";
-import { getEventById, getEventCategoriesById, getEventImages, getImageById } from "@/services/admin-events";
-import { getAllLabels } from "@/services/admin-labels";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { combineDateAndTimeToISO, formatDateToColombiaTime, parseISODate, validateDateYyyyMmDd } from "@/utils/formatDate";
 import { extractLatAndLng, extractPlaceFromGeo } from "@/utils/formatGeo";
-import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
-
 import { useForm, useWatch } from "react-hook-form";
 import GeoAutocomplete from "./GeoAutocomplete";
 import { onInvalid } from "@/utils/onInvalidFunc";
+import { useAdminAllCategories, useAdminEvent, useAdminEventCategories, useAdminEventImages, useAdminImagesData, useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
 
 export default function EditEvent({ eventId }: { eventId: number }) {
   const { eventFormData, updateEventFormData, setHasLoadedEvent, setHasLoadedTickets } = useCreateEventStore();
@@ -48,59 +44,13 @@ export default function EditEvent({ eventId }: { eventId: number }) {
   const token = getCookie("token");
   
   const type = ['free', 'paid'];
-  
-  const { data: eventCategories } = useQuery<IEventCategoryValue[]>({
-    queryKey: ["eventCategories"],
-    queryFn: () => getEventCategoriesById(token, eventId),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
 
-  const { data: categories } = useQuery<IEventCategories[]>({
-    queryKey: ["oldCategories"],
-    queryFn: () => getAllCategories({ token }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
-    
-  const { data: event } = useQuery<IEvent>({
-    queryKey: ["eventById"],
-    queryFn: () => getEventById({ token, id: eventId }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
-  
-  const { data: labelsTypes } = useQuery<IEventLabel[]>({
-    queryKey: ["labelsTypes"],
-    queryFn: () => getAllLabels({ token }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
-  
-  const { data: eventImages, isError: isErrorEventImages } = useQuery<IEventImages[]>({
-    queryKey: ["eventImages", eventId],
-    queryFn: () => getEventImages({ token, eventId }),
-    enabled: !!token && !!eventId,
-  });
-
-  const { data: imagesData, isLoading: loadingImages, isError: errorImages } = useQuery<IImageData[]>({
-    queryKey: ["imagesData", eventImages?.map(img => img.imageId)],
-    queryFn: async () => {
-      if (!eventImages || !token) return [];
-
-      const processedImages = await Promise.all(
-        eventImages.map(async (img) => {
-          const blob = await getImageById({ token, imageId: img.imageId });
-          const url = URL.createObjectURL(blob);
-
-          return {
-            id: img.imageId.toString(),
-            url,
-            // file no viene del backend, solo se añade en frontend si hay uploads
-          };
-        })
-      );
-
-      return processedImages;
-    },
-    enabled: !!token && !!eventImages,
-  });
+  const { eventCategories } = useAdminEventCategories({ eventId, token });
+  const { categories } = useAdminAllCategories({ token });
+  const { selectedEvent: event } = useAdminEvent({ eventId, token });
+  const { labelsTypes } = useAdminLabelsTypes({ token }); 
+  const { eventImages, isErrorEventImages } = useAdminEventImages({ token, eventId }); 
+  const { errorImages, imagesData, loadingImages } = useAdminImagesData({ token, eventImages }); 
   
   useEffect(() => {
     if (!event) return;
@@ -323,7 +273,7 @@ useEffect(() => {
       <br />
       {
         labelsTypes && watchedLabels &&
-        <FilterTagButton setValue={setValue} watchedLabels={watchedLabels} labelsTypes={labelsTypes} title="Etiquetas" />
+        <LabelTagButton setValue={setValue} watchedLabels={watchedLabels} labelsTypes={labelsTypes} title="Etiquetas" />
       }
 
       <br />

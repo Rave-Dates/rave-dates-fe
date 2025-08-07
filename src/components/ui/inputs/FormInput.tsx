@@ -5,11 +5,13 @@ import { UseFormRegisterReturn } from "react-hook-form";
 type FormInputProps = {
   title: string;
   type?: string;
-  typeOfValue?: "%" | "min";
+  typeOfValue?: "%" | "min" | "$";
   inputName: string;
   className?: string;
+  labelClassname?: string;
   placeholder?: string;
   register: UseFormRegisterReturn;
+  onInput?: React.InputHTMLAttributes<HTMLInputElement>["onInput"];
 };
 
 const FormInput = ({
@@ -18,18 +20,24 @@ const FormInput = ({
   typeOfValue,
   inputName,
   className = "",
+  labelClassname,
   placeholder,
   register,
+  onInput,
 }: FormInputProps) => {
   return (
     <div className="w-full">
-      <label htmlFor={inputName} className="text-xs">
+      <label htmlFor={inputName} className={`text-xs ${labelClassname}`}>
         {title}
       </label>
       <div className="flex relative items-center justify-center">
         {
           typeOfValue === "%" &&
           <span className="text-sm text-white absolute left-3 mt-2">%</span>
+        }
+        {
+          typeOfValue === "$" &&
+          <span className="text-sm text-white absolute left-4 mt-2">$</span>
         }
         {
           typeOfValue === "min" &&
@@ -42,6 +50,7 @@ const FormInput = ({
           id={inputName}
           placeholder={placeholder}
           type={type}
+          onInput={onInput}
           {...register}
           className={`${className} ${typeOfValue && "ps-8"} w-full mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white`}
         />

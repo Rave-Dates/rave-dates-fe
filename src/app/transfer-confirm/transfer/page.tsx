@@ -1,18 +1,11 @@
 "use client";
 
-// import EventDetails from "@/components/containers/checkout/EventDetails"
 import TitleCard from "@/components/common/TitleCard";
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
-import {
-  getClientEventById,
-  getClientEventImagesById,
-  getClientImageById,
-} from "@/services/clients-events";
-import { getTicketsFromClient } from "@/services/clients-tickets";
+import { useClientEvent, useClientEventServedOneImage, useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
 import { useTicketStore } from "@/store/useTicketStore";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
-import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import Image from "next/image";
@@ -29,46 +22,9 @@ export default function Verification() {
   const clientId = Number(decoded?.id);
   const router = useRouter();
 
-  const { data: purchasedTickets, isLoading: isTicketsLoading } = useQuery<
-    IPurchaseTicket[]
-  >({
-    queryKey: ["purchasedTickets", clientId], // agregamos clientId por seguridad
-    queryFn: async () => {
-      if (!token) throw new Error("Token missing");
-      return await getTicketsFromClient(clientId, token);
-    },
-    enabled: !!token && !!clientId,
-  });
-
-  const { data: event, isLoading: isEventLoading } = useQuery<IEvent>({
-    queryKey: ["event", eventId], // agregamos clientId por seguridad
-    queryFn: async () => {
-      if (!token) throw new Error("Token missing");
-      return await getClientEventById(eventId);
-    },
-    enabled: !!token && !!eventId,
-  });
-
-  const { data: eventImages } = useQuery<IEventImages[]>({
-    queryKey: [`eventImages-${eventId}`],
-    queryFn: async () => {
-      const images = await getClientEventImagesById(eventId);
-      return images;
-    },
-    enabled: !!eventId,
-  });
-
-  const { data: servedImageUrl, isLoading: isImageLoading } = useQuery<
-    string | null
-  >({
-    queryKey: [`servedImageUrl-${eventId}`],
-    queryFn: async () => {
-      if (!eventImages) return null;
-      const blob = await getClientImageById(Number(eventImages[0].imageId));
-      return URL.createObjectURL(blob);
-    },
-    enabled: !!eventImages,
-  });
+  const { purchasedTickets, isTicketsLoading } = useClientPurchasedTickets({clientId, clientToken: token});
+  const { selectedEvent, isEventLoading } = useClientEvent(eventId);
+  const { servedImageUrl, isImageLoading } = useClientEventServedOneImage(eventId);
 
   useEffect(() => {
     if (!eventId) {
@@ -84,7 +40,7 @@ export default function Verification() {
     <div className="min-h-screen pb-40 pt-28 sm:pb-24 sm:pt-36 bg-primary-black sm:justify-center sm:items-center text-white flex px-6">
       <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
       <div className="flex w-xl animate-fade-in mx-auto flex-col gap-y-2 items-center sm:justify-center">
-        {isEventLoading || !event ? (
+        {isEventLoading || !selectedEvent ? (
           <div className="w-full bg-cards-container h-18 rounded-xl gap-x-5 px-4 py-3 flex items-center justify-start">
             <div className="w-14 h-14 animate-pulse bg-inactive rounded-lg"></div>
             <div className="flex flex-col gap-y-2 items-start justify-center">
@@ -93,11 +49,11 @@ export default function Verification() {
             </div>
           </div>
         ) : (
-          event && (
+          selectedEvent && (
             <TitleCard
               className="w-full px-3 py-2 rounded-md"
-              title={event.title}
-              description={event.subtitle}
+              title={selectedEvent.title}
+              description={selectedEvent.subtitle}
             >
               {isImageLoading ? (
                 <div className="w-14 h-14 flex items-center justify-center">
@@ -116,11 +72,11 @@ export default function Verification() {
           )
         )}
 
-        {event?.date ? (
+        {selectedEvent?.date ? (
           <div className="sm:flex hidden bg-cards-container w-full rounded-md px-5 py-3 gap-x-4 mb-3">
             <h2 className="font-light text-sm">
-              {formatDateToColombiaTime(event.date).date} -{" "}
-              {formatDateToColombiaTime(event.date).time}hs
+              {formatDateToColombiaTime(selectedEvent.date).date} -{" "}
+              {formatDateToColombiaTime(selectedEvent.date).time}hs
             </h2>
           </div>
         ) : (

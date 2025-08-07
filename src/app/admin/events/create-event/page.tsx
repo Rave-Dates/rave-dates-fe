@@ -1,17 +1,15 @@
 "use client";
 
 import EventImageSwiper from "@/components/roles/admin/events/EventImagesSwiper";
-import FilterTagButton from "@/components/ui/buttons/FilterTagButton";
+import LabelTagButton from "@/components/ui/buttons/LabelTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
-import { getAllCategories } from "@/services/admin-categories";
-import { getAllLabels } from "@/services/admin-labels";
+import { useAdminAllCategories, useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { validateDateYyyyMmDd } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
-import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -21,7 +19,6 @@ import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/GeoAutocomplete"), { ssr: false });
-
 
 export default function Page() {
   const { eventFormData, updateEventFormData, setHasLoadedEvent } = useCreateEventStore();
@@ -45,17 +42,8 @@ export default function Page() {
   
   const type = ['free', 'paid'];
   
-  const { data: categories } = useQuery<IEventCategories[]>({
-    queryKey: ["roles"],
-    queryFn: () => getAllCategories({ token }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
-    
-  const { data: labelsTypes } = useQuery<IEventLabel[]>({
-    queryKey: ["labelsTypes"],
-    queryFn: () => getAllLabels({ token }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
+  const { categories } = useAdminAllCategories({ token });
+  const { labelsTypes } = useAdminLabelsTypes({ token });
 
   useEffect(() => {
     register("geo", {
@@ -206,7 +194,7 @@ export default function Page() {
       <br />
 
     {labelsTypes && watchedLabels && (
-      <FilterTagButton
+      <LabelTagButton
         setValue={setValue}
         watchedLabels={watchedLabels}
         labelsTypes={labelsTypes}

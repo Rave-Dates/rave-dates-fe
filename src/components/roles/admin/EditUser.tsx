@@ -10,12 +10,12 @@ import GoBackButton from '@/components/ui/buttons/GoBackButton';
 import DefaultButton from '@/components/ui/buttons/DefaultButton';
 import DeleteUserModal from '@/components/ui/modals/DeleteUserModal';
 import { useReactiveCookiesNext } from 'cookies-next';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { editUserById, getUserById } from '@/services/admin-users';
+import { useMutation } from '@tanstack/react-query';
+import { editUserById } from '@/services/admin-users';
 import { useForm } from 'react-hook-form';
 import { jwtDecode } from 'jwt-decode';
 import { notifyError, notifySuccess } from '@/components/ui/toast-notifications';
-import { getAllRoles } from '@/services/admin-roles';
+import { useAdminAllRoles, useAdminUserById } from '@/hooks/admin/queries/useAdminData';
 
 const EditUser = ({ userId } : { userId: number }) => {
   const pathname = usePathname();
@@ -24,19 +24,9 @@ const EditUser = ({ userId } : { userId: number }) => {
   const router = useRouter();
 
   const token = getCookie("token");
-  
-  // obtenemos user por id
-  const { data, isPending } = useQuery({
-    queryKey: ["user"],
-    queryFn: () => getUserById({ token, id: userId }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
 
-  const { data: roles } = useQuery({
-    queryKey: ["roles"],
-    queryFn: () => getAllRoles({ token }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
+  const { data, isPending } = useAdminUserById({ token, userId });
+  const { roles } = useAdminAllRoles({ token });
 
   // resetea los campos cuando llegan los datos
   useEffect(() => {

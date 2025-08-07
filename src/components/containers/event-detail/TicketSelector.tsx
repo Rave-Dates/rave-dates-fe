@@ -4,12 +4,12 @@ import TicketsChanger from "../tickets/TicketsChanger";
 import TicketsSkeleton from "@/utils/skeletons/event-skeletons/TicketsSkeleton";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useReactiveCookiesNext } from "cookies-next";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { purchaseFreeTicket } from "@/services/clients-tickets";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { useParams, useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
-import { getClientEventById } from "@/services/clients-events";
+import { useClientEvent } from "@/hooks/client/queries/useClientData";
 
 type Props = {
   isTicketList?: boolean;
@@ -35,6 +35,7 @@ const TicketSelector = ({
   const router = useRouter();
   const params = useParams();
   const eventId = Number(params.eventId);
+  const { selectedEvent } = useClientEvent(eventId);
 
   const totalQuantity = Object.values(selected).reduce(
     (acc, curr) => acc + curr.quantity,
@@ -45,11 +46,6 @@ const TicketSelector = ({
     0
   );
 
-  const { data: selectedEvent } = useQuery<IEvent>({
-    queryKey: [`selectedEvent-${eventId}`],
-    queryFn: () => getClientEventById(eventId),
-    enabled: !!eventId,
-  });
   
   const { mutate: purchaseFreeTicketMutation } = useMutation({
     mutationFn: purchaseFreeTicket,
@@ -65,7 +61,10 @@ const TicketSelector = ({
 
   const handleClick = () => {
     if (selectedEvent?.type === "free") {
-      if (!clientToken) return
+      if (!clientToken) {
+        router.push("/personal-data");
+        return
+      }
       const decoded: {id: number, email: string, iat: number, exp: number} = jwtDecode(clientToken);
       
       purchaseFreeTicketMutation({

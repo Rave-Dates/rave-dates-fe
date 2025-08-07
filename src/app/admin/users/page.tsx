@@ -3,22 +3,17 @@
 import UsersList from "@/components/containers/users-list/UsersList";
 import { useState } from "react";
 import DefaultButton from "@/components/ui/buttons/DefaultButton";
-import { getAllUsers } from "@/services/admin-users";
-import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
+import { useAdminAllUsers } from "@/hooks/admin/queries/useAdminData";
 
 export default function UserManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const { getCookie } = useReactiveCookiesNext();
 
   const token = getCookie("token");
-  
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["users"],
-    queryFn: () => getAllUsers({ token }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
 
+  const { data, isLoading, isError } = useAdminAllUsers({ token });
+  
   const filteredUsers = data?.filter((user) =>
     user?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );

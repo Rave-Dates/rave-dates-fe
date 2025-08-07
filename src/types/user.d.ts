@@ -30,7 +30,6 @@ interface IUser {
 
 type FormValues = {
   [key: `assignedEvent-${number}`]: string;
-  assignedCommission: string;
 };
 
 interface ICreateUser {
@@ -41,6 +40,31 @@ interface ICreateUser {
   isActive: boolean;
   password: string;
   roleId: number;
+}
+
+interface IClient {
+  name: string;
+  email: string;
+  whatsapp: string;
+  idCard: string;
+  balance: number;
+  firstLogin: boolean;
+}
+
+interface IGuest extends IClient {
+  purchaseTickets: Partial<IPurchaseTicket[]>;
+  clientId: number;
+}
+
+interface ICreateGuest {
+  ticketTypeId: number;
+  quantity: number;
+  clientId: number;
+}
+
+interface IFormGuest extends IClient {
+  ticketTypeId: number;
+  quantity: number;
 }
 
 interface IOrganizerEvent extends Partial<IEvent> {
@@ -63,4 +87,6 @@ interface IUserLogin {
   exp: number;
   iat: number;
   role: string ;
+  organizerId?: number | null;
+  promoterId?: number | null;
 }

@@ -1,47 +1,57 @@
 "use client"
 
+import SpinnerSvg from "@/components/svg/SpinnerSvg";
+import { useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData";
+import { useEventImage } from "@/hooks/admin/queries/useEventImage";
+import { formatDateToColombiaTime } from "@/utils/formatDate";
+import { extractPlaceFromGeo } from "@/utils/formatGeo";
+import { useReactiveCookiesNext } from "cookies-next";
+import Image from "next/image";
 import Link from "next/link"
 
-interface EventCardProps {
-  title: string
-  subtitle: string
-  date: string
-  location: string
-  price: string
-  amountSold: string
-  avatar?: string
-  avatarBg?: string
-  eventId: number
+type Props = {
+  event: IOrganizerEvent | IPromoterEvent, 
+  href?: string
+  totalSold?: number;
 }
 
-export function OrganizerEventCard({
-  eventId,
-  title,
-  subtitle,
-  date,
-  location,
-  price,
-  amountSold,
-  avatar = "D",
-  avatarBg = "bg-red-500",
-}: EventCardProps) {
+export function OrganizerEventCard({event, href = "organizer/event", totalSold}: Props) {
+  const { getCookie } = useReactiveCookiesNext();
+  const token = getCookie("token");
+  const { eventId, title, subtitle, date, geo } = event;
+  const { servedImageUrl, isImageLoading } = useEventImage({ eventId, token: token?.toString() });
+  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId: event.eventId! });
+
   return (
-    <Link href={`organizer/event/${eventId}`} className="bg-cards-container rounded-lg p-4 flex items-center gap-3">
+    <Link href={`${href}/${eventId}`} className="bg-cards-container rounded-lg p-4 flex items-center gap-3">
       {/* Avatar */}
       <div
-        className={`w-12 h-12 ${avatarBg} rounded-full flex items-center justify-center text-white font-bold text-lg`}
+        className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg"
       >
-        {avatar}
+        {
+          isImageLoading ?
+          <div className="w-full h-full flex items-center justify-center bg-main-container rounded-full">
+            <SpinnerSvg className="fill-primary text-inactive w-4" />
+          </div>
+          :
+          <Image className="w-full h-full rounded-full" 
+            src={servedImageUrl ?? "/images/event-placeholder.png"} 
+            width={1000} 
+            height={1000} 
+            alt="logo" 
+          />
+        }
       </div>
 
       {/* Event Details */}
       <div className="flex-1 min-w-0">
         <h3 className="text-white font-medium text-sm mb-1 truncate">{title} - {subtitle}</h3>
         <p className="text-xs mb-1 truncate">
-          {date} - {location}
+          {date && formatDateToColombiaTime(date).date} - {geo && extractPlaceFromGeo(geo)}
         </p>
         <p className="text-xs">
-          {amountSold} vendidos - {price}
+          {/* {amountSold} vendidos - {price} */}
+          {ticketMetrics?.ticketsPurchased} vendidos - {event.type === "free" ? "Gratis" : `COP ${totalSold?.toLocaleString() ?? 0}`}
         </p>
       </div>
     </Link>

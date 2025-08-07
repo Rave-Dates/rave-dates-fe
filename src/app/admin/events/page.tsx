@@ -3,11 +3,10 @@
 import EditSvg from "@/components/svg/EditSvg";
 import InfoSvg from "@/components/svg/InfoSvg";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
-import { getAllEvents } from "@/services/admin-events";
+import { useAdminAllEvents } from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { extractPlaceFromGeo } from "@/utils/formatGeo";
-import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
 import { useEffect } from "react";
@@ -16,18 +15,14 @@ export default function Page() {
   const { getCookie } = useReactiveCookiesNext();
   const { updateEventFormData } = useCreateEventStore();
 
+  const token = getCookie("token");
+  
+  const { allEvents, isErrorEvent, isEventLoading } = useAdminAllEvents({ token });
+  
   useEffect(() => {
     console.log("campos resetados")
     updateEventFormData(defaultEventFormData);
   }, []);
-
-  const token = getCookie("token");
-  
-  const { data: events, isLoading, isError } = useQuery<IEvent[]>({
-    queryKey: ["events"],
-    queryFn: () => getAllEvents({ token }),
-    enabled: !!token, // solo se ejecuta si hay token
-  });
 
   return (
     <div className="w-full flex flex-col gap-y-5 bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
@@ -51,7 +46,7 @@ export default function Page() {
 
           {/* Table Body */}
           <div className="divide-y divide-divider w-full">
-            {events?.map((data) => (
+            {allEvents?.map((data) => (
               <div
                 key={data.eventId}
                 className="grid grid-cols-[1fr_1fr_1fr_1.5fr] items-center py-3 px-3 gap-x-2 text-xs"
@@ -80,7 +75,7 @@ export default function Page() {
           </div>
         </div>
 
-          {!events &&!isError && (
+          {!allEvents &&!isErrorEvent && (
             Array.from(Array(6).keys()).map((user) => (
             <div
               key={user}
@@ -97,13 +92,13 @@ export default function Page() {
             ))
           )}
 
-          {!isLoading && Array.isArray(events) && events?.length === 0 &&  (
+          {!isEventLoading && Array.isArray(allEvents) && allEvents?.length === 0 &&  (
             <div className="text-center py-8 text-text-inactive">
               No se encontraron eventos
             </div>
           )}
 
-          {isError &&  (
+          {isErrorEvent &&  (
             <div className="text-center text-sm py-8 text-system-error">
               Error cargando eventos
             </div>
