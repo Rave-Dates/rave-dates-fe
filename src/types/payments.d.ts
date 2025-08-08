@@ -17,7 +17,7 @@ interface StageGroup {
 
 interface StageDetail {
   quantity: number;
-  ticketTypeId: number;
+  ticketType: string;
   activeStage: ActiveStage;
 }
 

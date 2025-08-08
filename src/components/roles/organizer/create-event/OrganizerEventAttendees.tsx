@@ -95,7 +95,7 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
         {/* Search Section */}
         <div className="flex gap-x-4">
           <SearchInput
-            placeholder="Busca un evento"
+            placeholder="Busca un invitado"
             value={searchTerm}
             handleFunc={handleSearch}
             results={results}

@@ -20,12 +20,13 @@ export default function Balance() {
   const { payments } = useAdminPayments({ token });
   const { data: user } = useAdminUserById({ token, userId });
 
+
   const filteredPayments = payments?.filter(
     (payment) =>
-      payment.organizerId === user?.organizer?.organizerId
+      payment.promoterId === user?.promoter?.promoterId
   );
 
-  console.log(user)
+  console.log(payments)
   const eventMap = new Map(allEvents?.map(event => [event.eventId, event.title]));
 
   return (

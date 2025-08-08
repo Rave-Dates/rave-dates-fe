@@ -1,4 +1,4 @@
-import EventInfo from "@/components/roles/admin/events/EventInfo";
+import EventBalance from "@/components/roles/admin/users/EventBalance";
 
 export default async function Page({
   params,
@@ -7,5 +7,5 @@ export default async function Page({
 }) {
   const { eventId } = await params
   const eventIdNumber = Number(eventId);
-  return <EventInfo eventId={eventIdNumber} />
+  return <EventBalance eventId={eventIdNumber} />
 }

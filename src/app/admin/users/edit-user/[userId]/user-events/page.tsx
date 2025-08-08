@@ -62,9 +62,9 @@ export default function Page() {
                 </div>
                 <div className="flex gap-x-2 justify-end">
                   <Link
-                    href={`${pathname}/event-balance`}
+                    href={`${pathname}/${event.eventId}/event-balance`}
                     className="border border-primary text-primary py-1 px-3 rounded-lg flex items-center justify-center text-center"
-                    aria-label="Añadir usuario"
+                    aria-label="Cuenta"
                   >
                     Cuenta
                   </Link>

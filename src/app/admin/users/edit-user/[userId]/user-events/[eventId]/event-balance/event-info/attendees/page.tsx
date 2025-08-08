@@ -7,8 +7,44 @@ import DefaultButton from "@/components/ui/buttons/DefaultButton";
 import UserSvg from "@/components/svg/UserSvg";
 import SendSvg from "@/components/svg/SendSvg";
 import ArrowSvg from "@/components/svg/ArrowSvg";
+import { useReactiveCookiesNext } from "cookies-next";
+import { useAdminEvent, useAdminGetGuests, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData";
+import { useParams } from "next/navigation";
+import SearchInput from "@/components/ui/inputs/search-input/SearchInput";
+import GoBackButton from "@/components/ui/buttons/GoBackButton";
 
 export default function UsersList() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [results, setResults] = useState<IGuest[]>([]);
+
+  const { getCookie } = useReactiveCookiesNext();
+  const token = getCookie("token");
+
+  const params = useParams();
+  const eventId = Number(params.eventId);
+
+  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });
+  const { selectedEvent } = useAdminEvent({ eventId, token });
+  const { guests } = useAdminGetGuests({ token, eventId });
+
+  console.log(ticketMetrics)
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+
+    if (term.length === 0) {
+      setResults([]);
+      return;
+    }
+
+    const filtered = guests?.filter((event) =>
+      event.name.toLowerCase().includes(term.toLowerCase())
+    ) || [];
+
+    setResults(filtered);
+  };
+  
   const users = [
     { id: 1, name: "Juan Gimenez", ticketType: "XXXX" },
     { id: 2, name: "Ana Martínez", ticketType: "XXXX" },
@@ -18,34 +54,23 @@ export default function UsersList() {
     { id: 6, name: "Diego Martínez", ticketType: "XXXX" },
     { id: 7, name: "Axel Gómez", ticketType: "XXXX" },
   ];
-
-  const [searchQuery, setSearchQuery] = useState("");
-
-  console.log(setSearchQuery)
-
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
   
   return (
     <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen pt-0 pb-40 sm:pt-32">
       <div className="max-w-xl w-full mx-auto animate-fade-in">
         {/* Search and Add User Section */}
         <div className="flex items-center bg-main-container gap-2 pt-10 pb-4 px-4 mb-4">
+          <GoBackButton className="animate-fade-in !rounded-lg p-2.5" />
+          <SearchInput
+            placeholder="Busca un usuario"
+            value={searchTerm}
+            handleFunc={handleSearch}
+            results={results}
+            isGuest={true}
+            setSearchTerm={setSearchTerm}
+          />
           <Link
-            href="/"
-            className="bg-primary text-primary-black text-2xl p-2.5 rounded-lg flex items-center justify-center text-center"
-            aria-label="Añadir usuario"
-          >
-            <ArrowSvg />
-          </Link>
-          {/* <SearchInput
-            placeholder="Busca un invitado"
-            value={searchQuery}
-            handleFunc={(e) => setSearchQuery(e.target.value)}
-          /> */}
-          <Link
-            href="/admin/events/event-info/attendees/attendee-data"
+            href="attendees/add-attendee"
             className="border border-primary text-primary text-2xl p-2.5 rounded-lg flex items-center justify-center text-center"
             aria-label="Añadir usuario"
           >
@@ -56,24 +81,21 @@ export default function UsersList() {
         {/* Users Table/List */}
         <div className="rounded-md overflow-hidden px-4">
           {/* Table Header */}
-          <div className="grid grid-cols-[2fr_1fr_1fr] border-b border-divider text-text-inactive gap-x-2 text-sm py-2 px-3">
+          <div className="grid grid-cols-[2fr_1fr] border-b border-divider text-text-inactive gap-x-2 text-sm py-2 px-3">
             <div className="text-start">Nombre y apellido</div>
-            <div className="text-center">Rol</div>
             <div className="text-end">Acciones</div>
           </div>
 
           {/* Table Body */}
           <div className="divide-y divide-divider w-full">
-            {filteredUsers.map((user) => (
+            {guests?.map((user) => (
               <div
-                key={user.id}
-                className="grid grid-cols-[2fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
+                key={user.clientId}
+                className="grid grid-cols-[2fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
               >
                 <div className="text-start">{user.name}</div>
-                <div className="text-center">{user.ticketType}</div>
-                <div className="flex gap-x-2 justify-end">
-                  <DefaultButton className="text-xl !bg-transparent border border-primary !text-primary" icon={<UserSvg stroke={1.5} />} href={`/admin/events/event-info/attendees/attendee-data`} /> 
-                  <DefaultButton className="!px-1 !py-1" icon={<SendSvg className="text-2xl" />} href={`/admin/events/event-info/attendees/success`} />
+                <div className="flex justify-end">
+                  <DefaultButton className="text-xl !bg-transparent border border-primary !text-primary" icon={<UserSvg stroke={1.5} />} href={`attendees/${user.clientId}/edit-attendee`} /> 
                 </div>
               </div>
             ))}
@@ -81,7 +103,7 @@ export default function UsersList() {
         </div>
 
         {/* Empty State */}
-        {filteredUsers.length === 0 && (
+        {guests?.length === 0 && (
           <div className="text-center py-8 text-neutral-400">
             No se encontraron usuarios
           </div>

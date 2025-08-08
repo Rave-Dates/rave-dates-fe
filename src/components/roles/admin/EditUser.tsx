@@ -87,8 +87,13 @@ const EditUser = ({ userId } : { userId: number }) => {
         <GoBackButton className="px-3 rounded-xl py-3 sm:opacity-0" />
         <div className='flex items-center gap-x-3'>
           {
-            (userById?.role.name === "ORGANIZER" || userById?.role.name === "PROMOTER") && (
+            userById?.role.name === "ORGANIZER" && (
               <DefaultButton className="px-12 rounded-xl py-3" text='Cuenta' href={`${pathname}/balance`} />
+            )
+          }
+          {
+            userById?.role.name === "PROMOTER" && (
+              <DefaultButton className="px-12 rounded-xl py-3" text='Cuenta' href={`${pathname}/promoter-balance`} />
             )
           }
           {

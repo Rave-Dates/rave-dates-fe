@@ -33,15 +33,18 @@ export default function Page() {
   const { allEvents } = useAdminAllEvents({ token });
   const { data: selectedUser } = useAdminUserById({ token, userId });
 
+  console.log(selectedUser)
+
   const watchedImage = useWatch({ name: "image", control });
 
   const onSubmit = (data: IPaymentForm) => {
-    if (!selectedUser?.organizer || !data.eventId) return;
+    if (!selectedUser?.promoter || !data.eventId) return;
     const formattedData = {
       image: data.image,
       paymentAmount: Number(data.paymentAmount),
       eventId: Number(data.eventId),
-      organizerId: selectedUser.organizer.organizerId || 0,
+      promoterId: selectedUser.promoter.promoterId || 0,
+      organizerId: selectedUser.promoter.organizerId || 0,
     };
 
     // Ejemplo de envío
