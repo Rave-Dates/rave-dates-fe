@@ -4,7 +4,7 @@ import { DropdownItem } from "@/components/roles/admin/events/DropDownItem"
 import { StageItem } from "@/components/roles/admin/events/StageItem"
 import EditSvg from "@/components/svg/EditSvg"
 import EyeSvg from "@/components/svg/EyeSvg"
-import { useAdminBinnacles, useAdminEvent, useAdminPromoterBinnacles, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData"
+import { useAdminBinnacles, useAdminEvent, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData"
 import { useClientEventTickets } from "@/hooks/client/queries/useClientData"
 import { CookieValueTypes } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
@@ -14,17 +14,22 @@ import { useEffect, useState } from "react"
 type Props = {
   eventId: number;
   token: CookieValueTypes;
+  promoterId?: number;
   isPromoter?: boolean;
   isPromoterBinnacle?: boolean;
 }
 
-export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromoterBinnacle }: Props) {
+export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromoterBinnacle, promoterId }: Props) {
   const [expandedSections, setExpandedSections] = useState<string[]>([])
   const [globalExpandedSections, setGlobalExpandedSections] = useState<string[]>([])
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
 
   const { eventTickets: ticketTypes } = useClientEventTickets(eventId);
   const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });
+
+  const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId });
+
+  console.log("promoterTicketMetrics", promoterTicketMetrics)
 
   const { selectedEvent } = useAdminEvent({ eventId, token });
 
@@ -34,10 +39,10 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromo
   });
 
   const { promoterBinnacles } = useAdminPromoterBinnacles({
-    promoterId: decoded?.promoterId ?? 0,
+    promoterId: decoded?.promoterId || promoterId,
     token: token?.toString() ?? "",
   });
-
+  
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
   const selectedPromoterBinnacle = promoterBinnacles?.find(b => b.eventId === eventId);
 
@@ -80,17 +85,18 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromo
                       </span>
                     </div>
                     {
-                      ticketTypes?.map((stage) => (
+                      selectedBinnacle?.stages.stages?.map((stage, index) => (
                         <DropdownItem
-                          key={stage.name}
-                          title={stage.name}
-                          isExpanded={expandedSections.includes(stage.name)}
-                          onToggle={() => toggleSection(stage.name)}
+                          key={index}
+                          title={stage.ticketType}
+                          isExpanded={expandedSections.includes(stage.ticketType)}
+                          onToggle={() => toggleSection(stage.ticketType)}
                         >
                           <div className="space-y-2 bg-main-container rounded-b-lg p-4">
                             <StageItem
-                              key={stage.ticketTypeId}
-                              items={stage.stages}
+                              key={stage.ticketType}
+                              stage={stage.activeStage}
+                              quantity={stage.quantity}
                             />
                           </div>
                         </DropdownItem>
@@ -188,44 +194,41 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromo
 
         {
           isPromoterBinnacle && ["Vendidas y dinero generado"].map((type) => (
-            <DropdownItem
-              key={type}
-              title={type}
-              className="!bg-input mt-2"
-              isExpanded={globalExpandedSections.includes(type)}
-              onToggle={() => toggleGlobalSection(type)}
-            >
-              <div className="bg-input px-2 py-1 rounded-b-lg">
-                {
-                  type === "Vendidas y dinero generado" && 
-                  <div className="mb-2">
-                    <div className="flex bg-main-container justify-between p-3 rounded-lg items-center">
-                      <h1>Total vendido:</h1>
-                      <span className="text-primary">
-                        {ticketMetrics?.ticketsPurchased}
-                      </span>
-                    </div>
+            <div className="bg-input px-2 py-3 rounded-lg mt-2">
+              {
+                type === "Vendidas y dinero generado" && 
+                <div>
+                  <h1 className="p-3 pt-1 text-lg">Entradas vendidas</h1>
+                  <div className="flex bg-main-container justify-between p-3 rounded-lg items-center">
+                    <h1>Total vendido:</h1>
+                    <span className="text-primary">
+                      {promoterTicketMetrics?.ticketsPurchased}
+                    </span>
+                  </div>
+                  <div className="space-y-2 mt-2">
                     {
-                      ticketTypes?.map((stage) => (
-                        <DropdownItem
-                          key={stage.name}
-                          title={stage.name}
-                          isExpanded={expandedSections.includes(stage.name)}
-                          onToggle={() => toggleSection(stage.name)}
-                        >
-                          <div className="space-y-2 bg-main-container rounded-b-lg p-4">
-                            <StageItem
-                              key={stage.ticketTypeId}
-                              items={stage.stages}
-                            />
+                      promoterTicketMetrics?.ticketsTypesMetrics?.map((ticket) => {
+                        return (
+                          <div key={ticket.name} className="space-y-2  bg-main-container rounded-lg p-4 ps-3">
+                            <div className="space-y-3 rounded-lg">
+                              <div className="flex justify-between items-center">
+                                <div className="">
+                                  <span>{ticket.name}</span>
+                                  <span> vendidas:</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <span className="text-primary text-sm">{ticket.quantity} de {ticket.total} disponibles</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                        </DropdownItem>
-                        ))
+                        )
+                      })
                     }
                   </div>
-                }
-              </div>
-            </DropdownItem>
+                </div>
+              }
+            </div>
           ))
         }
 

@@ -40,6 +40,7 @@ interface ICreateUser {
   isActive: boolean;
   password: string;
   roleId: number;
+  organizerId?: number;
 }
 
 interface IClient {
@@ -89,4 +90,5 @@ interface IUserLogin {
   role: string ;
   organizerId?: number | null;
   promoterId?: number | null;
+  checkerId?: number | null;
 }

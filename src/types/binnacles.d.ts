@@ -17,7 +17,7 @@ interface IStageGroup {
 
 interface IStageDetail {
   quantity: number;
-  ticketTypeId: number;
+  ticketType: string;
   activeStage: ActiveStage;
 }
 

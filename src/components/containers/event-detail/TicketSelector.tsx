@@ -13,7 +13,6 @@ import { useClientEvent } from "@/hooks/client/queries/useClientData";
 
 type Props = {
   isTicketList?: boolean;
-  ticketStatus?: "paid" | "pending";
   tickets?: IEventTicket[];
   isLoading?: boolean;
   maxPurchase?: number;
@@ -22,7 +21,6 @@ type Props = {
 
 const TicketSelector = ({
   isTicketList = false,
-  ticketStatus,
   tickets,
   isLoading,
   maxPurchase,

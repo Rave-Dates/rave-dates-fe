@@ -68,11 +68,8 @@ export default function EditOrganizerEvent({ eventId }: { eventId: number }) {
       promoterId: promoter.promoterId,
     }))
 
-    console.log("hasLoadedEvent", hasLoadedEvent)
     const validatedFormPromoters = 
       hasLoadedEvent ? eventFormData.formPromoters : formattedPromoters;
-
-    console.log("formattedPromoters", formattedPromoters)
 
     // Seteamos todo al formulario
     const setters = {

@@ -5,10 +5,11 @@ import { CookieValueTypes } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
 import Link from "next/link";
 import { CircularProgress } from "../organizer/create-event/ProgressCircular";
+import { ParamValue } from "next/dist/server/request/params";
 
 type Props = {
   eventId: number;
-  token: CookieValueTypes;
+  token: string | null;
 }
 
 export default function ControllerPanelSection({ token }: Props) {
@@ -17,7 +18,7 @@ export default function ControllerPanelSection({ token }: Props) {
   return (
     <div className="rounded-lg text-white w-full flex items-start justify-center mb-24 h-full">
       <div className="w-full h-full">
-        <Link href="/controller/scan-qr" className="bg-input h-[400px] flex justify-center items-center px-2 py-1 rounded-lg mt-3">
+        <Link href="/checker/scan-qr" className="bg-input h-[400px] flex justify-center items-center px-2 py-1 rounded-lg mt-3">
           <QRSvg />
         </Link>
         <div className="bg-input h-[80px] flex px-5 justify-between items-center py-1 rounded-lg mt-3">

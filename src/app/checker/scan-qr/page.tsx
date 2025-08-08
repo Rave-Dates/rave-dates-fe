@@ -1,6 +1,9 @@
 'use client';
 
+import { readQr } from '@/services/admin-qr';
+import { useReactiveCookiesNext } from 'cookies-next';
 import { Html5Qrcode, Html5QrcodeCameraScanConfig } from 'html5-qrcode';
+import { jwtDecode } from 'jwt-decode';
 import { useEffect, useRef, useState } from 'react';
 
 export default function ScanQRPage() {
@@ -8,6 +11,10 @@ export default function ScanQRPage() {
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [currentCameraId, setCurrentCameraId] = useState<string | null>(null);
   const [scanning, setScanning] = useState<boolean>(false);
+  const { getCookie } = useReactiveCookiesNext();
+  const token = getCookie("token");
+  const decoded = token && jwtDecode<IUserLogin>(token?.toString())
+
   const qrCodeRegionId = 'qr-reader';
 
   // Obtener cámaras disponibles
@@ -36,23 +43,24 @@ export default function ScanQRPage() {
     const html5QrCode = new Html5Qrcode(qrCodeRegionId);
     scannerRef.current = html5QrCode;
 
-    html5QrCode
-      .start(
-        currentCameraId,
-        config,
-        (decodedText) => {
-          console.log("✅ QR leído:", decodedText);
-          // Aquí podés redirigir o guardar el resultado
+    html5QrCode.start(
+      currentCameraId,
+      config,
+      async (decodedText) => {
+        console.log("✅ QR leído:", decodedText);
+        try {
+          // const res = await readQr({ token: token, qr: decodedText, controllerId: 1 });
+          console.log("decodedText", decodedText);
           alert(`QR escaneado: ${decodedText}`);
-        },
-        (errorMessage) => {
-          console.log("No se pudo leer el QR:", errorMessage);
+        } catch (err) {
+          console.error("Error al procesar QR:", err);
+          alert("Error al procesar QR");
         }
-      )
-      .then(() => setScanning(true))
-      .catch((err) => {
-        console.error("Error al iniciar el escaneo:", err);
-      });
+      },
+      (errorMessage) => {
+        console.log("No se pudo leer el QR:", errorMessage);
+      }
+    )
 
     return () => {
       html5QrCode.stop().then(() => {
