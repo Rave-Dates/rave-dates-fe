@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useState } from "react";
 import DefaultButton from "@/components/ui/buttons/DefaultButton";
 import UserSvg from "@/components/svg/UserSvg";
-import SendSvg from "@/components/svg/SendSvg";
-import ArrowSvg from "@/components/svg/ArrowSvg";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useAdminEvent, useAdminGetGuests, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData";
 import { useParams } from "next/navigation";
