@@ -142,9 +142,9 @@ export default function Checkout() {
         {/* Left Side */}
 
         <div className="space-y-4 order-last lg:order-first">
-          <PaymentTypeSelector isPromoter={Boolean(isPromoter)} selected={selectedPayment} setSelected={setSelectedPayment} />
+          <PaymentTypeSelector havePiggyBank={selectedEvent?.piggyBank} isPromoter={Boolean(isPromoter)} selected={selectedPayment} setSelected={setSelectedPayment} />
           {
-            selectedPayment === "Pago total" ?
+            selectedPayment === "Pago total" &&
             <PaymentMethodSelector
               selected={selectedMethod}
               setSelected={setSelectedMethod}
@@ -153,7 +153,9 @@ export default function Checkout() {
               clientData={clientData}
               isPromoter={Boolean(isPromoter)}
             /> 
-            :
+          }
+          {
+          selectedPayment === "Abonar a la alcancía" && selectedEvent && selectedEvent.piggyBank &&
             <PartialAmount 
               register={register}
               totalAmount={totalAmount}

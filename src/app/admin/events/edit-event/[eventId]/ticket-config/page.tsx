@@ -126,6 +126,7 @@ export default function EditTicketConfiguration() {
       timeOut: data.timeOut,
       labels: data.labels,
       tickets: formattedTickets,
+      piggyBank: data.piggyBank,
     }
 
     console.log("cleanedEventData",cleanedEventData)
