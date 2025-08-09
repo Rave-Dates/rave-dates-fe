@@ -4,10 +4,11 @@ import ImageUploader from "@/components/roles/admin/users/ImageUploader";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
-import { notifyPending } from "@/components/ui/toast-notifications";
+import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
 import { useCreatePayment } from "@/hooks/admin/mutations/useCreatePayment";
 import { useAdminAllEvents, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { onInvalid } from "@/utils/onInvalidFunc";
+import { AxiosError } from "axios";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
@@ -39,6 +40,10 @@ export default function Page() {
 
   const onSubmit = (data: IPaymentForm) => {
     if (!selectedUser?.promoter || !data.eventId) return;
+    if (!data.image) {
+      notifyError("Debes agregar una imagen");
+      return;
+    }
     const formattedData = {
       image: data.image,
       paymentAmount: Number(data.paymentAmount),
@@ -53,7 +58,13 @@ export default function Page() {
       new Promise((resolve, reject) => {
         createPaymentMutation(formattedData, {
           onSuccess: resolve,
-          onError: reject,
+          onError: (error) => {
+            const err = error as AxiosError<{ message: string }>;
+            if (err.response?.data?.message === "Organizer not found") {
+              notifyError("Evento sin organizador");
+            }
+            reject(err);
+          }
         });
       }),
       {
@@ -80,7 +91,7 @@ export default function Page() {
         >
           <option value="" disabled hidden>Selecciona un evento</option>
           {
-            allEvents?.map((event) => (
+            selectedUser?.promoter?.events?.map((event) => (
               <option key={event.eventId} value={String(event.eventId)}>
                 {event.title}
               </option>

@@ -41,6 +41,7 @@ export default function Page() {
         expires: expirationDate,
         maxAge: decoded.exp - Math.floor(Date.now() / 1000), // en segundos
       });
+
       notifySuccess("Logueado correctamente");
       if (decoded.role === "ADMIN") {
         router.push("/admin/users");
@@ -49,6 +50,11 @@ export default function Page() {
         router.push("/organizer");
         return;
       } else if (decoded.role === "PROMOTER") {
+        setCookie("isPromoter", true, {
+          path: "/",
+          expires: expirationDate,
+          maxAge: decoded.exp - Math.floor(Date.now() / 1000), // en segundos
+        });
         router.push("/promoter");
         return;
       }

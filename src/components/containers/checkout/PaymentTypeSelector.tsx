@@ -1,10 +1,14 @@
 type Props = {
   selected: "Pago total" | "Abonar a la alcancía";
   setSelected: (value: "Pago total" | "Abonar a la alcancía") => void;
+  isPromoter?: boolean;
 };
 
-export default function PaymentTypeSelector({ selected, setSelected }: Props) {
+export default function PaymentTypeSelector({ selected, setSelected, isPromoter = false }: Props) {
   const payments: ["Pago total", "Abonar a la alcancía"] = ["Pago total", "Abonar a la alcancía"];
+  const promoterPayments: ["Pago total"] = ["Pago total"];
+
+  const paymentsToShow = isPromoter ? promoterPayments : payments;
 
   return (
     <div className="bg-cards-container rounded-lg p-4 pb-1">
@@ -12,7 +16,7 @@ export default function PaymentTypeSelector({ selected, setSelected }: Props) {
         <div className="text-sm text-primary-white/45">Tipo de pago</div>
         <span>{selected}</span>
       </div>
-      {payments.map((item) => (
+      {paymentsToShow.map((item) => (
         <label
           key={item}
           className="flex items-center w-full cursor-pointer group py-4 not-last:border-b border-inactive"

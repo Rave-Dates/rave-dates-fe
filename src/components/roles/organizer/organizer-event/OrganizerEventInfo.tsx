@@ -4,8 +4,8 @@ import { DropdownItem } from "@/components/roles/admin/events/DropDownItem"
 import { StageItem } from "@/components/roles/admin/events/StageItem"
 import EditSvg from "@/components/svg/EditSvg"
 import EyeSvg from "@/components/svg/EyeSvg"
-import { useAdminBinnacles, useAdminEvent, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData"
-import { useClientEventTickets } from "@/hooks/client/queries/useClientData"
+import { notifySuccess } from "@/components/ui/toast-notifications"
+import { useAdminBinnacles, useAdminEvent, useAdminGetPromoterLink, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData"
 import { CookieValueTypes } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
 import Link from "next/link"
@@ -19,19 +19,15 @@ type Props = {
   isPromoterBinnacle?: boolean;
 }
 
-export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromoterBinnacle, promoterId }: Props) {
+export default function OrganizerEventInfo({ eventId, token, isPromoter = false, isPromoterBinnacle, promoterId }: Props) {
   const [expandedSections, setExpandedSections] = useState<string[]>([])
   const [globalExpandedSections, setGlobalExpandedSections] = useState<string[]>([])
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
 
-  const { eventTickets: ticketTypes } = useClientEventTickets(eventId);
-  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });
-
-  const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId });
-
-  console.log("promoterTicketMetrics", promoterTicketMetrics)
-
+  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId, isPromoter });
+  const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId: decoded?.promoterId || promoterId });
   const { selectedEvent } = useAdminEvent({ eventId, token });
+  const { promoterLink } = useAdminGetPromoterLink({ token, eventId, promoterId: decoded?.promoterId || promoterId });
 
   const { organizerBinnacles } = useAdminBinnacles({
     organizerId: decoded?.organizerId ?? 0,
@@ -59,8 +55,6 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromo
   }
 
   const types = ["Vendidas y dinero generado", "Dinero", "Promotores"]
-
-  console.log(selectedBinnacle)
 
   return (
     <div className="rounded-lg text-white w-full flex items-start justify-center mb-44 h-full">
@@ -167,29 +161,52 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromo
 
         {
           isPromoter &&
-          <div className="bg-input mt-2 rounded-lg px-3 py-2">
-            <h1 className="font-medium px-2 my-2">Dinero</h1>
-            <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
-              <div className="flex text-sm justify-between items-center">
-                <h2>Total</h2>
-                <h2 className="text-primary text-base text-end tabular-nums">COP ${Number(selectedPromoterBinnacle?.total ?? 0).toLocaleString() ?? 0}</h2>
-              </div>
+          <>
+            <div className="bg-input mt-2 rounded-lg px-3 py-2">
+              <h1 className="font-medium px-2 my-2">Dinero</h1>
+              <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
+                <div className="flex text-sm justify-between items-center">
+                  <h2>Total</h2>
+                  <h2 className="text-primary text-base text-end tabular-nums">COP ${Number(selectedPromoterBinnacle?.total ?? 0).toLocaleString() ?? 0}</h2>
+                </div>
 
-              <div className="flex text-sm justify-between items-center">
-                <h2>Dinero entregado</h2>
-                <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedPromoterBinnacle?.alreadyPaid.toLocaleString()?? 0}</h2>
-              </div>
+                <div className="flex text-sm justify-between items-center">
+                  <h2>Dinero entregado</h2>
+                  <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedPromoterBinnacle?.alreadyPaid.toLocaleString()?? 0}</h2>
+                </div>
 
-              <div className="flex text-sm justify-between items-center">
-                <h2>Dinero disponible</h2>
-                <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedPromoterBinnacle?.pendingPayment.toLocaleString()?? 0}</h2>
-              </div>
+                <div className="flex text-sm justify-between items-center">
+                  <h2>Dinero disponible</h2>
+                  <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedPromoterBinnacle?.pendingPayment.toLocaleString()?? 0}</h2>
+                </div>
 
-              <Link href={`/promoter/event/${eventId}/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-black bg-primary">
-                Ver dinero entregado
-              </Link>
-            </div> 
-          </div>
+                <Link href={`/promoter/event/${eventId}/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-black bg-primary">
+                  Ver dinero entregado
+                </Link>
+              </div> 
+            </div>
+            <div className="bg-input mt-2 rounded-lg px-3 py-2">
+              <h1 className="font-medium px-2 mt-2">Link de afiliado</h1>
+              <div className="border-t-2 flex flex-col gap-y-3 pt-3 mt-3 px-2 pb-2 border-dashed border-inactive">
+                <div className="flex justify-between items-center">
+                  <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/20">
+                    { promoterLink }
+                  </h2>                  
+                  <button
+                    onClick={() => {
+                      if (promoterLink) {
+                        navigator.clipboard.writeText(promoterLink);
+                        notifySuccess("Link copiado al portapapeles");
+                      }
+                    }}
+                    className="border border-primary hover:opacity-75 transition-opacity px-4 py-1.5 font-medium text-primary rounded-lg text-sm"
+                  >
+                    Copiar
+                  </button>
+                </div>
+              </div> 
+            </div>
+          </>
         }
 
         {

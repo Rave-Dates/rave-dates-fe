@@ -33,13 +33,14 @@ export default function Checkout() {
   const watchedPartialAmount = watch("partialAmount") || 0;
 
   const { getCookie } = useReactiveCookiesNext();
+  const promoterAffiliate = getCookie("promoterAffiliate");
   const clientToken = getCookie("clientToken");
   const tempToken = getCookie("tempToken");
-  const token = getCookie("token");
+  const isPromoter = getCookie("isPromoter");
 
   const decoded: {id: number} | null = clientToken && jwtDecode(clientToken?.toString()) || null;
   const decodedTemp: {id: number} | null = tempToken && jwtDecode(tempToken?.toString()) || null;
-  const decodedAdminToken: {id: number, role: string, promoterId: number} | null = token && jwtDecode(token?.toString()) || null;
+  const decodedPromoterAffiliate: {promoterId: number} | null = promoterAffiliate && jwtDecode(promoterAffiliate?.toString()) || null;
 
   const { clientData } = useClientGetById({clientId: decoded?.id, clientToken: clientToken});
   const { selectedEvent } = useClientEvent(eventId);
@@ -82,7 +83,7 @@ export default function Checkout() {
         quantity: selected[ticketTypeId].quantity,
         ticketTypeId: Number(ticketTypeId),
       })),
-      promoterId: decodedAdminToken?.role === "PROMOTER" && decodedAdminToken.promoterId || undefined,
+      promoterId: decodedPromoterAffiliate && decodedPromoterAffiliate.promoterId || undefined,
       isPartial: selectedPayment === "Abonar a la alcancía",
       amount: selectedPayment === "Abonar a la alcancía" ? watchedPartialAmount : 0,
       clientId: (decoded && decoded.id ) || (decodedTemp && decodedTemp.id) || 0,
@@ -141,7 +142,7 @@ export default function Checkout() {
         {/* Left Side */}
 
         <div className="space-y-4 order-last lg:order-first">
-          <PaymentTypeSelector selected={selectedPayment} setSelected={setSelectedPayment} />
+          <PaymentTypeSelector isPromoter={Boolean(isPromoter)} selected={selectedPayment} setSelected={setSelectedPayment} />
           {
             selectedPayment === "Pago total" ?
             <PaymentMethodSelector
@@ -150,7 +151,9 @@ export default function Checkout() {
               check={check}
               setCheck={setCheck}
               clientData={clientData}
-            /> :
+              isPromoter={Boolean(isPromoter)}
+            /> 
+            :
             <PartialAmount 
               register={register}
               totalAmount={totalAmount}

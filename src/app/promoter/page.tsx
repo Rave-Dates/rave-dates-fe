@@ -13,15 +13,15 @@ export default function OrganizerHome() {
   
   const { data: user, isPending: isUserLoading } = useAdminUserById({ token, userId: decoded.id }); 
   
-  const organizerId = user?.organizer?.organizerId;
+  const promoterId = user?.promoter?.promoterId;
 
-  const { promoterBinnacles } = useAdminPromoterBinnacles({ promoterId: organizerId ?? 0, token: token?.toString() });
-
+  const { promoterBinnacles } = useAdminPromoterBinnacles({ promoterId: promoterId ?? 0, token: token?.toString() });
+  
   const getTotalAvalible = () => {
     let total = 0;
     if (promoterBinnacles) {
       promoterBinnacles.forEach((binnacle) => {
-        total += Number(binnacle.total);
+        total += Number(binnacle.feePromoter);
       });
     }
     return total.toLocaleString('es-CO');
@@ -48,6 +48,8 @@ export default function OrganizerHome() {
               href="promoter/event"
               key={event.eventId}
               event={event}
+              promoterId={promoterId}
+              totalSold={Number(promoterBinnacles?.find(b => b.eventId === event.eventId)?.feePromoter?? 0)}
             />
           ))}
           {

@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import EventHero from './EventHero';
 import EventInfo from './EventInfo';
 import EventLocation from './EventLocation';
@@ -9,8 +9,23 @@ import GoBackButton from '@/components/ui/buttons/GoBackButton';
 import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
 import { formatDateToColombiaTime } from '@/utils/formatDate';
 import { useClientEvent, useClientEventServedImages, useClientEventTickets } from '@/hooks/client/queries/useClientData';
+import { useSearchParams } from 'next/navigation';
+import { useReactiveCookiesNext } from 'cookies-next';
 
 const EventDetails = ({ eventId } : { eventId: number }) => {
+  const { setCookie } = useReactiveCookiesNext();
+
+  const params = useSearchParams();
+  const urlPromotorAffiliate = params.get("promoter");
+
+  console.log(urlPromotorAffiliate)
+
+  useEffect(() => {
+    if (urlPromotorAffiliate) {
+      setCookie("promoterAffiliate", urlPromotorAffiliate, { path: "/", maxAge: 60 * 60 * 12 });
+    }
+  }, []);
+
   const { selectedEvent, isEventLoading } = useClientEvent(eventId);
   const { servedImages, isImagesLoading } = useClientEventServedImages(eventId);
   const { eventTickets, isTicketsLoading } = useClientEventTickets(eventId);

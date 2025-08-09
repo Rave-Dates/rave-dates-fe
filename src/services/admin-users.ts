@@ -74,7 +74,6 @@ export const deleteUserById = async ({token, id}: { token: CookieValueTypes, id:
   return res.data;
 };
 
-
 export const getGuests = async ({ token, eventId }: { token: CookieValueTypes, eventId: number }) => {
   const res = await axios.get(`${BASE_URL}/admin/clients/invites/${eventId}`, {
     headers: {
@@ -83,7 +82,6 @@ export const getGuests = async ({ token, eventId }: { token: CookieValueTypes, e
   });
   return res.data;
 };
-
 
 export const createGuest = async ({token, ticketTypeId, quantity, clientId}: ICreateGuest & { token: CookieValueTypes }) => {
   const res = await axios.post(`${BASE_URL}/admin/tickets/invite`, { ticketTypeId, quantity, clientId }, {
@@ -106,3 +104,12 @@ export const updateGuest = async ({token, data, clientId}: { token: CookieValueT
   });
   return res.data;
 }
+
+export const getPromoterLink = async ({ token, eventId, promoterId }: { token: CookieValueTypes, eventId: number, promoterId: number }) => {
+  const res = await axios.get(`${BASE_URL}/admin/tickets/promoter-link?promoterId=${promoterId}&eventId=${eventId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
