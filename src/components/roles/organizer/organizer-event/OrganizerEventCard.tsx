@@ -23,7 +23,7 @@ export function OrganizerEventCard({event, href = "organizer/event", totalSold, 
   const { eventId, title, subtitle, date, geo } = event;
   const { servedImageUrl, isImageLoading } = useEventImage({ eventId, token: token?.toString() });
 
-  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId, isPromoter: true });
+  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId, isPromoter: !!promoterId });
   const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId });
 
   const metricsToUse = ticketMetrics || promoterTicketMetrics;

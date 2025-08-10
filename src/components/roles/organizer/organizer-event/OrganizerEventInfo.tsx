@@ -4,12 +4,17 @@ import { DropdownItem } from "@/components/roles/admin/events/DropDownItem"
 import { StageItem } from "@/components/roles/admin/events/StageItem"
 import EditSvg from "@/components/svg/EditSvg"
 import EyeSvg from "@/components/svg/EyeSvg"
-import { notifySuccess } from "@/components/ui/toast-notifications"
+import FormInput from "@/components/ui/inputs/FormInput"
+import { notifyError, notifySuccess } from "@/components/ui/toast-notifications"
 import { useAdminBinnacles, useAdminEvent, useAdminGetPromoterLink, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData"
+import { generateCheckerLink } from "@/services/admin-qr"
+import { onInvalid } from "@/utils/onInvalidFunc"
+import { useMutation } from "@tanstack/react-query"
 import { CookieValueTypes } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
 
 type Props = {
   eventId: number;
@@ -21,8 +26,10 @@ type Props = {
 
 export default function OrganizerEventInfo({ eventId, token, isPromoter = false, isPromoterBinnacle, promoterId }: Props) {
   const [expandedSections, setExpandedSections] = useState<string[]>([])
+  const [checkerLink, setCheckerLink] = useState<string>()
   const [globalExpandedSections, setGlobalExpandedSections] = useState<string[]>([])
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
+  const { register, handleSubmit, reset } = useForm<{ checkerEmail: string, eventId: number }>();
 
   const { ticketMetrics } = useAdminTicketMetrics({ token, eventId, isPromoter });
   const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId: decoded?.promoterId || promoterId });
@@ -54,7 +61,28 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
     setGlobalExpandedSections((prev) => (prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section]))
   }
 
-  const types = ["Vendidas y dinero generado", "Dinero", "Promotores"]
+  const { mutate } = useMutation({
+    mutationFn: generateCheckerLink,
+    onSuccess: (data) => {
+      setCheckerLink(data);
+      notifySuccess('Link creado correctamente');
+    },
+    onError: (error) => {
+      console.log(error)
+      notifyError("Error al creado link");
+    },
+  });
+
+  const onSubmit = (data: { checkerEmail: string }) => {
+    console.log(data)
+
+    mutate({ 
+      eventId,
+      checkerEmail: data.checkerEmail,
+    });
+  };
+
+  const types = ["Vendidas y dinero generado", "Dinero", "Promotores", "Link de controlador"]
 
   return (
     <div className="rounded-lg text-white w-full flex items-start justify-center mb-44 h-full">
@@ -153,6 +181,46 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                       </div>
                     }
                   </div>
+                }
+                {
+                  type === "Link de controlador" && 
+                    <div className="bg-input rounded-lg px-5 py-2">
+                      <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="flex flex-col gap-y-3 justify-between items-center">
+                        <div className="flex w-full gap-x-3 items-center justify-between">
+                          <FormInput
+                            title="Email del controlador*"
+                            inputName="name"
+                            register={register("checkerEmail", { required: true })}
+                          />
+                          {/* <FormInput
+                            title="Ticket type*"
+                            inputName="name"
+                            register={register("checkerEmail")}
+                          /> */}
+                        </div>
+                        <button type="submit" className="bg-primary rounded-lg py-2.5 w-3/4 sm:w-1/2 font-medium text-sm text-primary-black">
+                          Generar link
+                        </button>
+                        <div className="flex w-full gap-x-1 justify-between py-2 items-center">
+                          <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/20">
+                            {checkerLink ? checkerLink : "Aqui aparecerá el link ..."}
+                          </h2>                  
+                          <button
+                            type="button"
+                            disabled={!checkerLink}
+                            onClick={() => {
+                              if (checkerLink) {
+                                navigator.clipboard.writeText(checkerLink);
+                                notifySuccess("Link copiado al portapapeles");
+                              }
+                            }}
+                            className="border border-primary disabled:opacity-60 disabled:pointer-events-none hover:opacity-75 transition-opacity px-4 py-1.5 font-medium text-primary rounded-lg text-sm"
+                          >
+                            Copiar
+                          </button>
+                        </div>
+                      </form>
+                    </div>
                 }
               </div>
             </DropdownItem>

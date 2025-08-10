@@ -49,8 +49,8 @@ export default function ScanQRPage() {
       async (decodedText) => {
         console.log("✅ QR leído:", decodedText);
         try {
-          // const res = await readQr({ token: token, qr: decodedText, controllerId: 1 });
-          console.log("decodedText", decodedText);
+          const res = await readQr({ token: token, qr: decodedText, controllerId: 4 });
+          console.log("decodedText", res);
           alert(`QR escaneado: ${decodedText}`);
         } catch (err) {
           console.error("Error al procesar QR:", err);

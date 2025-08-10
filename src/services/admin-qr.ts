@@ -11,3 +11,12 @@ export const readQr = async ({ token, qr, controllerId }: { token: CookieValueTy
   });
   return res.data;
 };
+
+export const generateCheckerLink = async ({ eventId, checkerEmail }: { eventId: number, checkerEmail: string }) => {
+  const res = await axios.post(`${BASE_URL}/admin/login/generate-checker-link`, { eventId, email: checkerEmail },{
+    headers: {
+      "Accept": "application/json",
+    },
+  });
+  return res.data;
+};
