@@ -75,6 +75,7 @@ const NavbarWeb: React.FC = () => {
               value={searchTerm}
               handleFunc={handleSearch}
               results={results}
+              type="event"
               setSearchTerm={setSearchTerm}
             />
             {

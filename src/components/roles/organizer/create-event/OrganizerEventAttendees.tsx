@@ -12,6 +12,7 @@ import { useReactiveCookiesNext } from "cookies-next"
 import Link from "next/link"
 import { exportGuestsToExcel } from "@/utils/exportExcel"
 import { jwtDecode } from "jwt-decode"
+import { notifyError } from "@/components/ui/toast-notifications"
 
 export default function OrganizerEventAttendees({eventId, isPromoter = false}: {eventId: number, isPromoter?: boolean}) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -107,7 +108,7 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
             value={searchTerm}
             handleFunc={handleSearch}
             results={results}
-            isGuest={true}
+            type="guest"
             setSearchTerm={setSearchTerm}
           />
           <Link href={isPromoter && promoterLink ? promoterLink : "attendees/add-guest"} className="border-primary flex justify-center items-center border text-primary text-2xl px-3 rounded-xl">
@@ -140,7 +141,7 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
             if (guests && guests.length > 0) {
               exportGuestsToExcel(guests);
             } else {
-              alert("No hay invitados para exportar.");
+              notifyError("No hay invitados para exportar.");
             }
           }}
           className="w-full bg-primary text-primary-black font-medium py-4 rounded-lg"

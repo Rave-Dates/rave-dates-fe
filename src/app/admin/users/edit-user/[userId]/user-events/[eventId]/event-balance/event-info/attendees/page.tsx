@@ -6,10 +6,12 @@ import { useState } from "react";
 import DefaultButton from "@/components/ui/buttons/DefaultButton";
 import UserSvg from "@/components/svg/UserSvg";
 import { useReactiveCookiesNext } from "cookies-next";
-import { useAdminEvent, useAdminGetGuests, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData";
+import { useAdminGetGuests, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData";
 import { useParams } from "next/navigation";
 import SearchInput from "@/components/ui/inputs/search-input/SearchInput";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
+import { exportGuestsToExcel } from "@/utils/exportExcel";
+import { notifyError } from "@/components/ui/toast-notifications";
 
 export default function UsersList() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,7 +24,6 @@ export default function UsersList() {
   const eventId = Number(params.eventId);
 
   const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });
-  const { selectedEvent } = useAdminEvent({ eventId, token });
   const { guests } = useAdminGetGuests({ token, eventId });
 
   console.log(ticketMetrics)
@@ -43,16 +44,6 @@ export default function UsersList() {
     setResults(filtered);
   };
   
-  const users = [
-    { id: 1, name: "Juan Gimenez", ticketType: "XXXX" },
-    { id: 2, name: "Ana Martínez", ticketType: "XXXX" },
-    { id: 3, name: "Carlos Ruiz", ticketType: "XXXX" },
-    { id: 4, name: "Pedro López", ticketType: "XXXX" },
-    { id: 5, name: "Roman Ruiz", ticketType: "XXXX" },
-    { id: 6, name: "Diego Martínez", ticketType: "XXXX" },
-    { id: 7, name: "Axel Gómez", ticketType: "XXXX" },
-  ];
-  
   return (
     <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen pt-0 pb-40 sm:pt-32">
       <div className="max-w-xl w-full mx-auto animate-fade-in">
@@ -64,7 +55,7 @@ export default function UsersList() {
             value={searchTerm}
             handleFunc={handleSearch}
             results={results}
-            isGuest={true}
+            type="guest"
             setSearchTerm={setSearchTerm}
           />
           <Link
@@ -109,6 +100,13 @@ export default function UsersList() {
       </div>
       <div className="mx-5">
         <button
+          onClick={() => {
+            if (guests && guests.length > 0) {
+              exportGuestsToExcel(guests);
+            } else {
+              notifyError("No hay invitados para exportar.");
+            }
+          }}          
           className="bg-primary mt-20 text-black input-button" 
         >
           Descargar
