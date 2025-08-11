@@ -64,9 +64,8 @@ export default function TicketsChanger({ eventInfo }: Props) {
 
   const nonTransferredTickets = purchasedTickets?.filter(
     (ticket) =>
-      (!ticket.isTransferred ||
+      ((!ticket.isTransferred && ticket.purchase.paymentStatus === "PAID") &&
         ticket.transferredClientId === null ||
-        ticket.purchase.paymentStatus !== "PARTIAL" ||
         ticket.transferredClientId === clientId) &&
       ticket.ticketType.eventId === eventId
   );
@@ -273,6 +272,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
                   eventInfo={eventInfo}
                   href="transferred"
                   key={ticket.purchaseTicketId}
+                  isPendingToPay={true}
                 />
               ))}
             </div>
@@ -308,7 +308,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
         ) : null}
         <Link
           href={`${pathname}/change-tickets`}
-          className="block text-center w-full bg-primary text-black font-medium py-3 rounded-lg mb-3 mt-14 hover:opacity-80 transition-opacity"
+          className="block text-center w-full bg-primary text-black font-medium py-3 rounded-lg mb-3 mt-10 hover:opacity-80 transition-opacity"
         >
           Cambiar tickets
         </Link>

@@ -18,6 +18,7 @@ interface TicketRowProps {
   ticket: IPurchaseTicket;
   eventInfo: { date: string, title: string };
   isTransferred?: boolean;
+  isPendingToPay?: boolean;
 }
 
 export function TicketRow({
@@ -25,6 +26,7 @@ export function TicketRow({
   ticket,
   eventInfo,
   isTransferred = false,
+  isPendingToPay = false,
 }: TicketRowProps) {
   const [showQR, setShowQR] = useState(false);
 
@@ -77,18 +79,24 @@ export function TicketRow({
       <div className="flex gap-2">
         {
           ticket.status === "READ" &&
-          <div className="flex items-center text-primary justify-center font-medium mb-1 gap-x-2">
-            <h2>Ticket leido</h2>
+          <div className="flex h-[47px] items-center text-primary justify-center text-sm gap-x-2">
+            <h2>Ticket usado</h2>
             <CheckSvg className="text-primary" />
           </div>
         }
         {
           ticket.status === "DEFEATED" &&
-          <div className="flex items-center text-system-error justify-center font-medium mb-1 gap-x-2">
+          <div className="flex h-[47px] items-center text-system-error justify-center text-sm gap-x-2">
             <h2>Ticket vencido</h2>
           </div>
         }
-        {ticket.status === "PENDING" &&
+        {
+          isPendingToPay &&
+          <div className="flex h-[47px] items-center text-system-error justify-center text-sm gap-x-2">
+            <h2>Ticket pendiente</h2>
+          </div>
+        }
+        {ticket.status === "PENDING" && !isPendingToPay &&
           actions.map((action) => {
             if (action === "download") {
               return (
