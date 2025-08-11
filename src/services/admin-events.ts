@@ -105,6 +105,17 @@ export const getPromoterTicketMetrics = async (token: CookieValueTypes, eventId:
   return res.data;
 }
 
+export const getCheckerTicketMetrics = async ({token, eventId}: { token: CookieValueTypes, eventId: number }) => {
+  const res = await axios.get(`${BASE_URL}/admin/tickets/metrics/${eventId}/checker`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+  });
+  return res.data;
+}
+
 export const createEventCategories = async (token: CookieValueTypes, categoryValueId: { categoryValueId: number; }, eventId: number) => {
   const res = await axios.post(`${BASE_URL}/admin/events/${eventId}/category-value`, categoryValueId, {
     headers: {

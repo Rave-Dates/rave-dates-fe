@@ -19,6 +19,17 @@ export const getAllUsers = async ({token}: { token: CookieValueTypes }) => {
   return data;
 };
 
+export const getAllCheckerUsers = async ({token, eventId}: { token: CookieValueTypes | Promise<CookieValueTypes>, eventId: number }) => {
+  const res = await axios.get(`${BASE_URL}/admin/clients/checker-list/${eventId}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  const data: IGuest[] = res.data;
+  return data;
+};
+
 export const getAllPromoters = async ({token, organizerId}: { token: CookieValueTypes, organizerId: number }) => {
   const res = await axios.get(`${BASE_URL}/admin/users/promoters?organizerId=${organizerId}`, {
     headers: {

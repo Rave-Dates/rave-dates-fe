@@ -47,7 +47,7 @@ export default function ControllerEventDetails() {
       ? urlToken
       : decodedCookieToken?.role === "CHECKER"
       ? cookiesToken
-      : null;
+      : undefined;
 
   useEffect(() => {
     // Evitar ejecutar hasta tener las cookies leídas
@@ -81,13 +81,15 @@ export default function ControllerEventDetails() {
     }
   }, [loadingAuth, cookiesToken, urlToken, router]);
 
+  const validDecodedToken = useMemo(() => safeDecode(validToken), [validToken]);
+
   const { servedImageUrl, isImageLoading } = useEventImage({
-    eventId: 1,
+    eventId: validDecodedToken?.eventId,
     token: validToken ?? undefined,
   });
 
   const { selectedEvent, isEventLoading } = useAdminEvent({
-    eventId: 1,
+    eventId: validDecodedToken?.eventId,
     token: validToken ?? undefined,
   });
 
@@ -141,7 +143,7 @@ export default function ControllerEventDetails() {
         </div>
       </div>
 
-      <ControllerPanelSection token={validToken} eventId={1} />
+      <ControllerPanelSection token={validToken} eventId={validDecodedToken?.eventId} />
     </div>
   );
 }

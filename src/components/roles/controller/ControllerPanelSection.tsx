@@ -1,19 +1,18 @@
 "use client"
 
 import QRSvg from "@/components/svg/QRSvg";
-import { CookieValueTypes } from "cookies-next"
-import { jwtDecode } from "jwt-decode"
 import Link from "next/link";
 import { CircularProgress } from "../organizer/create-event/ProgressCircular";
-import { ParamValue } from "next/dist/server/request/params";
+import { useAdminCheckerTicketMetrics } from "@/hooks/admin/queries/useAdminData";
+import { ProgressBar } from "../organizer/create-event/ProgressBar";
 
 type Props = {
-  eventId: number;
-  token: string | null;
+  eventId: number | undefined;
+  token: string | undefined | null;
 }
 
-export default function ControllerPanelSection({ token }: Props) {
-  // const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
+export default function ControllerPanelSection({ token, eventId }: Props) {
+  const { checkerTicketMetrics } = useAdminCheckerTicketMetrics({ token, eventId });
 
   return (
     <div className="rounded-lg text-white w-full flex items-start justify-center mb-24 h-full">
@@ -24,18 +23,36 @@ export default function ControllerPanelSection({ token }: Props) {
         <div className="bg-input h-[80px] flex px-5 justify-between items-center py-1 rounded-lg mt-3">
           <div>
             <h3 className="text-sm text-primary-white/50">Total leídos</h3>
-            <h3 className="text-lg">200/400</h3>
+            <h3 className="text-lg">{checkerTicketMetrics?.totalRead}/{checkerTicketMetrics?.ticketsPurchased}</h3>
           </div>
 
-          <CircularProgress current={200} total={400} />
+          {
+            checkerTicketMetrics && 
+            <CircularProgress current={checkerTicketMetrics.totalRead ?? 0} total={checkerTicketMetrics.ticketsPurchased ?? 0} />
+          }
         </div>
-        <button
-          type="submit"
-          form="filter-form"
-          className="w-full bg-primary mt-5 text-black py-4 rounded-lg font-medium hover:opacity-85 transition-opacity"
+        <div className="bg-input mt-3 space-y-4 rounded-lg pt-3 pb-5 px-4">
+          {
+            checkerTicketMetrics?.ticketsTypesMetrics.map((ticketType) => (
+              <div key={ticketType.name}>
+                <h2 className="text-text-inactive">{ticketType.name}</h2>
+                <ProgressBar current={ticketType.read} total={ticketType.quantity} />
+              </div>
+            ))
+          }
+          {
+            checkerTicketMetrics?.ticketsTypesMetrics.length === 0 &&
+            <div className="text-center pt-2 text-text-inactive">
+              No hay compras
+            </div>
+          }
+        </div>
+        <Link
+          href={`/checker/${eventId}/attendees`}
+          className="w-full block text-center bg-primary mt-5 text-black py-4 rounded-lg font-medium hover:opacity-85 transition-opacity"
         >
           Ver escaneados
-        </button>
+        </Link>
       </div>
     </div>
   )

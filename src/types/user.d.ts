@@ -88,6 +88,7 @@ interface IUserLogin {
   exp: number;
   iat: number;
   role: string ;
+  eventId?: number;
   organizerId?: number | null;
   promoterId?: number | null;
   checkerId?: number | null;

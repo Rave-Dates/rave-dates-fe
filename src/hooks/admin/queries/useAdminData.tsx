@@ -1,15 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { CookieValueTypes } from "cookies-next";
-import { getAllEvents, getEventById, getEventCategoriesById, getPromoterTicketMetrics, getTicketMetrics, getTicketTypesById } from "@/services/admin-events";
+import { getAllEvents, getCheckerTicketMetrics, getEventById, getEventCategoriesById, getPromoterTicketMetrics, getTicketMetrics, getTicketTypesById } from "@/services/admin-events";
 import { getAllBinnaclesFromOrganizer, getAllBinnaclesFromPromoter } from "@/services/admin-binnacles";
 import { getEventImages, getImageById } from "@/services/admin-events";
 import { getAllCategories } from "@/services/admin-categories";
 import { getAllLabels } from "@/services/admin-labels";
-import { getAllPromoters, getAllUsers, getGuests, getPromoterLink, getUserById } from "@/services/admin-users";
+import { getAllCheckerUsers, getAllPromoters, getAllUsers, getGuests, getPromoterLink, getUserById } from "@/services/admin-users";
 import { getAllRoles } from "@/services/admin-roles";
 import { getAllPayments, servedMovementImage } from "@/services/admin-payments";
 
-export function useAdminEvent({ eventId, token }: { eventId: number; token: CookieValueTypes }) {
+export function useAdminEvent({ eventId, token }: { eventId: number | undefined; token: CookieValueTypes }) {
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
     queryKey: [`selectedEvent-${eventId}`],
     queryFn: async () => {
@@ -190,6 +190,16 @@ export function useAdminAllUsers({ token }: { token: CookieValueTypes }) {
   return { data, isLoading, isError };
 }
 
+export function useAdminAllCheckerUsers({ token, eventId }: { token: CookieValueTypes | Promise<CookieValueTypes>, eventId: number }) {
+  const { data: checkerUsers, isLoading, isError } = useQuery({
+    queryKey: ["checkerUsers"],
+    queryFn: () => getAllCheckerUsers({ token, eventId }),
+    enabled: !!token && !!eventId,
+  });
+
+  return { checkerUsers, isLoading, isError };
+}
+
 export function useAdminAllPromoters({ token, organizerId }: { token: CookieValueTypes, organizerId: number | null | undefined }) {
   const { data: promoters, isLoading, isError } = useQuery({
     queryKey: ["promoters"],
@@ -248,6 +258,16 @@ export function useAdminPromoterTicketMetrics({ token, eventId, promoterId }: { 
   });
 
   return { promoterTicketMetrics };
+}
+
+export function useAdminCheckerTicketMetrics({ token, eventId }: { token: CookieValueTypes | null, eventId: number | undefined }) {
+  const { data: checkerTicketMetrics } = useQuery<IEventCheckerTicketMetrics>({
+    queryKey: ["checkerTicketMetrics", eventId],
+    queryFn: () => getCheckerTicketMetrics({token: token!, eventId: eventId!}),
+    enabled: !!token && !!eventId,
+  });
+
+  return { checkerTicketMetrics };
 }
 
 export function useAdminGetGuests({ token, eventId }: { token: CookieValueTypes, eventId: number }) {

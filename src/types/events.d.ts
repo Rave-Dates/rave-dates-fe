@@ -119,6 +119,16 @@ interface IEventTicketMetrics {
   }[];
 }
 
+interface IEventCheckerTicketMetrics {
+  totalRead: number;
+  ticketsPurchased: number;
+  ticketsTypesMetrics: {
+    name: string;
+    quantity: number;
+    read: number;
+  }[];
+}
+
 interface IEventStages {
   stageId?: number;
   date: string;
