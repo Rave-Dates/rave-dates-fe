@@ -6,9 +6,9 @@ import PaymentTypeSelector from "@/components/containers/checkout/PaymentTypeSel
 import PricingDetails from "@/components/containers/checkout/PricingDetails";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { useReactiveCookiesNext } from "cookies-next";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { initTicketPurchase } from "@/services/clients-tickets";
+import { changeTicketPurchase, initTicketPurchase } from "@/services/clients-tickets";
 import { useMutation } from "@tanstack/react-query";
 import { useTicketStore } from "@/store/useTicketStore";
 import { jwtDecode } from "jwt-decode";
@@ -16,12 +16,20 @@ import { notifyError, notifyPending, notifySuccess } from "@/components/ui/toast
 import { useClientEvent, useClientEventTickets, useClientGetById } from "@/hooks/client/queries/useClientData";
 import PartialAmount from "@/components/containers/checkout/PartialAmount";
 import { useForm } from "react-hook-form";
+import { useChangeTicketStore } from "@/store/useChangeTicketStore";
 
 export default function Checkout() {
   const [selectedPayment, setSelectedPayment] = useState<"Pago total" | "Abonar a la alcancía">("Pago total");
   const [selectedMethod, setSelectedMethod] = useState<"Nequi" | "Bold">("Bold");
   const { selected, eventId } = useTicketStore();
   const { eventTickets } = useClientEventTickets(eventId);
+  const { 
+    restados,
+    storePurchaseId,
+    getTotalRestados,
+  } = useChangeTicketStore();
+  const totalRestados = getTotalRestados();
+
 
   const [check, setCheck] = useState(false);
   const router = useRouter();
@@ -33,6 +41,8 @@ export default function Checkout() {
   const watchedPartialAmount = watch("partialAmount") || 0;
 
   const { getCookie } = useReactiveCookiesNext();
+  const searchParams = useSearchParams();
+  const isChangeTickets = searchParams.get("change-tickets");
   const promoterAffiliate = getCookie("promoterAffiliate");
   const clientToken = getCookie("clientToken");
   const tempToken = getCookie("tempToken");
@@ -73,8 +83,47 @@ export default function Checkout() {
     urlToReturn = `https://ravedates.proxising.com/transfer-confirm?eid=${eventId}`
   }
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!clientToken && !tempToken) return
+
+    if (isChangeTickets && decoded) {
+      const formattedOldTickets = []
+    
+      for (const [key, value] of Object.entries(restados)) {
+        formattedOldTickets.push({
+          ticketTypeId: Number(key),
+          quantity: value.cantidadActual,
+          price: value.price,
+        });
+      }
+
+      const formattedNewTickets = []
+
+      for (const [key, value] of Object.entries(selected)) {
+        formattedNewTickets.push({
+          ticketTypeId: Number(key),
+          quantity: value.quantity,
+          price: value.stage.price,
+        });
+      }
+    
+      await changeTicketPurchase({
+        ticketData: {
+          clientId: decoded.id,
+          oldTickets: totalRestados > 0 ? formattedOldTickets : [],
+          newTickets: formattedNewTickets,
+          payWithBalance: check,
+          eventId: eventId,
+          method: "BOLD",
+          boldMethod: selectedMethod.toUpperCase() === "BOLD" ? ["CREDIT_CARD"] : ["NEQUI"],
+          returnUrl: "https://ravedates.proxising.com/tickets",
+        },
+        purchaseId: storePurchaseId ?? 0,
+        clientToken: clientToken,
+      });
+
+      return
+    }
 
     const formattedTicketData: IClientPurchaseTicket = {
       method: "BOLD",

@@ -3,20 +3,27 @@ import AddSvg from "@/components/svg/AddSvg";
 import SubtractSvg from "@/components/svg/SubtractSvg";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useParams } from "next/navigation";
+import { useChangeTicketStore } from "@/store/useChangeTicketStore";
 
 type Props = {
   ticket: IEventTicket;
   maxPurchase?: number;
   totalQuantity: number;
+  overrideMaxTotalSelectable?: number;
+  fixedQuantity?: number; 
+  isOldTicket?: boolean;
 };
 
-const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
+const ChangeTicketButtons = ({ ticket, maxPurchase, totalQuantity, overrideMaxTotalSelectable, fixedQuantity, isOldTicket }: Props) => {
+  const { restar, restados, getTotalRestados, oldTicketsTotal } = useChangeTicketStore();
   const { add, subtract, selected, setEventId } = useTicketStore();
   const params = useParams();
   const eventId = Number(params.eventId);
   
-  let controlledMaxPurchase = maxPurchase ?? 1;
-  const currentQuantity = selected[ticket.ticketTypeId || 0]?.quantity ?? 0;
+  let controlledMaxPurchase = overrideMaxTotalSelectable ?? maxPurchase ?? 1;
+  const currentQuantity = fixedQuantity ?? selected[ticket.ticketTypeId || 0]?.quantity ?? 0;
+  const totalRestados = getTotalRestados();
+
 
   useEffect(() => {
     if (eventId) {
@@ -34,6 +41,10 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
   }
 
   if (typeof ticket.ticketTypeId !== "number") return null;
+
+  const totalOriginal = ticket.stages[0]?.quantity ?? 0;
+
+  console.log("totalRestados", totalRestados)
 
   return (
     <div className="space-y-2 mb-3">
@@ -55,8 +66,13 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
 
         <div className="flex items-center font-light text-subtitle">
           <button
-            onClick={() => subtract(ticket.ticketTypeId)}
-            disabled={currentQuantity === 0}
+              onClick={() => {
+                subtract(ticket.ticketTypeId);
+                if (isOldTicket) {
+                  restar(ticket.ticketTypeId, ticket.stages[0].price);
+                }
+              }}
+              disabled={isOldTicket ? restados[ticket.ticketTypeId]?.cantidadActual === 0 : currentQuantity <= 0}
             className={`p-3 rounded-l-xl transition-opacity ${
               currentQuantity > 0 ? "bg-primary-white text-black hover:opacity-75" : "bg-inactive text-text-inactive pointer-events-none"
             }`}
@@ -65,20 +81,20 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
           </button>
 
           <span className="px-4 h-12 tabular-nums w-[63] sm:w-[76px] content-center bg-text-inactive/70 text-center">
-            {currentQuantity}
+            {isOldTicket ? (restados[ticket.ticketTypeId]?.cantidadActual ?? 0) : currentQuantity}
           </span>
 
           <button
-            onClick={() => validStage && add({ ticketTypeId: ticket.ticketTypeId, price: validStage.price, quantity: validStage.quantity })}
-            disabled={
-              !validStage ||
-              currentQuantity >= validStage.quantity ||
-              totalQuantity >= controlledMaxPurchase
-            }            
+            onClick={() => {
+              if (!isOldTicket) {
+                add({ ticketTypeId: ticket.ticketTypeId, price: ticket.stages[0].price, quantity: ticket.stages[0].quantity });
+              }
+            }}
+            disabled={isOldTicket || totalQuantity === oldTicketsTotal - totalRestados }
             className={`p-3 rounded-r-xl flex items-center justify-center text-black transition-colors ${
               validStage &&
               currentQuantity < validStage.quantity &&
-              totalQuantity < controlledMaxPurchase
+              totalQuantity !== oldTicketsTotal - totalRestados
                 ? "bg-primary hover:bg-primary/70"
                 : "bg-inactive text-text-inactive pointer-events-none"
             }`}
@@ -91,4 +107,4 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
   );
 };
 
-export default TicketButtons;
+export default ChangeTicketButtons;

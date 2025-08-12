@@ -91,3 +91,14 @@ interface ITransferUser {
   whatsapp: string;
   idCard: string;
 }
+
+type IChangeTicketsPayload = {
+  clientId: number;
+  oldTickets: TicketStage[] | [];
+  newTickets: TicketStage[];
+  payWithBalance: boolean;
+  eventId: number;
+  method: "BOLD" | "NEQUI" | string;
+  boldMethod: string | string[] | undefined | {};
+  returnUrl: string;
+};
