@@ -6,26 +6,6 @@ import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-const sampleData = {
-  id: 1,
-  eventName: "Evento 1 - 10/05",
-  commission: 5,
-  tickets: [
-    { id: 1, name: "General", price: 125000, amount: 1200 },
-    { id: 2, name: "VIP", price: 200000, amount: 300 },
-    { id: 3, name: "Bakcstage", price: 180000, amount: 40 },
-  ],
-};
-
-const stats = [
-  { id: 1, name: "Total", price: 125000 },
-  { id: 2, name: "Comisión RD", price: 70000 },
-  { id: 3, name: "Comisión promotores", price: 120000 },
-  { id: 4, name: "NETO", price: 215000 },
-  { id: 5, name: "Retirado", price: 50000 },
-  { id: 6, name: "DISPONIBLE", price: 165000 },
-]
-
 export default function EventBalance({eventId}: { eventId: number }) {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");

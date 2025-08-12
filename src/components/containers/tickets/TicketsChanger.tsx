@@ -13,7 +13,6 @@ import {
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { generateTicketImage } from "./generateTicketImage";
 import { useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
-import { useTicketStore } from "@/store/useTicketStore";
 import { partialPurchase } from "@/services/clients-tickets";
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
 
@@ -42,7 +41,6 @@ export default function TicketsChanger({ eventInfo }: Props) {
     clientId,
     clientToken: token,
   });
-  const { setEventId, setSelected } = useTicketStore();
   const router = useRouter();
   const params = useParams();
   const eventId = Number(params.eventId);

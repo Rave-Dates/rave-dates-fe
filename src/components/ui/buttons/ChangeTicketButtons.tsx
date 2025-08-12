@@ -7,20 +7,17 @@ import { useChangeTicketStore } from "@/store/useChangeTicketStore";
 
 type Props = {
   ticket: IEventTicket;
-  maxPurchase?: number;
   totalQuantity: number;
-  overrideMaxTotalSelectable?: number;
   fixedQuantity?: number; 
   isOldTicket?: boolean;
 };
 
-const ChangeTicketButtons = ({ ticket, maxPurchase, totalQuantity, overrideMaxTotalSelectable, fixedQuantity, isOldTicket }: Props) => {
+const ChangeTicketButtons = ({ ticket, totalQuantity, fixedQuantity, isOldTicket }: Props) => {
   const { restar, restados, getTotalRestados, oldTicketsTotal } = useChangeTicketStore();
   const { add, subtract, selected, setEventId } = useTicketStore();
   const params = useParams();
   const eventId = Number(params.eventId);
   
-  let controlledMaxPurchase = overrideMaxTotalSelectable ?? maxPurchase ?? 1;
   const currentQuantity = fixedQuantity ?? selected[ticket.ticketTypeId || 0]?.quantity ?? 0;
   const totalRestados = getTotalRestados();
 
@@ -36,15 +33,7 @@ const ChangeTicketButtons = ({ ticket, maxPurchase, totalQuantity, overrideMaxTo
     return new Date(stage.dateMax).getTime() > now && stage.quantity > 0;
   });
 
-  if (validStage?.price === 0) {
-    controlledMaxPurchase = 1;
-  }
-
   if (typeof ticket.ticketTypeId !== "number") return null;
-
-  const totalOriginal = ticket.stages[0]?.quantity ?? 0;
-
-  console.log("totalRestados", totalRestados)
 
   return (
     <div className="space-y-2 mb-3">
@@ -68,7 +57,7 @@ const ChangeTicketButtons = ({ ticket, maxPurchase, totalQuantity, overrideMaxTo
           <button
               onClick={() => {
                 subtract(ticket.ticketTypeId);
-                if (isOldTicket) {
+                if (isOldTicket && ticket.ticketTypeId) {
                   restar(ticket.ticketTypeId, ticket.stages[0].price);
                 }
               }}

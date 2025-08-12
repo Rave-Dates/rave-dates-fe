@@ -8,7 +8,7 @@ type Props = {
   children: React.ReactNode;
   createHref: string;
   searchQuery?: string;
-  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  setSearchTerm?: React.Dispatch<React.SetStateAction<string>>;
   handleSearch?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   searchTerm?: string;
   hasSearch?: boolean;
@@ -30,7 +30,7 @@ export default function UsersList({
       <div className="max-w-xl mx-auto animate-fade-in">
         {/* Search and Add User Section */}
         <div className="flex items-center gap-2 mb-4">
-          {hasSearch && results && (
+          {hasSearch && results && !!setSearchTerm && (
             <SearchInput
               placeholder="Busca un usuario"
               value={searchTerm}

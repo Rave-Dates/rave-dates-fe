@@ -6,7 +6,7 @@ import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
 import { useCreatePayment } from "@/hooks/admin/mutations/useCreatePayment";
-import { useAdminAllEvents, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
+import { useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { AxiosError } from "axios";
 import { useReactiveCookiesNext } from "cookies-next";
@@ -31,7 +31,6 @@ export default function Page() {
     }
   });
   
-  const { allEvents } = useAdminAllEvents({ token });
   const { data: selectedUser } = useAdminUserById({ token, userId });
 
   console.log(selectedUser)

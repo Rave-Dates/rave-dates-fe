@@ -29,7 +29,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
   const [checkerLink, setCheckerLink] = useState<string>()
   const [globalExpandedSections, setGlobalExpandedSections] = useState<string[]>([])
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
-  const { register, handleSubmit, reset } = useForm<{ checkerEmail: string, eventId: number }>();
+  const { register, handleSubmit } = useForm<{ checkerEmail: string, eventId: number }>();
 
   const { ticketMetrics } = useAdminTicketMetrics({ token, eventId, isPromoter });
   const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId: decoded?.promoterId || promoterId });
@@ -279,7 +279,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
 
         {
           isPromoterBinnacle && ["Vendidas y dinero generado"].map((type) => (
-            <div className="bg-input px-2 py-3 rounded-lg mt-2">
+            <div key={type} className="bg-input px-2 py-3 rounded-lg mt-2">
               {
                 type === "Vendidas y dinero generado" && 
                 <div>

@@ -40,7 +40,6 @@ const ChangeTicketsView = () => {
     resetOldTicketsTotal, 
     oldTicketsTotal, 
     setOldTicketsPriceTotal,
-    storePurchaseId,
     setStorePurchaseId,
   } = useChangeTicketStore();
   const totalRestados = getTotalRestados();
@@ -96,11 +95,13 @@ const ChangeTicketsView = () => {
     let totalNew = 0;
     let totalOld = 0;
     for (const [key, value] of Object.entries(selected)) {
+      console.log(key)
       totalNew += value.quantity * value.stage.price;
     }
     {oldTickets
       ?.filter((ticket) => ticket?.purchaseId === activeTab)
       .map((ticket, index) => {
+        console.log(index)
         if (!ticket) return;
         totalOld += ticket.quantity * ticket.price;
       })
@@ -168,9 +169,9 @@ const ChangeTicketsView = () => {
     0
   );
 
-  const maxPurchase = oldTickets
-    .filter((ticket) => ticket?.purchaseId === activeTab)
-    .reduce((acc, curr) => acc + curr.quantity, 0);
+  // const maxPurchase = oldTickets
+  //   .filter((ticket) => ticket?.purchaseId === activeTab)
+  //   .reduce((acc, curr) => acc + (curr?.quantity ?? 0), 0);
 
   const handleSetActiveTab = (purchaseId: number) => {
     setStorePurchaseId(purchaseId);
@@ -284,7 +285,6 @@ const ChangeTicketsView = () => {
                       isOldTicket={true}
                       totalQuantity={totalQuantity}
                       ticket={newTicket}
-                      overrideMaxTotalSelectable={ticket.quantity}
                       fixedQuantity={ticket.quantity} 
                     />
                   );
@@ -301,8 +301,6 @@ const ChangeTicketsView = () => {
                     key={ticket.ticketTypeId}
                     totalQuantity={totalQuantity}
                     ticket={ticket}
-                    maxPurchase={totalRestados}
-                    
                   />
                 );
               })}

@@ -4,7 +4,7 @@ import { DropdownItem } from "@/components/roles/admin/events/DropDownItem"
 import { StageItem } from "@/components/roles/admin/events/StageItem"
 import UserSvg from "@/components/svg/UserSvg"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
-import { useAdminBinnacles, useAdminEvent, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes, useAdminUserById } from "@/hooks/admin/queries/useAdminData"
+import { useAdminBinnacles, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes, useAdminUserById } from "@/hooks/admin/queries/useAdminData"
 import { useReactiveCookiesNext } from "cookies-next"
 import Link from "next/link"
 import { useParams } from "next/navigation"
@@ -21,8 +21,6 @@ export default function EventInfo() {
   
   const { data: user } = useAdminUserById({ token, userId });
   const { ticketTypes } = useAdminTicketTypes({ token, eventId });
-
-  const { selectedEvent } = useAdminEvent({ token, eventId });
 
   const { organizerBinnacles } = useAdminBinnacles({
     organizerId: user?.organizer?.organizerId ?? 0,

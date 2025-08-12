@@ -99,6 +99,6 @@ type IChangeTicketsPayload = {
   payWithBalance: boolean;
   eventId: number;
   method: "BOLD" | "NEQUI" | string;
-  boldMethod: string | string[] | undefined | {};
+  boldMethod: string | string[] | undefined | object;
   returnUrl: string;
 };

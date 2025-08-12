@@ -3,7 +3,6 @@
 import { readQr } from '@/services/admin-qr';
 import { useReactiveCookiesNext } from 'cookies-next';
 import { CameraDevice, Html5Qrcode, Html5QrcodeCameraScanConfig } from 'html5-qrcode';
-import { jwtDecode } from 'jwt-decode';
 import { useEffect, useRef, useState } from 'react';
 
 export default function ScanQRPage() {
