@@ -37,7 +37,7 @@ export default function MoneyWithdrawn() {
           {/* Search and Add User Section */}
 
           <h1 className="text-title font-semibold">Dinero retirado</h1>
-          <h2 className="text-xl text-primary">COP ${selectedBinnacle?.alreadyPaid.toLocaleString()}</h2>
+          <h2 className="text-xl text-primary">COP ${selectedBinnacle?.alreadyPaid.toLocaleString() ?? 0}</h2>
 
           {/* Users Table/List */}
           <div className="rounded-md overflow-hidden mt-5">
@@ -72,7 +72,7 @@ export default function MoneyWithdrawn() {
           {/* Empty State */}
           {organizerBinnacles?.flatMap(b => b.movements).length === 0 && (
             <div className="text-center py-8 text-neutral-400">
-              No se encontraron usuarios
+              No se encontraron movimientos
             </div>
           )}
         </div>

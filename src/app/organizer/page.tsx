@@ -50,7 +50,7 @@ export default function OrganizerHome() {
               href="organizer/event"
               key={event.eventId}
               event={event}
-              totalSold={Number(organizerBinnacles?.find(b => b.eventId === event.eventId)?.total)}
+              totalSold={Number(organizerBinnacles?.find(b => b.eventId === event.eventId)?.total ?? 0)}
             />
           ))}
           {

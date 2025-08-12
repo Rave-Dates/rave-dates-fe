@@ -1,11 +1,5 @@
 import { create } from 'zustand';
 
-type TicketStage = {
-  ticketTypeId: number | undefined;
-  price: number;
-  quantity: number;
-};
-
 type TicketStore = {
   eventId: number;
   selected: Record<string, { quantity: number; stage: TicketStage }>;

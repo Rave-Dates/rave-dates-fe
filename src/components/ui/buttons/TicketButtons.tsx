@@ -8,17 +8,15 @@ type Props = {
   ticket: IEventTicket;
   maxPurchase?: number;
   totalQuantity: number;
-  overrideMaxTotalSelectable?: number;
-  fixedQuantity?: number; 
 };
 
-const TicketButtons = ({ ticket, maxPurchase, totalQuantity, overrideMaxTotalSelectable, fixedQuantity }: Props) => {
+const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
   const { add, subtract, selected, setEventId } = useTicketStore();
   const params = useParams();
   const eventId = Number(params.eventId);
   
-  let controlledMaxPurchase = overrideMaxTotalSelectable ?? maxPurchase ?? 1;
-  const currentQuantity = fixedQuantity ?? selected[ticket.ticketTypeId || 0]?.quantity ?? 0;
+  let controlledMaxPurchase = maxPurchase ?? 1;
+  const currentQuantity = selected[ticket.ticketTypeId || 0]?.quantity ?? 0;
 
   useEffect(() => {
     if (eventId) {
@@ -58,9 +56,9 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity, overrideMaxTotalSel
         <div className="flex items-center font-light text-subtitle">
           <button
             onClick={() => subtract(ticket.ticketTypeId)}
-            disabled={currentQuantity === 0 || !!fixedQuantity}
+            disabled={currentQuantity === 0}
             className={`p-3 rounded-l-xl transition-opacity ${
-              currentQuantity > 0 && !fixedQuantity ? "bg-primary-white text-black hover:opacity-75" : "bg-inactive text-text-inactive pointer-events-none"
+              currentQuantity > 0 ? "bg-primary-white text-black hover:opacity-75" : "bg-inactive text-text-inactive pointer-events-none"
             }`}
           >
             <SubtractSvg />

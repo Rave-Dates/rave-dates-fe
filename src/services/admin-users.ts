@@ -19,8 +19,19 @@ export const getAllUsers = async ({token}: { token: CookieValueTypes }) => {
   return data;
 };
 
-export const getAllPromoters = async ({token}: { token: CookieValueTypes }) => {
-  const res = await axios.get(`${BASE_URL}/admin/users/promoters`, {
+export const getAllCheckerUsers = async ({token, eventId}: { token: CookieValueTypes | Promise<CookieValueTypes>, eventId: number }) => {
+  const res = await axios.get(`${BASE_URL}/admin/clients/checker-list/${eventId}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  const data: IGuest[] = res.data;
+  return data;
+};
+
+export const getAllPromoters = async ({token, organizerId}: { token: CookieValueTypes, organizerId: number }) => {
+  const res = await axios.get(`${BASE_URL}/admin/users/promoters?organizerId=${organizerId}`, {
     headers: {
       "Accept": "application/json",
       "Authorization": `Bearer ${token}`,
@@ -74,7 +85,6 @@ export const deleteUserById = async ({token, id}: { token: CookieValueTypes, id:
   return res.data;
 };
 
-
 export const getGuests = async ({ token, eventId }: { token: CookieValueTypes, eventId: number }) => {
   const res = await axios.get(`${BASE_URL}/admin/clients/invites/${eventId}`, {
     headers: {
@@ -83,7 +93,6 @@ export const getGuests = async ({ token, eventId }: { token: CookieValueTypes, e
   });
   return res.data;
 };
-
 
 export const createGuest = async ({token, ticketTypeId, quantity, clientId}: ICreateGuest & { token: CookieValueTypes }) => {
   const res = await axios.post(`${BASE_URL}/admin/tickets/invite`, { ticketTypeId, quantity, clientId }, {
@@ -106,3 +115,12 @@ export const updateGuest = async ({token, data, clientId}: { token: CookieValueT
   });
   return res.data;
 }
+
+export const getPromoterLink = async ({ token, eventId, promoterId }: { token: CookieValueTypes, eventId: number, promoterId: number }) => {
+  const res = await axios.get(`${BASE_URL}/admin/tickets/promoter-link?promoterId=${promoterId}&eventId=${eventId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};

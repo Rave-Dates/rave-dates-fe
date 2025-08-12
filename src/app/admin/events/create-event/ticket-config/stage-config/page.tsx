@@ -63,7 +63,7 @@ export default function StageConfig() {
       price: 0,
       quantity: 0,
       date: yyyyMmDd,
-      feeType: "percentage",
+      feeType: "fixed",
       promoterFee: 0
     };
 

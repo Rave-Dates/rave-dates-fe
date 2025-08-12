@@ -3,9 +3,10 @@ import { OrganizerEventDetails } from "@/components/roles/organizer/organizer-ev
 export default async function Page({
   params,
 }: {
-  params: Promise<{ eventId: string }>
+  params: Promise<{ eventId: string, promoterId: string }>
 }) {
-  const { eventId } = await params
+  const { eventId, promoterId } = await params
   const eventIdNumber = Number(eventId);
-  return <OrganizerEventDetails isPromoterBinnacle={true} eventId={eventIdNumber} />
+  const promoterIdNumber = Number(promoterId);
+  return <OrganizerEventDetails isPromoterBinnacle={true} eventId={eventIdNumber} promoterId={promoterIdNumber} />
 }

@@ -2,6 +2,7 @@ import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import SearchSvg from "../../../svg/SearchSvg";
 import SearchResultItem from "./SearchInputItem";
 import SearchGuestItem from "./SearchGuestItem";
+import SearchUserItem from "./SearchUserItem";
 
 type BaseProps = {
   handleFunc?: (item: ChangeEvent<HTMLInputElement>) => void;
@@ -11,23 +12,28 @@ type BaseProps = {
 };
 
 type GuestProps = BaseProps & {
-  isGuest: true;
+  type: "guest";
   results: IGuest[];
 };
 
 type EventProps = BaseProps & {
-  isGuest?: false;
+  type?: "event";
   results: IEvent[];
 };
 
-type Props = GuestProps | EventProps;
+type UserProps = BaseProps & {
+  type?: "user";
+  results: IUser[];
+};
+
+type Props = GuestProps | EventProps | UserProps;
 
 const SearchInput = ({
   handleFunc,
   value,
   placeholder,
   results,
-  isGuest,
+  type,
   setSearchTerm,
 }: Props) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -67,7 +73,7 @@ const SearchInput = ({
 
       {isFocused && results.length > 0 && (
         <ul className="absolute z-10 space-y-1 mt-2 w-full bg-main-container border border-divider rounded-xl shadow-lg max-h-64 overflow-y-auto">
-          {!isGuest &&
+          {type === "event" &&
             results.map((event) => (
               <SearchResultItem
                 key={event.eventId}
@@ -76,11 +82,20 @@ const SearchInput = ({
               />
             ))}
 
-          {isGuest &&
+          {type === "guest" &&
             results.map((guest) => (
               <SearchGuestItem
                 key={guest.clientId}
                 guest={guest}
+                onClick={handleSearchClick}
+              />
+            ))}
+
+          {type === "user" &&
+            results.map((user) => (
+              <SearchUserItem
+                key={user.userId}
+                user={user}
                 onClick={handleSearchClick}
               />
             ))}

@@ -19,26 +19,27 @@ import { useAdminAllRoles, useAdminUserById } from '@/hooks/admin/queries/useAdm
 
 const EditUser = ({ userId } : { userId: number }) => {
   const pathname = usePathname();
-  const { register, handleSubmit, reset} = useForm();
+  const { register, handleSubmit, reset, watch } = useForm();
+  const roleId = watch("roleId");
   const { getCookie } = useReactiveCookiesNext();
   const router = useRouter();
 
   const token = getCookie("token");
 
-  const { data, isPending } = useAdminUserById({ token, userId });
+  const { data: userById, isPending } = useAdminUserById({ token, userId });
   const { roles } = useAdminAllRoles({ token });
 
   // resetea los campos cuando llegan los datos
   useEffect(() => {
-    if (data) {
+    if (userById) {
       reset({
-        name: data.name,
-        phone: data.phone,
-        email: data.email,
-        roleId: data.roleId,
+        name: userById.name,
+        phone: userById.phone,
+        email: userById.email,
+        roleId: userById.roleId,
       });
     }
-  }, [data, reset]);
+  }, [userById, reset]);
 
   // editamos el usuario 
   const { mutate } = useMutation({
@@ -86,21 +87,26 @@ const EditUser = ({ userId } : { userId: number }) => {
         <GoBackButton className="px-3 rounded-xl py-3 sm:opacity-0" />
         <div className='flex items-center gap-x-3'>
           {
-            (data?.role.name === "ORGANIZER" || data?.role.name === "PROMOTER") && (
+            userById?.role.name === "ORGANIZER" && (
               <DefaultButton className="px-12 rounded-xl py-3" text='Cuenta' href={`${pathname}/balance`} />
             )
           }
           {
-            data?.role.name !== "ADMIN" &&
+            userById?.role.name === "PROMOTER" && (
+              <DefaultButton className="px-12 rounded-xl py-3" text='Cuenta' href={`${pathname}/promoter-balance`} />
+            )
+          }
+          {
+            userById?.role.name !== "ADMIN" &&
             <DeleteUserModal userId={userId} />
           }
         </div>
       </div>
-      <DefaultForm isPending={isPending} goBackButton={false} handleSubmit={handleSubmit(onSubmit)} title={`${data?.name}`}>
+      <DefaultForm isPending={isPending} goBackButton={false} handleSubmit={handleSubmit(onSubmit)} title={`${userById?.name}`}>
         <FormInput
           title="Nombre completo*"
           inputName="name"
-          register={register("name", { required: true, value: data?.name })}
+          register={register("name", { required: true, value: userById?.name })}
         />
         <FormInput
           type='password'
@@ -109,7 +115,7 @@ const EditUser = ({ userId } : { userId: number }) => {
           register={register("password")}
         />
         {
-          data?.role.name !== "ADMIN" &&
+          userById?.role.name !== "ADMIN" &&
           <FormInput
             type='number'
             title="Número de celular*"
@@ -121,11 +127,12 @@ const EditUser = ({ userId } : { userId: number }) => {
           type="email"
           title="Mail*"
           inputName="email"
-          register={register("email", { required: true, value: data?.email })}
+          register={register("email", { required: true, value: userById?.email })}
         />
         <FormDropDown
           title="Rol*"
           register={register("roleId", { required: true, valueAsNumber: true })}
+          value={roleId?.toString()}
         >
           {
             roles?.map((role: IRole) => (
@@ -142,7 +149,7 @@ const EditUser = ({ userId } : { userId: number }) => {
           register={register("commission")}
         /> */}
         {
-          data?.role.name === "ORGANIZER" && 
+          userById?.role.name === "ORGANIZER" && 
           <FormInput
             type="number"
             title="Entradas cortesia (una cada)*" 
@@ -151,7 +158,7 @@ const EditUser = ({ userId } : { userId: number }) => {
           />
         }
         {
-          data?.role.name !== "ADMIN" &&
+          userById?.role.name !== "ADMIN" &&
           <Link
             href={`${pathname}/user-events`}
             className="text-primary-white mb-0 py-5 text-center w-full block"

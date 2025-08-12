@@ -80,6 +80,7 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       type: event.type,
       isActive: event.isActive,
       timeOut: event.timeOut,
+      piggyBank: event.piggyBank,
     };
 
     Object.entries(setters).forEach(([key, value]) => {

@@ -17,8 +17,6 @@ const NavbarWeb: React.FC = () => {
 
   const { data: events} = useClientAllRawEvents();
 
-  console.log("data", events)
-
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
     setSearchTerm(term);
@@ -77,6 +75,7 @@ const NavbarWeb: React.FC = () => {
               value={searchTerm}
               handleFunc={handleSearch}
               results={results}
+              type="event"
               setSearchTerm={setSearchTerm}
             />
             {

@@ -19,6 +19,7 @@ export default function CreateUser() {
   const router = useRouter();
 
   const token = getCookie("token");
+  const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
 
   // obtenemos todos los roles
   const { roles } = useAdminAllRoles({ token });
@@ -44,6 +45,8 @@ export default function CreateUser() {
 
   // creamos el usuario 
   const onSubmit = (data: Partial<ICreateUser>) => {
+    if (!decoded?.organizerId) return;
+
     const promoterRole = roles?.find((role) => role.name === 'PROMOTER');
     mutate({
       token,
@@ -54,6 +57,7 @@ export default function CreateUser() {
         phone: data.phone,
         roleId: promoterRole?.roleId,
         isActive: true,
+        organizerId: decoded.organizerId,
       },
     });
   };

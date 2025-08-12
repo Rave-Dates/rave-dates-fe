@@ -4,29 +4,37 @@ import { DropdownItem } from "@/components/roles/admin/events/DropDownItem"
 import { StageItem } from "@/components/roles/admin/events/StageItem"
 import EditSvg from "@/components/svg/EditSvg"
 import EyeSvg from "@/components/svg/EyeSvg"
-import { useAdminBinnacles, useAdminEvent, useAdminPromoterBinnacles, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData"
-import { useClientEventTickets } from "@/hooks/client/queries/useClientData"
+import FormInput from "@/components/ui/inputs/FormInput"
+import { notifyError, notifySuccess } from "@/components/ui/toast-notifications"
+import { useAdminBinnacles, useAdminEvent, useAdminGetPromoterLink, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData"
+import { generateCheckerLink } from "@/services/admin-qr"
+import { onInvalid } from "@/utils/onInvalidFunc"
+import { useMutation } from "@tanstack/react-query"
 import { CookieValueTypes } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
 
 type Props = {
   eventId: number;
   token: CookieValueTypes;
+  promoterId?: number;
   isPromoter?: boolean;
   isPromoterBinnacle?: boolean;
 }
 
-export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromoterBinnacle }: Props) {
+export default function OrganizerEventInfo({ eventId, token, isPromoter = false, isPromoterBinnacle, promoterId }: Props) {
   const [expandedSections, setExpandedSections] = useState<string[]>([])
+  const [checkerLink, setCheckerLink] = useState<string>()
   const [globalExpandedSections, setGlobalExpandedSections] = useState<string[]>([])
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
+  const { register, handleSubmit } = useForm<{ checkerEmail: string, eventId: number }>();
 
-  const { eventTickets: ticketTypes } = useClientEventTickets(eventId);
-  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });
-
+  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId, isPromoter });
+  const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId: decoded?.promoterId || promoterId });
   const { selectedEvent } = useAdminEvent({ eventId, token });
+  const { promoterLink } = useAdminGetPromoterLink({ token, eventId, promoterId: decoded?.promoterId || promoterId });
 
   const { organizerBinnacles } = useAdminBinnacles({
     organizerId: decoded?.organizerId ?? 0,
@@ -34,10 +42,10 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromo
   });
 
   const { promoterBinnacles } = useAdminPromoterBinnacles({
-    promoterId: decoded?.promoterId ?? 0,
+    promoterId: decoded?.promoterId || promoterId,
     token: token?.toString() ?? "",
   });
-
+  
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
   const selectedPromoterBinnacle = promoterBinnacles?.find(b => b.eventId === eventId);
 
@@ -53,9 +61,28 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromo
     setGlobalExpandedSections((prev) => (prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section]))
   }
 
-  const types = ["Vendidas y dinero generado", "Dinero", "Promotores"]
+  const { mutate } = useMutation({
+    mutationFn: generateCheckerLink,
+    onSuccess: (data) => {
+      setCheckerLink(data);
+      notifySuccess('Link creado correctamente');
+    },
+    onError: (error) => {
+      console.log(error)
+      notifyError("Error al creado link");
+    },
+  });
 
-  console.log(selectedBinnacle)
+  const onSubmit = (data: { checkerEmail: string }) => {
+    console.log(data)
+
+    mutate({ 
+      eventId,
+      checkerEmail: data.checkerEmail,
+    });
+  };
+
+  const types = ["Vendidas y dinero generado", "Dinero", "Promotores", "Link de controlador"]
 
   return (
     <div className="rounded-lg text-white w-full flex items-start justify-center mb-44 h-full">
@@ -80,17 +107,18 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromo
                       </span>
                     </div>
                     {
-                      ticketTypes?.map((stage) => (
+                      selectedBinnacle?.stages.stages?.map((stage, index) => (
                         <DropdownItem
-                          key={stage.name}
-                          title={stage.name}
-                          isExpanded={expandedSections.includes(stage.name)}
-                          onToggle={() => toggleSection(stage.name)}
+                          key={index}
+                          title={stage.ticketType}
+                          isExpanded={expandedSections.includes(stage.ticketType)}
+                          onToggle={() => toggleSection(stage.ticketType)}
                         >
                           <div className="space-y-2 bg-main-container rounded-b-lg p-4">
                             <StageItem
-                              key={stage.ticketTypeId}
-                              items={stage.stages}
+                              key={stage.ticketType}
+                              stage={stage.activeStage}
+                              quantity={stage.quantity}
                             />
                           </div>
                         </DropdownItem>
@@ -103,27 +131,27 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromo
                   <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
                     <div className="flex text-sm justify-between items-center">
                       <h2>Total</h2>
-                      <h2 className="text-primary text-base text-end tabular-nums">COP ${Number(selectedBinnacle?.total).toLocaleString()}</h2>
+                      <h2 className="text-primary text-base text-end tabular-nums">COP ${Number(selectedBinnacle?.total?? "0").toLocaleString()}</h2>
                     </div>
 
                     <div className="flex text-sm justify-between items-center">
                       <h2>Dinero entregado</h2>
-                      <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedBinnacle?.alreadyPaid.toLocaleString()}</h2>
+                      <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedBinnacle?.alreadyPaid.toLocaleString()?? 0}</h2>
                     </div>
                         
                     <div className="flex text-sm justify-between items-center">
                       <h2>Comisión Rave Dates</h2>
-                      <h2 className="text-red-400/80 text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feeRD).toLocaleString()}</h2>
+                      <h2 className="text-red-400/80 text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feeRD?? "0").toLocaleString()}</h2>
                     </div>
 
                     <div className="flex text-sm justify-between items-center">
                       <h2>Comisión de promotor</h2>
-                      <h2 className="text-red-400/80 text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feePromoter).toLocaleString()}</h2>
+                      <h2 className="text-red-400/80 text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feePromoter?? "0").toLocaleString()}</h2>
                     </div>
 
                     <div className="flex text-sm justify-between items-center">
                       <h2>Dinero disponible</h2>
-                      <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedBinnacle?.pendingPayment.toLocaleString()}</h2>
+                      <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedBinnacle?.pendingPayment.toLocaleString()?? 0}</h2>
                     </div>
 
                     <Link href={`/organizer/event/${eventId}/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-black bg-primary">
@@ -154,6 +182,46 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromo
                     }
                   </div>
                 }
+                {
+                  type === "Link de controlador" && 
+                    <div className="bg-input rounded-lg px-5 py-2">
+                      <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="flex flex-col gap-y-3 justify-between items-center">
+                        <div className="flex w-full gap-x-3 items-center justify-between">
+                          <FormInput
+                            title="Email del controlador*"
+                            inputName="name"
+                            register={register("checkerEmail", { required: true })}
+                          />
+                          {/* <FormInput
+                            title="Ticket type*"
+                            inputName="name"
+                            register={register("checkerEmail")}
+                          /> */}
+                        </div>
+                        <button type="submit" className="bg-primary rounded-lg py-2.5 w-3/4 sm:w-1/2 font-medium text-sm text-primary-black">
+                          Generar link
+                        </button>
+                        <div className="flex w-full gap-x-1 justify-between py-2 items-center">
+                          <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/20">
+                            {checkerLink ? checkerLink : "Aqui aparecerá el link ..."}
+                          </h2>                  
+                          <button
+                            type="button"
+                            disabled={!checkerLink}
+                            onClick={() => {
+                              if (checkerLink) {
+                                navigator.clipboard.writeText(checkerLink);
+                                notifySuccess("Link copiado al portapapeles");
+                              }
+                            }}
+                            className="border border-primary disabled:opacity-60 disabled:pointer-events-none hover:opacity-75 transition-opacity px-4 py-1.5 font-medium text-primary rounded-lg text-sm"
+                          >
+                            Copiar
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                }
               </div>
             </DropdownItem>
           ))
@@ -161,71 +229,91 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter, isPromo
 
         {
           isPromoter &&
-          <div className="bg-input mt-2 rounded-lg px-3 py-2">
-            <h1 className="font-medium px-2 my-2">Dinero</h1>
-            <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
-              <div className="flex text-sm justify-between items-center">
-                <h2>Total</h2>
-                <h2 className="text-primary text-base text-end tabular-nums">COP ${Number(selectedPromoterBinnacle?.total ?? 0).toLocaleString() ?? 0}</h2>
-              </div>
+          <>
+            <div className="bg-input mt-2 rounded-lg px-3 py-2">
+              <h1 className="font-medium px-2 my-2">Dinero</h1>
+              <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
+                <div className="flex text-sm justify-between items-center">
+                  <h2>Total</h2>
+                  <h2 className="text-primary text-base text-end tabular-nums">COP ${Number(selectedPromoterBinnacle?.total ?? 0).toLocaleString() ?? 0}</h2>
+                </div>
 
-              <div className="flex text-sm justify-between items-center">
-                <h2>Dinero entregado</h2>
-                <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedPromoterBinnacle?.alreadyPaid.toLocaleString()?? 0}</h2>
-              </div>
+                <div className="flex text-sm justify-between items-center">
+                  <h2>Dinero entregado</h2>
+                  <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedPromoterBinnacle?.alreadyPaid.toLocaleString()?? 0}</h2>
+                </div>
 
-              <div className="flex text-sm justify-between items-center">
-                <h2>Dinero disponible</h2>
-                <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedPromoterBinnacle?.pendingPayment.toLocaleString()?? 0}</h2>
-              </div>
+                <div className="flex text-sm justify-between items-center">
+                  <h2>Dinero disponible</h2>
+                  <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedPromoterBinnacle?.pendingPayment.toLocaleString()?? 0}</h2>
+                </div>
 
-              <Link href={`/promoter/event/${eventId}/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-black bg-primary">
-                Ver dinero entregado
-              </Link>
-            </div> 
-          </div>
+                <Link href={`/promoter/event/${eventId}/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-black bg-primary">
+                  Ver dinero entregado
+                </Link>
+              </div> 
+            </div>
+            <div className="bg-input mt-2 rounded-lg px-3 py-2">
+              <h1 className="font-medium px-2 mt-2">Link de afiliado</h1>
+              <div className="border-t-2 flex flex-col gap-y-3 pt-3 mt-3 px-2 pb-2 border-dashed border-inactive">
+                <div className="flex justify-between items-center">
+                  <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/20">
+                    { promoterLink }
+                  </h2>                  
+                  <button
+                    onClick={() => {
+                      if (promoterLink) {
+                        navigator.clipboard.writeText(promoterLink);
+                        notifySuccess("Link copiado al portapapeles");
+                      }
+                    }}
+                    className="border border-primary hover:opacity-75 transition-opacity px-4 py-1.5 font-medium text-primary rounded-lg text-sm"
+                  >
+                    Copiar
+                  </button>
+                </div>
+              </div> 
+            </div>
+          </>
         }
 
         {
           isPromoterBinnacle && ["Vendidas y dinero generado"].map((type) => (
-            <DropdownItem
-              key={type}
-              title={type}
-              className="!bg-input mt-2"
-              isExpanded={globalExpandedSections.includes(type)}
-              onToggle={() => toggleGlobalSection(type)}
-            >
-              <div className="bg-input px-2 py-1 rounded-b-lg">
-                {
-                  type === "Vendidas y dinero generado" && 
-                  <div className="mb-2">
-                    <div className="flex bg-main-container justify-between p-3 rounded-lg items-center">
-                      <h1>Total vendido:</h1>
-                      <span className="text-primary">
-                        {ticketMetrics?.ticketsPurchased}
-                      </span>
-                    </div>
+            <div key={type} className="bg-input px-2 py-3 rounded-lg mt-2">
+              {
+                type === "Vendidas y dinero generado" && 
+                <div>
+                  <h1 className="p-3 pt-1 text-lg">Entradas vendidas</h1>
+                  <div className="flex bg-main-container justify-between p-3 rounded-lg items-center">
+                    <h1>Total vendido:</h1>
+                    <span className="text-primary">
+                      {promoterTicketMetrics?.ticketsPurchased}
+                    </span>
+                  </div>
+                  <div className="space-y-2 mt-2">
                     {
-                      ticketTypes?.map((stage) => (
-                        <DropdownItem
-                          key={stage.name}
-                          title={stage.name}
-                          isExpanded={expandedSections.includes(stage.name)}
-                          onToggle={() => toggleSection(stage.name)}
-                        >
-                          <div className="space-y-2 bg-main-container rounded-b-lg p-4">
-                            <StageItem
-                              key={stage.ticketTypeId}
-                              items={stage.stages}
-                            />
+                      promoterTicketMetrics?.ticketsTypesMetrics?.map((ticket) => {
+                        return (
+                          <div key={ticket.name} className="space-y-2  bg-main-container rounded-lg p-4 ps-3">
+                            <div className="space-y-3 rounded-lg">
+                              <div className="flex justify-between items-center">
+                                <div className="">
+                                  <span>{ticket.name}</span>
+                                  <span> vendidas:</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <span className="text-primary text-sm">{ticket.quantity} de {ticket.total} disponibles</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                        </DropdownItem>
-                        ))
+                        )
+                      })
                     }
                   </div>
-                }
-              </div>
-            </DropdownItem>
+                </div>
+              }
+            </div>
           ))
         }
 

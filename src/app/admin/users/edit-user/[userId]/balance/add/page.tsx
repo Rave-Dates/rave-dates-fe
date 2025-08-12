@@ -6,10 +6,8 @@ import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyPending } from "@/components/ui/toast-notifications";
 import { useCreatePayment } from "@/hooks/admin/mutations/useCreatePayment";
-import { getAllEvents } from "@/services/admin-events";
-import { getUserById } from "@/services/admin-users";
+import { useAdminAllEvents, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { onInvalid } from "@/utils/onInvalidFunc";
-import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
@@ -32,17 +30,8 @@ export default function Page() {
     }
   });
   
-  const { data: allEvents } = useQuery<IEvent[]>({
-    queryKey: ["allEvents"],
-    queryFn: () => getAllEvents({ token }),
-    enabled: !!token,
-  });
-
-  const { data: selectedUser } = useQuery({
-    queryKey: ["user"],
-    queryFn: () => getUserById({ token, id: userId }),
-    enabled: !!token && !!userId,
-  });
+  const { allEvents } = useAdminAllEvents({ token });
+  const { data: selectedUser } = useAdminUserById({ token, userId });
 
   const watchedImage = useWatch({ name: "image", control });
 
@@ -71,8 +60,6 @@ export default function Page() {
       }
     );
   }
-
-
 
   return (
     <div className="min-h-screen px-4 bg-primary-black pb-40 sm:pb-32 flex flex-col justify-between">

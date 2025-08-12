@@ -20,26 +20,18 @@ export default function Balance() {
   const { payments } = useAdminPayments({ token });
   const { data: user } = useAdminUserById({ token, userId });
 
-
   const filteredPayments = payments?.filter(
     (payment) =>
       payment.organizerId === user?.organizer?.organizerId
   );
+
+  console.log(user)
   const eventMap = new Map(allEvents?.map(event => [event.eventId, event.title]));
 
   return (
     <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
       <div>
         <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
-        <div className="absolute z-30 top-10 right-5 animate-fade-in">
-          <Link
-            href="/admin/events/event-info/attendees"
-            className="bg-primary text-primary-black p-3 text-sm px-5 rounded-lg font-medium flex items-center justify-center text-center"
-            aria-label="Añadir usuario"
-          >
-            Ver asistentes
-          </Link>
-        </div>
         <div className="max-w-xl pt-24 mx-auto animate-fade-in">
           {/* Search and Add User Section */}
 

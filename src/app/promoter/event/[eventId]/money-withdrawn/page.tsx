@@ -2,7 +2,7 @@
 
 import EyeSvg from "@/components/svg/EyeSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
-import { useAdminBinnacles, useAdminEvent } from "@/hooks/admin/queries/useAdminData";
+import { useAdminEvent, useAdminPromoterBinnacles } from "@/hooks/admin/queries/useAdminData";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
@@ -17,8 +17,8 @@ export default function MoneyWithdrawn() {
   const token = getCookie("token");
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
 
-  const { organizerBinnacles } = useAdminBinnacles({
-    organizerId: decoded?.organizerId ?? 0,
+  const { promoterBinnacles } = useAdminPromoterBinnacles({
+    promoterId: decoded?.promoterId ?? 0,
     token: token?.toString() ?? "",
   });
 
@@ -27,7 +27,7 @@ export default function MoneyWithdrawn() {
     eventId,
   });
 
-  const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
+  const selectedBinnacle = promoterBinnacles?.find(b => b.eventId === eventId);
     
   return (
     <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
@@ -37,7 +37,7 @@ export default function MoneyWithdrawn() {
           {/* Search and Add User Section */}
 
           <h1 className="text-title font-semibold">Dinero retirado</h1>
-          <h2 className="text-xl text-primary">COP ${selectedBinnacle?.alreadyPaid.toLocaleString()}</h2>
+          <h2 className="text-xl text-primary">COP ${selectedBinnacle?.alreadyPaid.toLocaleString() ?? 0}</h2>
 
           {/* Users Table/List */}
           <div className="rounded-md overflow-hidden mt-5">
@@ -70,9 +70,9 @@ export default function MoneyWithdrawn() {
         </div>
 
           {/* Empty State */}
-          {organizerBinnacles?.flatMap(b => b.movements).length === 0 && (
+          {promoterBinnacles?.flatMap(b => b.movements).length === 0 && (
             <div className="text-center py-8 text-neutral-400">
-              No se encontraron usuarios
+              No se encontraron movimientos
             </div>
           )}
         </div>

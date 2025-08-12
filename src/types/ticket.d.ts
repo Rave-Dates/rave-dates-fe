@@ -34,13 +34,19 @@ interface IPurchaseTicket {
   };
 }
 
+type TicketStage = {
+  ticketTypeId: number | undefined;
+  price: number;
+  quantity: number;
+};
+
 interface IPurchaseData {
   purchaseId: number;
   clientId: number;
   promoterId: number | null;
   transferredClientId: number | null;
   paymentMethod: 'BOLD' | 'NEQUI' | string;
-  paymentStatus: 'PENDING' | 'COMPLETED' | 'FAILED' | string;
+  paymentStatus: 'PENDING' | 'PAID' | 'FAILED' | string;
   totalAmount: number;
   partialAmount: number | null;
   quantity: number;
@@ -85,3 +91,14 @@ interface ITransferUser {
   whatsapp: string;
   idCard: string;
 }
+
+type IChangeTicketsPayload = {
+  clientId: number;
+  oldTickets: TicketStage[] | [];
+  newTickets: TicketStage[];
+  payWithBalance: boolean;
+  eventId: number;
+  method: "BOLD" | "NEQUI" | string;
+  boldMethod: string | string[] | undefined | object;
+  returnUrl: string;
+};

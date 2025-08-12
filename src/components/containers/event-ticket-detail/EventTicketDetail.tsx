@@ -49,7 +49,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
             }
             {
               selectedEvent &&
-              <TicketSelector eventInfo={{date: selectedEvent.date, title: selectedEvent.title}} ticketStatus="paid" isTicketList={true} />
+              <TicketSelector eventInfo={{date: selectedEvent.date, title: selectedEvent.title}} isTicketList={true} />
             }     
           </div>
         </div>
@@ -88,7 +88,7 @@ const EventTicketDetails = ({ eventId } : { eventId: number }) => {
             )}            
             {
               selectedEvent &&
-              <TicketSelector eventInfo={{date: selectedEvent.date, title: selectedEvent.title}} ticketStatus="paid" isTicketList={true} />
+              <TicketSelector eventInfo={{date: selectedEvent.date, title: selectedEvent.title}} isTicketList={true} />
             } 
           </div>
         </div>

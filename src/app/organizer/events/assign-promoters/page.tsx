@@ -4,6 +4,7 @@ import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { useAdminAllPromoters } from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { useReactiveCookiesNext } from "cookies-next";
+import { jwtDecode } from "jwt-decode";
 import { useEffect } from "react";
 
 export default function UserManagement() {
@@ -11,14 +12,13 @@ export default function UserManagement() {
   const { eventFormData, updateEventFormData } = useCreateEventStore();
 
   const token = getCookie("token");
-  const { promoters } = useAdminAllPromoters({ token });
-
-  const isLoading = false;
-  const isError = false;
+  const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
+  
+  const { promoters, isLoading, isError } = useAdminAllPromoters({ token, organizerId: decoded?.organizerId });
 
   useEffect(() => {
-    console.log("eventFormData", eventFormData)
-  }, [eventFormData]);
+    console.log("promoters", promoters)
+  }, [promoters]);
 
   const promoterAlreadyIn = (promoterId: number | undefined) => {
     const isIn = eventFormData.formPromoters?.find((promoter) => promoter.promoterId === promoterId);
@@ -109,12 +109,12 @@ export default function UserManagement() {
         )}
         {!isLoading && Array.isArray(promoters) && promoters?.length === 0 &&  (
           <div className="text-center py-8 text-text-inactive">
-            No se encontraron usuarios
+            No se encontraron promoters
           </div>
         )}
         {isError &&  (
           <div className="text-center text-sm py-8 text-system-error">
-            Error cargando usuarios
+            Error cargando promoters
           </div>
         )}
       </div>

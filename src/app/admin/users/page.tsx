@@ -7,22 +7,39 @@ import { useReactiveCookiesNext } from "cookies-next";
 import { useAdminAllUsers } from "@/hooks/admin/queries/useAdminData";
 
 export default function UserManagement() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [results, setResults] = useState<IUser[]>([]);
+
   const { getCookie } = useReactiveCookiesNext();
 
   const token = getCookie("token");
 
   const { data, isLoading, isError } = useAdminAllUsers({ token });
-  
-  const filteredUsers = data?.filter((user) =>
-    user?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+
+    if (term.length === 0) {
+      setResults([]);
+      return;
+    }
+
+    const filtered = data?.filter((user) =>
+      user.name.toLowerCase().includes(term.toLowerCase())
+    ) || [];
+
+    setResults(filtered);
+  };
 
   return (
     <UsersList
       createHref="users/create-user"
-      setSearchQuery={setSearchQuery}
-      searchQuery={searchQuery}
+      hasSearch={true}
+      searchTerm={searchTerm}
+      handleSearch={handleSearch}
+      results={results}
+      setSearchTerm={setSearchTerm}
     >
       <div className="rounded-md overflow-hidden">
         {/* Table Header */}
@@ -34,7 +51,7 @@ export default function UserManagement() {
 
         {/* Table Body */}
         <div className="divide-y divide-divider w-full">
-          {filteredUsers?.map((user) => (
+          {data?.map((user) => (
             <div
               key={user?.userId}
               className="grid grid-cols-[2fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
@@ -46,7 +63,7 @@ export default function UserManagement() {
               </div>
             </div>
           ))}
-          {!filteredUsers && (
+          {!data && (
             Array.from(Array(10).keys()).map((user) => (
             <div
               key={user}
@@ -58,7 +75,7 @@ export default function UserManagement() {
             </div>
             ))
           )}
-          {!isLoading && Array.isArray(data) && filteredUsers?.length === 0 &&  (
+          {!isLoading && Array.isArray(data) && data?.length === 0 &&  (
             <div className="text-center py-8 text-text-inactive">
               No se encontraron usuarios
             </div>

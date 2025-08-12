@@ -5,13 +5,14 @@ export function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const isAdminRoute = path.startsWith("/admin");
   const isOrganizerRoute = path.startsWith("/organizer");
+  const isPromoterRoute = path.startsWith("/promoter");
 
   const token = req.cookies.get("token")?.value;
   const tempToken = req.cookies.get("tempToken")?.value;
   const clientToken = req.cookies.get("clientToken")?.value;
 
   // Rutas públicas sin token
-  if (!isAdminRoute && !isOrganizerRoute) {
+  if (!isAdminRoute && !isOrganizerRoute && !isPromoterRoute) {
     return NextResponse.next();
   }
 
@@ -57,13 +58,6 @@ export function middleware(req: NextRequest) {
 
     try {
       const decoded: IUserLogin = jwtDecode(token);
-      const now = Math.floor(Date.now() / 1000);
-
-      if (decoded.exp < now) {
-        const res = NextResponse.redirect(new URL("/", req.url));
-        res.cookies.delete("token");
-        return res;
-      }
 
       if (decoded.role !== "ADMIN") {
         const res = NextResponse.redirect(new URL("/", req.url));
@@ -96,15 +90,31 @@ export function middleware(req: NextRequest) {
 
     try {
       const decoded: IUserLogin = jwtDecode(token);
-      const now = Math.floor(Date.now() / 1000);
 
-      if (decoded.exp < now) {
+      if (decoded.role !== "ORGANIZER") {
         const res = NextResponse.redirect(new URL("/", req.url));
-        res.cookies.delete("token");
         return res;
       }
 
-      if (decoded.role !== "ORGANIZER") {
+    } catch {
+      const res = NextResponse.redirect(new URL("/", req.url));
+      res.cookies.delete("token");
+      return res;
+    }
+  }
+
+  // ------------------------------------------
+  // PROMOTER AREA
+  // ------------------------------------------
+  if (isPromoterRoute) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/admin/auth", req.url));
+    }
+
+    try {
+      const decoded: IUserLogin = jwtDecode(token);
+
+      if (decoded.role !== "PROMOTER") {
         const res = NextResponse.redirect(new URL("/", req.url));
         return res;
       }

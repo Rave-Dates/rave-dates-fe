@@ -1,7 +1,7 @@
 "use client"
 
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
-import { useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData";
+import { useAdminPromoterTicketMetrics, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData";
 import { useEventImage } from "@/hooks/admin/queries/useEventImage";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { extractPlaceFromGeo } from "@/utils/formatGeo";
@@ -13,14 +13,20 @@ type Props = {
   event: IOrganizerEvent | IPromoterEvent, 
   href?: string
   totalSold?: number;
+  promoterId?: number;
 }
 
-export function OrganizerEventCard({event, href = "organizer/event", totalSold}: Props) {
+export function OrganizerEventCard({event, href = "organizer/event", totalSold, promoterId}: Props) {
+  console.log("totalSold", totalSold)
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const { eventId, title, subtitle, date, geo } = event;
   const { servedImageUrl, isImageLoading } = useEventImage({ eventId, token: token?.toString() });
-  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId: event.eventId! });
+
+  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId, isPromoter: !!promoterId });
+  const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId });
+
+  const metricsToUse = ticketMetrics || promoterTicketMetrics;
 
   return (
     <Link href={`${href}/${eventId}`} className="bg-cards-container rounded-lg p-4 flex items-center gap-3">
@@ -51,7 +57,7 @@ export function OrganizerEventCard({event, href = "organizer/event", totalSold}:
         </p>
         <p className="text-xs">
           {/* {amountSold} vendidos - {price} */}
-          {ticketMetrics?.ticketsPurchased} vendidos - {event.type === "free" ? "Gratis" : `COP ${totalSold?.toLocaleString() ?? 0}`}
+          {metricsToUse?.ticketsPurchased ?? 0} vendidos - {event.type === "free" ? "Gratis" : `COP ${totalSold?.toLocaleString() ?? 0}`}
         </p>
       </div>
     </Link>

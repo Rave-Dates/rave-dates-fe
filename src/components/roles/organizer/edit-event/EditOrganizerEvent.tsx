@@ -68,11 +68,8 @@ export default function EditOrganizerEvent({ eventId }: { eventId: number }) {
       promoterId: promoter.promoterId,
     }))
 
-    console.log("hasLoadedEvent", hasLoadedEvent)
     const validatedFormPromoters = 
       hasLoadedEvent ? eventFormData.formPromoters : formattedPromoters;
-
-    console.log("formattedPromoters", formattedPromoters)
 
     // Seteamos todo al formulario
     const setters = {
@@ -203,6 +200,24 @@ useEffect(() => {
     const formattedTimeUTC = formatColombiaTimeToUTC(validDate)
     const formattedGeo = `${data.geo};${data.place?.trim()}`;
 
+    const parsedCategories = data.oldCategories && Object.values(data.oldCategories).map((cat) => JSON.parse(cat));
+    const formattedOldCategories = eventCategories?.map((category) => ({
+      categoryId: category.categoryId,
+      valueId: category.valueId,
+    }));
+
+    const categoriesToUpdate = parsedCategories && parsedCategories
+      .map((newCat: IEventCategoryValue) => {
+        const oldCat = formattedOldCategories?.find((old) => old.categoryId === newCat.categoryId);
+        if (!oldCat || oldCat.valueId === newCat.valueId) return null;
+        return {
+          categoryId: newCat.categoryId,
+          oldCategoryValueId: oldCat.valueId,
+          newCategoryValueId: newCat.valueId,
+        };
+      })
+      .filter(Boolean);
+
     updateEventFormData({
       ...eventFormData,
       ...data,
@@ -220,7 +235,7 @@ useEffect(() => {
       isActive: data.isActive,
       feeRD: data.feeRD,
       feePB: data.feePB,
-      categoriesToUpdate: data.categoriesToUpdate,
+      categoriesToUpdate: categoriesToUpdate,
       transferCost: data.transferCost,
       discountCode: data.discountCode,
       discountType: data.discountType,
@@ -233,7 +248,6 @@ useEffect(() => {
       formPromoters: data.formPromoters
     }
 
-    console.log("cleanedEventData", cleanedEventData)
     notifyPending(
       new Promise((resolve, reject) => {
         editEvent({formData: cleanedEventData, isOrganizer: true}, {

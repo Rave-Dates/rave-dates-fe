@@ -7,9 +7,12 @@ import AddSvg from "@/components/svg/AddSvg"
 import EditSvg from "@/components/svg/EditSvg"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
 import SearchInput from "@/components/ui/inputs/search-input/SearchInput"
-import { useAdminEvent, useAdminGetGuests, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData"
+import { useAdminEvent, useAdminGetGuests, useAdminGetPromoterLink, useAdminPromoterTicketMetrics, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData"
 import { useReactiveCookiesNext } from "cookies-next"
 import Link from "next/link"
+import { exportGuestsToExcel } from "@/utils/exportExcel"
+import { jwtDecode } from "jwt-decode"
+import { notifyError } from "@/components/ui/toast-notifications"
 
 export default function OrganizerEventAttendees({eventId, isPromoter = false}: {eventId: number, isPromoter?: boolean}) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,10 +20,17 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
 
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
+  const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
+  
 
-  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });
+  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId, isPromoter });
+  const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId: decoded?.promoterId ?? 0 });
   const { selectedEvent } = useAdminEvent({ eventId, token });
   const { guests } = useAdminGetGuests({ token, eventId });
+  const { promoterLink } = useAdminGetPromoterLink({ token, eventId, promoterId: decoded?.promoterId || 0 });
+  
+
+  const metricsToUse = ticketMetrics || promoterTicketMetrics;
 
   console.log(ticketMetrics)
 
@@ -54,19 +64,19 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
         <div className="space-y-4">
           <div>
             <div className="text-text-inactive text-sm">Total asistentes</div>
-            <div className="text-primary-white text-2xl font-bold">{ticketMetrics?.ticketsPurchased}</div>
+            <div className="text-primary-white text-2xl font-bold">{metricsToUse?.ticketsPurchased}</div>
           </div>
 
           <div className="flex items-center justify-between bg-cards-container rounded-lg py-2 px-4">
             <div>
               <div className="text-text-inactive text-sm">Total registrados</div>
               <div className="text-primary-white text-xl font-medium">
-                {ticketMetrics?.ticketsPurchased}/{ticketMetrics?.totalTickets}
+                {metricsToUse?.ticketsPurchased}/{metricsToUse?.totalTickets}
               </div>
             </div>
             {
-              ticketMetrics?.totalTickets && ticketMetrics?.ticketsPurchased ?
-              <CircularProgress current={ticketMetrics?.ticketsPurchased} total={ticketMetrics?.totalTickets} />
+              metricsToUse?.totalTickets && metricsToUse?.ticketsPurchased ?
+              <CircularProgress current={metricsToUse?.ticketsPurchased} total={metricsToUse?.totalTickets} />
               :
               <CircularProgress current={0} total={100} />
             }
@@ -76,7 +86,7 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
         {/* Progress Bars */}
         <div className="bg-cards-container space-y-4 rounded-lg pt-3 pb-5 px-4">
           {
-            ticketMetrics?.ticketsTypesMetrics.map((ticketType) => (
+            metricsToUse?.ticketsTypesMetrics.map((ticketType) => (
               <div key={ticketType.name}>
                 <h2 className="text-text-inactive">{ticketType.name}</h2>
                 <ProgressBar current={ticketType.quantity} total={ticketType.total} />
@@ -84,7 +94,7 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
             ))
           }
           {
-            ticketMetrics?.ticketsTypesMetrics.length === 0 &&
+            metricsToUse?.ticketsTypesMetrics.length === 0 &&
             <div className="text-center pt-2 text-text-inactive">
               No hay compras
             </div>
@@ -94,14 +104,14 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
         {/* Search Section */}
         <div className="flex gap-x-4">
           <SearchInput
-            placeholder="Busca un evento"
+            placeholder="Busca un invitado"
             value={searchTerm}
             handleFunc={handleSearch}
             results={results}
-            isGuest={true}
+            type="guest"
             setSearchTerm={setSearchTerm}
           />
-          <Link href={isPromoter ? `/event/${eventId}` : "attendees/add-guest"} className="border-primary flex justify-center items-center border text-primary text-2xl px-3 rounded-xl">
+          <Link href={isPromoter && promoterLink ? promoterLink : "attendees/add-guest"} className="border-primary flex justify-center items-center border text-primary text-2xl px-3 rounded-xl">
             <AddSvg />
           </Link>
         </div>
@@ -126,7 +136,18 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
         </div>
 
         {/* Bottom Actions */}
-        <button className="w-full bg-primary text-primary-black font-medium py-4 rounded-lg">Descargar lista</button>
+        <button
+          onClick={() => {
+            if (guests && guests.length > 0) {
+              exportGuestsToExcel(guests);
+            } else {
+              notifyError("No hay invitados para exportar.");
+            }
+          }}
+          className="w-full bg-primary text-primary-black font-medium py-4 rounded-lg"
+        >
+          Descargar lista
+        </button>      
       </div>
     </div>
   )

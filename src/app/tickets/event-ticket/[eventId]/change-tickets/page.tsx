@@ -1,23 +1,28 @@
 "use client"
 
-import TicketButtons from "@/components/ui/buttons/TicketButtons";
 import React, { useEffect, useState } from "react";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import {
+  changeTicketPurchase,
   getClientTicketTypesByEventId,
   getTicketsByPurchaseId,
 } from "@/services/clients-tickets";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
+import { useChangeTicketStore } from "@/store/useChangeTicketStore";
+import ChangeTicketButtons from "@/components/ui/buttons/ChangeTicketButtons";
 
 const ChangeTicketsView = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3; // cantidad de usuarios por página
   const { getCookie } = useReactiveCookiesNext();
-  const { selected } = useTicketStore();
+  const { selected, resetSelected } = useTicketStore();
   const params = useParams();
+  const router = useRouter();
   const clientToken = getCookie("clientToken");
   const decoded: { id: number } = (clientToken && jwtDecode(clientToken.toString())) || { id: 0 };
   const clientId = Number(decoded?.id);
@@ -25,6 +30,20 @@ const ChangeTicketsView = () => {
   const [activeTab, setActiveTab] = useState<number | null>(null);
 
   const { purchasedTickets } = useClientPurchasedTickets({clientId, clientToken: clientToken});
+
+  const { 
+    getTotalRestados, 
+    restados, 
+    resetStore, 
+    setCantidadRestada, 
+    setOldTicketsTotal, 
+    resetOldTicketsTotal, 
+    oldTicketsTotal, 
+    setOldTicketsPriceTotal,
+    setStorePurchaseId,
+  } = useChangeTicketStore();
+  const totalRestados = getTotalRestados();
+
 
   const { data: ticketTypes } = useQuery({
     queryKey: ["ticketTypes"],
@@ -38,7 +57,7 @@ const ChangeTicketsView = () => {
   const purchaseIds = React.useMemo(() => {
     const ids = new Set<number>();
     purchasedTickets?.forEach((ticket) => {
-      if (ticket.ticketType.eventId === eventId && (ticket.transferredClientId === null || ticket.transferredClientId === clientId)) {
+      if (ticket.ticketType.eventId === eventId && (ticket.transferredClientId === null || ticket.transferredClientId !== clientId)) {
         ids.add(ticket.purchaseId);
       }
     });
@@ -57,29 +76,87 @@ const ChangeTicketsView = () => {
       })) ?? [],
   });
 
-
   const oldTickets = oldTicketsQueries
     .filter((query) => query.data)
     .flatMap((query) => query.data);
-
-  console.log("oldTickets", oldTickets)
-  console.log("purchaseIds", purchaseIds)
-  console.log("purchasedTickets", purchasedTickets)
 
 
   useEffect(() => {
     if (purchaseIds.length > 0 && activeTab === null) {
       setActiveTab(purchaseIds[0]);
+      setStorePurchaseId(purchaseIds[0]);
     }
   }, [purchaseIds, activeTab]);
 
+  console.log(purchasedTickets)
+
 
   const handleConfirm = async () => {
-    console.log(selected)
-    console.log(oldTickets)
-    // al checkout cuando el ticket nuevo es mas caro
+    let totalNew = 0;
+    let totalOld = 0;
+    for (const [key, value] of Object.entries(selected)) {
+      console.log(key)
+      totalNew += value.quantity * value.stage.price;
+    }
+    {oldTickets
+      ?.filter((ticket) => ticket?.purchaseId === activeTab)
+      .map((ticket, index) => {
+        console.log(index)
+        if (!ticket) return;
+        totalOld += ticket.quantity * ticket.price;
+      })
+    }
 
-    // se suma al balance cuando los tickets nuevos son mas baratos que los antiguos
+    
+    if (!activeTab) return
+    
+    const formattedOldTickets = []
+    
+    for (const [key, value] of Object.entries(restados)) {
+      formattedOldTickets.push({
+        ticketTypeId: Number(key),
+        quantity: value.cantidadActual,
+        price: value.price,
+      });
+    }
+    
+    if (totalNew > totalOld) {
+      setOldTicketsPriceTotal(totalOld);
+      router.push("/checkout?change-tickets=true");
+      return
+    }
+    const formattedNewTickets = []
+
+    for (const [key, value] of Object.entries(selected)) {
+      formattedNewTickets.push({
+        ticketTypeId: Number(key),
+        quantity: value.quantity,
+        price: value.stage.price,
+      });
+    }
+
+    console.log("formattedOldTickets", formattedOldTickets)
+    console.log("formattedNewTickets", formattedNewTickets)
+
+    await changeTicketPurchase({
+      ticketData: {
+        clientId,
+        oldTickets: totalRestados > 0 ? formattedOldTickets : [],
+        newTickets: formattedNewTickets,
+        payWithBalance: false,
+        eventId: eventId,
+        method: "BOLD",
+        boldMethod: ["CREDIT_CARD"],
+        returnUrl: "",
+      },
+      purchaseId: activeTab,
+      clientToken: clientToken,
+    });
+
+    console.log("totalNew", totalNew)
+    console.log("totalOld", totalOld)
+    // console.log("viejos",restados)
+    // console.log("nuevos",selected)
   };
 
   const totalPrice = Object.values(selected).reduce(
@@ -94,7 +171,26 @@ const ChangeTicketsView = () => {
 
   // const maxPurchase = oldTickets
   //   .filter((ticket) => ticket?.purchaseId === activeTab)
-  //   .reduce((acc, curr) => acc + curr.quantity, 0);
+  //   .reduce((acc, curr) => acc + (curr?.quantity ?? 0), 0);
+
+  const handleSetActiveTab = (purchaseId: number) => {
+    setStorePurchaseId(purchaseId);
+    setActiveTab(purchaseId);
+    resetStore();
+    resetSelected();
+    resetOldTicketsTotal();
+  }
+
+  console.log("totalQuantity", totalQuantity)
+  console.log("totalRestados", totalRestados)
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = purchaseIds?.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = purchaseIds && Math.ceil(purchaseIds.length / itemsPerPage);
+
+
 
   return (
     <div className="min-h-screen bg-primary-black flex sm:justify-center sm:items-center text-primary-white">
@@ -105,21 +201,49 @@ const ChangeTicketsView = () => {
             Entradas por compra
           </h3>
 
-          <div className="flex space-x-2 overflow-x-auto mb-6">
-            {
-              purchaseIds?.map((purchaseId) => (
+          <div className="flex justify-between gap-x-5 items-center mb-4">
+            {totalPages && totalPages > 1 ? (
+              <div className="flex justify-center items-center text-primary-black gap-2">
                 <button
-                  key={purchaseId}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                    activeTab === Number(purchaseId)
-                      ? "bg-primary text-black"
-                      : "bg-secondary text-white"
-                  }`}
-                  onClick={() => setActiveTab(Number(purchaseId))}
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-1.5 text-sm rounded-lg bg-primary disabled:opacity-50 disabled:pointer-events-none"
                 >
-                  Compra #{purchaseId}
+                  Anterior
                 </button>
-              ))}
+              </div>
+              ) : null
+            }
+            <div className="flex space-x-2 overflow-x-auto">
+              {
+                currentItems?.map((purchaseId) => (
+                  <button
+                    key={purchaseId}
+                    className={`px-4 py-2 rounded-lg tabular-nums text-sm font-medium transition-colors whitespace-nowrap ${
+                      activeTab === Number(purchaseId)
+                        ? "bg-primary text-black"
+                        : "bg-secondary text-white"
+                    }`}
+                    onClick={() => handleSetActiveTab(Number(purchaseId))}
+                  >
+                    Compra #{purchaseId}
+                  </button>
+                ))}
+            </div>
+            {totalPages && totalPages > 1 ? (
+              <div className="flex justify-center items-center text-primary-black gap-2">
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-1.5 text-sm rounded-lg bg-primary disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  Siguiente
+                </button>
+              </div>
+              ) : null
+            }
           </div>
 
           <h1 className="mb-2">Tus entradas</h1>
@@ -128,14 +252,20 @@ const ChangeTicketsView = () => {
             <div className="space-y-4 mb-10">
               {oldTickets
                 ?.filter((ticket) => ticket?.purchaseId === activeTab)
-                .map((ticket, index) => {                
+                .map((ticket, index) => {
                   if (!ticket) return;
+                  console.log("ticket", ticket)
                   const futureDate = new Date();
                   futureDate.setDate(futureDate.getDate() + 1);
 
+                  if (!restados[ticket.ticketTypeId]) {
+                      setCantidadRestada(ticket.ticketTypeId, ticket.quantity, ticket.price);
+                      setOldTicketsTotal(ticket.quantity);
+                  }
+
                   const newTicket = {
                     name: ticket.ticketType,
-                    ticketTypeId: index,
+                    ticketTypeId: ticket.ticketTypeId,
                     maxDate: futureDate.toISOString(),
                     stages: [
                       {
@@ -148,13 +278,13 @@ const ChangeTicketsView = () => {
                       },
                     ],
                   };
-                  
+
                   return (
-                    <TicketButtons
+                    <ChangeTicketButtons
                       key={index}
-                      totalQuantity={ticket.quantity}
+                      isOldTicket={true}
+                      totalQuantity={totalQuantity}
                       ticket={newTicket}
-                      overrideMaxTotalSelectable={ticket.quantity}
                       fixedQuantity={ticket.quantity} 
                     />
                   );
@@ -167,11 +297,10 @@ const ChangeTicketsView = () => {
             <div className="space-y-4">
               {ticketTypes?.map((ticket) => {
                 return (
-                  <TicketButtons
+                  <ChangeTicketButtons
                     key={ticket.ticketTypeId}
                     totalQuantity={totalQuantity}
                     ticket={ticket}
-                    // overrideMaxTotalSelectable={maxPurchase}
                   />
                 );
               })}
@@ -197,7 +326,7 @@ const ChangeTicketsView = () => {
                 activeTab &&
                 purchaseIds &&
                 totalPrice !== 0 
-                // && totalQuantity === maxPurchase
+                && totalQuantity === oldTicketsTotal - totalRestados
               )
             }
             className="w-full text-center py-3 rounded-lg transition-colors text-black bg-primary hover:bg-primary/70 disabled:bg-primary/60 disabled:pointer-events-none"

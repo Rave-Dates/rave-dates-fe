@@ -38,7 +38,6 @@ export default function StageConfig() {
       router.push(`/admin/events/edit-event/${eventId}`)
     }
   });
-
       
   const { fields, append, remove } = useFieldArray({
     control,
@@ -75,7 +74,7 @@ export default function StageConfig() {
       price: 0,
       quantity: 0,
       date: yyyyMmDd,
-      feeType: "percentage",
+      feeType: "fixed",
       promoterFee: 0
     };
 

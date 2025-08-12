@@ -75,12 +75,12 @@ export const getTicketsByPurchaseId = async ({pruchaseId, clientId, clientToken}
       "Authorization": `Bearer ${clientToken}`,
     },
   });
-  const data: { ticketType: string, price: number, quantity: number }[] = res.data;
+  const data: { ticketType: string, ticketTypeId: number, price: number, quantity: number }[] = res.data;
   return data;
 };
 
-export const changeTicketPurchase = async ({ticketData, clientToken}: { ticketData: Omit<IClientPurchaseTicket, 'isPartial'>, clientToken: CookieValueTypes }) => {
-  const { data } = await axios.post(`${BASE_URL}/app/tickets`, ticketData, {
+export const changeTicketPurchase = async ({ticketData, clientToken, purchaseId}: { ticketData: IChangeTicketsPayload, clientToken: CookieValueTypes, purchaseId: number }) => {
+  const { data } = await axios.post(`${BASE_URL}/app/tickets/change/${purchaseId}`, ticketData, {
     headers: {
       "Accept": "application/json",
       "Authorization": `Bearer ${clientToken}`,
@@ -88,5 +88,17 @@ export const changeTicketPurchase = async ({ticketData, clientToken}: { ticketDa
   });
   return data;
 };
+
+
+export const partialPurchase = async ({ticketData, clientToken, purchaseId}: { ticketData: { method: string, boldMethod: string, returnUrl: string }, clientToken: CookieValueTypes, purchaseId: number }) => {
+  const { data } = await axios.post(`${BASE_URL}/app/tickets/partial/${purchaseId}`, ticketData, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${clientToken}`,
+    },
+  });
+  return data;
+};
+
 
 

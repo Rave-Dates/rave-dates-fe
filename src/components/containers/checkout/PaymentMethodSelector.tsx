@@ -5,12 +5,13 @@ import { SetStateAction } from "react";
 type Props = {
   clientData: IClient | null | undefined;
   selected: string;
-  setSelected: React.Dispatch<SetStateAction<"Nequi" | "Bold">>;
   check: boolean;
+  isPromoter?: boolean;
+  setSelected: React.Dispatch<SetStateAction<"Nequi" | "Bold">>;
   setCheck: (value: boolean) => void;
 };
 
-export default function PaymentMethodSelector({ clientData, selected, setSelected, check, setCheck }: Props) {
+export default function PaymentMethodSelector({ clientData, selected, setSelected, check, setCheck, isPromoter = false }: Props) {
   const methods: ["Nequi", "Bold"] = ["Nequi", "Bold"];
 
   return (
@@ -59,7 +60,7 @@ export default function PaymentMethodSelector({ clientData, selected, setSelecte
       ))}
 
       {
-        clientData ?
+        clientData && !isPromoter ?
           <div className="flex items-center pt-3 pb-1 select-none">
             <input 
               disabled={clientData?.balance <= 0}
@@ -101,14 +102,19 @@ export default function PaymentMethodSelector({ clientData, selected, setSelecte
           :
           <div className="flex items-center pt-3 pb-1 select-none">
             <div
-              className="w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors cursor-pointer border border-inactive pointer-events-none"
+              className="w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors border border-inactive pointer-events-none"
             >
             </div>
-            <label htmlFor="receiveInfo" className="w-full flex items-center justify-between px-4 select-none cursor-pointer text-primary-white/60">
+            <label htmlFor="receiveInfo" className="w-full flex items-center justify-between px-4 select-none text-primary-white/60">
               <div className="flex font-light flex-col items-start justify-center">
                 Usar crédito disponible
                 <h3 className="text-sm text-primary-white/45">
-                  Verifica tu cuenta para desbloquear esta opción
+                  {
+                    !isPromoter ? "Verifica tu cuenta para desbloquear esta opción" : ""
+                  }
+                  {
+                    isPromoter  ? "No puedes usar esta opción siendo promotor" : ""
+                  }
                 </h3>
               </div>
             </label>

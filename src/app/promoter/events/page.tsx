@@ -21,7 +21,6 @@ export default function Page() {
   // obtenemos user por id
   const { data: user } = useAdminUserById({ token, userId: decoded.id }); 
 
-
   useEffect(() => {
     updateEventFormData(defaultEventFormData);
     setHasLoadedEvent(false);

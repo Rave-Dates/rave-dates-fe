@@ -10,7 +10,7 @@ import { useEventImage } from "@/hooks/admin/queries/useEventImage"
 import SpinnerSvg from "@/components/svg/SpinnerSvg"
 import { useAdminEvent } from "@/hooks/admin/queries/useAdminData"
 
-export function OrganizerEventDetails({ eventId, isPromoter, isPromoterBinnacle }: { eventId: number, isPromoter?: boolean, isPromoterBinnacle?: boolean }) {
+export function OrganizerEventDetails({ eventId, isPromoter, isPromoterBinnacle, promoterId }: { eventId: number, isPromoter?: boolean, isPromoterBinnacle?: boolean, promoterId?: number }) {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const { servedImageUrl, isImageLoading } = useEventImage({ eventId, token: token?.toString() });
@@ -57,7 +57,7 @@ export function OrganizerEventDetails({ eventId, isPromoter, isPromoterBinnacle 
         </div>
       </div>
 
-      <OrganizerEventInfo isPromoter={isPromoter} isPromoterBinnacle={isPromoterBinnacle} token={token} eventId={eventId} />
+      <OrganizerEventInfo isPromoter={isPromoter} isPromoterBinnacle={isPromoterBinnacle} token={token} eventId={eventId} promoterId={promoterId} />
     </div>
   )
 }
