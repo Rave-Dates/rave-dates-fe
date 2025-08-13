@@ -17,7 +17,6 @@ export default function PricingDetails({check, clientData, selectedPayment, part
   const searchParams = useSearchParams();
   const isChangeTickets = searchParams.get("change-tickets");
   const { 
-    oldTicketsPriceTotal,
     oldSubtracted
   } = useChangeTicketStore();
   

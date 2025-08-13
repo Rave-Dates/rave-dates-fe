@@ -1,28 +1,39 @@
 'use client';
 
+import { notifyError } from '@/components/ui/toast-notifications';
 import { readQr } from '@/services/admin-qr';
-import { useReactiveCookiesNext } from 'cookies-next';
+import { getCookie } from 'cookies-next';
 import { CameraDevice, Html5Qrcode, Html5QrcodeCameraScanConfig } from 'html5-qrcode';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 export default function ScanQRPage() {
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const [cameras, setCameras] = useState<CameraDevice[]>([]);
   const [currentCameraId, setCurrentCameraId] = useState<string | null>(null);
-  const [scanning, setScanning] = useState(false);
   const [loading, setLoading] = useState(false);
   const [scanResult, setScanResult] = useState<{ success: boolean; text: string } | null>(null);
   const isProcessingRef = useRef(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const router = useRouter();
 
-  const { getCookie } = useReactiveCookiesNext();
   const token = getCookie('token');
   const qrCodeRegionId = 'qr-reader';
 
-  // Obtener cámaras una sola vez
   useEffect(() => {
+    if (!token) {
+      notifyError('No se pudo leer el token de autenticación');
+      router.replace('/');
+    }
+  }, [token, router]);
+  
+  // Montaje y obtención de cámaras
+  useEffect(() => {
+    let mounted = true;
+
     Html5Qrcode.getCameras()
       .then((devices) => {
-        if (devices.length) {
+        if (mounted && devices.length) {
           setCameras(devices);
           setCurrentCameraId(devices[0].id);
         }
@@ -34,12 +45,22 @@ export default function ScanQRPage() {
     scannerRef.current = new Html5Qrcode(qrCodeRegionId);
 
     return () => {
-      scannerRef.current?.stop().catch(() => {});
-      scannerRef.current?.clear();
+      mounted = false;
+      if (scannerRef.current && isScanning) {
+        scannerRef.current
+          .stop()
+          .then(() => {
+            setIsScanning(false);
+            return scannerRef.current?.clear();
+          })
+          .catch(() => {
+            // ignorar si ya estaba detenido
+          });
+      }
     };
   }, []);
 
-  // Manejar inicio de escaneo cuando cambia la cámara
+  // Iniciar escaneo cuando cambia la cámara
   useEffect(() => {
     if (!currentCameraId || !scannerRef.current) return;
 
@@ -50,9 +71,10 @@ export default function ScanQRPage() {
       };
 
       try {
-        if (scanning) {
+        if (isScanning) {
           await scannerRef.current?.stop().catch(() => {});
-          await scannerRef.current?.clear();
+          scannerRef.current?.clear()
+          setIsScanning(false);
         }
 
         await scannerRef.current?.start(
@@ -72,26 +94,25 @@ export default function ScanQRPage() {
 
               console.log('📦 Respuesta API:', res);
               setScanResult({ success: true, text: `QR válido` });
-              setLoading(false);
             } catch (err) {
               console.error('Error al procesar QR:', err);
               setScanResult({ success: false, text: 'QR Inválido o error al procesar' });
-              setLoading(false);
             } finally {
+              setLoading(false);
               scannerRef.current?.pause(true);
 
               setTimeout(() => {
+                setLoading(false);
                 setScanResult(null);
                 isProcessingRef.current = false;
                 scannerRef.current?.resume();
-                setLoading(false);
               }, 3000);
             }
           },
           () => {}
         );
 
-        setScanning(true);
+        setIsScanning(true);
       } catch (err) {
         console.error('Error al iniciar escaneo:', err);
       }
@@ -145,7 +166,7 @@ export default function ScanQRPage() {
         </div>
       )}
 
-      {!scanning && !loading && !scanResult && (
+      {!loading && !scanResult && !isScanning && (
         <p className="mt-4 text-red-400">Esperando cámara...</p>
       )}
     </div>

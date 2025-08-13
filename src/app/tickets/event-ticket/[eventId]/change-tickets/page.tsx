@@ -72,7 +72,7 @@ const ChangeTicketsView = () => {
         ticket.ticketType.eventId === eventId && 
         (ticket.transferredClientId === null || 
           ticket.transferredClientId !== clientId) && 
-          !ticket.purchase.meta.changeTickets &&
+          !ticket.purchase?.meta?.changeTickets &&
           ticket.status === "PENDING"
         ) {
           console.log("este paso", ticket)
@@ -154,7 +154,7 @@ const ChangeTicketsView = () => {
       });
     }
     
-    let total = (totalPrice - totalSubtracted)
+    const total = (totalPrice - totalSubtracted)
 
     if (total > 0) {
       setOldTicketsPriceTotal(totalOld);
@@ -247,7 +247,7 @@ const ChangeTicketsView = () => {
   const totalPages = purchaseIds && Math.ceil(purchaseIds.length / itemsPerPage);
 
   const getTotalPrice = (totalSelectedPrice: number, totalSubstractedPrice: number) => {
-    let total = (totalSelectedPrice - totalSubstractedPrice)
+    const total = (totalSelectedPrice - totalSubstractedPrice)
     if (total < 0) return (
       <div> 
         <span className="text-sm text-primary-white/50">Este monto se te acreditará en el balance </span>

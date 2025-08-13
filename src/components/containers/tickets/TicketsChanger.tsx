@@ -62,7 +62,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
 
   const nonTransferredTickets = purchasedTickets?.filter(
     (ticket) =>
-      ((!ticket.isTransferred && ticket.purchase.paymentStatus === "PAID") &&
+      ((!ticket.isTransferred && ticket.purchase?.paymentStatus === "PAID") &&
         ticket.transferredClientId === null ||
         ticket.transferredClientId === clientId) &&
       ticket.ticketType.eventId === eventId
@@ -70,7 +70,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
 
   const pendingTickets = purchasedTickets
     ?.map((t) => t)
-    .filter((t) => t.purchase.paymentStatus === "PARTIAL" && t.ticketType.eventId === eventId);
+    .filter((t) => t.purchase?.paymentStatus === "PARTIAL" && t.ticketType.eventId === eventId);
 
   const groupedPendingPurchases: {
     [purchaseId: number]: {
