@@ -12,9 +12,10 @@ import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import { useParams, useRouter } from "next/navigation";
 import { useTicketStore } from "@/store/useTicketStore";
-import { useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
+import { useClientGetById, useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
 import { useChangeTicketStore } from "@/store/useChangeTicketStore";
 import ChangeTicketButtons from "@/components/ui/buttons/ChangeTicketButtons";
+import { notifySuccess } from "@/components/ui/toast-notifications";
 
 const ChangeTicketsView = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,18 +32,26 @@ const ChangeTicketsView = () => {
 
   const { purchasedTickets } = useClientPurchasedTickets({clientId, clientToken: clientToken});
 
+  const { clientData } = useClientGetById({clientId, clientToken: clientToken});
+
   const { 
-    getTotalRestados, 
-    restados, 
+    getTotalOldTickets, 
+    oldTickets, 
     resetStore, 
-    setCantidadRestada, 
+    setOldQuantity, 
     setOldTicketsTotal, 
     resetOldTicketsTotal, 
     oldTicketsTotal, 
     setOldTicketsPriceTotal,
     setStorePurchaseId,
+    oldTicketsPriceTotal,
+    resetOldTicketsPriceTotal,
+    getTotalOldSubtracted,
+    oldSubtracted,
+    resetSubtracted
   } = useChangeTicketStore();
-  const totalRestados = getTotalRestados();
+  const totalOldTickets = getTotalOldTickets();
+  const totalOldSubtracted = getTotalOldSubtracted();
 
 
   const { data: ticketTypes } = useQuery({
@@ -54,10 +63,19 @@ const ChangeTicketsView = () => {
     enabled: !!clientToken,
   });
 
+  console.log("ticketTypes", ticketTypes)
+
   const purchaseIds = React.useMemo(() => {
     const ids = new Set<number>();
     purchasedTickets?.forEach((ticket) => {
-      if (ticket.ticketType.eventId === eventId && (ticket.transferredClientId === null || ticket.transferredClientId !== clientId)) {
+      if (
+        ticket.ticketType.eventId === eventId && 
+        (ticket.transferredClientId === null || 
+          ticket.transferredClientId !== clientId) && 
+          !ticket.purchase?.meta?.changeTickets &&
+          ticket.status === "PENDING"
+        ) {
+          console.log("este paso", ticket)
         ids.add(ticket.purchaseId);
       }
     });
@@ -76,7 +94,7 @@ const ChangeTicketsView = () => {
       })) ?? [],
   });
 
-  const oldTickets = oldTicketsQueries
+  const oldTicketsDb = oldTicketsQueries
     .filter((query) => query.data)
     .flatMap((query) => query.data);
 
@@ -88,7 +106,22 @@ const ChangeTicketsView = () => {
     }
   }, [purchaseIds, activeTab]);
 
-  console.log(purchasedTickets)
+  useEffect(() => {
+    if (activeTab === null) return;
+
+    oldTicketsDb
+      ?.filter((ticket) => ticket?.purchaseId === activeTab)
+      .forEach((ticket) => {
+        if (!ticket) return;
+        if (!oldTickets[ticket.ticketTypeId]) {
+          setOldQuantity(ticket.ticketTypeId, ticket.quantity, ticket.price);
+          setOldTicketsTotal(ticket.quantity);
+          setOldTicketsPriceTotal(ticket.price * ticket.quantity);
+        }
+      });
+  }, [oldTicketsDb, activeTab]);
+
+  console.log("oldTickets", oldTicketsDb)
 
 
   const handleConfirm = async () => {
@@ -98,7 +131,7 @@ const ChangeTicketsView = () => {
       console.log(key)
       totalNew += value.quantity * value.stage.price;
     }
-    {oldTickets
+    {oldTicketsDb
       ?.filter((ticket) => ticket?.purchaseId === activeTab)
       .map((ticket, index) => {
         console.log(index)
@@ -112,19 +145,23 @@ const ChangeTicketsView = () => {
     
     const formattedOldTickets = []
     
-    for (const [key, value] of Object.entries(restados)) {
+    for (const [key, value] of Object.entries(oldTickets)) {
+      if (value.actualQuantity === 0) continue;
       formattedOldTickets.push({
         ticketTypeId: Number(key),
-        quantity: value.cantidadActual,
+        quantity: value.actualQuantity,
         price: value.price,
       });
     }
     
-    if (totalNew > totalOld) {
+    const total = (totalPrice - totalSubtracted)
+
+    if (total > 0) {
       setOldTicketsPriceTotal(totalOld);
       router.push("/checkout?change-tickets=true");
       return
     }
+
     const formattedNewTickets = []
 
     for (const [key, value] of Object.entries(selected)) {
@@ -138,10 +175,10 @@ const ChangeTicketsView = () => {
     console.log("formattedOldTickets", formattedOldTickets)
     console.log("formattedNewTickets", formattedNewTickets)
 
-    await changeTicketPurchase({
+    const res = await changeTicketPurchase({
       ticketData: {
         clientId,
-        oldTickets: totalRestados > 0 ? formattedOldTickets : [],
+        oldTickets: totalOldTickets > 0 ? formattedOldTickets : [],
         newTickets: formattedNewTickets,
         payWithBalance: false,
         eventId: eventId,
@@ -152,6 +189,12 @@ const ChangeTicketsView = () => {
       purchaseId: activeTab,
       clientToken: clientToken,
     });
+
+    if (res.data === "PAY NOT NEEDED") {
+      notifySuccess("Cambio realizado correctamente");
+      router.push("/tickets");
+      return
+    }
 
     console.log("totalNew", totalNew)
     console.log("totalOld", totalOld)
@@ -179,10 +222,23 @@ const ChangeTicketsView = () => {
     resetStore();
     resetSelected();
     resetOldTicketsTotal();
+    resetOldTicketsPriceTotal();
+    resetSubtracted();
   }
 
   console.log("totalQuantity", totalQuantity)
-  console.log("totalRestados", totalRestados)
+  console.log("totalOldTickets", totalOldTickets)
+  console.log("oldTicketsPriceTotal", oldTicketsPriceTotal)
+  console.log("totalOldSubtracted", totalOldSubtracted)
+  console.log("oldSubtracted", oldSubtracted)
+
+  let totalSubtracted = 0;
+  for (const [key, value] of Object.entries(oldSubtracted)) {
+    console.log(key)
+    totalSubtracted += value.currentSubtracted * value.price;
+  }
+
+    console.log("totalSubtracted", totalSubtracted)
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -190,7 +246,17 @@ const ChangeTicketsView = () => {
 
   const totalPages = purchaseIds && Math.ceil(purchaseIds.length / itemsPerPage);
 
-
+  const getTotalPrice = (totalSelectedPrice: number, totalSubstractedPrice: number) => {
+    const total = (totalSelectedPrice - totalSubstractedPrice)
+    if (total < 0) return (
+      <div> 
+        <span className="text-sm text-primary-white/50">Este monto se te acreditará en el balance </span>
+        <span className="text-primary">+ </span>
+        <span>${Math.abs(total).toLocaleString()} COP</span>
+      </div>
+    )
+    return `$${total.toLocaleString()} COP`
+  }
 
   return (
     <div className="min-h-screen bg-primary-black flex sm:justify-center sm:items-center text-primary-white">
@@ -250,18 +316,13 @@ const ChangeTicketsView = () => {
           
           {activeTab !== null && (
             <div className="space-y-4 mb-10">
-              {oldTickets
+              {oldTicketsDb
                 ?.filter((ticket) => ticket?.purchaseId === activeTab)
                 .map((ticket, index) => {
                   if (!ticket) return;
                   console.log("ticket", ticket)
                   const futureDate = new Date();
                   futureDate.setDate(futureDate.getDate() + 1);
-
-                  if (!restados[ticket.ticketTypeId]) {
-                      setCantidadRestada(ticket.ticketTypeId, ticket.quantity, ticket.price);
-                      setOldTicketsTotal(ticket.quantity);
-                  }
 
                   const newTicket = {
                     name: ticket.ticketType,
@@ -306,16 +367,13 @@ const ChangeTicketsView = () => {
               })}
             </div>
           )}
-
-          <h1 className="sm:hidden block text-start w-full text-primary mt-6">
-            Crédito disponible $1000 COP
-          </h1>
         </div>
 
         <div className="w-full flex flex-col items-end mb-7 md:mb-0">
           <div className="w-full mb-3">
             <div className="flex justify-end items-center font-light tabular-nums">
-              <span>${totalPrice ? totalPrice.toLocaleString() : "0"} COP</span>
+              {/* <span>${(totalPrice - totalSubtracted).toLocaleString()} COP</span> */}
+              <span>{getTotalPrice(totalPrice, totalSubtracted)}</span>
             </div>
           </div>
 
@@ -326,7 +384,7 @@ const ChangeTicketsView = () => {
                 activeTab &&
                 purchaseIds &&
                 totalPrice !== 0 
-                && totalQuantity === oldTicketsTotal - totalRestados
+                && totalQuantity === oldTicketsTotal - totalOldTickets
               )
             }
             className="w-full text-center py-3 rounded-lg transition-colors text-black bg-primary hover:bg-primary/70 disabled:bg-primary/60 disabled:pointer-events-none"
@@ -335,7 +393,7 @@ const ChangeTicketsView = () => {
           </button>
 
           <h1 className="sm:block hidden text-start w-full text-primary mt-6">
-            Crédito disponible $1000 COP
+            Crédito disponible ${clientData?.balance.toLocaleString()} COP
           </h1>
         </div>
       </div>

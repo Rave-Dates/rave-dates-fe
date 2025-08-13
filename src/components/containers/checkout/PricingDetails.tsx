@@ -17,7 +17,7 @@ export default function PricingDetails({check, clientData, selectedPayment, part
   const searchParams = useSearchParams();
   const isChangeTickets = searchParams.get("change-tickets");
   const { 
-    oldTicketsPriceTotal
+    oldSubtracted
   } = useChangeTicketStore();
   
 
@@ -51,6 +51,13 @@ export default function PricingDetails({check, clientData, selectedPayment, part
   // No dejar que el total sea negativo
   totalWithBalanceDiscount = Math.max(totalWithBalanceDiscount, 0);
 
+  let totalSubtracted = 0;
+
+  for (const [key, value] of Object.entries(oldSubtracted)) {
+    console.log(key)
+    totalSubtracted += value.currentSubtracted * value.price;
+  }
+
   // if (!clientData?.balance) return null;
 
   // if (check && clientData?.balance >= totalAmount) {
@@ -76,20 +83,12 @@ export default function PricingDetails({check, clientData, selectedPayment, part
         isChangeTickets &&
         <div className="flex justify-between">
           <span className="text-primary-white/50">Ya pagado</span>
-          <span className="text-end">- ${oldTicketsPriceTotal.toLocaleString()} COP</span>
+          <span className="text-end">- ${totalSubtracted.toLocaleString()} COP</span>
         </div>
       }
-      <div className="flex justify-between">
-        <span className="text-primary-white/50">Ya pagado</span>
-        <span className="text-end">-$0 COP</span>
-      </div>
-      <div className="flex justify-between">
-        <span className="text-primary-white/50">Ya pagado</span>
-        <span className="text-end">-$0 COP</span>
-      </div>
       <div className="flex justify-between text-lg">
         <span className="text-primary-white/50">TOTAL</span>
-        <span className="text-end">${ !isChangeTickets ? totalWithBalanceDiscount.toLocaleString() : (totalAmount - oldTicketsPriceTotal).toLocaleString()} COP</span>
+        <span className="text-end">${ !isChangeTickets ? totalWithBalanceDiscount.toLocaleString() : (totalAmount - totalSubtracted).toLocaleString()} COP</span>
       </div>
 
       <div className="flex">

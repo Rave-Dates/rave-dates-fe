@@ -49,6 +49,8 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
   const selectedPromoterBinnacle = promoterBinnacles?.find(b => b.eventId === eventId);
 
+  console.log("ticketMetrics", ticketMetrics)
+
   useEffect(() => {
     setGlobalExpandedSections(["Vendidas y dinero generado"]);
   }, []);

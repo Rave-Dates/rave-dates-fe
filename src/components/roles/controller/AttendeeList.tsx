@@ -20,6 +20,13 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
 
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
 
+  useEffect(() => {
+    if (!token) {
+      notifyError('No se pudo leer el token de autenticación');
+      router.replace('/');
+    }
+  }, [token, router]);
+
   const { checkerUsers, isLoading, isError } = useAdminAllCheckerUsers({
     token,
     eventId,
