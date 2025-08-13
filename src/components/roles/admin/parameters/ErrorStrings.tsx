@@ -10,7 +10,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 export default function ErrorStrings() {
-  const { register, handleSubmit, setValue, reset } = useForm<{ email: string }>();
+  const { register, handleSubmit, reset } = useForm<{ email: string }>();
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
 
