@@ -20,7 +20,7 @@ export const createPaymentImage = async (
 };
 
 export const servedMovementImage = async ({ token, url }: { token: CookieValueTypes, url: string }) => {
-  const res = await axios.get(`${BASE_URL}/admin/images/movements/${url}`, {
+  const res = await axios.get(`${BASE_URL}/admin/images/movements?url=${url}`, {
     headers: {
       "Authorization": `Bearer ${token}`,
     },

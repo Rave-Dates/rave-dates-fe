@@ -13,14 +13,15 @@ type Props = {
   title: string;
   children: React.ReactNode;
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  labelClassname?: string;
 };
 
-const FormDropDown = ({ register, title, children, value, onChange }: Props) => {
+const FormDropDown = ({ register, title, children, value, onChange, labelClassname }: Props) => {
   return (
     <div className="relative w-full">
       <label
         htmlFor="countries"
-        className="block mb-2 text-xs"
+        className={`block mb-2 text-xs ${labelClassname}`}
       >
         {title}
       </label>

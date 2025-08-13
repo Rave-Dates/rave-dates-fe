@@ -124,3 +124,12 @@ export const getPromoterLink = async ({ token, eventId, promoterId }: { token: C
   });
   return res.data;
 };
+
+export const getAllCheckers = async ({ token }: { token: CookieValueTypes }) => {
+  const res = await axios.get(`${BASE_URL}/admin/users/checkers`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};

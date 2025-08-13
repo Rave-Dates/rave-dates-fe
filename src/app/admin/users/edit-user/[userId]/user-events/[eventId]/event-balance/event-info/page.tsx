@@ -38,9 +38,8 @@ export default function EventInfo() {
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
   const selectedPromoterBinnacle = promoterBinnacles?.find(b => b.eventId === eventId);
 
-  const binnacleToUse = selectedBinnacle || selectedPromoterBinnacle;
-  const ticketMetricsToUse = ticketMetrics || promoterTicketMetrics;
-
+  const binnacleToUse = user?.role.name === "PROMOTER" ? selectedPromoterBinnacle : selectedBinnacle;
+  const ticketMetricsToUse = user?.role.name === "PROMOTER" ? promoterTicketMetrics : ticketMetrics;
   
   useEffect(() => {
     if (ticketTypes && ticketTypes.length > 0) {
@@ -73,35 +72,38 @@ export default function EventInfo() {
         {/* Dropdown Sections */}
         <div className="overflow-hidden">
           {/* General Section */}
-          {
-            binnacleToUse ? ticketTypes?.map((ticket) => (
-              <DropdownItem
-                key={ticket.name}
-                title={ticket.name}
-                isExpanded={expandedSections.includes(ticket.name)}
-                onToggle={() => toggleSection(ticket.name)}
-              >
+            {
+              binnacleToUse && binnacleToUse?.stages?.length > 0 ?
+              <>
                 {
-                  binnacleToUse?.stages.stages?.map((stage, index) => {
-                    if (ticket.name !== stage.ticketType) return
-
-                    return (
-                      <div key={index} className="space-y-2 bg-main-container rounded-b-lg p-4">
-                        <StageItem
-                          stage={stage.activeStage}
-                          quantity={stage.quantity}
-                        />
+                  selectedBinnacle?.stages?.map((stageGroup, groupIndex) => (
+                    <DropdownItem
+                      key={`${groupIndex}-${groupIndex}`}
+                      title={stageGroup[0].ticketType}
+                      isExpanded={expandedSections.includes(stageGroup[0].ticketType)}
+                      onToggle={() => toggleSection(stageGroup[0].ticketType)}
+                    >
+                      <div className="space-y-2 bg-main-container px-4 pb-3 rounded-b-lg">
+                        {
+                          stageGroup.map((stage, stageIndex) => (
+                            <StageItem
+                              key={stageIndex}
+                              stage={stage}
+                              quantity={stage.quantity}
+                              index={stageIndex}
+                            />
+                          ))
+                        }
                       </div>
-                    )
-                  })
+                    </DropdownItem>
+                  ))
                 }
-              </DropdownItem>
-              ))
+              </>
               :
-              <div className="text-center pt-2 pb-6 text-text-inactive">
+                <div className="text-center pt-2 pb-6 text-text-inactive">
                 No se encontró información para mostrar
               </div>
-          }
+            }
         </div>
       </div>
     </div>

@@ -25,6 +25,8 @@ export default function WithdrawInfo({ paymentId }: { paymentId: number }) {
 
   const selectedMovement = selectedBinnacle?.movements.find(m => m.paymentId === paymentId);
 
+  console.log(selectedMovement)
+
   const { movementImage, isErrorMovementImage, isLoadingMovementImage } = useServeMovementImage({ token, url: selectedMovement?.imageUrl });
 
   return (

@@ -32,21 +32,28 @@ export default function EventBalance({eventId}: { eventId: number }) {
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
   const selectedPromoterBinnacle = promoterBinnacles?.find(b => b.eventId === eventId);
 
-  const binnacleToUse = selectedBinnacle || selectedPromoterBinnacle;
-  const ticketMetricsToUse = ticketMetrics || promoterTicketMetrics;
+  const binnacleToUse = user?.role.name === "PROMOTER" ? selectedPromoterBinnacle : selectedBinnacle;
+  const ticketMetricsToUse = user?.role.name === "PROMOTER" ? promoterTicketMetrics : ticketMetrics;
+
+  console.log(selectedPromoterBinnacle)
+  console.log(promoterTicketMetrics)
 
   return (
     <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
       <div>
         <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
         <div className="absolute z-30 top-10 right-5 animate-fade-in">
-          <Link
-            href={`event-balance/event-info`}
-            className="bg-primary text-primary-black p-3 text-sm px-5 rounded-lg font-medium flex items-center justify-center text-center"
-            aria-label="Añadir usuario"
-          >
-            Ver asistentes
-          </Link>
+
+          {
+            user?.role.name === "ORGANIZER" || user?.role.name === "PROMOTER" &&
+            <Link
+              href={`event-balance/event-info`}
+              className="bg-primary text-primary-black p-3 text-sm px-5 rounded-lg font-medium flex items-center justify-center text-center"
+              aria-label="Añadir usuario"
+            >
+              Ver asistentes
+            </Link>
+          }
         </div>
         <div className="max-w-xl pt-24 mx-auto animate-fade-in">
           <h1 className="text-title font-semibold">Saldo y movimientos</h1>

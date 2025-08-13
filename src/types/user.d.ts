@@ -12,6 +12,13 @@ interface IUser {
     createdAt: string;
     updatedAt: string;
   };
+  checker?: {
+    checkerId: number;
+    ticketTypesIds: {
+      name: string;
+      ticketTypeId: number;
+    }
+  }
   promoter?: {
     userId: number;
     promoterId?: number;

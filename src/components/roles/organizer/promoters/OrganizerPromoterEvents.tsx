@@ -33,10 +33,12 @@ export default function OrganizerPromoterEvents({ userId }: {userId: number}) {
   return (
     <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
       <div>
-        <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
-        <div className="max-w-xl pt-24 mx-auto animate-fade-in">
+        <div className="flex justify-start items-center gap-x-3 mt-6 ps-1">
+          <GoBackButton className="px-3 py-3 animate-fade-in" />
+          <h1 className="font-medium text-lg">{data?.name}</h1> 
+        </div>
+        <div className="max-w-xl pt-5 mx-auto animate-fade-in">
           <h1 className="text-title font-semibold">Eventos asignados</h1>
-          <h1 className="font-light text-sm">{data?.name}</h1> 
 
           {/* Users Table/List */}
           <div className="rounded-md overflow-hidden mt-5">
