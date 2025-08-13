@@ -4,10 +4,10 @@ import { DropdownItem } from "@/components/roles/admin/events/DropDownItem"
 import { StageItem } from "@/components/roles/admin/events/StageItem"
 import EditSvg from "@/components/svg/EditSvg"
 import EyeSvg from "@/components/svg/EyeSvg"
-import FormInput from "@/components/ui/inputs/FormInput"
+import FormDropDown from "@/components/ui/inputs/FormDropDown"
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications"
-import { useAdminBinnacles, useAdminEvent, useAdminGetPromoterLink, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData"
-import { generateCheckerLink } from "@/services/admin-qr"
+import { useAdminBinnacles, useAdminEvent, useAdminGetCheckers, useAdminGetPromoterLink, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData"
+import { generateCheckerLink, updateCheckerTicketTypes } from "@/services/admin-qr"
 import { onInvalid } from "@/utils/onInvalidFunc"
 import { useMutation } from "@tanstack/react-query"
 import { CookieValueTypes } from "cookies-next"
@@ -29,12 +29,20 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
   const [checkerLink, setCheckerLink] = useState<string>()
   const [globalExpandedSections, setGlobalExpandedSections] = useState<string[]>([])
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
-  const { register, handleSubmit } = useForm<{ checkerEmail: string, eventId: number }>();
+  const { register, handleSubmit, setValue, watch } = useForm<{
+    checkerData: string;
+    eventId: number;
+    ticketTypeMap: Record<number, string>;
+  }>();
+
+  const selectedTickets = watch("ticketTypeMap");
 
   const { ticketMetrics } = useAdminTicketMetrics({ token, eventId, isPromoter });
   const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId: decoded?.promoterId || promoterId });
   const { selectedEvent } = useAdminEvent({ eventId, token });
   const { promoterLink } = useAdminGetPromoterLink({ token, eventId, promoterId: decoded?.promoterId || promoterId });
+  const { ticketTypes } = useAdminTicketTypes({ token, eventId });
+  const { allCheckers } = useAdminGetCheckers({ token });
 
   const { organizerBinnacles } = useAdminBinnacles({
     organizerId: decoded?.organizerId ?? 0,
@@ -49,7 +57,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
   const selectedPromoterBinnacle = promoterBinnacles?.find(b => b.eventId === eventId);
 
-  console.log("ticketMetrics", ticketMetrics)
+  console.log("selectedBinnacle", selectedBinnacle)
 
   useEffect(() => {
     setGlobalExpandedSections(["Vendidas y dinero generado"]);
@@ -75,13 +83,47 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
     },
   });
 
-  const onSubmit = (data: { checkerEmail: string }) => {
-    console.log(data)
+  const { mutate: updateTicketTypes } = useMutation({
+    mutationFn: updateCheckerTicketTypes,
+    onError: (error) => {
+      console.log(error)
+      notifyError("Error al asignar tickets");
+    },
+  });
 
+  console.log(allCheckers)
+
+  const onSubmit = (data: { checkerData: string }) => {
+    if (!selectedTickets || Object.keys(selectedTickets).length === 0) {
+      notifyError("Debes seleccionar al menos un ticket");
+      return;
+    }
+
+    const parsedData: { email: string, id: number } = JSON.parse(data.checkerData);
+    
+    updateTicketTypes({
+      checkerId: parsedData.id,
+      ticketTypeIds: Object.keys(selectedTickets).map(id => Number(id)),
+      token
+    });
     mutate({ 
       eventId,
-      checkerEmail: data.checkerEmail,
+      checkerEmail: parsedData.email,
     });
+  };
+
+  const handleTicketTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedOptions = Array.from(e.target.selectedOptions);
+    const selectedObj: Record<number, string> = {};
+
+    selectedOptions.forEach((option) => {
+      selectedObj[Number(option.value)] = option.label;
+    });
+
+    // Merge con lo que ya estaba
+    const newMap = { ...selectedTickets, ...selectedObj };
+
+    setValue("ticketTypeMap", newMap, { shouldValidate: true, shouldDirty: true });
   };
 
   const types = ["Vendidas y dinero generado", "Dinero", "Promotores", "Link de controlador"]
@@ -109,23 +151,27 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                       </span>
                     </div>
                     {
-                      selectedBinnacle?.stages.stages?.map((stage, index) => (
+                      selectedBinnacle?.stages?.map((stageGroup, groupIndex) => (
                         <DropdownItem
-                          key={index}
-                          title={stage.ticketType}
-                          isExpanded={expandedSections.includes(stage.ticketType)}
-                          onToggle={() => toggleSection(stage.ticketType)}
+                          key={`${groupIndex}-${groupIndex}`}
+                          title={stageGroup[0].ticketType}
+                          isExpanded={expandedSections.includes(stageGroup[0].ticketType)}
+                          onToggle={() => toggleSection(stageGroup[0].ticketType)}
                         >
-                          <div className="space-y-2 bg-main-container rounded-b-lg p-4">
-                            <StageItem
-                              key={stage.ticketType}
-                              stage={stage.activeStage}
-                              quantity={stage.quantity}
-                            />
+                          <div className="space-y-2 bg-main-container px-4 pb-3 rounded-b-lg">
+                            {
+                              stageGroup.map((stage, stageIndex) => (
+                                <StageItem
+                                  key={stageIndex}
+                                  stage={stage}
+                                  quantity={stage.quantity}
+                                  index={stageIndex}
+                                />
+                              ))
+                            }
                           </div>
                         </DropdownItem>
-                        ))
-                    }
+                    ))}
                   </div>
                 }
                 {
@@ -189,39 +235,63 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                     <div className="bg-input rounded-lg px-5 py-2">
                       <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="flex flex-col gap-y-3 justify-between items-center">
                         <div className="flex w-full gap-x-3 items-center justify-between">
-                          <FormInput
-                            title="Email del controlador*"
-                            inputName="name"
-                            register={register("checkerEmail", { required: true })}
-                          />
-                          {/* <FormInput
-                            title="Ticket type*"
-                            inputName="name"
-                            register={register("checkerEmail")}
-                          /> */}
+                          <FormDropDown
+                            labelClassname="!mb-0"
+                            title="Elegir controlador*"
+                            register={register("checkerData")}
+                          >
+                            <option value="" disabled selected>Controlador</option>
+                            {allCheckers?.map((checker) => (
+                              <option key={checker.userId} value={JSON.stringify({ email: checker.email, id: checker.checker?.checkerId })}>
+                                {checker.name}
+                              </option>
+                            ))}
+                          </FormDropDown>
+                          <FormDropDown
+                            labelClassname="!mb-0"
+                            title="Tipos de tickets*"
+                            register={register("ticketTypeMap")}
+                            onChange={handleTicketTypeChange}
+                          >
+                            <option value="" disabled selected>Selecciona un tipo de ticket</option>
+                            {ticketTypes?.map((ticket) => (
+                              <option key={ticket.ticketTypeId} value={ticket.ticketTypeId}>
+                                {ticket.name}
+                              </option>
+                            ))}
+                          </FormDropDown>
+                        </div>
+                        <div className="text-sm flex justify-start w-full h-7 items-center gap-x-1">
+                          <h2>Tickets seleccionados:</h2>
+                          {selectedTickets &&
+                            Object.entries(selectedTickets).map(([id, name]) => (
+                              <span key={id} className="bg-inactive px-2 py-1 rounded">
+                                {name}
+                              </span>
+                            ))}
                         </div>
                         <button type="submit" className="bg-primary rounded-lg py-2.5 w-3/4 sm:w-1/2 font-medium text-sm text-primary-black">
                           Generar link
                         </button>
-                        <div className="flex w-full gap-x-1 justify-between py-2 items-center">
-                          <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/20">
-                            {checkerLink ? checkerLink : "Aqui aparecerá el link ..."}
-                          </h2>                  
-                          <button
-                            type="button"
-                            disabled={!checkerLink}
-                            onClick={() => {
-                              if (checkerLink) {
-                                navigator.clipboard.writeText(checkerLink);
-                                notifySuccess("Link copiado al portapapeles");
-                              }
-                            }}
-                            className="border border-primary disabled:opacity-60 disabled:pointer-events-none hover:opacity-75 transition-opacity px-4 py-1.5 font-medium text-primary rounded-lg text-sm"
-                          >
-                            Copiar
-                          </button>
-                        </div>
                       </form>
+                      <div className="flex w-full gap-x-1 mt-3 justify-between py-2 items-center">
+                        <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/20">
+                          {checkerLink ? checkerLink : "Aqui aparecerá el link ..."}
+                        </h2>                  
+                        <button
+                          type="button"
+                          disabled={!checkerLink}
+                          onClick={() => {
+                            if (checkerLink) {
+                              navigator.clipboard.writeText(checkerLink);
+                              notifySuccess("Link copiado al portapapeles");
+                            }
+                          }}
+                          className="border border-primary disabled:opacity-60 disabled:pointer-events-none hover:opacity-75 transition-opacity px-4 py-1.5 font-medium text-primary rounded-lg text-sm"
+                        >
+                          Copiar
+                        </button>
+                      </div>
                     </div>
                 }
               </div>
@@ -237,7 +307,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
               <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
                 <div className="flex text-sm justify-between items-center">
                   <h2>Total</h2>
-                  <h2 className="text-primary text-base text-end tabular-nums">COP ${Number(selectedPromoterBinnacle?.total ?? 0).toLocaleString() ?? 0}</h2>
+                  <h2 className="text-primary text-base text-end tabular-nums">COP ${Number(selectedPromoterBinnacle?.feePromoter ?? 0).toLocaleString() ?? 0}</h2>
                 </div>
 
                 <div className="flex text-sm justify-between items-center">

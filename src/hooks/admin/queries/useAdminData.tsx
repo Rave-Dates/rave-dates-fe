@@ -5,7 +5,7 @@ import { getAllBinnaclesFromOrganizer, getAllBinnaclesFromPromoter } from "@/ser
 import { getEventImages, getImageById } from "@/services/admin-events";
 import { getAllCategories } from "@/services/admin-categories";
 import { getAllLabels } from "@/services/admin-labels";
-import { getAllCheckerUsers, getAllPromoters, getAllUsers, getGuests, getPromoterLink, getUserById } from "@/services/admin-users";
+import { getAllCheckers, getAllCheckerUsers, getAllPromoters, getAllUsers, getGuests, getPromoterLink, getUserById } from "@/services/admin-users";
 import { getAllRoles } from "@/services/admin-roles";
 import { getAllPayments, servedMovementImage } from "@/services/admin-payments";
 
@@ -288,4 +288,14 @@ export function useAdminGetPromoterLink({ token, eventId, promoterId }: { token:
   });
 
   return { promoterLink };
+}
+
+export function useAdminGetCheckers({ token }: { token: CookieValueTypes }) {
+  const { data: allCheckers } = useQuery<IUser[]>({
+    queryKey: ["allCheckers"],
+    queryFn: () => getAllCheckers({ token }),
+    enabled: !!token,
+  });
+
+  return { allCheckers };
 }

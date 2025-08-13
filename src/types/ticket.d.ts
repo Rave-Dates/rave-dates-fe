@@ -75,6 +75,7 @@ interface IClientPurchaseTicket {
   boldMethod: string | string[];
   payWithBalance: boolean;
   returnUrl: string;
+  discountCode: string;
 }
 
 interface IClientPurchaseFreeTicket {

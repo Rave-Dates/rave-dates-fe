@@ -20,3 +20,13 @@ export const generateCheckerLink = async ({ eventId, checkerEmail }: { eventId: 
   });
   return res.data;
 };
+
+export const updateCheckerTicketTypes = async ({ checkerId, ticketTypeIds, token }: { checkerId: number, ticketTypeIds : number[] , token: CookieValueTypes }) => {
+  const res = await axios.put(`${BASE_URL}/admin/users/assign-ticket-type/${checkerId}`, { ticketTypeIds },{
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};

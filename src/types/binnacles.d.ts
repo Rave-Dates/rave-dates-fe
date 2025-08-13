@@ -4,21 +4,19 @@ interface IEventPaymentSummary {
   feePromoter: string;
   feeRD: string;
   feeOrganizer: string;
-  stages: IStageGroup;
+  stages: IStageDetail[][]; // <- array de arrays
   alreadyPaid: number;
   pendingPayment: number;
   movements: IPaymentMovement[];
 }
 
-interface IStageGroup {
-  eventId: number;
-  stages: IStageDetail[];
-}
-
 interface IStageDetail {
   quantity: number;
+  ticketTypeId: number;
   ticketType: string;
-  activeStage: ActiveStage;
+  dateMax: string;
+  date: string;
+  price: number;
 }
 
 interface ActiveStage {

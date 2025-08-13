@@ -21,6 +21,7 @@ import { useChangeTicketStore } from "@/store/useChangeTicketStore";
 export default function Checkout() {
   const [selectedPayment, setSelectedPayment] = useState<"Pago total" | "Abonar a la alcancía">("Pago total");
   const [selectedMethod, setSelectedMethod] = useState<"Nequi" | "Bold">("Bold");
+  const [hasDiscountFlag, setHasDiscountFlag] = useState<boolean>(false);
   const { selected, eventId } = useTicketStore();
   const { eventTickets } = useClientEventTickets(eventId);
   const { 
@@ -34,11 +35,12 @@ export default function Checkout() {
   const [check, setCheck] = useState(false);
   const router = useRouter();
   
-  const { register, watch } = useForm<{ partialAmount: number }>({
-    defaultValues: { partialAmount: 0 }
+  const { register, watch } = useForm<{ partialAmount: number, discountCode: string }>({
+    defaultValues: { partialAmount: 0, discountCode: "" }
   });
 
   const watchedPartialAmount = watch("partialAmount") || 0;
+  const watchedDiscountCode = watch("discountCode") || "";
 
   const { getCookie } = useReactiveCookiesNext();
   const searchParams = useSearchParams();
@@ -151,6 +153,7 @@ export default function Checkout() {
       returnUrl: urlToReturn,
       boldMethod: selectedMethod.toUpperCase() === "BOLD" ? ["CREDIT_CARD"] : ["NEQUI"],
       payWithBalance: check,
+      discountCode: watchedDiscountCode,
     };
 
     console.log(formattedTicketData)
@@ -238,6 +241,12 @@ export default function Checkout() {
             selectedPayment={selectedPayment} 
             partialAmount={watchedPartialAmount} 
             totalAmount={totalAmount}
+            register={register}
+            eventDiscountCode={selectedEvent?.discountCode}
+            eventDiscountAmount={selectedEvent?.discount}
+            watchedDiscountCode={watchedDiscountCode}
+            setHasDiscountFlag={setHasDiscountFlag}
+            hasDiscountFlag={hasDiscountFlag}
           />
           <button onClick={() => handleContinue()} className="lg:block hidden w-full order-last bg-primary text-black font-medium py-3 rounded-lg text-lg">
             Continuar

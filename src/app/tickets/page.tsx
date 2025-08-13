@@ -19,7 +19,9 @@ const TicketsEventList: React.FC = () => {
   const decoded: { id: number } = (token && jwtDecode(token.toString())) || { id: 0 };
   const clientId = Number(decoded?.id);
 
+  
   const { purchasedTickets, isTicketsLoading, isTicketsError } = useClientPurchasedTickets({clientId, clientToken: token});
+  console.log(purchasedTickets)
 
   // Obtener los eventos asociados a los eventId de los tickets
   useEffect(() => {
@@ -131,7 +133,7 @@ const TicketsEventList: React.FC = () => {
           <div className="space-y-4 animate-fade-in">
             {finishedEvents?.map((event) => (
               <div key={event.eventId} className="flex justify-center">
-                <EventCard isTicketList={true} text="Detalles" href="/tickets/event-ticket" {...event} />
+                <EventCard isTicketList={true} text="Finalizado" href="/tickets/event-ticket" {...event} />
               </div>
             ))}
             {finishedEvents?.length === 0 && (

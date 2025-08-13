@@ -3,7 +3,7 @@ import { UseFormRegister } from "react-hook-form";
 
 type Props = {
   eventPBComission: number
-  register: UseFormRegister<{ partialAmount: number }>
+  register: UseFormRegister<{ partialAmount: number, discountCode: string }>
   totalAmount: number
   partialAmount: number
 };
