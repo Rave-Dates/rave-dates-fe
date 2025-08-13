@@ -4,6 +4,7 @@ import CreateCategory from "@/components/roles/admin/parameters/CreateCategory";
 import CreateCategoryValues from "@/components/roles/admin/parameters/CreateCategoryValues";
 import CreateLabel from "@/components/roles/admin/parameters/CreateLabel";
 import CreateTicketType from "@/components/roles/admin/parameters/CreateTicketType";
+import ErrorStrings from "@/components/roles/admin/parameters/ErrorStrings";
 import React from "react";
 
 export default function Parameters() {
@@ -14,6 +15,7 @@ export default function Parameters() {
       <CreateTicketType />
       <CreateCategory />
       <CreateCategoryValues />
+      <ErrorStrings />
     </div>
   );
 }

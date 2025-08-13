@@ -36,7 +36,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
   const ticketMetricsToUse = user?.role.name === "PROMOTER" ? promoterTicketMetrics : ticketMetrics;
 
   console.log(selectedPromoterBinnacle)
-  console.log(promoterTicketMetrics)
+  console.log(user?.role.name === "ORGANIZER" || user?.role.name === "PROMOTER")
 
   return (
     <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
@@ -45,7 +45,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
         <div className="absolute z-30 top-10 right-5 animate-fade-in">
 
           {
-            user?.role.name === "ORGANIZER" || user?.role.name === "PROMOTER" &&
+            (user?.role.name === "ORGANIZER" || user?.role.name === "PROMOTER") &&
             <Link
               href={`event-balance/event-info`}
               className="bg-primary text-primary-black p-3 text-sm px-5 rounded-lg font-medium flex items-center justify-center text-center"

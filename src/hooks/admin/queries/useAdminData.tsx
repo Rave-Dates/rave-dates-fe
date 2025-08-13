@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { CookieValueTypes } from "cookies-next";
-import { getAllEvents, getCheckerTicketMetrics, getEventById, getEventCategoriesById, getPromoterTicketMetrics, getTicketMetrics, getTicketTypesById } from "@/services/admin-events";
+import { getAllEvents, getCheckerTicketMetrics, getEventById, getEventCategoriesById, getOrganizerByEventId, getPromoterTicketMetrics, getTicketMetrics, getTicketTypesById } from "@/services/admin-events";
 import { getAllBinnaclesFromOrganizer, getAllBinnaclesFromPromoter } from "@/services/admin-binnacles";
 import { getEventImages, getImageById } from "@/services/admin-events";
 import { getAllCategories } from "@/services/admin-categories";
@@ -8,6 +8,7 @@ import { getAllLabels } from "@/services/admin-labels";
 import { getAllCheckers, getAllCheckerUsers, getAllPromoters, getAllUsers, getGuests, getPromoterLink, getUserById } from "@/services/admin-users";
 import { getAllRoles } from "@/services/admin-roles";
 import { getAllPayments, servedMovementImage } from "@/services/admin-payments";
+import { getErrorStrings } from "@/services/admin-parameters";
 
 export function useAdminEvent({ eventId, token }: { eventId: number | undefined; token: CookieValueTypes }) {
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
@@ -298,4 +299,24 @@ export function useAdminGetCheckers({ token }: { token: CookieValueTypes }) {
   });
 
   return { allCheckers };
+}
+
+export function useAdminGetOrganizerFromEvent({ token, eventId }: { token: CookieValueTypes, eventId: number | undefined }) {
+  const { data: organizerFromEvent } = useQuery({
+    queryKey: ["organizerFromEvent"],
+    queryFn: () => getOrganizerByEventId({token, eventId: eventId!}),
+    enabled: !!token && !!eventId,
+  });
+
+  return { organizerFromEvent };
+}
+
+export function useAdminGetErrorStrings({ token }: { token: CookieValueTypes }) {
+  const { data: errorStrings } = useQuery<{ email: string }>({
+    queryKey: ["errorStrings"],
+    queryFn: () => getErrorStrings({token}),
+    enabled: !!token,
+  });
+
+  return { errorStrings };
 }
