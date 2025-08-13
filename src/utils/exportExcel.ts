@@ -7,7 +7,6 @@ export const exportGuestsToExcel = (guests: IGuest[]) => {
     Email: guest.email || "",    
     Teléfono: guest.whatsapp || "",
     Cédula: guest.idCard || "",
-    Crédito: guest.balance || 0,
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(data);

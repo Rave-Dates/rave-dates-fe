@@ -196,6 +196,8 @@ export default function TicketsChanger({ eventInfo }: Props) {
     );
   };
 
+  console.log(nonTransferredTickets)
+
   return (
     <div className="w-full mb-6">
       <div className="space-y-6">

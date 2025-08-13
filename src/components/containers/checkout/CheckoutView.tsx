@@ -24,12 +24,12 @@ export default function Checkout() {
   const { selected, eventId } = useTicketStore();
   const { eventTickets } = useClientEventTickets(eventId);
   const { 
-    restados,
-    storePurchaseId,
-    getTotalRestados,
+    oldTickets,
+    oldSubtracted,
+    getTotalOldTickets,
+    storePurchaseId
   } = useChangeTicketStore();
-  const totalRestados = getTotalRestados();
-
+  const totalRestados = getTotalOldTickets()
 
   const [check, setCheck] = useState(false);
   const router = useRouter();
@@ -89,10 +89,11 @@ export default function Checkout() {
     if (isChangeTickets && decoded) {
       const formattedOldTickets = []
     
-      for (const [key, value] of Object.entries(restados)) {
+      for (const [key, value] of Object.entries(oldTickets)) {
+        if (value.actualQuantity === 0) continue;
         formattedOldTickets.push({
           ticketTypeId: Number(key),
-          quantity: value.cantidadActual,
+          quantity: value.actualQuantity,
           price: value.price,
         });
       }
@@ -100,14 +101,19 @@ export default function Checkout() {
       const formattedNewTickets = []
 
       for (const [key, value] of Object.entries(selected)) {
+        console.log("oldTickets", oldTickets)
+        console.log("oldSubtracted", oldSubtracted)
         formattedNewTickets.push({
           ticketTypeId: Number(key),
           quantity: value.quantity,
           price: value.stage.price,
         });
       }
+
+      console.log("formattedOldTickets", formattedOldTickets)
+      console.log("formattedNewTickets", formattedNewTickets)
     
-      await changeTicketPurchase({
+      const data = await changeTicketPurchase({
         ticketData: {
           clientId: decoded.id,
           oldTickets: totalRestados > 0 ? formattedOldTickets : [],
@@ -122,6 +128,12 @@ export default function Checkout() {
         clientToken: clientToken,
       });
 
+      if (data === "PAY NOT NEEDED") {
+        notifySuccess("No se necesita pagar")
+        router.push("https://ravedates.proxising.com/tickets")
+        return
+      }
+      router.push(data)
       return
     }
 
@@ -191,21 +203,25 @@ export default function Checkout() {
         {/* Left Side */}
 
         <div className="space-y-4 order-last lg:order-first">
-          <PaymentTypeSelector havePiggyBank={selectedEvent?.piggyBank} isPromoter={Boolean(isPromoter)} selected={selectedPayment} setSelected={setSelectedPayment} />
+          <PaymentTypeSelector 
+            havePiggyBank={selectedEvent?.piggyBank} 
+            isPromoter={Boolean(isPromoter)} 
+            selected={selectedPayment} 
+            setSelected={setSelectedPayment} 
+            isChangeTickets={isChangeTickets}
+          />
+          <PaymentMethodSelector
+            selected={selectedMethod}
+            setSelected={setSelectedMethod}
+            check={check}
+            setCheck={setCheck}
+            clientData={clientData}
+            isPromoter={Boolean(isPromoter)}
+          /> 
           {
-            selectedPayment === "Pago total" &&
-            <PaymentMethodSelector
-              selected={selectedMethod}
-              setSelected={setSelectedMethod}
-              check={check}
-              setCheck={setCheck}
-              clientData={clientData}
-              isPromoter={Boolean(isPromoter)}
-            /> 
-          }
-          {
-          selectedPayment === "Abonar a la alcancía" && selectedEvent && selectedEvent.piggyBank &&
+          selectedPayment === "Abonar a la alcancía" && selectedEvent && selectedEvent.piggyBank && !isChangeTickets &&
             <PartialAmount 
+              eventPBComission={selectedEvent.feePB}
               register={register}
               totalAmount={totalAmount}
               partialAmount={watchedPartialAmount}

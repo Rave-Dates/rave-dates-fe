@@ -72,7 +72,7 @@ export default function Page() {
   };
   
   return (
-    <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Iniciar sesión - Admin">
+    <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Iniciar sesión">
       <FormInput
         type="email"
         title="Usuario*"

@@ -1,15 +1,16 @@
 type Props = {
+  isChangeTickets?: string | null;
   selected: "Pago total" | "Abonar a la alcancía";
   isPromoter?: boolean;
   havePiggyBank?: boolean;
   setSelected: (value: "Pago total" | "Abonar a la alcancía") => void;
 };
 
-export default function PaymentTypeSelector({ selected, setSelected, isPromoter = false, havePiggyBank = false }: Props) {
+export default function PaymentTypeSelector({ selected, setSelected, isPromoter = false, havePiggyBank = false, isChangeTickets }: Props) {
   const payments: ["Pago total", "Abonar a la alcancía"] = ["Pago total", "Abonar a la alcancía"];
   const promoterPayments: ["Pago total"] = ["Pago total"];
 
-  const paymentsToShow = isPromoter || !havePiggyBank ? promoterPayments : payments;
+  const paymentsToShow = isPromoter || !havePiggyBank || !!isChangeTickets ? promoterPayments : payments;
 
   return (
     <div className="bg-cards-container rounded-lg p-4 pb-1">

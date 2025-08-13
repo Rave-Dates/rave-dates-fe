@@ -5,38 +5,57 @@ type TicketChangeStore = {
   storePurchaseId: number | null;
   oldTicketsPriceTotal: number;
   oldTicketsTotal: number;
-  restados: Record<number, { cantidadActual: number; price: number }>;
-  restar: (ticketTypeId: number, price: number) => void;
-  setCantidadRestada: (ticketTypeId: number, cantidad: number, price: number) => void;
-  getTotalRestados: () => number;
-  resetStore: () => void;
+
+  oldTickets: Record<number, { actualQuantity: number; price: number }>;
+  oldSubtracted: Record<number, { currentSubtracted: number; price: number }>;
+
+  addSubtractedOldTicket: (ticketTypeId: number, price: number) => void;
+  subtractOldTicket: (ticketTypeId: number, price: number) => void;
+  setOldQuantity: (ticketTypeId: number, cantidad: number, price: number) => void;
+  getTotalOldTickets: () => number;
+  getTotalOldSubtracted: () => number;
+
   setOldTicketsTotal: (total: number) => void;
-  setOldTicketsPriceTotal: (total: number) => void;
-  resetOldTicketsTotal: () => void;
   setStorePurchaseId: (purchaseId: number) => void;
+  setOldTicketsPriceTotal: (total: number) => void;
+
+  resetStore: () => void;
+  resetSubtracted: () => void;
+  resetOldTicketsTotal: () => void;
+  resetOldTicketsPriceTotal: () => void;
 };
 
 export const useChangeTicketStore = create<TicketChangeStore>((set, get) => ({
   storePurchaseId: null,
   oldTicketsPriceTotal: 0,
   oldTicketsTotal: 0,
-  restados: {},
-  restar: (ticketTypeId, price) => {
+  oldTickets: {},
+  oldSubtracted: {},
+  addSubtractedOldTicket: (ticketTypeId, price) => {
     set((state) => {
-      const actual = state.restados[ticketTypeId]?.cantidadActual || 0;
-      return { restados: { ...state.restados, [ticketTypeId]: { cantidadActual: actual - 1, price } } };
+      const actual = state.oldSubtracted[ticketTypeId]?.currentSubtracted || 0;
+      return { oldSubtracted: { ...state.oldSubtracted, [ticketTypeId]: { currentSubtracted: actual + 1, price } } };
     });
   },
-  setCantidadRestada: (ticketTypeId, cantidad, price) => {
+  subtractOldTicket: (ticketTypeId, price) => {
+    set((state) => {
+      const actual = state.oldTickets[ticketTypeId]?.actualQuantity || 0;
+      return { oldTickets: { ...state.oldTickets, [ticketTypeId]: { actualQuantity: actual - 1, price } } };
+    });
+  },
+  setOldQuantity: (ticketTypeId, cantidad, price) => {
     set((state) => ({
-      restados: { ...state.restados, [ticketTypeId]: { cantidadActual: cantidad, price } },
+      oldTickets: { ...state.oldTickets, [ticketTypeId]: { actualQuantity: cantidad, price } },
     }));
   },
-  getTotalRestados: () => {
-    return Object.values(get().restados).reduce((acc, val) => acc + val.cantidadActual, 0);
+  getTotalOldTickets: () => {
+    return Object.values(get().oldTickets).reduce((acc, val) => acc + val.actualQuantity, 0);
   },
   resetStore: () => {
-    set({ restados: {} });
+    set({ oldTickets: {} });
+  },
+  resetSubtracted: () => {
+    set({ oldSubtracted: {} });
   },
   setOldTicketsTotal: (total) => {
     set((state) => ({
@@ -47,9 +66,17 @@ export const useChangeTicketStore = create<TicketChangeStore>((set, get) => ({
     set({ oldTicketsTotal: 0 });
   },
   setOldTicketsPriceTotal: (total) => {
-    set({ oldTicketsPriceTotal: total });
+    set((state) => ({
+      oldTicketsPriceTotal: state.oldTicketsPriceTotal + total,
+    }));  
   },
   setStorePurchaseId: (purchaseId) => {
     set({ storePurchaseId: purchaseId });
+  },
+  resetOldTicketsPriceTotal: () => {
+    set({ oldTicketsPriceTotal: 0 });
+  },
+  getTotalOldSubtracted: () => {
+    return Object.values(get().oldTickets).reduce((acc, val) => acc + val.actualQuantity, 0);
   },
 }));

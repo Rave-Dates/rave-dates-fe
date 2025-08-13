@@ -57,6 +57,7 @@ interface IPurchaseData {
   updatedAt: string;
   meta: {
     event: IEvent
+    changeTickets: object | null
   }
 }
 
