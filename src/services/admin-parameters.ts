@@ -45,3 +45,25 @@ export const createTicketType = async ({token, data}: { token: CookieValueTypes,
 
   return res.data;
 };
+
+export const updateErrorStrings = async ({token, data}: { token: CookieValueTypes, data: { email: string} }) => {
+  const res = await axios.put(`${BASE_URL}/admin/config`, data, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
+
+export const getErrorStrings = async ({token}: { token: CookieValueTypes }) => {
+  const res = await axios.get(`${BASE_URL}/admin/config`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};

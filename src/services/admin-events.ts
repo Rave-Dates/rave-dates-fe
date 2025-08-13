@@ -238,3 +238,15 @@ export const deleteOrganizerEvent = async (token: CookieValueTypes, data: { orga
   });
   return res.data;
 }
+
+export const getOrganizerByEventId = async ({token, eventId}: { token: CookieValueTypes, eventId: number }) => {
+  const res = await axios.get(`${BASE_URL}/admin/users/organizer/event/${eventId}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+  });
+  const data: { organizerId: number | undefined, eventId: number } = res.data;
+  return data;
+}

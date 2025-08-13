@@ -133,3 +133,14 @@ export const getAllCheckers = async ({ token }: { token: CookieValueTypes }) => 
   });
   return res.data;
 };
+
+export const resendTicketGuest = async ({token, clientId, eventId}: { token: CookieValueTypes, clientId: number, eventId: number }) => {
+  const res = await axios.post(`${BASE_URL}/admin/tickets/resend-tickets`, { clientId, eventId }, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+  });
+  return res.data;
+}

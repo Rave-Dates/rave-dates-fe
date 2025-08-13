@@ -4,7 +4,7 @@ import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { useAdminGetGuests } from "@/hooks/admin/queries/useAdminData";
-import { updateGuest } from "@/services/admin-users";
+import { resendTicketGuest, updateGuest } from "@/services/admin-users";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
@@ -35,6 +35,17 @@ export default function EditGuest({ clientId }: {clientId: number}) {
     },
   });
 
+  const { mutate: resendTickets } = useMutation({
+    mutationFn: resendTicketGuest,
+    onSuccess: () => {
+      notifySuccess('Tickets reenviados correctamente');
+    },
+    onError: (error) => {
+      console.log(error)
+      notifyError("Error al reenviar tickets");
+    },
+  });
+
   useEffect(() => {
     if (!guests) return;
     const guest = guests.find(g => g.clientId === clientId);
@@ -59,6 +70,14 @@ export default function EditGuest({ clientId }: {clientId: number}) {
       token,
       data: formData,
       clientId,
+    });
+  };
+
+  const handleResendTicket = () => {
+    resendTickets({
+      token,
+      clientId,
+      eventId
     });
   };
 
@@ -101,13 +120,22 @@ export default function EditGuest({ clientId }: {clientId: number}) {
         </FormDropDown> */}
 
       </DefaultForm>
-      <button
-        onClick={handleSubmit(onSubmit, onInvalid)}
-        type="submit"
-        className="bg-primary rounded-lg py-4 font-medium text-black mx-6"
-      >
-        Editar
-      </button>
+      <div className="flex flex-col items-center justify-center w-full px-6 gap-y-5">
+        <button
+          onClick={handleResendTicket}
+          type="submit"
+          className="border border-primary text-primary w-full rounded-lg py-4 font-medium mx-6"
+        >
+          Reenviar
+        </button>
+        <button
+          onClick={handleSubmit(onSubmit, onInvalid)}
+          type="submit"
+          className="bg-primary rounded-lg py-4 font-medium w-full text-black mx-6"
+        >
+          Editar
+        </button>
+      </div>
     </div>
   );
 }

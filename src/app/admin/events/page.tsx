@@ -18,7 +18,7 @@ export default function Page() {
   const token = getCookie("token");
   
   const { allEvents, isErrorEvent, isEventLoading } = useAdminAllEvents({ token });
-  
+
   useEffect(() => {
     console.log("campos resetados")
     updateEventFormData(defaultEventFormData);
@@ -57,14 +57,17 @@ export default function Page() {
                 <div className="text-center tabular-nums">{data.title}</div>
                 <div className="text-center tabular-nums">{extractPlaceFromGeo(data.geo) || data.geo}</div>
                 <div className="flex justify-end gap-x-2">
+                  {
+                    new Date(data.date).getTime() > new Date().getTime() &&
+                    <Link
+                      href={`/admin/events/edit-event/${data.eventId}`}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-black"
+                    >
+                      <EditSvg className="text-xl" />
+                    </Link>
+                  }
                   <Link
-                    href={`/admin/events/edit-event/${data.eventId}`}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-black"
-                  >
-                    <EditSvg className="text-xl" />
-                  </Link>
-                  <Link
-                    href={`/admin/events/event-info/${data.eventId}`}
+                    href={`/admin/users/edit-user/2/user-events/${data.eventId}/event-balance/event-info?organizerId=true`}
                     className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end border border-primary text-primary"
                   >
                     <InfoSvg className="text-xl" />

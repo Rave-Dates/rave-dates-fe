@@ -161,7 +161,7 @@ export function TicketRow({
                     href={`${pathname}/${href}/${ticket.purchaseTicketId}`}
                   >
                     {getActionIcon(action)}
-                    <h2 className="text-[10px]">Enviar</h2>
+                    <h2 className="text-[10px]">Transferir</h2>
                   </DefaultTitledButton>
                 </div>
               );
