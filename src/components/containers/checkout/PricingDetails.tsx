@@ -122,7 +122,7 @@ export default function PricingDetails({check, clientData, selectedPayment, part
         <span className="text-end">
           ${ 
             !isChangeTickets 
-              ? (totalWithBalanceDiscount - (hasDiscountFlag && totalWithBalanceDiscount !== 0 && eventDiscountAmount ? eventDiscountAmount : 0)).toLocaleString() 
+              ? (totalWithBalanceDiscount - (hasDiscountFlag && selectedPayment !== "Abonar a la alcancía" && totalWithBalanceDiscount !== 0 && eventDiscountAmount ? eventDiscountAmount : 0)).toLocaleString() 
               : (totalAmount - totalSubtracted).toLocaleString()
           } COP
         </span>

@@ -228,6 +228,8 @@ export default function Checkout() {
               register={register}
               totalAmount={totalAmount}
               partialAmount={watchedPartialAmount}
+              hasDiscountFlag={hasDiscountFlag}
+              watchedDiscountCode={selectedEvent?.discount}
             />
           }
         </div>
