@@ -6,14 +6,18 @@ type Props = {
   register: UseFormRegister<{ partialAmount: number, discountCode: string }>
   totalAmount: number
   partialAmount: number
+  hasDiscountFlag: boolean
+  watchedDiscountCode: number
 };
 
-export default function PartialAmount({ register, totalAmount, partialAmount, eventPBComission }: Props) {
+export default function PartialAmount({ register, totalAmount, partialAmount, eventPBComission, hasDiscountFlag, watchedDiscountCode } : Props) {
   const MIN_AMOUNT = 1000;
 
   console.log("eventPBComission", eventPBComission)
 
   const pendingAmount = Math.max(totalAmount - partialAmount, 0);
+
+  console.log(watchedDiscountCode)
 
   return (
     <div className="bg-cards-container flex flex-col rounded-lg p-4">
@@ -39,7 +43,7 @@ export default function PartialAmount({ register, totalAmount, partialAmount, ev
         />    
       </div>
       <h3 className="text-xs text-primary-white/50 pt-2 pb-5">Cantidad mínima inicial: ${MIN_AMOUNT.toLocaleString()} COP</h3>
-      <h2 className="pb-1 text-sm">Saldo pendiente a pagar: ${pendingAmount.toLocaleString()} COP <span className="text-xs text-primary-white/50"></span></h2>
+      <h2 className="pb-1 text-sm">Saldo pendiente a pagar: ${(!hasDiscountFlag ? pendingAmount : pendingAmount - watchedDiscountCode).toLocaleString()} COP <span className="text-xs text-primary-white/50"></span></h2>
       <h3 className="text-xs text-primary-white/50 pb-3">Comisión de alcancía: ${eventPBComission.toLocaleString()} COP</h3>
       <h3 className="text-xs text-primary-white/50 pb-2">Deberás abonar el resto del pago antes del evento a través de &quot;Mis Tickets&quot;</h3>
     </div>
