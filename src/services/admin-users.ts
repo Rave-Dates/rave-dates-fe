@@ -144,3 +144,14 @@ export const resendTicketGuest = async ({token, clientId, eventId}: { token: Coo
   });
   return res.data;
 }
+
+export const getCheckerById = async ({token, id}: { token: CookieValueTypes, id: IUser["userId"] }) => {
+  const res = await axios.get(`${BASE_URL}/admin/users/checkers/${id}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  const data: IUser = res.data;
+  return data;
+};

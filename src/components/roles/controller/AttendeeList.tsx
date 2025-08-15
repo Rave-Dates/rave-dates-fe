@@ -71,6 +71,8 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = checkerUsers?.slice(indexOfFirstItem, indexOfLastItem);
 
+  console.log(checkerUsers)
+
   const totalPages = checkerUsers && Math.ceil(checkerUsers.length / itemsPerPage);
 
   return (
@@ -85,6 +87,7 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
               handleFunc={handleSearch}
               results={results}
               type="guest"
+              isLink={false}
               setSearchTerm={setSearchTerm}
             />
           )}

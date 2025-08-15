@@ -20,10 +20,12 @@ type Props = {
 };
 
 export default function PricingDetails({check, clientData, selectedPayment, partialAmount, totalAmount, register, eventDiscountCode, watchedDiscountCode, setHasDiscountFlag, hasDiscountFlag, eventDiscountAmount} : Props) {
-  const { selected, eventId } = useTicketStore();
+  const { selected, eventId, pendingPaymentAmount } = useTicketStore();
   const { eventTickets } = useClientEventTickets(eventId);
   const searchParams = useSearchParams();
-  const isChangeTickets = searchParams.get("change-tickets");
+  const isChangeTickets = Boolean(searchParams.get("change-tickets"));
+  const isPendingPayment = Boolean(searchParams.get("pp"));
+
   const { 
     oldSubtracted
   } = useChangeTicketStore();
@@ -90,6 +92,9 @@ export default function PricingDetails({check, clientData, selectedPayment, part
     }
   }
 
+  console.log("pp", isPendingPayment)
+  console.log("isChangeTickets", isChangeTickets)
+
   return (
     <div className="bg-cards-container rounded-lg p-4 space-y-3">
       {mergedTickets.map((ticket, index) => (
@@ -111,6 +116,13 @@ export default function PricingDetails({check, clientData, selectedPayment, part
         </div>
       }
       {
+        isPendingPayment &&
+        <div className="flex justify-between">
+          <span className="text-primary-white/50">Pago pendiente</span>
+          <span className="text-end">${pendingPaymentAmount.toLocaleString()} COP</span>
+        </div>
+      }
+      {
         hasDiscountFlag &&
         <div className="flex justify-between">
           <span className="text-primary-white/50">Descuento</span>
@@ -119,17 +131,25 @@ export default function PricingDetails({check, clientData, selectedPayment, part
       }
       <div className="flex justify-between text-lg">
         <span className="text-primary-white/50">TOTAL</span>
-        <span className="text-end">
-          ${ 
-            !isChangeTickets 
-              ? (totalWithBalanceDiscount - (hasDiscountFlag && selectedPayment !== "Abonar a la alcancía" && totalWithBalanceDiscount !== 0 && eventDiscountAmount ? eventDiscountAmount : 0)).toLocaleString() 
-              : (totalAmount - totalSubtracted).toLocaleString()
-          } COP
-        </span>
+        {
+          !isPendingPayment ?
+            <span className="text-end">
+              ${ 
+                !isChangeTickets 
+                  ? (totalWithBalanceDiscount - (hasDiscountFlag && selectedPayment !== "Abonar a la alcancía" && totalWithBalanceDiscount !== 0 && eventDiscountAmount ? eventDiscountAmount : 0)).toLocaleString() 
+                  : (totalAmount - totalSubtracted).toLocaleString()
+              } COP
+            </span>
+            :
+            <span className="text-end">
+              ${pendingPaymentAmount.toLocaleString()} COP
+            </span>
+
+        }
       </div>
 
       {
-        !isChangeTickets &&
+       !isChangeTickets && !isPendingPayment &&
         <div className="flex">
           <input
             type="text"

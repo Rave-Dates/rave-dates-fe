@@ -18,6 +18,6 @@ export const getAllBinnaclesFromPromoter = async ({token, promoterId}: { token: 
       "Authorization": `Bearer ${token}`,
     },
   });
-  const data: IEventPaymentSummary[] = res.data;
+  const data: IEventPromoterPaymentSummary = res.data;
   return data;
 };

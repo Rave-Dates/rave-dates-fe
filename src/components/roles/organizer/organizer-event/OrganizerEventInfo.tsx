@@ -6,7 +6,7 @@ import EditSvg from "@/components/svg/EditSvg"
 import EyeSvg from "@/components/svg/EyeSvg"
 import FormDropDown from "@/components/ui/inputs/FormDropDown"
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications"
-import { useAdminBinnacles, useAdminEvent, useAdminGetCheckers, useAdminGetPromoterLink, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData"
+import { useAdminBinnacles, useAdminEvent, useAdminGetCheckers, useAdminGetPromoterLink, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData"
 import { generateCheckerLink, updateCheckerTicketTypes } from "@/services/admin-qr"
 import { onInvalid } from "@/utils/onInvalidFunc"
 import { useMutation } from "@tanstack/react-query"
@@ -48,16 +48,8 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
     organizerId: decoded?.organizerId ?? 0,
     token: token?.toString() ?? "",
   });
-
-  const { promoterBinnacles } = useAdminPromoterBinnacles({
-    promoterId: decoded?.promoterId || promoterId,
-    token: token?.toString() ?? "",
-  });
   
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
-  const selectedPromoterBinnacle = promoterBinnacles?.find(b => b.eventId === eventId);
-
-  console.log("selectedBinnacle", selectedBinnacle)
 
   useEffect(() => {
     setGlobalExpandedSections(["Vendidas y dinero generado"]);
@@ -90,8 +82,6 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
       notifyError("Error al asignar tickets");
     },
   });
-
-  console.log(allCheckers)
 
   const onSubmit = (data: { checkerData: string }) => {
     if (!selectedTickets || Object.keys(selectedTickets).length === 0) {
@@ -210,7 +200,6 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                 {
                   type === "Promotores" && 
                   <div className="space-y-2 rounded-lg px-2 pb-2">
-
                     {
                        selectedEvent?.promoters?.map((promoter) => (
                         <div key={promoter.userId} className="flex justify-between items-center">
@@ -303,29 +292,6 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
           isPromoter &&
           <>
             <div className="bg-input mt-2 rounded-lg px-3 py-2">
-              <h1 className="font-medium px-2 my-2">Dinero</h1>
-              <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
-                <div className="flex text-sm justify-between items-center">
-                  <h2>Total</h2>
-                  <h2 className="text-primary text-base text-end tabular-nums">COP ${Number(selectedPromoterBinnacle?.feePromoter ?? 0).toLocaleString() ?? 0}</h2>
-                </div>
-
-                <div className="flex text-sm justify-between items-center">
-                  <h2>Dinero entregado</h2>
-                  <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedPromoterBinnacle?.alreadyPaid.toLocaleString()?? 0}</h2>
-                </div>
-
-                <div className="flex text-sm justify-between items-center">
-                  <h2>Dinero disponible</h2>
-                  <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedPromoterBinnacle?.pendingPayment.toLocaleString()?? 0}</h2>
-                </div>
-
-                <Link href={`/promoter/event/${eventId}/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-black bg-primary">
-                  Ver dinero entregado
-                </Link>
-              </div> 
-            </div>
-            <div className="bg-input mt-2 rounded-lg px-3 py-2">
               <h1 className="font-medium px-2 mt-2">Link de afiliado</h1>
               <div className="border-t-2 flex flex-col gap-y-3 pt-3 mt-3 px-2 pb-2 border-dashed border-inactive">
                 <div className="flex justify-between items-center">
@@ -345,6 +311,29 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                   </button>
                 </div>
               </div> 
+            </div>
+            <div className="space-y-2 mt-2 w-full">
+              {promoterTicketMetrics?.ticketsTypesMetrics.map((data) => (
+                <div key={data.name} className="bg-input rounded-lg p-4 ps-3">
+                  <div className="space-y-3 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <div className="">
+                        <span>{data.name}</span>
+                        <span> vendidas:</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-primary text-sm">{data.quantity} de {data.total} disponibles</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {
+                promoterTicketMetrics?.ticketsTypesMetrics.length === 0 &&
+                <div className="text-center pt-2 pb-6 text-text-inactive">
+                  No se encontraron entradas vendidas
+                </div>
+              }
             </div>
           </>
         }
