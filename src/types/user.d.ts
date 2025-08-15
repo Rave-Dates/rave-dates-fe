@@ -52,6 +52,7 @@ interface ICreateUser {
 }
 
 interface IClient {
+  clientId?: number;
   name: string;
   email: string;
   whatsapp: string;

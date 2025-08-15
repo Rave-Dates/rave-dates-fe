@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { CookieValueTypes } from "cookies-next";
-import { getAllEvents, getCheckerTicketMetrics, getEventById, getEventCategoriesById, getOrganizerByEventId, getPromoterTicketMetrics, getTicketMetrics, getTicketTypesById } from "@/services/admin-events";
+import { getAllEvents, getCheckerTicketMetrics, getComplimentaryAvailable, getEventById, getEventCategoriesById, getOrganizerByEventId, getPromoterTicketMetrics, getTicketMetrics, getTicketTypesById } from "@/services/admin-events";
 import { getAllBinnaclesFromOrganizer, getAllBinnaclesFromPromoter } from "@/services/admin-binnacles";
 import { getEventImages, getImageById } from "@/services/admin-events";
 import { getAllCategories } from "@/services/admin-categories";
@@ -9,6 +9,7 @@ import { getAllCheckers, getAllCheckerUsers, getAllPromoters, getAllUsers, getCh
 import { getAllRoles } from "@/services/admin-roles";
 import { getAllPayments, servedMovementImage } from "@/services/admin-payments";
 import { getErrorStrings } from "@/services/admin-parameters";
+import { jwtDecode } from "jwt-decode";
 
 export function useAdminEvent({ eventId, token }: { eventId: number | undefined; token: CookieValueTypes }) {
   const { data: selectedEvent, isLoading: isEventLoading } = useQuery<IEvent>({
@@ -292,9 +293,16 @@ export function useAdminGetPromoterLink({ token, eventId, promoterId }: { token:
 }
 
 export function useAdminGetCheckers({ token }: { token: CookieValueTypes }) {
+  
   const { data: allCheckers } = useQuery<IUser[]>({
     queryKey: ["allCheckers"],
-    queryFn: () => getAllCheckers({ token }),
+    queryFn: async () => {
+      const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
+      if (decoded?.role === "PROMOTER" || decoded?.role === "CHECKER") return []
+
+      const res = await getAllCheckers({ token });
+      return res;
+    },
     enabled: !!token,
   });
 
@@ -329,4 +337,14 @@ export function useAdminGetCheckerById({ token, userId }: { token: string | null
   });
 
   return { checker, isPending };
+}
+
+export function useAdminGetComplimentaryAvailable({ token, eventId, promoterId }: { token: string | null | undefined, eventId: number, promoterId: number }) {
+  const { data: complimentaryAvailable, isLoading } = useQuery<IComplimentaryAvailable[]>({
+    queryKey: ["complimentaryAvailable"],
+    queryFn: () => getComplimentaryAvailable(token!, eventId, promoterId),
+    enabled: !!token && !!eventId && !!promoterId,
+  });
+
+  return { complimentaryAvailable, isLoading };
 }

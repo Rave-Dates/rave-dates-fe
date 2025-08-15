@@ -94,6 +94,18 @@ interface ITransferUser {
   idCard: string;
 }
 
+interface IComplimentaryPurchase {
+  promoterId: number;
+  clientId: number;
+  ticketTypeId: number;
+  eventId: number;
+}
+
+interface IComplimentaryAvailable {
+  ticketTypeId: string;
+  quantity: number;
+}
+
 type IChangeTicketsPayload = {
   clientId: number;
   oldTickets: TicketStage[] | [];

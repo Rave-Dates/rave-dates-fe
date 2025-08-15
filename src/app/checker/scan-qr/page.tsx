@@ -1,9 +1,12 @@
 'use client';
 
 import { notifyError } from '@/components/ui/toast-notifications';
+import { useAdminGetCheckerById } from '@/hooks/admin/queries/useAdminData';
 import { readQr } from '@/services/admin-qr';
+import { AxiosError } from 'axios';
 import { getCookie } from 'cookies-next';
 import { CameraDevice, Html5Qrcode, Html5QrcodeCameraScanConfig } from 'html5-qrcode';
+import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -20,13 +23,17 @@ export default function ScanQRPage() {
   const token = getCookie('token');
   const qrCodeRegionId = 'qr-reader';
 
+  const decoded: { id: number } = (token && jwtDecode(token.toString())) || {id: 0};
+  const { checker } = useAdminGetCheckerById({ token: token?.toString(), userId: decoded.id });
+
   useEffect(() => {
     if (!token) {
       notifyError('No se pudo leer el token de autenticación');
       router.replace('/');
     }
   }, [token, router]);
-  
+
+
   // Montaje y obtención de cámaras
   useEffect(() => {
     let mounted = true;
@@ -86,15 +93,28 @@ export default function ScanQRPage() {
             setLoading(true);
 
             try {
+              if (!token || !checker?.checker) {
+                throw new Error("Token o checkerId no encontrados");
+              }
               const res = await readQr({
                 token,
                 qr: decodedText,
-                controllerId: 1,
+                controllerId: checker?.checker?.checkerId,
               });
 
               console.log('📦 Respuesta API:', res);
-              setScanResult({ success: true, text: `QR válido` });
-            } catch (err) {
+              setScanResult({ success: true, text: `Ticket leído correctamente` });
+            } catch (error) {
+              const err = error as AxiosError<{ message: string }>;
+
+              if (err.response?.data.message === "Checker not allowed to read this ticket") {
+                setScanResult({ success: false, text: 'No tienes permiso para leer este ticket' });
+                return
+              }
+              if (err.response?.data.message === "Ticket not pending") {
+                setScanResult({ success: false, text: 'Ticket ya utilizado o vencido' });
+                return
+              }
               console.error('Error al procesar QR:', err);
               setScanResult({ success: false, text: 'QR Inválido o error al procesar' });
             } finally {
@@ -158,7 +178,11 @@ export default function ScanQRPage() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
           <div
             className={`max-w-xs border w-full px-6 py-4 rounded-lg text-center ${
-              scanResult.success ? 'border-green-600 brightness-150 text-green-600' : 'border-system-error brightness-150  text-system-error'
+              scanResult.success 
+              ? 'border-green-600 brightness-150 text-green-600' 
+              : scanResult.text === "No tienes permiso para leer este ticket" 
+                ? "border-[#FFD64D] text-[#FFD64D]"
+                : "border-system-error brightness-150  text-system-error"
             } shadow-lg`}
           >
             <p className="text-lg font-semibold">{scanResult.text}</p>

@@ -5,9 +5,12 @@ import { StageItem } from "@/components/roles/admin/events/StageItem"
 import EditSvg from "@/components/svg/EditSvg"
 import EyeSvg from "@/components/svg/EyeSvg"
 import FormDropDown from "@/components/ui/inputs/FormDropDown"
+import FormInput from "@/components/ui/inputs/FormInput"
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications"
-import { useAdminBinnacles, useAdminEvent, useAdminGetCheckers, useAdminGetPromoterLink, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData"
+import { useAdminBinnacles, useAdminEvent, useAdminGetCheckers, useAdminGetComplimentaryAvailable, useAdminGetPromoterLink, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData"
+import { purchaseComplimentaryTicket } from "@/services/admin-events"
 import { generateCheckerLink, updateCheckerTicketTypes } from "@/services/admin-qr"
+import { getClientByEmail } from "@/services/admin-users"
 import { onInvalid } from "@/utils/onInvalidFunc"
 import { useMutation } from "@tanstack/react-query"
 import { CookieValueTypes } from "cookies-next"
@@ -26,13 +29,15 @@ type Props = {
 
 export default function OrganizerEventInfo({ eventId, token, isPromoter = false, isPromoterBinnacle, promoterId }: Props) {
   const [expandedSections, setExpandedSections] = useState<string[]>([])
+  const [clientId, setClientId] = useState<number | null>(null);
   const [checkerLink, setCheckerLink] = useState<string>()
   const [globalExpandedSections, setGlobalExpandedSections] = useState<string[]>([])
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
-  const { register, handleSubmit, setValue, watch } = useForm<{
+  const { register, handleSubmit, setValue, watch, getValues, reset } = useForm<{
     checkerData: string;
     eventId: number;
     ticketTypeMap: Record<number, string>;
+    clientEmail: string;
   }>();
 
   const selectedTickets = watch("ticketTypeMap");
@@ -43,6 +48,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
   const { promoterLink } = useAdminGetPromoterLink({ token, eventId, promoterId: decoded?.promoterId || promoterId });
   const { ticketTypes } = useAdminTicketTypes({ token, eventId });
   const { allCheckers } = useAdminGetCheckers({ token });
+  const { complimentaryAvailable } = useAdminGetComplimentaryAvailable({ token, eventId, promoterId: decoded?.promoterId ?? 0 });
 
   const { organizerBinnacles } = useAdminBinnacles({
     organizerId: decoded?.organizerId ?? 0,
@@ -83,6 +89,21 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
     },
   });
 
+  const { mutate: complimentaryTicketMutation } = useMutation({
+    mutationFn: purchaseComplimentaryTicket,
+    onSuccess: () => {
+      reset()
+      notifySuccess('Entrada de cortesía entregada correctamente');
+    },
+    onError: (err: { response: { data: { message: string } } }) => {
+      if (err.response.data.message === "Not enough complimentary tickets") {
+        notifyError("No tienes entradas de cortesía disponibles");
+        return
+      }
+      notifyError("Error al entregar entrada de cortesía");
+    },
+  });
+
   const onSubmit = (data: { checkerData: string }) => {
     if (!selectedTickets || Object.keys(selectedTickets).length === 0) {
       notifyError("Debes seleccionar al menos un ticket");
@@ -99,6 +120,42 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
     mutate({ 
       eventId,
       checkerEmail: parsedData.email,
+    });
+  };
+
+  const onClientSearch = (data: { clientEmail: string }) => {
+    const res = getClientByEmail({ token, email: data.clientEmail });
+    res.then((client) => {
+      if (client.clientId) {
+        setClientId(client.clientId);
+        notifySuccess("Cliente encontrado");
+      }
+    }).catch(() => {
+      notifyError("No se encontró el cliente");
+    });
+  };
+
+  const onComplimentarySubmit = () => {
+    if (!clientId) {
+      notifyError("Primero debes seleccionar un cliente");
+      return;
+    }
+    if (!decoded?.promoterId) {
+      notifyError("Debes ser promotor para poder entregar entradas de cortesía");
+      return;
+    }
+
+    console.log(getValues("ticketTypeMap"))
+    console.log(clientId)
+
+    complimentaryTicketMutation({
+      ticketData: {
+        promoterId: decoded?.promoterId ?? 0,
+        clientId,
+        eventId,
+        ticketTypeId: Number(getValues("ticketTypeMap")),
+      },
+      token,
     });
   };
 
@@ -312,6 +369,61 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                 </div>
               </div> 
             </div>
+            <div className="bg-input flex flex-col items-center rounded-lg p-4 ps-3 mt-2">
+              Entradas de cortesía disponibles:
+              <div className="flex gap-x-3">
+                {complimentaryAvailable?.map((data) => (
+                  <div key={data.ticketTypeId} className="space-y-3 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <span>{data.ticketTypeId}</span>
+                        <span className="text-primary"> x{data.quantity}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="bg-input mt-2 rounded-lg px-3 py-2">
+              <h1 className="font-medium px-2 mt-2">Canjear entradas de cortesía</h1>
+              <div className="border-t-2 flex flex-col gap-y-3 pt-3 mt-3 px-2 pb-2 border-dashed border-inactive">
+                <form onSubmit={handleSubmit(onClientSearch, onInvalid)} className="flex gap-x-4 justify-between items-end">
+                  <FormInput 
+                    title="Email del cliente*"
+                    inputName="clientEmail"
+                    type="email"
+                    register={register("clientEmail", { required: "Debes seleccionar un email de cliente" })}
+                    placeholder="ejemplo@ejemplo.com"
+                  />                 
+                  <button
+                    type="submit"
+                    className="border border-primary hover:opacity-75 transition-opacity px-[21.5px] py-3.5 font-medium text-primary rounded-lg text-sm"
+                  >
+                    Buscar
+                  </button>
+                </form>
+                <form onSubmit={handleSubmit(onComplimentarySubmit, onInvalid)} className="flex gap-x-4 justify-between items-end">
+                  <FormDropDown
+                    labelClassname="!mb-0"
+                    title="Tipos de tickets*"
+                    register={register("ticketTypeMap")}
+                  >
+                    <option value="" disabled selected>Selecciona un tipo de ticket</option>
+                    {ticketTypes?.map((ticket) => (
+                      <option key={ticket.ticketTypeId} value={ticket.ticketTypeId}>
+                        {ticket.name}
+                      </option>
+                    ))}
+                  </FormDropDown>              
+                  <button
+                    type="submit"
+                    className="border border-primary hover:opacity-75 transition-opacity px-4 py-3.5 font-medium text-primary rounded-lg text-sm"
+                  >
+                    Entregar
+                  </button>
+                </form>
+              </div> 
+            </div>
             <div className="space-y-2 mt-2 w-full">
               {promoterTicketMetrics?.ticketsTypesMetrics.map((data) => (
                 <div key={data.name} className="bg-input rounded-lg p-4 ps-3">
@@ -377,12 +489,6 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
             </div>
           ))
         }
-
-
-        {/* Dropdown Sections */}
-        <div className="overflow-hidden">
-          {/* General Section */}
-        </div>
       </div>
     </div>
   )

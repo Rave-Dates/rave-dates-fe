@@ -155,3 +155,14 @@ export const getCheckerById = async ({token, id}: { token: CookieValueTypes, id:
   const data: IUser = res.data;
   return data;
 };
+
+export const getClientByEmail = async ({token, email}: { token: CookieValueTypes, email: string }) => {
+  const res = await axios.get(`${BASE_URL}/admin/clients/find?search=${email}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  const data: IClient = res.data;
+  return data;
+};
