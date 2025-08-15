@@ -250,3 +250,25 @@ export const getOrganizerByEventId = async ({token, eventId}: { token: CookieVal
   const data: { organizerId: number | undefined, eventId: number } = res.data;
   return data;
 }
+
+export const purchaseComplimentaryTicket = async ({ ticketData, token }: { ticketData: IComplimentaryPurchase, token: CookieValueTypes }) => {
+  const { data } = await axios.post(`${BASE_URL}/admin/tickets/purchase/promoter/complimentary`, ticketData, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  return data;
+}
+
+export const getComplimentaryAvailable = async (token: CookieValueTypes, eventId: number, promoterId: number) => {
+  const res = await axios.get(`${BASE_URL}/admin/tickets/complimentary-available?eventId=${eventId}&promoterId=${promoterId}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+  });
+  return res.data;
+}
