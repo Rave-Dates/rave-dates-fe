@@ -40,7 +40,7 @@ export default function EventInfo() {
   const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId: user?.promoter?.promoterId });
   
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
-  const selectedPromoterBinnacle = promoterBinnacles?.find(b => b.eventId === eventId);
+  const selectedPromoterBinnacle = promoterBinnacles?.events.find(b => b.eventId === eventId);
   
   const binnacleToUse = user?.role.name === "PROMOTER" ? selectedPromoterBinnacle : selectedBinnacle;
   const ticketMetricsToUse = user?.role.name === "PROMOTER" ? promoterTicketMetrics : ticketMetrics;

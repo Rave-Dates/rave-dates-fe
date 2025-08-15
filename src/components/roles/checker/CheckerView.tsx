@@ -6,7 +6,7 @@ import Image from "next/image"
 import { formatDateToColombiaTime } from "@/utils/formatDate"
 import { useEventImage } from "@/hooks/admin/queries/useEventImage"
 import SpinnerSvg from "@/components/svg/SpinnerSvg"
-import { useAdminEvent } from "@/hooks/admin/queries/useAdminData"
+import { useAdminEvent, useAdminGetCheckerById } from "@/hooks/admin/queries/useAdminData"
 import ControllerPanelSection from "@/components/roles/controller/ControllerPanelSection"
 import { useRouter, useSearchParams } from "next/navigation"
 import { jwtDecode } from "jwt-decode"
@@ -21,9 +21,9 @@ export default function ControllerEventDetails() {
 
   const [cookiesToken, setCookiesToken] = useState<string | null>(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
-
+  
   const urlToken = params.get("token");
-
+  
   // Leer cookie token una sola vez en client
   useEffect(() => {
     const t = getCookie("token");
@@ -38,17 +38,17 @@ export default function ControllerEventDetails() {
       return null;
     }
   };
-
+  
   const decodedUrlToken = useMemo(() => safeDecode(urlToken), [urlToken]);
   const decodedCookieToken = useMemo(() => safeDecode(cookiesToken), [cookiesToken]);
-
+  
   const validToken =
     decodedUrlToken?.role === "CHECKER"
-      ? urlToken
-      : decodedCookieToken?.role === "CHECKER"
-      ? cookiesToken
-      : undefined;
-
+    ? urlToken
+    : decodedCookieToken?.role === "CHECKER"
+    ? cookiesToken
+    : undefined;
+  
   useEffect(() => {
     // Evitar ejecutar hasta tener las cookies leídas
     if (cookiesToken === null && urlToken === null) return;
@@ -83,6 +83,8 @@ export default function ControllerEventDetails() {
 
   const validDecodedToken = useMemo(() => safeDecode(validToken), [validToken]);
 
+  const { checker } = useAdminGetCheckerById({ token: validToken, userId: validDecodedToken?.id });
+
   const { servedImageUrl, isImageLoading } = useEventImage({
     eventId: validDecodedToken?.eventId,
     token: validToken ?? undefined,
@@ -92,6 +94,8 @@ export default function ControllerEventDetails() {
     eventId: validDecodedToken?.eventId,
     token: validToken ?? undefined,
   });
+
+console.log(checker)
 
   if (loadingAuth) {
     return (
@@ -140,6 +144,25 @@ export default function ControllerEventDetails() {
             {selectedEvent && formatDateToColombiaTime(selectedEvent?.date).date} -{" "}
             {selectedEvent && formatDateToColombiaTime(selectedEvent?.date).time}hs
           </h2>
+        </div>
+      </div>
+        
+      <div className="flex text-sm py-4 px-5 gap-y-2 w-full mt-3 bg-input rounded-lg flex-col items-center justify-center">
+        Tickets habilitados para escanear
+        <div className="flex gap-x-3 text-primary-black text-sm font-medium">
+          {
+            checker?.checker?.ticketTypeIds?.map((ticketType) => (
+              <div key={ticketType.ticketTypeId} className="flex items-center gap-x-2">
+                <div className="bg-primary rounded-lg px-3 py-1">{ticketType.name}</div>
+              </div>
+            ))
+          }
+          {
+            checker?.checker?.ticketTypeIds?.length === 0 || !checker?.checker?.ticketTypeIds &&
+              <div className="flex items-center gap-x-2">
+                <div className="bg-inactive text-primary-white rounded-lg px-4 py-0.5">No puedes leer tickets de este evento</div>
+              </div>
+          }
         </div>
       </div>
 

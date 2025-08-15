@@ -9,7 +9,6 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import CalendarSvg from '@/components/svg/CalendarSvg';
 import GraphSvg from '@/components/svg/GraphSvg';
-import FileSvg from '@/components/svg/FileSvg';
 
 const NavbarMobile: React.FC = () => {
   const pathname = usePathname();
@@ -59,13 +58,7 @@ const NavbarMobile: React.FC = () => {
         href: "/admin/parameters",
         label: 'Parámetros',
         icon: <GraphSvg className='w-6 h-6' />,
-      },
-      {
-        id: 'contact',
-        href: "/contact",
-        label: 'Informes',
-        icon: <FileSvg className='w-6 h-6' />,
-      },
+      }
     ],
     "organizer": [
       {

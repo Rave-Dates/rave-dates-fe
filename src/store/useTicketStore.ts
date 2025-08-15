@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 type TicketStore = {
   eventId: number;
+  pendingPaymentAmount: number;
   selected: Record<string, { quantity: number; stage: TicketStage }>;
   setEventId: (eventId: number) => void;
   add: (ticket: TicketStage) => void;
@@ -9,9 +10,11 @@ type TicketStore = {
   resetSelected: () => void;
   setSelected: (tickets: TicketStage[]) => void;
   replaceSelected: (tickets: TicketStage[]) => void;
+  setPendimPaymentAmount: (amount: number) => void;
 };
 
 export const useTicketStore = create<TicketStore>((set, get) => ({
+  pendingPaymentAmount: 0,
   selected: {},
   eventId: 0,
   resetSelected: () => set({ selected: {} }),
@@ -75,5 +78,6 @@ export const useTicketStore = create<TicketStore>((set, get) => ({
       }
       return { selected: updated };
     });
-  }
+  },
+  setPendimPaymentAmount: (amount) => set({ pendingPaymentAmount: amount }),
 }));

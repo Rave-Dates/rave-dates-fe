@@ -8,7 +8,7 @@ import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { changeTicketPurchase, initTicketPurchase } from "@/services/clients-tickets";
+import { changeTicketPurchase, initTicketPurchase, partialPurchase } from "@/services/clients-tickets";
 import { useMutation } from "@tanstack/react-query";
 import { useTicketStore } from "@/store/useTicketStore";
 import { jwtDecode } from "jwt-decode";
@@ -45,6 +45,7 @@ export default function Checkout() {
   const { getCookie } = useReactiveCookiesNext();
   const searchParams = useSearchParams();
   const isChangeTickets = searchParams.get("change-tickets");
+  const pendingPaymentPurchaseId = searchParams.get("pp");
   const promoterAffiliate = getCookie("promoterAffiliate");
   const clientToken = getCookie("clientToken");
   const tempToken = getCookie("tempToken");
@@ -139,6 +140,33 @@ export default function Checkout() {
       return
     }
 
+    if (pendingPaymentPurchaseId && (clientToken || tempToken)) {
+      const ticketData = {
+        method: "BOLD",
+        boldMethod: "CREDIT_CARD",
+        returnUrl: `https://ravedates.proxising.com/tickets/event-ticket/${eventId}`,
+      };
+
+      notifyPending(
+        new Promise((resolve, reject) => {
+          partialPurchase({ ticketData, clientToken: (clientToken || tempToken), purchaseId: Number(pendingPaymentPurchaseId) })
+            .then((data) => {
+              resolve(data);
+              router.push(data);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        }),
+        {
+          loading: "Iniciando pago...",
+          success: "Redirigiendo al checkout",
+          error: "Error al realizar el pago",
+        }
+      ); 
+      return
+    }
+
     const formattedTicketData: IClientPurchaseTicket = {
       method: "BOLD",
       eventId,
@@ -212,6 +240,7 @@ export default function Checkout() {
             selected={selectedPayment} 
             setSelected={setSelectedPayment} 
             isChangeTickets={isChangeTickets}
+            isPendingPayment={pendingPaymentPurchaseId}
           />
           <PaymentMethodSelector
             selected={selectedMethod}

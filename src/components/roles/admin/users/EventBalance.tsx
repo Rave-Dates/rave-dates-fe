@@ -30,7 +30,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
   const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId: user?.promoter?.promoterId });
   
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
-  const selectedPromoterBinnacle = promoterBinnacles?.find(b => b.eventId === eventId);
+  const selectedPromoterBinnacle = promoterBinnacles?.events.find(b => b.eventId === eventId);
 
   const binnacleToUse = user?.role.name === "PROMOTER" ? selectedPromoterBinnacle : selectedBinnacle;
   const ticketMetricsToUse = user?.role.name === "PROMOTER" ? promoterTicketMetrics : ticketMetrics;
@@ -43,11 +43,10 @@ export default function EventBalance({eventId}: { eventId: number }) {
       <div>
         <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
         <div className="absolute z-30 top-10 right-5 animate-fade-in">
-
           {
             (user?.role.name === "ORGANIZER" || user?.role.name === "PROMOTER") &&
             <Link
-              href={`event-balance/event-info`}
+              href={user?.role.name === "ORGANIZER" ? "event-balance/event-info" : `/admin/users/edit-user/2/user-events/${eventId}/event-balance/event-info?organizerId=true`}
               className="bg-primary text-primary-black p-3 text-sm px-5 rounded-lg font-medium flex items-center justify-center text-center"
               aria-label="Añadir usuario"
             >
@@ -93,33 +92,36 @@ export default function EventBalance({eventId}: { eventId: number }) {
             Total
           </div>
           <div className="tabular-nums">
-            ${Number(binnacleToUse?.total?? "0").toLocaleString("es-ES")}
+            ${Number(binnacleToUse?.total?? "0").toLocaleString()}
           </div>
         </div>
-        <div className="flex justify-between text-sm gap-y-2 py-3 px-3">
+        <div className="flex h-[44px] justify-between items-center text-sm gap-y-2 py-3 px-3">
           <div className="text-text-inactive">
             Comisión de Rave Dates
           </div>
           <div className="tabular-nums flex items-center justify-center">
             <span className="text-system-error text-2xl">-</span>
-            ${Number(binnacleToUse?.feeRD?? "0").toLocaleString("es-ES")}
+            ${Number(binnacleToUse?.feeRD?? "0").toLocaleString()}
           </div>
         </div>
-        <div className="flex justify-between text-sm gap-y-2 py-3 px-3">
-          <div className="text-text-inactive">
-            Comisión de promotor
+        {
+          user?.role.name === "ORGANIZER" &&
+          <div className="flex h-[44px] justify-between items-center text-sm gap-y-2 py-3 px-3">
+            <div className="text-text-inactive">
+              Comisión de promotor
+            </div>
+            <div className="tabular-nums flex items-center justify-center">
+              <span className="text-system-error text-2xl">-</span>
+              ${Number(binnacleToUse?.feePromoter?? "0").toLocaleString()}
+            </div>
           </div>
-          <div className="tabular-nums flex items-center justify-center">
-            <span className="text-system-error text-2xl">-</span>
-            ${Number(binnacleToUse?.feePromoter?? "0").toLocaleString("es-ES")}
-          </div>
-        </div>
+        }
         <div className="flex justify-between text-sm gap-y-2 py-3 px-3">
           <div className="text-text-inactive">
             Retirado
           </div>
           <div className="tabular-nums">
-            ${Number(binnacleToUse?.alreadyPaid?? "0").toLocaleString("es-ES")}
+            ${Number(binnacleToUse?.alreadyPaid?? "0").toLocaleString()}
           </div>
         </div>
         <div className="flex justify-between text-sm gap-y-2 py-3 px-3">
@@ -127,7 +129,12 @@ export default function EventBalance({eventId}: { eventId: number }) {
             DISPONIBLE
           </div>
           <div className="tabular-nums text-primary">
-            ${Number(binnacleToUse?.pendingPayment?? "0").toLocaleString("es-ES")}
+            {
+              user?.role.name === "ORGANIZER" ?
+              `$${Number(binnacleToUse?.pendingPayment?? "0").toLocaleString()}`
+              :
+              `$${Number(binnacleToUse?.feePromoter?? "0").toLocaleString()}`
+            }
           </div>
         </div>
       </div>

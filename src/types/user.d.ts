@@ -14,10 +14,11 @@ interface IUser {
   };
   checker?: {
     checkerId: number;
-    ticketTypesIds: {
+    ticketTypeIds: {
       name: string;
       ticketTypeId: number;
-    }
+      eventId: number;
+    }[]
   }
   promoter?: {
     userId: number;

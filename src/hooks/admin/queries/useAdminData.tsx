@@ -5,7 +5,7 @@ import { getAllBinnaclesFromOrganizer, getAllBinnaclesFromPromoter } from "@/ser
 import { getEventImages, getImageById } from "@/services/admin-events";
 import { getAllCategories } from "@/services/admin-categories";
 import { getAllLabels } from "@/services/admin-labels";
-import { getAllCheckers, getAllCheckerUsers, getAllPromoters, getAllUsers, getGuests, getPromoterLink, getUserById } from "@/services/admin-users";
+import { getAllCheckers, getAllCheckerUsers, getAllPromoters, getAllUsers, getCheckerById, getGuests, getPromoterLink, getUserById } from "@/services/admin-users";
 import { getAllRoles } from "@/services/admin-roles";
 import { getAllPayments, servedMovementImage } from "@/services/admin-payments";
 import { getErrorStrings } from "@/services/admin-parameters";
@@ -319,4 +319,14 @@ export function useAdminGetErrorStrings({ token }: { token: CookieValueTypes }) 
   });
 
   return { errorStrings };
+}
+
+export function useAdminGetCheckerById({ token, userId }: { token: string | null | undefined, userId: number | undefined }) {
+  const { data: checker, isPending } = useQuery({
+    queryKey: ["checker"],
+    queryFn: () => getCheckerById({ token: token!, id: userId! }),
+    enabled: !!token && !!userId,
+  });
+
+  return { checker, isPending };
 }

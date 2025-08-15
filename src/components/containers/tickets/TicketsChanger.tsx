@@ -13,8 +13,8 @@ import {
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { generateTicketImage } from "./generateTicketImage";
 import { useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
-import { partialPurchase } from "@/services/clients-tickets";
-import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
+import { notifyError } from "@/components/ui/toast-notifications";
+import { useTicketStore } from "@/store/useTicketStore";
 
 type Props = {
   eventInfo: { date: string; title: string };
@@ -41,6 +41,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
     clientId,
     clientToken: token,
   });
+  const { setEventId, setPendimPaymentAmount } = useTicketStore();
   const router = useRouter();
   const params = useParams();
   const eventId = Number(params.eventId);
@@ -110,30 +111,9 @@ export default function TicketsChanger({ eventInfo }: Props) {
   }
 
   const handleCompletePiggyBank = async (purchase: PendingPurchases) => {
-    const purchaseId = purchase.purchaseId;
-    const ticketData = {
-      method: "BOLD",
-      boldMethod: "CREDIT_CARD",
-      returnUrl: "https://ravedates.proxising.com/tickets",
-    };
-
-    notifyPending(
-      new Promise((resolve, reject) => {
-        partialPurchase({ ticketData, clientToken: token, purchaseId })
-          .then((data) => {
-            resolve(data);
-            router.push(data);
-          })
-          .catch((err) => {
-            reject(err);
-          });
-      }),
-      {
-        loading: "Iniciando pago...",
-        success: "Redirigiendo al checkout",
-        error: "Error al realizar el pago",
-      }
-    );
+    setEventId(eventId);
+    setPendimPaymentAmount(purchase.remainingAmount)
+    router.push(`/checkout?pp=${purchase.purchaseId}`)
   };
 
   const handleDownloadAll = async () => {

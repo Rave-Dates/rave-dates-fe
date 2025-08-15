@@ -10,6 +10,14 @@ interface IEventPaymentSummary {
   movements: IPaymentMovement[];
 }
 
+interface IEventPromoterPaymentSummary {
+  events: IEventPaymentSummary[];
+  movements: IPaymentMovement[];
+  total: number;
+  alreadyPaid: number;
+  pendingPayment: number;
+}
+
 interface IStageDetail {
   quantity: number;
   ticketTypeId: number;
@@ -35,6 +43,7 @@ interface IPaymentMovement {
   promoterId: number | null;
   userId: number;
   paymentAmount: number;
+  reference: string | null;
   imageUrl: string;
   createdAt: string;
   updatedAt: string;

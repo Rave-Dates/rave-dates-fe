@@ -8,6 +8,7 @@ type BaseProps = {
   handleFunc?: (item: ChangeEvent<HTMLInputElement>) => void;
   value?: string;
   placeholder: string;
+  isLink?: boolean;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
 };
 
@@ -34,6 +35,7 @@ const SearchInput = ({
   placeholder,
   results,
   type,
+  isLink,
   setSearchTerm,
 }: Props) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -85,6 +87,7 @@ const SearchInput = ({
           {type === "guest" &&
             results.map((guest) => (
               <SearchGuestItem
+                isLink={isLink}
                 key={guest.clientId}
                 guest={guest}
                 onClick={handleSearchClick}
