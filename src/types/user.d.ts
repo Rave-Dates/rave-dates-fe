@@ -59,6 +59,9 @@ interface IClient {
   idCard: string;
   balance: number;
   firstLogin: boolean;
+  isEmailVerified?: boolean,
+  isWhatsappVerified?: boolean,
+
 }
 
 interface IGuest extends IClient {

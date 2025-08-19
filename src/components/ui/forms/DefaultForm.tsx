@@ -24,11 +24,11 @@ export default function DefaultForm({
   isPending,
 }: Props) {
   return (
-    <div className={`${className} pt-14 sm:pt-44 bg-primary-black sm:justify-center sm:items-center text-white flex`}>
+    <div className={`${className} pt-32 md:pt-44 bg-primary-black md:justify-center md:items-center text-white flex`}>
       {goBackButton && (
         <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
       )}
-      <div className="w-full max-w-2xl relative animate-fade-in pt-14 sm:pt-0">
+      <div className="w-full max-w-2xl relative animate-fade-in">
         {ticketButtons ? (
           <div className="flex w-full justify-between items-center">
             <h1 className="text-title font-bold mb-6">{title}</h1>

@@ -1,19 +1,17 @@
-import { Dispatch, SetStateAction } from "react";
-
 type Props = {
   selected: string;
-  setSelected: Dispatch<SetStateAction<"Email" | "Whatsapp">>
+  setSelected: (isEmailOrWhatsapp: string) => void;
 };
 
 export default function VerificationTypeSelector({ selected, setSelected }: Props) {
   const methods: ["Email", "Whatsapp"] = ["Email", "Whatsapp"];
 
   return (
-    <div className="bg-cards-container rounded-lg animate-fade-in">
+    <div className="flex gap-x-5 animate-fade-in">
       {methods.map((item) => (
         <label
           key={item}
-          className="flex items-center w-full justify-between cursor-pointer group py-4 not-last:border-b border-inactive"
+          className="flex bg-cards-container rounded-lg items-center w-full justify-between cursor-pointer group py-4"
         >
           <div className="order-last relative pe-4">
             <input

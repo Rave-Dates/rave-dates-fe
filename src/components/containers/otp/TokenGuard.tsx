@@ -21,9 +21,7 @@ export default function TokenGuard({ emailOrWhatsapp, loadingValidate }: Props) 
     const hasTemp = !!tempToken;
     const hasClient = !!clientToken;
 
-    if (hasClient && !hasTemp && !emailOrWhatsapp) {
-      router.push("/my-data");
-    } else if (!hasTemp && !hasClient && !emailOrWhatsapp) {
+    if (!hasTemp && !hasClient && !emailOrWhatsapp) {
       notifyError("No tenés token, redirigiendo a inicio");
       router.push("/");
     }

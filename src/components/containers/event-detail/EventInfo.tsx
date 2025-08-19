@@ -52,9 +52,9 @@ const EventInfo= ({ labels, eventCategoryValues, isLoading, description, organiz
           {/* Organizer */}
           <div>
             <h3 className="text-small-title font-semibold text-white mb-2">Organizador</h3>
-            <p className="text-primary-white text-body bg-cards-container px-4 py-3 rounded-lg">
-              {organizerName || "Organizador no disponible"}
-            </p>
+              <span className="bg-primary text-black px-3 py-1.5 rounded-xl text-sm">
+                {organizerName || "Organizador no disponible"}
+              </span>
           </div>
 
           {/* Genres */}

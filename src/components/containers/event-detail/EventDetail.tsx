@@ -82,10 +82,10 @@ const EventDetails = ({ eventId } : { eventId: number }) => {
             {/* Date */}
             <div className='mb-8'>
               <h3 className="text-lg mb-2">Fecha</h3>
-              <p className="text-body bg-cards-container px-4 py-3 rounded-lg">
+              <p className="text-body capitalize bg-cards-container px-4 py-3 rounded-lg">
                 {
                   selectedEvent?.date &&
-                  <>{formatDateToColombiaTime(selectedEvent.date).date} {formatDateToColombiaTime(selectedEvent.date).time}hs (COL)</>
+                  <>{formatDateToColombiaTime(selectedEvent.date).formatted} {formatDateToColombiaTime(selectedEvent.date).time}hs (COL)</>
                 }
               </p>
             </div>
