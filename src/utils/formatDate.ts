@@ -35,9 +35,18 @@ export const formatDateToColombiaTime = (value: string | Date ) => {
   const hh = String(colombiaDate.getUTCHours()).padStart(2, '0');
   const min = String(colombiaDate.getUTCMinutes()).padStart(2, '0');
 
+  // Nuevo formato "Sáb, 16 ago 2025"
+  const formatted = colombiaDate.toLocaleDateString("es-CO", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
   return {
     date: `${yyyy}-${mm}-${dd}`, // → "2025-07-15"
-    time: `${hh}:${min}`,      // → "16:30"
+    time: `${hh}:${min}`,        // → "16:30"
+    formatted,                   // → "sáb, 16 ago 2025"
   }
 };
 

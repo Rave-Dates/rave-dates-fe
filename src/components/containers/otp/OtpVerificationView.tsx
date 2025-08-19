@@ -1,6 +1,5 @@
 "use client"
 
-import VerificationTypeSelector from "@/components/containers/otp/VerificationTypeSelector";
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { notifyError } from "@/components/ui/toast-notifications";
@@ -23,11 +22,10 @@ type VerificationForm = {
 export default function OtpVerificationView() {
   const [loadingSend, setLoadingSend] = useState(false);
   const [loadingValidate, setLoadingValidate] = useState(false);
-  const [selectedVerification, setSelectedVerification] = useState<"Email" | "Whatsapp">("Email");
 
   const { getCookie, setCookie, deleteCookie } = useReactiveCookiesNext();
   const { sendCode, validateCode } = useVerification();
-  const { emailOrWhatsapp, redirectToCheckout } = useClientAuthStore()
+  const { emailOrWhatsapp, redirectToCheckout, isEmailOrWhatsapp } = useClientAuthStore()
   const { setEventId } = useTicketStore();
   const router = useRouter();
   
@@ -90,7 +88,7 @@ export default function OtpVerificationView() {
 
   const handleSendCode = () => {
     const emailOrWhatsapp = getValues("emailOrWhatsapp");
-    const method: "EMAIL" | "WHATSAPP" = selectedVerification === "Email" ? "EMAIL" : "WHATSAPP";
+    const method: "EMAIL" | "WHATSAPP" = isEmailOrWhatsapp === "Email" ? "EMAIL" : "WHATSAPP";
     setLoadingSend(true);
 
     console.log("objeto de send code",{emailOrWhatsapp, method})
@@ -104,6 +102,7 @@ export default function OtpVerificationView() {
       })
       .finally(() => {
         setLoadingSend(false);
+        inputRefs.current[0]?.focus();
       });
   };
 
@@ -154,10 +153,12 @@ export default function OtpVerificationView() {
       <div className="max-w-md mx-auto space-y-6">
         <h1 className="text-3xl font-bold animate-fade-in">Valida tus datos</h1>
 
-        <VerificationTypeSelector
-          selected={selectedVerification}
-          setSelected={setSelectedVerification}
-        />
+        <div className="bg-cards-container rounded-lg px-3 py-4">
+          <span className="text-primary-white/70 text-sm">
+            Tu {isEmailOrWhatsapp === "Email" ? "Email" : "WhatsApp"}: {" "}
+          </span>
+          {emailOrWhatsapp}
+        </div>
 
         <input
           className="sr-only"

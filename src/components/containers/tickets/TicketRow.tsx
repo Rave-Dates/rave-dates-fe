@@ -8,10 +8,10 @@ import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { GenerateJPGButton } from "./GenerateJPGButton";
 import CheckSvg from "@/components/svg/CheckSvg";
 import { useReactiveCookiesNext } from "cookies-next";
-import QRCode from "qrcode";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import AddSvg from "@/components/svg/AddSvg";
 import { useClientEventServedOneImage, useClientGetById } from "@/hooks/client/queries/useClientData";
+import { generateTicketImage } from "./generateTicketImage";
 
 interface TicketRowProps {
   href: string;
@@ -38,15 +38,32 @@ export function TicketRow({
   const { servedImageUrl } = useClientEventServedOneImage(eventId);
   const { clientData } = useClientGetById({clientId: ticket.transferredClientId, clientToken});
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [ticketCanvas, setTicketCanvas] = useState<string | undefined>();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (canvasRef.current && showQR) {
-      QRCode.toCanvas(canvasRef.current, ticket.qr, { width: 256 }, function (error) {
-        if (error) console.error(error);
-      });
+    if (showQR) {
+      (async () => {
+        try {
+          setLoading(true); // empieza el loading
+          const dataUrl = await generateTicketImage({
+            bgImage: "/images/ticket-bg-ravedates.jpg",
+            fileName: "ticket.jpg",
+            qrData: ticket.qr,
+            name: eventInfo.title,
+            time: `${formatDateToColombiaTime(eventInfo.date).formatted} ${formatDateToColombiaTime(eventInfo.date).time}hs`,
+            ticketType: ticket.ticketType.name,
+            eventImage: servedImageUrl ?? "/images/event-placeholder.png",
+            logoRD: "/logo.svg",
+            mode: "return",
+          });
+          setTicketCanvas(dataUrl);
+        } finally {
+          setLoading(false); // termina el loading
+        }
+      })();
     }
-  }, [showQR, ticket.qr]);
+  }, [showQR]);
 
   const getActionIcon = (action: string) => {
     switch (action) {
@@ -174,19 +191,27 @@ export function TicketRow({
           onClick={() => setShowQR(false)}
         >
           <div
-            className="bg-primary-white p-6 rounded-lg relative w-[90%] max-w-sm flex flex-col items-center"
-            onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del modal
+            className="bg-cards-container mx-2 rounded-lg relative w-fit p-2 max-w-sm flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="absolute top-4 right-4 text-xl font-bold"
+              className="absolute top-4 right-4 text-3xl font-bold"
               onClick={() => setShowQR(false)}
               aria-label="Cerrar"
             >
-              <AddSvg className="rotate-45" />
+              <AddSvg className="rotate-45 text-primary-white" />
             </button>
-            <h2 className="mb-2 font-semibold text-center">Código QR del ticket</h2>
-            <canvas ref={canvasRef} className="w-64 h-64" />
-            <p className="mt-4 text-xs font-medium break-all text-center">{ticket.ticketType.name} - {eventInfo.title} - {`${formatDateToColombiaTime(eventInfo.date).date}, ${formatDateToColombiaTime(eventInfo.date).time}hs`}</p>
+
+            <div className="max-w-80 overflow-y-scroll h-auto">
+              {loading ? (
+                <div className="flex flex-col h-[694px] w-80 items-center justify-center text-center">
+                  <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent mb-4"></div>
+                  <p className="text-sm text-primary">Generando ticket...</p>
+                </div>
+              ) : (
+                <img src={ticketCanvas} alt="Ticket" />
+              )}
+            </div>
           </div>
         </div>
       )}

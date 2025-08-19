@@ -69,9 +69,9 @@ const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?:
         </h3>
         
         <div className="space-y-2 mb-4 text-text-inactive text-body">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center capitalize gap-2">
             <CalendarSvg className='w-6 h-6' />
-            {formatDateToColombiaTime(date).date} {formatDateToColombiaTime(date).time}hs (COL)
+            {formatDateToColombiaTime(date).formatted} {formatDateToColombiaTime(date).time}hs (COL)
           </div>
           
           <div className="flex items-center gap-2">

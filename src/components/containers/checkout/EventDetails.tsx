@@ -36,7 +36,7 @@ export default function EventDetails({className, selectedEvent, eventId}: Props)
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
           <span className="text-primary-white/50">Fecha y hora</span>
-          <span className="text-end">{formatDateToColombiaTime(selectedEvent.date).date} {formatDateToColombiaTime(selectedEvent.date).time}hs (COL)</span>
+          <span className="text-end capitalize">{formatDateToColombiaTime(selectedEvent.date).formatted} {formatDateToColombiaTime(selectedEvent.date).time}hs (COL)</span>
         </div>
         <div className="flex justify-between">
           <span className="text-primary-white/50">Ubicación</span>

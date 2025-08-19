@@ -30,7 +30,7 @@ const NavbarMobile: React.FC = () => {
       {
         id: 'auth',
         href: "/auth",
-        label: 'Mis datos',
+        label: 'Mi cuenta',
         icon: <UserSvg className='w-6 h-6' />,
       },
       {

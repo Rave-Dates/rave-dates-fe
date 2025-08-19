@@ -158,10 +158,6 @@ export default function DataForm() {
         register={register("whatsapp", { required: "El WhatsApp es obligatorio"  })}
       />
 
-      <p className="text-sm">
-        Te enviaremos los tickets vía email y/o WhatsApp
-      </p>
-
        <CheckFormInput
         name="receiveInfo"
         register={register("receiveInfo")}

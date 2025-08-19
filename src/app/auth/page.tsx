@@ -1,5 +1,6 @@
 "use client";
 
+import VerificationTypeSelector from "@/components/containers/otp/VerificationTypeSelector";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
 import FormInput from "@/components/ui/inputs/FormInput";
@@ -18,7 +19,7 @@ type ClientForm = {
 
 export default function ClientAuth() {
   const { getCookie } = useReactiveCookiesNext();
-  const { setClientAuthData } = useClientAuthStore()
+  const { setClientAuthData, setIsEmailOrWhatsapp, isEmailOrWhatsapp } = useClientAuthStore()
   const router = useRouter()
   const tempToken = getCookie("tempToken");
   const clientToken = getCookie("clientToken");
@@ -43,20 +44,36 @@ export default function ClientAuth() {
   const onSubmit = (data: ClientForm) => {
     if(!data.emailOrWhatsapp) return
     setClientAuthData({emailOrWhatsapp: data.emailOrWhatsapp})
-    redirect('/otp');
+    router.push('/otp');
   };
 
   return (
-    <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Ingresa tus datos">
-      <FormInput
-        title="Email o WhatsApp*"
-        inputName="emailOrWhatsapp"
-        register={register("emailOrWhatsapp", { required: "El email o el WhatsApp es obligatorio"  })}
+    <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Iniciar sesión">
+      <h2 className="text-sm">
+        Selecciona el tipo de verificación que vas a utilizar
+      </h2>
+
+      <VerificationTypeSelector
+        selected={isEmailOrWhatsapp}
+        setSelected={setIsEmailOrWhatsapp}
       />
 
-      <p className="text-sm">
-        Te enviaremos los tickets vía email y/o WhatsApp
-      </p>
+      {
+        isEmailOrWhatsapp === "Email" ?
+        <FormInput
+          title="Email*"
+          type="email"
+          inputName="emailOrWhatsapp"
+          register={register("emailOrWhatsapp", { required: "El email es obligatorio"  })}
+        />
+        :
+        <FormInput
+          title="WhatsApp*"
+          type="tel"
+          inputName="emailOrWhatsapp"
+          register={register("emailOrWhatsapp", { required: "El WhatsApp es obligatorio"  })}
+        />
+      }
 
        <CheckFormInput
         name="receiveInfo"
