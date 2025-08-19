@@ -1,6 +1,5 @@
 "use client"
 
-import VerificationTypeSelector from "@/components/containers/otp/VerificationTypeSelector";
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { notifyError } from "@/components/ui/toast-notifications";
@@ -26,7 +25,7 @@ export default function OtpVerificationView() {
 
   const { getCookie, setCookie, deleteCookie } = useReactiveCookiesNext();
   const { sendCode, validateCode } = useVerification();
-  const { emailOrWhatsapp, redirectToCheckout, setIsEmailOrWhatsapp, isEmailOrWhatsapp } = useClientAuthStore()
+  const { emailOrWhatsapp, redirectToCheckout, isEmailOrWhatsapp } = useClientAuthStore()
   const { setEventId } = useTicketStore();
   const router = useRouter();
   

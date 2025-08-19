@@ -51,7 +51,7 @@ function drawTicketTextWithBackground(
 ) {
   ctx.textAlign = "center";
   const words = text.split(" ");
-  let lines: string[] = [];
+  const lines: string[] = [];
   let line = "";
 
   for (let i = 0; i < words.length; i++) {
@@ -119,8 +119,8 @@ export const generateTicketImage = async ({
 
   // 👇 Registrarlas en document.fonts, pero como tienen NOMBRE ÚNICO
   // no pisan a las globales
-  (document as any).fonts.add(font);
-  (document as any).fonts.add(fontTitle);
+  document.fonts.add(font);
+  document.fonts.add(fontTitle);
 
   const loadImage = (src: string): Promise<HTMLImageElement> =>
     new Promise((resolve, reject) => {
@@ -161,7 +161,6 @@ export const generateTicketImage = async ({
 
   const ticketHeight = 60
   const ticketWidth = 600
-  const ticketX = (canvasWidth - ticketWidth) / 2
 
   ctx.font = "bold 40px GoodTimes"
   y = drawTicketTextWithBackground(
