@@ -7,7 +7,7 @@ import { editClient, getClientById } from "@/services/clients-login";
 import { useClientAuthStore } from "@/store/useClientAuthStore";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { deleteCookie, useReactiveCookiesNext } from "cookies-next";
+import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import type React from "react";
@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function DataForm() {
-  const { getCookie } = useReactiveCookiesNext();
+  const { getCookie, deleteCookie } = useReactiveCookiesNext();
   const { setClientAuthData, setIsEmailOrWhatsapp } = useClientAuthStore();
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -67,6 +67,7 @@ export default function DataForm() {
       notifySuccess("Datos editados correctamente");
     },
     onError: () => {
+      router.replace('/my-data');
       notifyError("Error al editar datos");
     },
   });
