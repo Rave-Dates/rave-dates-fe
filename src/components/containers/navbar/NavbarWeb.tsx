@@ -42,7 +42,7 @@ const NavbarWeb: React.FC = () => {
     },
     {
       id: 'instagram',
-      href: "https://www.instagram.com",
+      href: "https://www.instagram.com/ravedates/",
       label: 'Instagram',
       icon: <InstagramSvg className='w-8 h-8' />,
     },
