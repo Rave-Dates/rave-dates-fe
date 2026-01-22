@@ -1,11 +1,11 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState } from "react";
 import EventCard from "./EventCard";
 import EventCardSkeleton from "@/utils/skeletons/event-skeletons/EventCardSkeleton";
-import { useClientAllEvents } from "@/hooks/client/queries/useClientData";
+// import { useClientAllEvents } from "@/hooks/client/queries/useClientData";
 import { fakeDb } from "@/template-data/fakeDb";
-import { useEventStore } from "@/store/useEventStore";
+// import { useEventStore } from "@/store/useEventStore";
 
 const EventCardList: React.FC = () => {
   // const { filters, setEvents } = useEventStore();
