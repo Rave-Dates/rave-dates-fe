@@ -26,35 +26,37 @@ const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?:
     resetSelected()
   }, []);
 
-  const { data: eventImages } = useQuery<IEventImages[]>({
-    queryKey: [`eventImages-${eventId}`],
-    queryFn: () => getClientEventImagesById(Number(eventId)),
-  });
+  // const { data: eventImages } = useQuery<IEventImages[]>({
+  //   queryKey: [`eventImages-${eventId}`],
+  //   queryFn: () => getClientEventImagesById(Number(eventId)),
+  // });
 
-  const { data: servedImages, isLoading: loadingImages } = useQuery({
-    queryKey: [`servedImages-${eventId}`, eventImages?.map(img => img.imageId)],
-    queryFn: async () => {
-      if (!eventImages) return [];
-      const processedImages = await Promise.all(
-        eventImages?.map(async (img) => {
-          const blob = await getClientImageById(img.imageId);
-          const url = URL.createObjectURL(blob);
+  // const { data: servedImages, isLoading: loadingImages } = useQuery({
+  //   queryKey: [`servedImages-${eventId}`, eventImages?.map(img => img.imageId)],
+  //   queryFn: async () => {
+  //     if (!eventImages) return [];
+  //     const processedImages = await Promise.all(
+  //       eventImages?.map(async (img) => {
+  //         const blob = await getClientImageById(img.imageId);
+  //         const url = URL.createObjectURL(blob);
           
-          return {
-            id: String(img.imageId),
-            url,
-          };
-        })
-      );
+  //         return {
+  //           id: String(img.imageId),
+  //           url,
+  //         };
+  //       })
+  //     );
 
-      return processedImages;
-    },
-  });
+  //     return processedImages;
+  //   },
+  // });
+
+  const servedImages = [{id: "1", url: "/images/flyer-1.png"}, {id: "2", url: "/images/flyer-2.png"}]; 
 
   return (
     <div className="bg-cards-container rounded-sm overflow-hidden shadow-2xl w-xl h-fit mx-auto mb-5">
       {
-        loadingImages ?
+        false ?
         <div className='h-[36rem] flex items-center justify-center w-full bg-cards-container'>
           <SpinnerSvg className='fill-primary w-10 sm:w-14' />
         </div>
