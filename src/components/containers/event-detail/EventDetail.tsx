@@ -8,7 +8,7 @@ import TicketSelector from './TicketSelector';
 import GoBackButton from '@/components/ui/buttons/GoBackButton';
 import HeaderSkeleton from '@/utils/skeletons/event-skeletons/HeaderSkeleton';
 import { formatDateToColombiaTime } from '@/utils/formatDate';
-// import { useClientEvent, useClientEventServedImages, useClientEventTickets } from '@/hooks/client/queries/useClientData';
+import { useClientEvent, useClientEventServedImages, useClientEventTickets } from '@/hooks/client/queries/useClientData';
 import { useSearchParams } from 'next/navigation';
 import { useReactiveCookiesNext } from 'cookies-next';
 
