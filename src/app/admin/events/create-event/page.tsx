@@ -11,14 +11,14 @@ import { useCreateEventStore } from "@/store/createEventStore";
 import { validateDateYyyyMmDd } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
-// import dynamic from "next/dynamic";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
 
 import { useForm, useWatch } from "react-hook-form";
 
-// const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/GeoAutocomplete"), { ssr: false });
+const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/GeoAutocomplete"), { ssr: false });
 
 export default function Page() {
   const { eventFormData, updateEventFormData, setHasLoadedEvent } = useCreateEventStore();
@@ -45,18 +45,18 @@ export default function Page() {
   const { categories } = useAdminAllCategories({ token });
   const { labelsTypes } = useAdminLabelsTypes({ token });
 
-  // useEffect(() => {
-  //   register("geo", {
-  //     required: "Debes seleccionar una ubicación válida",
-  //     validate: (value) => {
-  //       const parts = value?.split(";");
-  //       if (parts?.length !== 2) return "Ubicación inválida";
-  //       return true;
-  //     },
-  //   });
+  useEffect(() => {
+    register("geo", {
+      required: "Debes seleccionar una ubicación válida",
+      validate: (value) => {
+        const parts = value?.split(";");
+        if (parts?.length !== 2) return "Ubicación inválida";
+        return true;
+      },
+    });
 
-  //   register("editPlace");
-  // }, [register]);
+    register("editPlace");
+  }, [register]);
 
   useEffect(() => {
     if (!eventFormData) return;
@@ -67,8 +67,8 @@ export default function Page() {
       place: eventFormData.place,
       date: eventFormData.date,
       time: eventFormData.time,
-      // geo: eventFormData.geo,
-      geo: "00;00",
+      geo: eventFormData.geo,
+      // geo: "00;00",
       editPlace: eventFormData.editPlace,
       description: eventFormData.description,
       type: eventFormData.type,
@@ -156,10 +156,10 @@ export default function Page() {
         register={register("place", {required: "El lugar es obligatorio"  })}
       />
 
-      {/* <GeoAutocomplete
+      <GeoAutocomplete
         setValue={setValue}
         defaultGeo={eventFormData.editPlace}
-      /> */}
+      />
 
       <EventImageSwiper setImages={setValue} images={watchedImages} />
 
@@ -205,9 +205,6 @@ export default function Page() {
       <br />
 
       <div>
-        <h3 className="text-white text-sm font-medium mb-1">
-          Tipo de evento
-        </h3>
         <div className="px-4 flex rounded-xl gap-x-5">
           {type.map((item) => (
             <label

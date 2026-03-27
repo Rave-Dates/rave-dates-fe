@@ -281,9 +281,6 @@ useEffect(() => {
 
       <div>
         <h5 className="text-xs mb-2"><strong>CUIDADO!</strong> Cambiar de tipo &quot;Pago&quot; a &quot;Gratuito&quot; puede ser peligroso</h5>
-        <h3 className="text-white text-sm font-medium mb-1">
-          Tipo de evento
-        </h3>
         <div className="px-4 flex rounded-xl gap-x-5">
           {type.map((item) => (
             <label
