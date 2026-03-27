@@ -11,14 +11,14 @@ import { useCreateEventStore } from "@/store/createEventStore";
 import { validateDateYyyyMmDd } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
-import dynamic from "next/dynamic";
+// import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
 
 import { useForm, useWatch } from "react-hook-form";
 
-const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/GeoAutocomplete"), { ssr: false });
+// const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/GeoAutocomplete"), { ssr: false });
 
 export default function Page() {
   const { eventFormData, updateEventFormData, setHasLoadedEvent } = useCreateEventStore();
