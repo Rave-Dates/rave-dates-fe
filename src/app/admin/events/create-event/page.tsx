@@ -45,18 +45,18 @@ export default function Page() {
   const { categories } = useAdminAllCategories({ token });
   const { labelsTypes } = useAdminLabelsTypes({ token });
 
-  useEffect(() => {
-    register("geo", {
-      required: "Debes seleccionar una ubicación válida",
-      validate: (value) => {
-        const parts = value?.split(";");
-        if (parts?.length !== 2) return "Ubicación inválida";
-        return true;
-      },
-    });
+  // useEffect(() => {
+  //   register("geo", {
+  //     required: "Debes seleccionar una ubicación válida",
+  //     validate: (value) => {
+  //       const parts = value?.split(";");
+  //       if (parts?.length !== 2) return "Ubicación inválida";
+  //       return true;
+  //     },
+  //   });
 
-    register("editPlace");
-  }, [register]);
+  //   register("editPlace");
+  // }, [register]);
 
   useEffect(() => {
     if (!eventFormData) return;
@@ -67,7 +67,8 @@ export default function Page() {
       place: eventFormData.place,
       date: eventFormData.date,
       time: eventFormData.time,
-      geo: eventFormData.geo,
+      // geo: eventFormData.geo,
+      geo: "00;00",
       editPlace: eventFormData.editPlace,
       description: eventFormData.description,
       type: eventFormData.type,
@@ -155,10 +156,10 @@ export default function Page() {
         register={register("place", {required: "El lugar es obligatorio"  })}
       />
 
-      <GeoAutocomplete
+      {/* <GeoAutocomplete
         setValue={setValue}
         defaultGeo={eventFormData.editPlace}
-      />
+      /> */}
 
       <EventImageSwiper setImages={setValue} images={watchedImages} />
 
