@@ -81,9 +81,9 @@ export default function Checkout() {
   let urlToReturn = ""
 
   if (tempToken && !clientToken) {
-    urlToReturn = `https://ravedates.proxising.com/otp?redirect=transfer?eid=${eventId}`
+    urlToReturn = `http://31.97.84.44/otp?redirect=transfer?eid=${eventId}`
   } else if (!tempToken && clientToken) {
-    urlToReturn = `https://ravedates.proxising.com/transfer-confirm?eid=${eventId}`
+    urlToReturn = `http://31.97.84.44/transfer-confirm?eid=${eventId}`
   }
 
   const handleContinue = async () => {
@@ -125,7 +125,7 @@ export default function Checkout() {
           eventId: eventId,
           method: "BOLD",
           boldMethod: selectedMethod.toUpperCase() === "BOLD" ? ["CREDIT_CARD"] : ["NEQUI"],
-          returnUrl: "https://ravedates.proxising.com/tickets",
+          returnUrl: "http://31.97.84.44/tickets",
         },
         purchaseId: storePurchaseId ?? 0,
         clientToken: clientToken,
@@ -133,7 +133,7 @@ export default function Checkout() {
 
       if (data === "PAY NOT NEEDED") {
         notifySuccess("No se necesita pagar")
-        router.push("https://ravedates.proxising.com/tickets")
+        router.push("http://31.97.84.44/tickets")
         return
       }
       router.push(data)
@@ -144,7 +144,7 @@ export default function Checkout() {
       const ticketData = {
         method: "BOLD",
         boldMethod: "CREDIT_CARD",
-        returnUrl: `https://ravedates.proxising.com/tickets/event-ticket/${eventId}`,
+        returnUrl: `http://31.97.84.44/tickets/event-ticket/${eventId}`,
       };
 
       notifyPending(
