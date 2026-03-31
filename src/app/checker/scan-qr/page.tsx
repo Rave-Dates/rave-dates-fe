@@ -28,7 +28,7 @@ export default function ScanQRPage() {
 
   useEffect(() => {
     if (!token) {
-      notifyError('No se pudo leer el token de autenticación');
+      notifyError('No se pudo autenticar correctamente');
       router.replace('/');
     }
   }, [token, router]);

@@ -22,7 +22,7 @@ export default function TokenGuard({ emailOrWhatsapp, loadingValidate }: Props) 
     const hasClient = !!clientToken;
 
     if (!hasTemp && !hasClient && !emailOrWhatsapp) {
-      notifyError("No tenés token, redirigiendo a inicio");
+      notifyError("La sesión expiró, inicia sesión nuevamente");
       router.push("/");
     }
   }, [tempToken, clientToken, emailOrWhatsapp]);

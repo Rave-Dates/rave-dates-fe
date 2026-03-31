@@ -50,7 +50,7 @@ export default function DatePicker({ value, onChange, title = "Fecha*" }: DatePi
           <Button
             variant="outline"
             className={cn(
-              "w-full justify-start text-left font-normal bg-input border-none h-[56px] rounded-lg text-primary-white hover:bg-input hover:text-primary-white focus:ring-1 focus:ring-primary",
+              "w-full justify-start text-left font-normal bg-main-container border-none h-[56px] rounded-lg text-primary-white hover:bg-input hover:text-primary-white focus:ring-1 focus:ring-primary",
               !value && "text-muted-foreground"
             )}
           >

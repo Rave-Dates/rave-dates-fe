@@ -60,7 +60,7 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
       router.push("/");
       return
     } else if (!token) {
-      notifyError("No se encontró un token en las cookies");
+      notifyError("No tienes permisos para acceder a esta página");
       router.push("/");
       return
     } else return
