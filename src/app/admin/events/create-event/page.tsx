@@ -1,5 +1,6 @@
 "use client";
 
+import DatePicker from "@/components/ui/date-picker/date-picker";
 import EventImageSwiper from "@/components/roles/admin/events/EventImagesSwiper";
 import LabelTagButton from "@/components/ui/buttons/LabelTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
@@ -13,10 +14,10 @@ import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import type React from "react";
 import { useEffect } from "react";
 
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
+import { InputTime } from "@/components/ui/date-picker/input-time";
 
 const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/GeoAutocomplete"), { ssr: false });
 
@@ -68,7 +69,6 @@ export default function Page() {
       date: eventFormData.date,
       time: eventFormData.time,
       geo: eventFormData.geo,
-      // geo: "00;00",
       editPlace: eventFormData.editPlace,
       description: eventFormData.description,
       type: eventFormData.type,
@@ -131,23 +131,30 @@ export default function Page() {
         register={register("subtitle", { required: "El subtítulo es obligatorio"  })}
       />
       <div className="w-full gap-x-5 flex justify-between">
-        <FormInput
-          title="Fecha*"
-          inputName="date"
-          placeholder="yyyy-mm-dd"
-          register={register("date", { 
-            required: "La fecha es obligatoria", 
-            validate: validateDateYyyyMmDd
-          })}
+        <Controller
+          name="date"
+          control={control}
+          rules={{ required: "La fecha es obligatoria", validate: validateDateYyyyMmDd }}
+          render={({ field }) => (
+            <DatePicker 
+              value={field.value} 
+              onChange={field.onChange} 
+              title="Fecha*" 
+            />
+          )}
         />
 
-        <FormInput
-          title="Hora (COL)*"
-          inputName="time"
-          placeholder="00:00"
-          register={register("time", { 
-            required: "La fecha es obligatoria", 
-          })}
+        <Controller
+          name="time"
+          control={control}
+          rules={{ required: "La hora es obligatoria" }}
+          render={({ field }) => (
+            <InputTime 
+              value={field.value} 
+              onChange={field.onChange} 
+              title="Hora (COL)*" 
+            />
+          )}
         />
       </div>
       <FormInput

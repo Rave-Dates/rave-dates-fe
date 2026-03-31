@@ -22,6 +22,27 @@
 
   --breakpoint-xs: 22rem;
 
+  /* DatePicker isolated tokens */
+  --color-dp-primary: var(--dp-primary);
+  --color-dp-primary-foreground: var(--dp-primary-foreground);
+  --color-dp-background: var(--dp-background);
+  --color-dp-foreground: var(--dp-foreground);
+  --color-dp-card: var(--dp-card);
+  --color-dp-card-foreground: var(--dp-card-foreground);
+  --color-dp-popover: var(--dp-popover);
+  --color-dp-popover-foreground: var(--dp-popover-foreground);
+  --color-dp-secondary: var(--dp-secondary);
+  --color-dp-secondary-foreground: var(--dp-secondary-foreground);
+  --color-dp-muted: var(--dp-muted);
+  --color-dp-muted-foreground: var(--dp-muted-foreground);
+  --color-dp-accent: var(--dp-accent);
+  --color-dp-accent-foreground: var(--dp-accent-foreground);
+  --color-dp-destructive: var(--dp-destructive);
+  --color-dp-destructive-foreground: var(--dp-destructive-foreground);
+  --color-dp-border: var(--dp-border);
+  --color-dp-input: var(--dp-input);
+  --color-dp-ring: var(--dp-ring);
+
   @keyframes fade-in {
     0% {
       opacity: 0
@@ -105,4 +126,26 @@ button {
 
 .toast-out {
   animation: toast-out 0.3s ease-out both;
+}
+
+:root {
+  --dp-background: oklch(0.145 0 0);
+  --dp-foreground: oklch(0.985 0 0);
+  --dp-card: oklch(0.205 0 0);
+  --dp-card-foreground: oklch(0.985 0 0);
+  --dp-popover: oklch(0.205 0 0);
+  --dp-popover-foreground: oklch(0.985 0 0);
+  --dp-primary: oklch(0.922 0 0);
+  --dp-primary-foreground: oklch(0.205 0 0);
+  --dp-secondary: oklch(0.269 0 0);
+  --dp-secondary-foreground: oklch(0.985 0 0);
+  --dp-muted: oklch(0.269 0 0);
+  --dp-muted-foreground: oklch(0.708 0 0);
+  --dp-accent: oklch(0.269 0 0);
+  --dp-accent-foreground: oklch(0.985 0 0);
+  --dp-destructive: oklch(0.704 0.191 22.216);
+  --dp-destructive-foreground: oklch(0.985 0 0);
+  --dp-border: oklch(1 0 0 / 10%);
+  --dp-input: oklch(1 0 0 / 15%);
+  --dp-ring: oklch(0.556 0 0);
 }
