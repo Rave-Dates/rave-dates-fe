@@ -17,9 +17,10 @@ interface DatePickerProps {
   value?: string; // yyyy-MM-dd
   onChange?: (value: string) => void;
   title?: string;
+  className?: string;
 }
 
-export default function DatePicker({ value, onChange, title = "Fecha*" }: DatePickerProps) {
+export default function DatePicker({ value, onChange, title = "Fecha*", className }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 
   // Parse the string value into a Date object for the Calendar
@@ -51,6 +52,7 @@ export default function DatePicker({ value, onChange, title = "Fecha*" }: DatePi
             variant="outline"
             className={cn(
               "w-full justify-start text-left font-normal bg-main-container border-none h-[56px] rounded-lg text-primary-white hover:bg-input hover:text-primary-white focus:ring-1 focus:ring-primary",
+              className,
               !value && "text-muted-foreground"
             )}
           >

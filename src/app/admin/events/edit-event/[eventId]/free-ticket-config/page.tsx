@@ -1,21 +1,22 @@
 "use client"
 
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
+import DatePicker from "@/components/ui/date-picker/date-picker";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyPending } from "@/components/ui/toast-notifications";
 import { useEditEvent } from "@/hooks/admin/mutations/useEditEvent";
 import { useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { combineDateAndTimeToISO, formatColombiaTimeToUTC, formatDate } from "@/utils/formatDate";
+import { combineDateAndTimeToISO, formatColombiaTimeToUTC, formatDate, validateDateYyyyMmDd } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 export default function FreeTicketConfiguration() {
   const { eventFormData, updateEventFormData, setHasLoadedTickets, hasLoadedTickets } = useCreateEventStore();
-  const { register, handleSubmit, reset , setValue} = useForm<IEventFormData>({
+  const { register, handleSubmit, reset , setValue, control} = useForm<IEventFormData>({
     defaultValues: eventFormData
   });
   const { mutate: editEvent } = useEditEvent(reset);
@@ -133,34 +134,42 @@ export default function FreeTicketConfiguration() {
           <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
             <div className="flex gap-x-5">
               <FormInput
-                className="!bg-cards-container"
                 title="Nombre"
                 inputName="ticketName"
                 register={register("tickets.0.name", { required: true })}
               />
               <FormInput
-                className="!bg-cards-container"
                 title="Cantidad"
                 inputName="quantity"
                 register={register("tickets.0.stages.0.quantity", { required: true, valueAsNumber: true })}
               />
             </div>
-            <div className="flex gap-x-5">
-              <FormInput
-                className="!bg-cards-container"
-                title="Fecha inicio"
-                placeholder="yyyy-mm-dd"
-                inputName="date"
-                register={register("tickets.0.stages.0.date", { required: true, valueAsDate: true })}
-              />
-              <FormInput
-                className="!bg-cards-container"
-                title="Fecha máx."
-                placeholder="yyyy-mm-dd"
-                inputName="dateMax"
-                register={register(`tickets.0.stages.0.dateMax`, { required: true })}
-              />
-            </div>
+              <div className="w-full gap-x-5 flex justify-between">
+                <Controller
+                  name="tickets.0.stages.0.date"
+                  control={control}
+                  rules={{ required: "La fecha de inicio es obligatoria", validate: validateDateYyyyMmDd }}
+                  render={({ field }) => (
+                    <DatePicker 
+                      value={field.value} 
+                      onChange={field.onChange} 
+                      title="Fecha inicio*" 
+                    />
+                  )}
+                />
+                <Controller
+                  name="tickets.0.stages.0.dateMax"
+                  control={control}
+                  rules={{ required: "La fecha máx. es obligatoria", validate: validateDateYyyyMmDd }}
+                  render={({ field }) => (
+                    <DatePicker 
+                      value={field.value} 
+                      onChange={field.onChange} 
+                      title="Fecha máx.*" 
+                    />
+                  )}
+                />
+              </div>
               <button
                 type="submit"
                 className="w-full bg-primary text-black font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"

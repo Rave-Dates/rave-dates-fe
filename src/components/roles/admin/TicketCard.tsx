@@ -1,17 +1,19 @@
 "use client"
 
 import TrashSvg from "@/components/svg/TrashSvg"
+import DatePicker from "@/components/ui/date-picker/date-picker"
 import FormInput from "@/components/ui/inputs/FormInput"
 import { useCreateEventStore } from "@/store/createEventStore"
 import { validateDateYyyyMmDd } from "@/utils/formatDate"
 import { useRouter, useParams } from "next/navigation"
 import { useEffect, useState } from "react"
-import { UseFormGetValues, UseFormRegister } from "react-hook-form"
+import { Control, Controller, UseFormGetValues, UseFormRegister } from "react-hook-form"
 
 interface TicketCardProps {
   ticketNumber: number | undefined,
   index: number,
   isEditing?: boolean,
+  control: Control<IEventFormData>,
   onDelete?: () => void,
   register: UseFormRegister<IEventFormData>,
   getValues: UseFormGetValues<IEventFormData>,
@@ -24,6 +26,7 @@ export function TicketCard({
   onDelete,
   register,
   getValues,
+  control,
 }: TicketCardProps) {
   const router = useRouter()
   const params = useParams()
@@ -74,7 +77,7 @@ export function TicketCard({
   };
 
   return (
-    <div className={`bg-main-container rounded-lg p-4 space-y-4 h-64 ${stagesEnabled && "h-80"} transition-all duration-400`}>
+    <div className={`bg-main-container rounded-lg p-4 space-y-4 h-68 ${stagesEnabled && "h-83"} transition-all duration-400`}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-white font-medium">Ticket {ticketNumber}</h3>
@@ -90,36 +93,37 @@ export function TicketCard({
           {...register(`tickets.${index}.ticketTypeId`)}
         />
         <FormInput
-          className="!bg-cards-container !py-1"
+          className="bg-cards-container! py-1!"
           title="Nombre"
           inputName="ticketName"
           register={register(`tickets.${index}.name`, { required: "El nombre es obligatorio" })}
         />
         <FormInput
-          className="!bg-cards-container !py-1"
+          className="bg-cards-container! py-1!"
           title="Cantidad"
           inputName="quantity"
           register={register(`tickets.${index}.stages.0.quantity`, { required: "La cantidad es obligatoria", valueAsNumber: true })}
         />
         <FormInput
           type="number"
-          className="!bg-cards-container !py-1"
+          className="bg-cards-container! py-1!"
           title="Precio"
           inputName="price"
           register={register(`tickets.${index}.stages.0.price`, { required: "El precio es obligatorio", valueAsNumber: true})}
         />
         <div className="col-span-3"> 
-          <FormInput
-            placeholder="yyyy-mm-dd"
-            className="!bg-cards-container !py-1"
-            title="Fecha máx."
-            inputName="maxDate"
-            register={
-              stagesEnabled ?
-              register(`tickets.${index}.maxDate`, { required: "la fecha máx. es obligatoria", validate: validateDateYyyyMmDd })
-              :
-              register(`tickets.${index}.stages.0.dateMax`, { required: "la fecha máx. es obligatoria", validate: validateDateYyyyMmDd })
-            }
+          <Controller
+            name={stagesEnabled ? `tickets.${index}.maxDate` : `tickets.${index}.stages.0.dateMax`}
+            control={control}
+            rules={{ required: "La fecha máx. es obligatoria", validate: validateDateYyyyMmDd }}
+            render={({ field }) => (
+              <DatePicker
+                value={field.value as string} 
+                onChange={field.onChange} 
+                title="Fecha máx.*" 
+                className="h-9 bg-cards-container"
+              />
+            )}
           />
         </div>
       </div>

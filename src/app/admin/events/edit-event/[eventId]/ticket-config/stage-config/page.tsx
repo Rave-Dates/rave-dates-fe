@@ -135,6 +135,7 @@ export default function StageConfig() {
           <div className="space-y-4">
             {fields.map((stage, index) => (
               <StageCard
+                control={control}
                 register={register}
                 key={stage.id}
                 index={index}

@@ -14,11 +14,13 @@ import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useAdminAllCategories, useAdminEvent, useAdminEventCategories, useAdminEventImages, useAdminImagesData, useAdminLabelsTypes, useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData";
 import GeoAutocomplete from "../../admin/events/GeoAutocomplete";
 import { useEditEvent } from "@/hooks/admin/mutations/useEditEvent";
+import DatePicker from "@/components/ui/date-picker/date-picker";
+import { InputTime } from "@/components/ui/date-picker/input-time";
 
 export default function EditOrganizerEvent({ eventId }: { eventId: number }) {
   const { eventFormData, updateEventFormData, setHasLoadedEvent, setHasLoadedTickets, hasLoadedTickets, hasLoadedEvent } = useCreateEventStore();
@@ -298,23 +300,30 @@ useEffect(() => {
       />
       
       <div className="w-full gap-x-5 flex justify-between">
-        <FormInput
-          title="Fecha*"
-          inputName="date"
-          placeholder="yyyy-mm-dd"
-          register={register("date", { 
-            required: "La fecha es obligatoria", 
-            validate: validateDateYyyyMmDd
-          })}
+        <Controller
+          name="date"
+          control={control}
+          rules={{ required: "La fecha es obligatoria", validate: validateDateYyyyMmDd }}
+          render={({ field }) => (
+            <DatePicker 
+              value={field.value} 
+              onChange={field.onChange} 
+              title="Fecha*" 
+            />
+          )}
         />
 
-        <FormInput
-          title="Hora (COL)*"
-          inputName="time"
-          placeholder="00:00"
-          register={register("time", { 
-            required: "La fecha es obligatoria", 
-          })}
+        <Controller
+          name="time"
+          control={control}
+          rules={{ required: "La hora es obligatoria" }}
+          render={({ field }) => (
+            <InputTime 
+              value={field.value} 
+              onChange={field.onChange} 
+              title="Hora (COL)*" 
+            />
+          )}
         />
       </div>
 

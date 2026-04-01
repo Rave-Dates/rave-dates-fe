@@ -1,19 +1,23 @@
 "use client"
 
 import TrashSvg from "@/components/svg/TrashSvg"
+import DatePicker from "@/components/ui/date-picker/date-picker";
 import FormInput from "@/components/ui/inputs/FormInput"
-import { UseFormRegister } from "react-hook-form";
+import { validateDateYyyyMmDd } from "@/utils/formatDate";
+import { Control, Controller, UseFormRegister } from "react-hook-form";
 
 interface StageCardProps {
   index: number,
   onDelete?: () => void,
   register: UseFormRegister<IEventTicket>,
+  control: Control<IEventTicket>,
 }
 
 export function StageCard({
   index,
   onDelete,
   register,
+  control,
 }: StageCardProps) {
 
   return (
@@ -30,21 +34,21 @@ export function StageCard({
       <div className="flex flex-col gap-3">
         <div className="flex w-full justify-center items-center gap-x-3">
           <FormInput
-            className="!bg-cards-container"
+            className="bg-cards-container!"
             title="Cantidad"
             inputName="quantity"
             register={register(`stages.${index}.quantity`, { required: true, valueAsNumber: true })}
           />
           <FormInput
             type="number"
-            className="!bg-cards-container"
+            className="bg-cards-container!"
             title="Precio"
             inputName="price"
             register={register(`stages.${index}.price`, { required: true, valueAsNumber: true })}
           />
           <FormInput
             type="number"
-            className="!bg-cards-container"
+            className="bg-cards-container!"
             title="Comisión de promotor"
             typeOfValue="$"
             inputName="promoterFee"
@@ -52,27 +56,34 @@ export function StageCard({
           />
         </div>
         <div className="flex w-full justify-center items-center gap-x-3">
-          <FormInput
-            className="!bg-cards-container"
-            title="Fecha inicio"
-            placeholder="yyyy-mm-dd"
-            inputName="date"
-            register={register(`stages.${index}.date`, { required: true })}
+
+          <Controller
+            name={`stages.${index}.date`}
+            control={control}
+            rules={{ required: "La fecha de inicio es obligatoria", validate: validateDateYyyyMmDd }}
+            render={({ field }) => (
+              <DatePicker
+                value={field.value as string} 
+                onChange={field.onChange} 
+                title="Fecha inicio*" 
+                className="h-13 bg-cards-container"
+              />
+            )}
           />
-          <FormInput
-            className="!bg-cards-container"
-            title="Fecha máx."
-            placeholder="yyyy-mm-dd"
-            inputName="dateMax"
-            register={register(`stages.${index}.dateMax`, { required: true })}
+          <Controller
+            name={`stages.${index}.dateMax`}
+            control={control}
+            rules={{ required: "La fecha máx. es obligatoria", validate: validateDateYyyyMmDd }}
+            render={({ field }) => (
+              <DatePicker
+                value={field.value as string} 
+                onChange={field.onChange} 
+                title="Fecha máx.*" 
+                className="h-13 bg-cards-container"
+              />
+            )}
           />
         </div>
-        {/* <FormInput
-          className="!bg-cards-container"
-          title="Comisión promotor (%)"
-          inputName="commission"
-          register={register(`stages.${index}.commission`, { required: true, valueAsNumber: true })}
-        /> */}
       </div>
     </div>
   )

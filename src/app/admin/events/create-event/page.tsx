@@ -103,7 +103,6 @@ export default function Page() {
 
     delete formattedData.categories;
 
-    console.log(formattedData)
     updateEventFormData({
       ...eventFormData,
       ...formattedData,

@@ -212,6 +212,7 @@ export default function EditTicketConfiguration() {
             <TicketCard
               getValues={getValues}
               register={register}
+              control={control}
               index={index}
               isEditing={true}
               key={ticket.id}

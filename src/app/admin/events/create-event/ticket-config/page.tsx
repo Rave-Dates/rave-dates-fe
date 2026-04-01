@@ -175,6 +175,7 @@ export default function TicketConfiguration() {
             <TicketCard
               getValues={getValues}
               register={register}
+              control={control}
               index={index}
               key={ticket?.ticketId}
               ticketNumber={ticket.ticketId}
