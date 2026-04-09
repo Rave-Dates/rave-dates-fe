@@ -9,6 +9,8 @@ import { useReactiveCookiesNext } from "cookies-next";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
+import ConfirmationModal from "@/components/ui/modals/ConfirmationModal";
+
 export default function ErrorStrings() {
   const { register, handleSubmit, reset } = useForm<{ email: string }>();
   const { getCookie } = useReactiveCookiesNext();
@@ -22,7 +24,7 @@ export default function ErrorStrings() {
         email: errorStrings.email
       })
     }
-  }, [errorStrings])
+  }, [errorStrings, reset])
 
   // creamos el usuario 
   const { mutate } = useMutation({
@@ -49,7 +51,7 @@ export default function ErrorStrings() {
   };
 
   return (
-    <form className="w-full mt-5" onSubmit={handleSubmit(onSubmit)}>
+    <div className="w-full mt-5">
 
       <h2 className="text-system-error text-lg font-medium">
         ¡Precaución!
@@ -63,12 +65,21 @@ export default function ErrorStrings() {
         register={register("email", { required: true })}
       />
 
-      <button
-        type="submit"
-        className="text-primary border border-primary input-button"
-      >
-        Actualizar string de error
-      </button>
-    </form>
+      <ConfirmationModal
+        title="¿Actualizar strings de error?"
+        description="Esta acción modificará los mensajes de error globales de la aplicación. ¿Deseas continuar?"
+        confirmText="Actualizar"
+        variant="danger"
+        onConfirm={handleSubmit(onSubmit)}
+        trigger={
+          <button
+            type="button"
+            className="text-primary border border-primary input-button"
+          >
+            Actualizar string de error
+          </button>
+        }
+      />
+    </div>
   );
 }

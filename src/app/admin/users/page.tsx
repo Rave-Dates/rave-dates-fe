@@ -5,7 +5,6 @@ import { useState } from "react";
 import DefaultButton from "@/components/ui/buttons/DefaultButton";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useAdminAllUsers } from "@/hooks/admin/queries/useAdminData";
-import { useRouter } from "next/navigation";
 
 export default function UserManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,8 +13,7 @@ export default function UserManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // cantidad de usuarios por página
 
-  const router = useRouter();
-  const { getCookie, deleteCookie } = useReactiveCookiesNext();
+  const { getCookie } = useReactiveCookiesNext();
 
   const token = getCookie("token");
 
@@ -44,19 +42,8 @@ export default function UserManagement() {
   const totalPages = data && Math.ceil(data.length / itemsPerPage);
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => {
-          deleteCookie("token");
-          router.push("/admin");
-        }}
-        className="border z-20 absolute w-36 top-10 md:top-32 right-5 lg:right-52 border-system-error text-system-error py-2.5 rounded-lg bg-background"
-      >
-         Cerrar sesión
-      </button>
-      <UsersList
-        createHref="users/create-user"
+    <UsersList
+      createHref="users/create-user"
       hasSearch={true}
       searchTerm={searchTerm}
       handleSearch={handleSearch}
@@ -137,6 +124,5 @@ export default function UserManagement() {
         </div>
       </div>
     </UsersList>
-    </>
   );
 }
