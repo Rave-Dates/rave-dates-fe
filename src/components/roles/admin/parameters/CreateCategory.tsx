@@ -1,11 +1,11 @@
 "use client";
 
-import TrashSvg from "@/components/svg/TrashSvg";
+import EditableItem from "@/components/ui/EditableItem";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { useAdminAllCategories } from "@/hooks/admin/queries/useAdminData";
-import { createCategory } from "@/services/admin-parameters";
-import { useMutation } from "@tanstack/react-query";
+import { createCategory, deleteCategory, updateCategory } from "@/services/admin-parameters";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -13,16 +13,18 @@ import { useForm } from "react-hook-form";
 export default function CreateCategory() {
   const { register, handleSubmit, setValue } = useForm<{ name: string }>();
   const { getCookie } = useReactiveCookiesNext();
+  const queryClient = useQueryClient();
 
   const token = getCookie("token");
   const { categories } = useAdminAllCategories({ token });
 
-  // creamos el usuario 
-  const { mutate } = useMutation({
+  // mutation to create
+  const { mutate: createMutate } = useMutation({
     mutationFn: createCategory,
     onSuccess: () => {
       notifySuccess('Categoría creada correctamente');
       setValue("name", "");
+      queryClient.invalidateQueries({ queryKey: ["oldCategories"] });
     },
     onError: (error) => {
       notifyError("Error al crear categoría.");
@@ -30,14 +32,44 @@ export default function CreateCategory() {
     },
   });
 
-  const deleteCategory = (categoryId: number) => {
-    notifySuccess("Categoría eliminada correctamente " + categoryId);
+  // mutation to update
+  const { mutate: updateMutate } = useMutation({
+    mutationFn: updateCategory,
+    onSuccess: () => {
+      notifySuccess('Categoría actualizada correctamente');
+      queryClient.invalidateQueries({ queryKey: ["oldCategories"] });
+    },
+    onError: (error) => {
+      notifyError("Error al actualizar categoría.");
+      console.log(error)
+    },
+  });
+
+  // mutation to delete
+  const { mutate: deleteMutate } = useMutation({
+    mutationFn: deleteCategory,
+    onSuccess: () => {
+      notifySuccess("Categoría eliminada correctamente");
+      queryClient.invalidateQueries({ queryKey: ["oldCategories"] });
+    },
+    onError: (error) => {
+      notifyError("Error al eliminar categoría.");
+      console.log(error)
+    },
+  });
+
+  const handleDelete = (categoryId: number) => {
+    deleteMutate({ token, categoryId });
+  }
+
+  const handleUpdate = (categoryId: number, newName: string) => {
+    updateMutate({ token, categoryId, name: newName });
   }
 
   // creamos el usuario 
   const onSubmit = ({ name }: { name: string }) => {
     const trimmedName = name.trim();
-    mutate({
+    createMutate({
       token,
       name: trimmedName,
     });
@@ -52,16 +84,12 @@ export default function CreateCategory() {
         <div className="flex items-center flex-wrap gap-x-4 gap-y-2 ms-2">
           {
             categories?.map((category) => (
-              <div className="bg-primary rounded-md flex items-center gap-2 animate-fade-in" key={category.categoryId}>
-                <h1 className="text-sm px-2 text-primary-black font-semibold">{category.name}</h1>
-                <button 
-                  type="button" 
-                  onClick={() => deleteCategory(category.categoryId)} 
-                  className="text-primary-black h-8 w-10 flex items-center justify-center rounded-r-md bg-system-error hover:bg-system-error/80 transition-colors"
-                >
-                  <TrashSvg />
-                </button>
-              </div>
+              <EditableItem
+                key={category.categoryId}
+                initialValue={category.name}
+                onSave={(newName) => handleUpdate(category.categoryId, newName)}
+                onDelete={() => handleDelete(category.categoryId)}
+              />
             ))
           }
         </div>

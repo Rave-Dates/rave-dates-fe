@@ -46,6 +46,83 @@ export const createTicketType = async ({token, data}: { token: CookieValueTypes,
   return res.data;
 };
 
+export const updateLabel = async ({token, labelId, name, icon}: { token: CookieValueTypes, labelId: number, name: string, icon: string | null }) => {
+  const res = await axios.put(`${BASE_URL}/label/${labelId}`, {name, icon}, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
+
+export const deleteLabel = async ({token, labelId}: { token: CookieValueTypes, labelId: number }) => {
+  const res = await axios.delete(`${BASE_URL}/label/${labelId}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
+
+export const updateCategory = async ({token, categoryId, name}: { token: CookieValueTypes, categoryId: number, name: string }) => {
+  const res = await axios.put(`${BASE_URL}/admin/categories/${categoryId}`, {name}, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
+
+export const deleteCategory = async ({token, categoryId}: { token: CookieValueTypes, categoryId: number }) => {
+  const res = await axios.delete(`${BASE_URL}/admin/categories/${categoryId}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
+
+export const updateCategoryValue = async ({token, valueId, value, categoryId}: { token: CookieValueTypes, valueId: number, value: string, categoryId: number }) => {
+  const res = await axios.put(`${BASE_URL}/admin/category-values/${valueId}`, {value, categoryId}, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
+
+export const deleteCategoryValue = async ({token, valueId}: { token: CookieValueTypes, valueId: number }) => {
+  const res = await axios.delete(`${BASE_URL}/admin/category-values/${valueId}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
+
+export const deleteTicketType = async ({token, ticketTypeId}: { token: CookieValueTypes, ticketTypeId: number }) => {
+  const res = await axios.delete(`${BASE_URL}/admin/ticket-types/${ticketTypeId}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
+
 export const updateErrorStrings = async ({token, data}: { token: CookieValueTypes, data: { email: string} }) => {
   const res = await axios.put(`${BASE_URL}/admin/config`, data, {
     headers: {

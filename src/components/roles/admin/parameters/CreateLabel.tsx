@@ -1,11 +1,11 @@
 "use client";
 
-import TrashSvg from "@/components/svg/TrashSvg";
+import EditableItem from "@/components/ui/EditableItem";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
-import { createLabel } from "@/services/admin-parameters";
-import { useMutation } from "@tanstack/react-query";
+import { createLabel, deleteLabel, updateLabel } from "@/services/admin-parameters";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -13,16 +13,18 @@ import { useForm } from "react-hook-form";
 export default function CreateLabel() {
   const { register, handleSubmit, setValue } = useForm<{ name: string }>();
   const { getCookie } = useReactiveCookiesNext();
+  const queryClient = useQueryClient();
 
   const token = getCookie("token");
   const { labelsTypes } = useAdminLabelsTypes({token});
 
-  // creamos el usuario 
-  const { mutate } = useMutation({
+  // mutation to create
+  const { mutate: createMutate } = useMutation({
     mutationFn: createLabel,
     onSuccess: () => {
       notifySuccess('Etiqueta creada correctamente');
       setValue("name", "");
+      queryClient.invalidateQueries({ queryKey: ["labelsTypes"] });
     },
     onError: (error) => {
       notifyError("Error al crear etiqueta.");
@@ -30,16 +32,46 @@ export default function CreateLabel() {
     },
   });
 
+  // mutation to update
+  const { mutate: updateMutate } = useMutation({
+    mutationFn: updateLabel,
+    onSuccess: () => {
+      notifySuccess('Etiqueta actualizada correctamente');
+      queryClient.invalidateQueries({ queryKey: ["labelsTypes"] });
+    },
+    onError: (error) => {
+      notifyError("Error al actualizar etiqueta.");
+      return error
+    },
+  });
 
-  const deleteLabel = (labelId: number) => {
-    notifySuccess("Etiqueta eliminada correctamente " + labelId);
+  // mutation to delete
+  const { mutate: deleteMutate } = useMutation({
+    mutationFn: deleteLabel,
+    onSuccess: () => {
+      notifySuccess("Etiqueta eliminada correctamente");
+      queryClient.invalidateQueries({ queryKey: ["labelsTypes"] });
+    },
+    onError: (error) => {
+      notifyError("Error al eliminar etiqueta.");
+      console.log(error)
+    },
+  });
+
+
+  const handleDelete = (labelId: number) => {
+    deleteMutate({ token, labelId });
+  }
+
+  const handleUpdate = (labelId: number, newName: string) => {
+    updateMutate({ token, labelId, name: newName, icon: null });
   }
 
   // creamos el usuario 
   const onSubmit = ({ name }: { name: string }) => {
     const trimmedName = name.trim();
 
-    mutate({
+    createMutate({
       token,
       name: trimmedName,
       icon: null,
@@ -55,12 +87,12 @@ export default function CreateLabel() {
         <div className="flex items-center flex-wrap gap-x-4 gap-y-2 ms-2">
           {
             labelsTypes?.map((labelType) => (
-              <div className="bg-primary rounded-md flex items-center gap-2" key={labelType.labelId}>
-                <h1 className="text-sm px-2 text-primary-black font-semibold">{labelType.name}</h1>
-                <button type="button" onClick={() => deleteLabel(labelType.labelId)} className="text-primary-black h-8 w-10 flex items-center justify-center rounded-r-md bg-system-error">
-                  <TrashSvg />
-                </button>
-              </div>
+              <EditableItem
+                key={labelType.labelId}
+                initialValue={labelType.name}
+                onSave={(newName) => handleUpdate(labelType.labelId, newName)}
+                onDelete={() => handleDelete(labelType.labelId)}
+              />
             ))
           }
         </div>

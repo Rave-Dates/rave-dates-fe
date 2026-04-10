@@ -1,13 +1,13 @@
 "use client";
 
 import ArrowDownSvg from "@/components/svg/ArrowDown";
-import TrashSvg from "@/components/svg/TrashSvg";
+import EditableItem from "@/components/ui/EditableItem";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
-import { getAllEvents } from "@/services/admin-events";
-import { createTicketType } from "@/services/admin-parameters";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { editTicketTypes, getAllEvents } from "@/services/admin-events";
+import { createTicketType, deleteTicketType } from "@/services/admin-parameters";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -25,19 +25,48 @@ export default function CreateTicketType() {
   });
   const { getCookie } = useReactiveCookiesNext();
   const [selectedPreviewEvent, setSelectedPreviewEvent] = useState<number>(1);
+  const queryClient = useQueryClient();
 
   const token = getCookie("token");
 
-  const { mutate } = useMutation({
+  // mutation to create
+  const { mutate: createMutate } = useMutation({
     mutationFn: createTicketType,
     onSuccess: () => {
       notifySuccess('Tipo de ticket creado correctamente'); 
       setValue("name", "");
       setValue("eventId", undefined);
       setValue("maxDate", "");
+      queryClient.invalidateQueries({ queryKey: ["ticketTypes", selectedPreviewEvent] });
     },
     onError: (error) => {
       notifyError("Error al crear tipo de ticket.");
+      console.log(error)
+    },
+  });
+
+  // mutation to update
+  const { mutate: updateMutate } = useMutation({
+    mutationFn: ({token, data, id}: {token: any, data: IEventTicket, id: number}) => editTicketTypes(token, data, id),
+    onSuccess: () => {
+      notifySuccess('Tipo de ticket actualizado correctamente');
+      queryClient.invalidateQueries({ queryKey: ["ticketTypes", selectedPreviewEvent] });
+    },
+    onError: (error) => {
+      notifyError("Error al actualizar tipo de ticket.");
+      console.log(error)
+    },
+  });
+
+  // mutation to delete
+  const { mutate: deleteMutate } = useMutation({
+    mutationFn: deleteTicketType,
+    onSuccess: () => {
+      notifySuccess("Tipo de ticket eliminado correctamente");
+      queryClient.invalidateQueries({ queryKey: ["ticketTypes", selectedPreviewEvent] });
+    },
+    onError: (error) => {
+      notifyError("Error al eliminar tipo de ticket.");
       console.log(error)
     },
   });
@@ -60,14 +89,19 @@ export default function CreateTicketType() {
       maxDate: trimmedMaxDate,
     };
     
-    mutate({
+    createMutate({
       token,
       data: formattedData,
     });
   };
 
-  const deleteTicketType = (ticketTypeId: number) => {
-    notifySuccess("Tipo de ticket eliminado correctamente " + ticketTypeId);
+  const handleDelete = (ticketTypeId: number) => {
+    deleteMutate({ token, ticketTypeId });
+  }
+
+  const handleUpdate = (ticketType: IEventTicket, newName: string) => {
+    const updatedTicket = { ...ticketType, name: newName };
+    updateMutate({ token, data: updatedTicket, id: ticketType.ticketTypeId ?? 0 });
   }
 
   return (
@@ -110,16 +144,12 @@ export default function CreateTicketType() {
           {
             ticketTypes && ticketTypes.length > 0 ? (
               ticketTypes.map((ticketType: IEventTicket) => (
-                <div className="bg-primary rounded-md flex items-center gap-2 animate-fade-in" key={ticketType.ticketTypeId}>
-                  <h1 className="text-sm px-3 py-1 text-primary-black font-bold uppercase tracking-tight">{ticketType.name}</h1>
-                  <button 
-                    type="button"
-                    onClick={() => deleteTicketType(ticketType.ticketTypeId ?? 0)} 
-                    className="text-primary-black h-8 w-10 flex items-center justify-center rounded-r-md bg-system-error hover:bg-system-error/80 transition-colors"
-                  >
-                    <TrashSvg />
-                  </button>
-                </div>
+                <EditableItem
+                  key={ticketType.ticketTypeId}
+                  initialValue={ticketType.name}
+                  onSave={(newName) => handleUpdate(ticketType, newName)}
+                  onDelete={() => handleDelete(ticketType.ticketTypeId ?? 0)}
+                />
               ))
             ) : (
               <p className="text-sm text-text-inactive italic">No hay tipos de tickets para este evento</p>

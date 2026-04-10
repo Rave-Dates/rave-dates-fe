@@ -1,13 +1,13 @@
 "use client";
 
 import ArrowDownSvg from "@/components/svg/ArrowDown";
-import TrashSvg from "@/components/svg/TrashSvg";
+import EditableItem from "@/components/ui/EditableItem";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { useAdminAllCategories } from "@/hooks/admin/queries/useAdminData";
-import { createCategoryValue } from "@/services/admin-parameters";
-import { useMutation } from "@tanstack/react-query";
+import { createCategoryValue, deleteCategoryValue, updateCategoryValue } from "@/services/admin-parameters";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -21,17 +21,19 @@ export default function CreateCategoryValues() {
   });
   const { getCookie } = useReactiveCookiesNext();
   const [selectedPreviewCategory, setSelectedPreviewCategory] = useState<number>(1);
+  const queryClient = useQueryClient();
 
   const token = getCookie("token");
 
   const { categories } = useAdminAllCategories({ token });
 
-  const { mutate } = useMutation({
+  // mutation to create
+  const { mutate: createMutate } = useMutation({
     mutationFn: createCategoryValue,
     onSuccess: () => {
       notifySuccess('Valor de categoría creado correctamente'); 
       setValue("value", "");
-      setValue("categoryId", 1);
+      queryClient.invalidateQueries({ queryKey: ["oldCategories"] });
     },
     onError: (error) => {
       notifyError("Error al crear valor de categoría.");
@@ -39,13 +41,43 @@ export default function CreateCategoryValues() {
     },
   });
 
-  const deleteCategoryValue = (valueId: number) => {
-    notifySuccess("Valor de categoría eliminado correctamente " + valueId);
+  // mutation to update
+  const { mutate: updateMutate } = useMutation({
+    mutationFn: updateCategoryValue,
+    onSuccess: () => {
+      notifySuccess('Valor de categoría actualizado correctamente');
+      queryClient.invalidateQueries({ queryKey: ["oldCategories"] });
+    },
+    onError: (error) => {
+      notifyError("Error al actualizar valor de categoría.");
+      console.log(error)
+    },
+  });
+
+  // mutation to delete
+  const { mutate: deleteMutate } = useMutation({
+    mutationFn: deleteCategoryValue,
+    onSuccess: () => {
+      notifySuccess("Valor de categoría eliminado correctamente");
+      queryClient.invalidateQueries({ queryKey: ["oldCategories"] });
+    },
+    onError: (error) => {
+      notifyError("Error al eliminar valor de categoría.");
+      console.log(error)
+    },
+  });
+
+  const handleDelete = (valueId: number) => {
+    deleteMutate({ token, valueId });
+  }
+
+  const handleUpdate = (valueId: number, newValue: string) => {
+    updateMutate({ token, valueId, value: newValue, categoryId: selectedPreviewCategory });
   }
 
   const onSubmit = ({value, categoryId}: {value: string, categoryId: number}) => {
     const trimmedValue = value.trim();
-    mutate({
+    createMutate({
       token,
       value: trimmedValue,
       categoryId,
@@ -88,16 +120,12 @@ export default function CreateCategoryValues() {
           {
             currentPreviewCategory && currentPreviewCategory.values.length > 0 ? (
               currentPreviewCategory.values.map((val) => (
-                <div className="bg-primary rounded-md flex items-center gap-2 animate-fade-in" key={val.valueId}>
-                  <h1 className="text-sm px-2 text-primary-black font-semibold">{val.value}</h1>
-                  <button 
-                    type="button" 
-                    onClick={() => deleteCategoryValue(val.valueId)} 
-                    className="text-primary-black h-8 w-10 flex items-center justify-center rounded-r-md bg-system-error hover:bg-system-error/80 transition-colors"
-                  >
-                    <TrashSvg />
-                  </button>
-                </div>
+                <EditableItem
+                  key={val.valueId}
+                  initialValue={val.value}
+                  onSave={(newValue) => handleUpdate(val.valueId, newValue)}
+                  onDelete={() => handleDelete(val.valueId)}
+                />
               ))
             ) : (
               <p className="text-sm text-text-inactive italic">No hay valores para esta categoría</p>
