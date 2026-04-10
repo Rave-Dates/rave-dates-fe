@@ -8,7 +8,7 @@ import { notifyError, notifySuccess } from "@/components/ui/toast-notifications"
 import { editTicketTypes, getAllEvents } from "@/services/admin-events";
 import { createTicketType, deleteTicketType } from "@/services/admin-parameters";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useReactiveCookiesNext } from "cookies-next";
+import { CookieValueTypes, useReactiveCookiesNext } from "cookies-next";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -47,7 +47,7 @@ export default function CreateTicketType() {
 
   // mutation to update
   const { mutate: updateMutate } = useMutation({
-    mutationFn: ({token, data, id}: {token: any, data: IEventTicket, id: number}) => editTicketTypes(token, data, id),
+    mutationFn: ({token, data, id}: {token: CookieValueTypes, data: IEventTicket, id: number}) => editTicketTypes(token, data, id),
     onSuccess: () => {
       notifySuccess('Tipo de ticket actualizado correctamente');
       queryClient.invalidateQueries({ queryKey: ["ticketTypes", selectedPreviewEvent] });

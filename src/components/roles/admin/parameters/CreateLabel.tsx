@@ -7,7 +7,6 @@ import { useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
 import { createLabel, deleteLabel, updateLabel } from "@/services/admin-parameters";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
-import React from "react";
 import { useForm } from "react-hook-form";
 
 export default function CreateLabel() {
@@ -89,7 +88,7 @@ export default function CreateLabel() {
             labelsTypes?.map((labelType) => (
               <EditableItem
                 key={labelType.labelId}
-                initialValue={labelType.name}
+                initialValue={labelType.name || ""}
                 onSave={(newName) => handleUpdate(labelType.labelId, newName)}
                 onDelete={() => handleDelete(labelType.labelId)}
               />
