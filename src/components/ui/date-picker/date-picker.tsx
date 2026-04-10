@@ -43,7 +43,7 @@ export default function DatePicker({ value, onChange, title = "Fecha*", classNam
 
   return (
     <div className="w-full flex flex-col gap-y-2">
-      <label className="text-primary-white text-body font-medium">
+      <label className="text-primary-white text-xs font-medium">
         {title}
       </label>
       <Popover open={open} onOpenChange={setOpen}>

@@ -24,6 +24,25 @@ export default function Page() {
     updateEventFormData(defaultEventFormData);
   }, []);
 
+  const eventStatus = [
+    {
+      name: "Activo",
+      className: "bg-green-500"
+    },
+    {
+      name: "Inactivo",
+      className: "bg-orange-400"
+    },
+    {
+      name: "Finalizado",
+      className: "bg-gray-400"
+    }
+  ];
+
+  const isEventPast = (date: string) => {
+    return new Date(date).getTime() > new Date().getTime();
+  }
+
   return (
     <div className="w-full flex flex-col gap-y-5 bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
       <Link
@@ -32,10 +51,22 @@ export default function Page() {
       >
         Nuevo evento
       </Link>
+
+      <div className="flex gap-x-2 mx-auto">
+        {eventStatus.map((status) => (
+          <div
+            key={status.name}
+            className="px-2 text-sm py-1 rounded-md flex items-center gap-x-2"
+          >
+            <div className={`h-2 w-2 ${status.className} rounded-full`}></div>
+            {status.name}
+          </div>
+        ))}
+      </div>
       <div>
         <div className="max-w-xl mx-auto animate-fade-in">
           {/* Users Table/List */}
-          <div className="rounded-md overflow-hidden mt-5">
+          <div className="rounded-md overflow-hidden mt-2">
           {/* Table Header */}
           <div className="grid grid-cols-[1fr_1fr_1fr_1.5fr] border-b border-divider text-text-inactive gap-x-2 text-xs py-2 px-3">
             <div className="text-start">Fecha</div>
@@ -49,16 +80,27 @@ export default function Page() {
             {allEvents?.map((data) => (
               <div
                 key={data.eventId}
-                className="grid grid-cols-[1fr_1fr_1fr_1.5fr] items-center py-3 px-3 gap-x-2 text-xs"
+                className={`grid grid-cols-[1fr_1fr_1fr_0.1fr_1.2fr] items-center py-3 px-3 gap-x-2 text-xs ${isEventPast(data.date) ? "text-white" : "text-white/60"}`}
               >
                 <div className="text-start flex flex-col">
                   <h3>{formatDateToColombiaTime(data.date).date} {formatDateToColombiaTime(data.date).time}hs</h3>
                 </div>
                 <div className="text-center tabular-nums">{data.title}</div>
                 <div className="text-center tabular-nums">{extractPlaceFromGeo(data.geo) || data.geo}</div>
+                <div className="text-center tabular-nums">
+                  {
+                    isEventPast(data.date) ?
+                    data.isActive ? 
+                    <div className="h-2 w-2 bg-green-500 rounded-full"></div> 
+                    :
+                    <div className="h-2 w-2 bg-orange-400 rounded-full"></div>
+                    :
+                    <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
+                  }
+                </div>
                 <div className="flex justify-end gap-x-2">
                   {
-                    new Date(data.date).getTime() > new Date().getTime() &&
+                    isEventPast(data.date) &&
                     <Link
                       href={`/admin/events/edit-event/${data.eventId}`}
                       className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-black"

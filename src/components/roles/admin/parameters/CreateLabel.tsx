@@ -48,7 +48,7 @@ export default function CreateLabel() {
 
   return (
     <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
-      <h1 className="text-xl font-semibold mb-4">Crear etiqueta</h1>
+      <h1 className="text-2xl font-semibold mb-4">Crear etiqueta</h1>
       
       <div className="flex flex-col items-start my-3">
         <p className="w-34 mb-3">Etiquetas activas:</p>

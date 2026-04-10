@@ -1,9 +1,12 @@
 "use client";
 
+import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 import AddSvg from "@/components/svg/AddSvg";
 import CheckSvg from "@/components/svg/CheckSvg";
 import SpinnerSvg from "../svg/SpinnerSvg";
+
+import { translateError } from "@/utils/translateError";
 
 export const notifySuccess = (message: string) => {
   toast(message, {
@@ -31,7 +34,7 @@ export const notifyError = (message: string | React.ReactNode, duration?: number
   });
 };
 
-export const notifyPending = (promise: Promise<string>, options?: {  loading?: string, success?: string, error?: string }) => {
+export const notifyPending = (promise: Promise<unknown>, options?: {  loading?: string, success?: string, error?: string }) => {
   toast.promise(promise, {
     loading: (
       <div className="flex items-center gap-2">
@@ -45,12 +48,30 @@ export const notifyPending = (promise: Promise<string>, options?: {  loading?: s
         {options?.success || "Operación completada correctamente"}
       </div>
     ),
-    error: () => (
-      <div className="flex items-center gap-2">
-        <AddSvg className="text-system-error text-xl rotate-45" />
-        {options?.error || "Ocurrió un error"}
-      </div>
-    ),
+    error: (err: unknown) => {
+      let rawMessage = "";
+
+      if (typeof err === "string") {
+        rawMessage = err;
+      } else if (axios.isAxiosError(err)) {
+        rawMessage = (err as AxiosError<{ message: string }>).response?.data?.message || err.message;
+      } else if (err instanceof Error) {
+        rawMessage = err.message;
+      }
+
+      const translated = translateError(rawMessage);
+      
+      // Si el mensaje fue traducido satisfactoriamente, lo mostramos.
+      // Si no, usamos el mensaje amigable de las opciones (fallback).
+      const displayMessage = (rawMessage && translated !== rawMessage ? translated : options?.error) || "Ocurrió un error";
+
+      return (
+        <div className="flex items-center gap-2">
+          <AddSvg className="text-system-error text-xl rotate-45" />
+          {displayMessage}
+        </div>
+      )
+    },
     className: "bg-primary-black",
     style: {
       backgroundColor: "#151515",

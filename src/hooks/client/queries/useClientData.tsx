@@ -76,7 +76,7 @@ export function useClientAllEvents({
     isError,
     isFetching,
   } = useQuery<IEvent[], Error>({
-    queryKey: ["clientEvents", limit, filters],
+    queryKey: ["clientEvents", page, limit, filters],
     queryFn: () => getAllClientEvents(page, limit, filters),
   });
 

@@ -131,7 +131,7 @@ export default function EditTicketConfiguration() {
 
     console.log("cleanedEventData",cleanedEventData)
 
-    // // funcion para editar evento
+    // funcion para editar evento
     notifyPending(
       new Promise((resolve, reject) => {
         editEvent({formData: cleanedEventData}, {
@@ -139,8 +139,8 @@ export default function EditTicketConfiguration() {
             resolve("");
             route.push("/admin/events");
           },
-          onError: (err) => {
-            console.log(err)
+          onError: (err: unknown) => {
+            console.log(err);
             reject(err);
             route.push("/admin/events");
           },

@@ -77,17 +77,13 @@ export function TicketCard({
   };
 
   return (
-    <div className={`bg-main-container rounded-lg p-4 space-y-4 h-68 ${stagesEnabled && "h-83"} transition-all duration-400`}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-white font-medium">Ticket {ticketNumber}</h3>
-        <button onClick={onDelete} className={`${isEditing && "hidden"} text-text-inactive active:text-system-error`}>
-          <TrashSvg />
-        </button>
-      </div>
-
+    <div className={`bg-main-container relative rounded-lg p-4 space-y-4 h-58 ${stagesEnabled && "h-73"} transition-all duration-300`}>
+      <button type="button" onClick={onDelete} className={`${isEditing && "hidden"} absolute right-0 top-0 text-primary-white px-2 py-1.5 rounded-bl-lg rounded-tr-lg bg-system-error`}>
+        <TrashSvg />
+      </button>
+      
       {/* Input Fields */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-3 mt-2">
         <input
           type="hidden"
           {...register(`tickets.${index}.ticketTypeId`)}
@@ -128,7 +124,7 @@ export function TicketCard({
         </div>
       </div>
 
-      <div className="space-y-3 w-full pointer-events-none">
+      <div className="space-y-3 w-full pointer-events-none pt-2">
         <div className="flex items-center justify-between">
           <span className="text-white text-sm">Etapas</span>
           <button

@@ -57,7 +57,7 @@ export default function ErrorStrings() {
         ¡Precaución!
       </h2>
       <p className="text-primary-white/60 text-sm mb-2">Modificar este campo puede causar problemas en la aplicación.</p>
-      <h1 className="text-xl font-semibold mb-3">Crear string de error</h1>
+      <h1 className="text-2xl font-semibold mb-3">Crear string de error</h1>
 
       <FormInput
         title="Input de email*"

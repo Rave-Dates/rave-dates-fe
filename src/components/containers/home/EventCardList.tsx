@@ -9,10 +9,6 @@ import { useEventStore } from "@/store/useEventStore";
 const EventCardList: React.FC = () => {
   const { filters, setEvents } = useEventStore();
 
-  useEffect(() => {
-    console.log(filters)
-  }, [filters])
-  
   const [page, setPage] = useState(1);
   const limit = 10;
   const { 
@@ -21,25 +17,14 @@ const EventCardList: React.FC = () => {
     isError,
     isFetching
   } = useClientAllEvents({page, limit}); 
-  
+
   const clientEvents = (data ?? []) as IEvent[];
 
   useEffect(() => {
-    console.log(clientEvents);
-  }, [clientEvents]);
-
-  useEffect(() => {
-    if (!data) return;
-    async function loadEvents() {
-      setEvents({ events: data! });
+    if (data) {
+      setEvents({ events: data });
     }
-
-    loadEvents();
-  }, [data]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [filters]);
+  }, [data, setEvents]);
 
   return (
     <div className="py-8 pb-40 sm:pb-8 sm:pt-[7.5rem] bg-primary-black mx-auto px-6">

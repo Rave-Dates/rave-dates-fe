@@ -72,15 +72,15 @@ export default function CreateTicketType() {
 
   return (
     <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
-      <h1 className="text-xl font-semibold mb-4">Crear tipo de ticket</h1>
+      <h1 className="text-2xl font-semibold mb-4">Crear tipo de ticket</h1>
       
       <div className="flex flex-col items-start my-3">
         
-        <p className="w-34 mb-3 text-sm font-medium">Tipos de tickets activos:</p>
+        <p className="mb-3 text-sm font-medium">Ver tipos de ticket activos:</p>
         <div className="relative w-full">
           <label
             htmlFor="preview-event-select"
-            className={`block mb-2 text-xs text-primary-white/60`}
+            className="block mb-2 text-xs text-primary-white/60"
           >
             Vista previa por evento
           </label>
@@ -89,7 +89,7 @@ export default function CreateTicketType() {
               id="preview-event-select"
               onChange={(e) => setSelectedPreviewEvent(Number(e.target.value))}
               value={selectedPreviewEvent}
-              className="w-full appearance-none mt-1 bg-input border outline-none border-divider rounded-lg py-3 px-4 text-white relative transition-colors focus:border-primary/50"
+              className="w-full appearance-none mt-1 bg-main-container outline-none rounded-lg py-3 px-4 text-white relative transition-colors focus:border-primary/50"
             >
               {
                 events?.map((event) => (
@@ -102,11 +102,11 @@ export default function CreateTicketType() {
                 ))
               }
             </select>
-            <ArrowDownSvg className="pointer-events-none absolute right-4 top-1/2 mt-1 -translate-y-1/2 text-gray-500" />
+            <ArrowDownSvg className="pointer-events-none absolute right-4 top-1/2 mt-1 -translate-y-1/2" />
           </div>
         </div>
 
-        <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-4">
+        <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-4 mb-4">
           {
             ticketTypes && ticketTypes.length > 0 ? (
               ticketTypes.map((ticketType: IEventTicket) => (
