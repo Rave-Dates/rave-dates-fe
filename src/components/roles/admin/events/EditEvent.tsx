@@ -73,7 +73,7 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       maxPurchase: event.maxPurchase,
       geo: extractLatAndLng(event.geo),
       place: extractPlaceFromGeo(event.geo),
-      description: event.description,
+      description: event.description || "",
       transferCost: event.transferCost,
       feePB: event.feePB,
       type: event.type,
@@ -248,9 +248,9 @@ useEffect(() => {
       <EventImageSwiper isErrorEventImages={isErrorEventImages} isError={errorImages} isLoading={loadingImages} setImages={setValue} images={watchedImages} />
 
       <FormInput
-        title="Información general*"
+        title="Información general"
         inputName="description"
-        register={register("description", { required: "La descripción es obligatoria"  })}
+        register={register("description")}
       />
 
        { 

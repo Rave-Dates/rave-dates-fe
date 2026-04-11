@@ -85,7 +85,10 @@ export default function CreateUser() {
 
       <FormDropDown
         title="Rol*"
-        register={register("roleId", { required: true, valueAsNumber: true })}
+        register={register("roleId", { 
+          required: true, 
+          setValueAs: (v) => v === "" ? undefined : Number(v) 
+        })}
       >
         {
           roles?.map((role: IRole) => (

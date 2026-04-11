@@ -120,7 +120,10 @@ const EditUser = ({ userId } : { userId: number }) => {
             type='number'
             title="Número de celular*"
             inputName="phone"
-            register={register("phone", { required: true, valueAsNumber: true })}
+            register={register("phone", { 
+              required: true, 
+              setValueAs: (v) => v === "" ? undefined : Number(v) 
+            })}
           />
         }
         <FormInput
@@ -131,7 +134,10 @@ const EditUser = ({ userId } : { userId: number }) => {
         />
         <FormDropDown
           title="Rol*"
-          register={register("roleId", { required: true, valueAsNumber: true })}
+          register={register("roleId", { 
+            required: true, 
+            setValueAs: (v) => v === "" ? undefined : Number(v) 
+          })}
           value={roleId?.toString()}
         >
           {

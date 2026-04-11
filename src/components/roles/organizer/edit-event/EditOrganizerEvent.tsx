@@ -82,7 +82,7 @@ export default function EditOrganizerEvent({ eventId }: { eventId: number }) {
       maxPurchase: event.maxPurchase,
       geo: extractLatAndLng(event.geo),
       place: extractPlaceFromGeo(event.geo),
-      description: event.description,
+      description: event.description || "",
       transferCost: event.transferCost,
       feePB: event.feePB,
       type: event.type,
@@ -229,7 +229,7 @@ useEffect(() => {
       subtitle: data.subtitle || "",
       date: formattedTimeUTC,
       geo: formattedGeo,
-      description: data.description,
+      description: data.description || "",
       type: data.type,
       isActive: data.isActive,
       feeRD: data.feeRD,
@@ -339,9 +339,9 @@ useEffect(() => {
       <EventImageSwiper isErrorEventImages={isErrorEventImages} isError={errorImages} isLoading={loadingImages} setImages={setValue} images={watchedImages} />
 
       <FormInput
-        title="Información general*"
+        title="Información general"
         inputName="description"
-        register={register("description", { required: "La descripción es obligatoria"  })}
+        register={register("description")}
       />
 
        <h1 className="font-semibold text-3xl mt-8">Configura los tickets</h1> 
@@ -355,7 +355,10 @@ useEffect(() => {
         <FormInput
           title="Cantidad*"
           inputName="quantity"
-          register={register("tickets.0.stages.0.quantity", { required: "La cantidad es obligatoria", valueAsNumber: true })}
+          register={register("tickets.0.stages.0.quantity", { 
+            required: "La cantidad es obligatoria", 
+            setValueAs: (v) => v === "" ? undefined : Number(v) 
+          })}
         />
        </div>
         <div className="flex gap-x-5">

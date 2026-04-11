@@ -67,7 +67,7 @@ export default function Page() {
       time: eventFormData.time,
       geo: eventFormData.geo,
       editPlace: eventFormData.editPlace,
-      description: eventFormData.description,
+      description: eventFormData.description || "",
       type: eventFormData.type,
       labels: eventFormData.labels || [],
       images: eventFormData.images,
@@ -126,7 +126,7 @@ export default function Page() {
         inputName="subtitle"
         register={register("subtitle")}
       />
-      <div className="w-full gap-x-5 flex justify-between">
+      <div className="w-full gap-x-3 flex justify-between">
         <Controller
           name="date"
           control={control}
@@ -167,9 +167,9 @@ export default function Page() {
       <EventImageSwiper setImages={setValue} images={watchedImages} />
 
       <FormInput
-        title="Información general*"
+        title="Información general"
         inputName="description"
-        register={register("description", { required: "La descripción es obligatoria"  })}
+        register={register("description")}
       />
 
        { 

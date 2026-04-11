@@ -42,7 +42,7 @@ export default function DatePicker({ value, onChange, title = "Fecha*", classNam
   };
 
   return (
-    <div className="w-full flex flex-col gap-y-2">
+    <div className="w-full flex flex-col gap-y-2 flex-1 min-w-0">
       <label className="text-primary-white text-xs font-medium">
         {title}
       </label>
@@ -51,13 +51,15 @@ export default function DatePicker({ value, onChange, title = "Fecha*", classNam
           <Button
             variant="outline"
             className={cn(
-              "w-full justify-start text-left font-normal bg-main-container border-none h-[56px] rounded-lg text-primary-white hover:bg-input hover:text-primary-white focus:ring-1 focus:ring-primary",
+              "w-full justify-start text-left font-normal bg-main-container border-none h-[56px] rounded-lg text-primary-white hover:bg-input hover:text-primary-white focus:ring-1 focus:ring-primary overflow-hidden",
               className,
               !value && "text-muted-foreground"
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {selectedDate ? format(selectedDate, "PPP", { locale: es }) : <span>Fecha</span>}
+            <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+            <span className="truncate">
+              {selectedDate ? format(selectedDate, "PPP", { locale: es }) : "Fecha"}
+            </span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">

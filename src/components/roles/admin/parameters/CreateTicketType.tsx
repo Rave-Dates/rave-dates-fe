@@ -167,7 +167,10 @@ export default function CreateTicketType() {
         />
         <FormDropDown
           title="Evento*"
-          register={register(`eventId`, { required: true, valueAsNumber: true })}
+          register={register(`eventId`, { 
+            required: true, 
+            setValueAs: (v) => v === "" ? undefined : Number(v) 
+          })}
         >
           {
             events?.map((event) => (

@@ -15,12 +15,12 @@ export function InputTime({ value = "00:00", onChange, title = "Hora (COL)*" }: 
   };
 
   return (
-    <div className="w-full flex flex-col gap-y-2">
+    <div className="w-full flex flex-col gap-y-2 flex-1 min-w-0">
       <label className="text-primary-white text-xs font-medium">
         {title}
       </label>
       <input 
-        className="w-full cursor-pointer bg-main-container hover:bg-input transition-all py-4 px-4 rounded-lg text-primary-white border-none outline-none focus:ring-1 focus:ring-primary h-[56px] scheme-dark" 
+        className="w-full cursor-pointer bg-main-container hover:bg-input transition-all py-4 px-3 rounded-lg text-primary-white border-none outline-none focus:ring-1 focus:ring-primary h-[56px] scheme-dark text-sm" 
         type="time" 
         value={value} 
         onChange={handleTimeChange} 

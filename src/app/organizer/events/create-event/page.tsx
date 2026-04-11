@@ -73,7 +73,7 @@ export default function Page() {
       time: eventFormData.time,
       geo: eventFormData.geo,
       editPlace: eventFormData.editPlace,
-      description: eventFormData.description,
+      description: eventFormData.description || "",
       type: "free",
       labels: eventFormData.labels || [],
       images: eventFormData.images,
@@ -142,7 +142,7 @@ export default function Page() {
       subtitle: data.subtitle || "",
       date: formatColombiaTimeToUTC(validDate),
       geo: formattedGeo,
-      description: data.description,
+      description: data.description || "",
       type: data.type,
       isActive: data.isActive,
       feeRD: data.feeRD,
@@ -190,7 +190,7 @@ export default function Page() {
         register={register("subtitle")}
       />
       
-      <div className="w-full gap-x-5 flex justify-between">
+      <div className="w-full gap-x-3 flex justify-between">
         <Controller
           name="date"
           control={control}
@@ -232,9 +232,9 @@ export default function Page() {
       <EventImageSwiper setImages={setValue} images={watchedImages} />
 
       <FormInput
-        title="Información general*"
+        title="Información general"
         inputName="description"
-        register={register("description", { required: "La descripción es obligatoria"  })}
+        register={register("description")}
       />
 
        <h1 className="font-semibold text-3xl mt-8">Configura los tickets</h1> 
@@ -248,10 +248,13 @@ export default function Page() {
         <FormInput
           title="Cantidad*"
           inputName="quantity"
-          register={register("tickets.0.stages.0.quantity", { required: "La cantidad es obligatoria", valueAsNumber: true })}
+          register={register("tickets.0.stages.0.quantity", { 
+            required: "La cantidad es obligatoria", 
+            setValueAs: (v) => v === "" ? undefined : Number(v) 
+          })}
         />
        </div>
-        <div className="flex gap-x-5">
+        <div className="flex gap-x-3">
           <FormInput
             className="!bg-cards-container"
             title="Fecha inicio"

@@ -38,6 +38,7 @@ export function StageCard({
             className="bg-cards-container!"
             title="Cantidad"
             inputName="quantity"
+            labelClassname="block h-8 sm:h-auto"
             register={register(`stages.${index}.quantity`, { 
               required: true, 
               setValueAs: (v) => v === "" ? undefined : Number(v) 
@@ -47,7 +48,9 @@ export function StageCard({
             type="number"
             className="bg-cards-container!"
             title="Precio"
+            typeOfValue="$"
             inputName="price"
+            labelClassname="block h-8 sm:h-auto"
             register={register(`stages.${index}.price`, { 
               required: true, 
               setValueAs: (v) => v === "" ? undefined : Number(v) 
@@ -57,6 +60,7 @@ export function StageCard({
             type="number"
             className="bg-cards-container!"
             title="Comisión de promotor"
+            labelClassname="block h-8 sm:h-auto"
             typeOfValue="$"
             inputName="promoterFee"
             register={register(`stages.${index}.promoterFee`, { 

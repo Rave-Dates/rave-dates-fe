@@ -45,7 +45,7 @@ export default function FreeTicketConfiguration() {
       subtitle: data.subtitle,
       date: formatColombiaTimeToUTC(validDate),
       geo: formattedGeo,
-      description: data.description,
+      description: data.description || "",
       type: data.type,
       isActive: data.isActive,
       feeRD: data.feeRD,
@@ -97,7 +97,10 @@ export default function FreeTicketConfiguration() {
               <FormInput
                 title="Cantidad"
                 inputName="quantity"
-                register={register("tickets.0.stages.0.quantity", { required: "La cantidad es obligatoria", valueAsNumber: true })}
+                register={register("tickets.0.stages.0.quantity", { 
+                  required: "La cantidad es obligatoria", 
+                  setValueAs: (v) => v === "" ? undefined : Number(v) 
+                })}
               />
             </div>
               <div className="w-full gap-x-5 flex justify-between">

@@ -74,7 +74,7 @@ export default function TicketConfiguration() {
       subtitle: data.subtitle,
       date: formatColombiaTimeToUTC(validDate),
       geo: formattedGeo,
-      description: data.description,
+      description: data.description || "",
       type: data.type,
       isActive: data.isActive,
       feeRD: data.feeRD,
@@ -201,7 +201,6 @@ export default function TicketConfiguration() {
                 inputName="feeRD"
                 typeOfValue="%"
                 register={register("feeRD", {
-                  required: "La comisión RD es obligatoria (Max: 100%)", 
                   setValueAs: (v) => v === "" ? undefined : Number(v), 
                   max: 100
                 })}
@@ -212,7 +211,6 @@ export default function TicketConfiguration() {
                 inputName="feePB" 
                 typeOfValue="%"
                 register={register("feePB", { 
-                  required: "La comisión de alcancía es obligatoria (Max: 100%)", 
                   setValueAs: (v) => v === "" ? undefined : Number(v), 
                   max: 100 
                 })} 
@@ -221,9 +219,9 @@ export default function TicketConfiguration() {
             <div className="flex flex-col xs:flex-row gap-x-5">
               <FormInput
                 title="Costo transferencia de ticket"
+                labelClassname="whitespace-nowrap"
                 inputName="transferCost"
                 register={register("transferCost", {
-                  required: "El costo de transferencia es obligatorio", 
                   setValueAs: (v) => v === "" ? undefined : Number(v)
                 })}
               />

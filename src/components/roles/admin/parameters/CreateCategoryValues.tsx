@@ -143,7 +143,10 @@ export default function CreateCategoryValues() {
 
         <FormDropDown
           title="Categoría*"
-          register={register(`categoryId`, { required: true, valueAsNumber: true })}
+          register={register(`categoryId`, { 
+            required: true, 
+            setValueAs: (v) => v === "" ? undefined : Number(v) 
+          })}
         >
           {
             categories?.map((category) => (

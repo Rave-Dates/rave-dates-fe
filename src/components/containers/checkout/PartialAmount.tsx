@@ -29,7 +29,7 @@ export default function PartialAmount({ register, totalAmount, partialAmount, ev
           inputName="partialAmount" 
           typeOfValue="$"
           register={register("partialAmount", {
-            valueAsNumber: true,
+            setValueAs: (v) => v === "" ? undefined : Number(v),
             required: "La cantidad parcial es obligatoria",
             min: MIN_AMOUNT,
           })}

@@ -108,6 +108,7 @@ export function TicketCard({
           type="number"
           className="bg-cards-container! py-1!"
           title="Precio"
+          typeOfValue="$"
           inputName="price"
           register={register(`tickets.${index}.stages.0.price`, { 
             required: "El precio es obligatorio", 
