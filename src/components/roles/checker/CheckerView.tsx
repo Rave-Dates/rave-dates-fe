@@ -13,6 +13,8 @@ import { jwtDecode } from "jwt-decode"
 import { useEffect, useMemo, useState } from "react"
 import { useReactiveCookiesNext } from "cookies-next"
 import { notifyError } from "@/components/ui/toast-notifications"
+import ConfirmationModal from "@/components/ui/modals/ConfirmationModal"
+import LogoutSvg from "@/components/svg/LogoutSvg"
 
 export default function ControllerEventDetails() {
   const { getCookie, setCookie } = useReactiveCookiesNext();
@@ -108,6 +110,24 @@ console.log(checker)
   return (
     <div className="bg-primary-black min-h-screen flex flex-col text-primary-white pt-10 rounded-lg p-4 items-center">
       <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3" />
+      <div className="absolute top-10 right-5">
+        <ConfirmationModal
+          isLogout
+          title="Cerrar Sesión"
+          description="¿Estás seguro de que quieres cerrar tu sesión actual?"
+          confirmText="Cerrar Sesión"
+          showModal={true}
+          trigger={
+            <button
+              type="button"
+              className="bg-system-error text-primary-black text-2xl p-2.5 rounded-lg flex items-center justify-center text-center transition-all active:scale-95"
+              aria-label="Desloguearse"
+            >
+              <LogoutSvg />
+            </button>
+          }
+        />
+      </div>
 
       <div className="flex py-4 px-5 w-full mt-16 bg-input rounded-lg flex-col items-start justify-center">
         {selectedEvent && !isEventLoading && (

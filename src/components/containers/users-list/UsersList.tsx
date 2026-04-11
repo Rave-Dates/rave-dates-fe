@@ -15,6 +15,7 @@ type Props = {
   searchTerm?: string;
   hasSearch?: boolean;
   results?: IUser[];
+  isLogout?: boolean;
 };
 
 export default function UsersList({
@@ -26,6 +27,7 @@ export default function UsersList({
   searchQuery,
   hasSearch = true,
   results,
+  isLogout = false,
 }: Props) {
   return (
     <div className="w-full bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
@@ -37,6 +39,7 @@ export default function UsersList({
             title="Cerrar Sesión"
             description="¿Estás seguro de que quieres cerrar tu sesión actual?"
             confirmText="Cerrar Sesión"
+            showModal={isLogout}
             trigger={
               <button
                 type="button"

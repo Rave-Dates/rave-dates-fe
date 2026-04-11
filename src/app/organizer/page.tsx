@@ -1,6 +1,8 @@
 "use client"
 
 import { OrganizerEventCard } from "@/components/roles/organizer/organizer-event/OrganizerEventCard"
+import LogoutSvg from "@/components/svg/LogoutSvg"
+import ConfirmationModal from "@/components/ui/modals/ConfirmationModal"
 import { useAdminBinnacles, useAdminUserById } from "@/hooks/admin/queries/useAdminData"
 import { useReactiveCookiesNext } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
@@ -32,9 +34,28 @@ export default function OrganizerHome() {
     <div className="bg-primary-black pt-14 text-primary-white min-h-screen pb-40 p-4">
       <div className="max-w-md mx-auto space-y-4">
         {/* Available Balance Header */}
-        <div className="space-y-1">
-          <h1 className="text-3xl font-semibold ">Disponible</h1>
-          <p className="text-primary text-2xl">COP ${getTotalAvalible()}</p>
+        <div className="flex w-full justify-between items-center">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-semibold ">Disponible</h1>
+            <p className="text-primary text-2xl">COP ${getTotalAvalible()}</p>
+          </div>
+
+          <ConfirmationModal
+            isLogout
+            title="Cerrar Sesión"
+            description="¿Estás seguro de que quieres cerrar tu sesión actual?"
+            confirmText="Cerrar Sesión"
+            showModal={true}
+            trigger={
+              <button
+                type="button"
+                className="bg-system-error text-primary-black text-2xl p-2.5 rounded-lg flex items-center justify-center text-center transition-all active:scale-95"
+                aria-label="Desloguearse"
+              >
+                <LogoutSvg />
+              </button>
+            }
+          />
         </div>
 
         {/* Event Cards */}
