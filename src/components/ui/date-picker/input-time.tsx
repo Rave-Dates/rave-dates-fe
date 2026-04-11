@@ -16,7 +16,7 @@ export function InputTime({ value = "00:00", onChange, title = "Hora (COL)*" }: 
 
   return (
     <div className="w-full flex flex-col gap-y-2">
-      <label className="text-primary-white text-body font-medium">
+      <label className="text-primary-white text-xs font-medium">
         {title}
       </label>
       <input 

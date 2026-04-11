@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter } from "next/navigation";
+import { notifySuccess } from "../toast-notifications";
 
 interface ConfirmationModalProps {
   trigger: React.ReactNode;
@@ -12,6 +13,7 @@ interface ConfirmationModalProps {
   onConfirm?: () => void;
   isLogout?: boolean;
   variant?: "danger" | "primary";
+  showModal?: boolean;
 }
 
 export default function ConfirmationModal({
@@ -22,6 +24,7 @@ export default function ConfirmationModal({
   onConfirm,
   isLogout = false,
   variant = "danger",
+  showModal = false,
 }: ConfirmationModalProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { deleteCookie } = useReactiveCookiesNext();
@@ -29,7 +32,9 @@ export default function ConfirmationModal({
 
   const handleConfirm = () => {
     if (isLogout) {
+      notifySuccess("Sesión cerrada correctamente");
       deleteCookie("token");
+      deleteCookie("isPromoter")
       router.push("/admin");
     }
 
@@ -54,7 +59,7 @@ export default function ConfirmationModal({
   }, [isModalOpen]);
 
   return (
-    <>
+    <div className={showModal ? "" : "hidden"}>
       <div onClick={() => setIsModalOpen(true)} className="cursor-pointer">
         {trigger}
       </div>
@@ -94,6 +99,6 @@ export default function ConfirmationModal({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
