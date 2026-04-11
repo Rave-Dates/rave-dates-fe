@@ -58,7 +58,7 @@ export default function FreeTicketConfiguration() {
       maxPurchase: data.maxPurchase,
       images: data.images,
       timeOut: data.timeOut,
-      labels: data.labels,
+      labels: data.labels || [],
       tickets: [validTickets[0]],
     };
 

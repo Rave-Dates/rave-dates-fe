@@ -80,7 +80,7 @@ export default function FreeTicketConfiguration() {
     const cleanedEventData = {
       eventId: eventFormData.eventId,
       title: data.title,
-      subtitle: data.subtitle,
+      subtitle: data.subtitle || "",
       date: formattedTimeUTC,
       geo: data.geo,
       description: data.description,
@@ -96,7 +96,7 @@ export default function FreeTicketConfiguration() {
       maxPurchase: data.maxPurchase,
       images: data.images,
       timeOut: data.timeOut,
-      labels: data.labels,
+      labels: data.labels || [],
       tickets: [formattedTickets[0]],
     }
 

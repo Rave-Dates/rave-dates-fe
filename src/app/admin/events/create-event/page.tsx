@@ -31,10 +31,7 @@ export default function Page() {
 
   const token = getCookie("token");
   
-  register("labels", {
-    validate: (value) =>
-      value && value.length > 0 ? true : "Debes seleccionar al menos una etiqueta",
-  });
+  register("labels");
 
   register("images", {
     validate: (value) =>
@@ -64,7 +61,7 @@ export default function Page() {
 
     const setters = {
       title: eventFormData.title,
-      subtitle: eventFormData.subtitle,
+      subtitle: eventFormData.subtitle || "",
       place: eventFormData.place,
       date: eventFormData.date,
       time: eventFormData.time,
@@ -72,7 +69,7 @@ export default function Page() {
       editPlace: eventFormData.editPlace,
       description: eventFormData.description,
       type: eventFormData.type,
-      labels: eventFormData.labels,
+      labels: eventFormData.labels || [],
       images: eventFormData.images,
     };
 
@@ -125,9 +122,9 @@ export default function Page() {
         register={register("title", { required: "El titulo es obligatorio"  })}
       />
       <FormInput
-        title="Subtítulo del evento*"
+        title="Subtítulo del evento"
         inputName="subtitle"
-        register={register("subtitle", { required: "El subtítulo es obligatorio"  })}
+        register={register("subtitle")}
       />
       <div className="w-full gap-x-5 flex justify-between">
         <Controller

@@ -31,10 +31,7 @@ export default function EditOrganizerEvent({ eventId }: { eventId: number }) {
   const { getCookie } = useReactiveCookiesNext();
   const { mutate: editEvent } = useEditEvent(reset);
 
-  register("labels", {
-    validate: (value) =>
-      value && value.length > 0 ? true : "Debes seleccionar al menos una etiqueta",
-  });
+  register("labels");
 
   register("images", {
     validate: (value) =>
@@ -76,7 +73,7 @@ export default function EditOrganizerEvent({ eventId }: { eventId: number }) {
     // Seteamos todo al formulario
     const setters = {
       title: event.title,
-      subtitle: event.subtitle,
+      subtitle: event.subtitle || "",
       discount: event.discount,
       discountCode: event.discountCode,
       feeRD: event.feeRD,
@@ -229,7 +226,7 @@ useEffect(() => {
     const cleanedEventData = {
       eventId: eventFormData.eventId,
       title: data.title,
-      subtitle: data.subtitle,
+      subtitle: data.subtitle || "",
       date: formattedTimeUTC,
       geo: formattedGeo,
       description: data.description,
@@ -245,7 +242,7 @@ useEffect(() => {
       maxPurchase: data.maxPurchase,
       images: data.images,
       timeOut: data.timeOut,
-      labels: data.labels,
+      labels: data.labels || [],
       tickets: [formattedTickets[0]],
       formPromoters: data.formPromoters
     }
@@ -294,9 +291,9 @@ useEffect(() => {
         register={register("title", { required: "El título es obligatorio"  })}
       />
       <FormInput
-        title="Subtítulo del evento*"
+        title="Subtítulo del evento"
         inputName="subtitle"
-        register={register("subtitle", { required: "El subtítulo es obligatorio"  })}
+        register={register("subtitle")}
       />
       
       <div className="w-full gap-x-5 flex justify-between">

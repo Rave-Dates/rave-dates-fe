@@ -124,7 +124,7 @@ export default function EditTicketConfiguration() {
       maxPurchase: data.maxPurchase,
       images: data.images,
       timeOut: data.timeOut,
-      labels: data.labels,
+      labels: data.labels || [],
       tickets: formattedTickets,
       piggyBank: data.piggyBank,
     }

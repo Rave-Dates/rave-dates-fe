@@ -87,7 +87,7 @@ export default function TicketConfiguration() {
       maxPurchase: data.maxPurchase,
       images: data.images,
       timeOut: data.timeOut,
-      labels: data.labels,
+      labels: data.labels || [],
       tickets: validTickets,
     };
 

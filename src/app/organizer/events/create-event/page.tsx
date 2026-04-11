@@ -39,10 +39,7 @@ export default function Page() {
   const token = getCookie("token");
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
   
-  register("labels", {
-    validate: (value) =>
-      value && value.length > 0 ? true : "Debes seleccionar al menos una etiqueta",
-  });
+  register("labels");
 
   register("images", {
     validate: (value) =>
@@ -70,7 +67,7 @@ export default function Page() {
 
     const setters = {
       title: eventFormData.title,
-      subtitle: eventFormData.subtitle,
+      subtitle: eventFormData.subtitle || "",
       place: eventFormData.place,
       date: eventFormData.date,
       time: eventFormData.time,
@@ -78,7 +75,7 @@ export default function Page() {
       editPlace: eventFormData.editPlace,
       description: eventFormData.description,
       type: "free",
-      labels: eventFormData.labels,
+      labels: eventFormData.labels || [],
       images: eventFormData.images,
       tickets: eventFormData.tickets,
       categories: eventFormData.categories,
@@ -142,7 +139,7 @@ export default function Page() {
     const cleanedEventData = {
       eventCategoryValues: formattedCategoryValues,
       title: data.title,
-      subtitle: data.subtitle,
+      subtitle: data.subtitle || "",
       date: formatColombiaTimeToUTC(validDate),
       geo: formattedGeo,
       description: data.description,
@@ -158,7 +155,7 @@ export default function Page() {
       maxPurchase: data.maxPurchase,
       images: data.images,
       timeOut: data.timeOut,
-      labels: data.labels,
+      labels: data.labels || [],
       organizerId: decoded?.organizerId || 0,
       tickets: [validTickets[0]],
       formPromoters: data.formPromoters,
@@ -188,9 +185,9 @@ export default function Page() {
         register={register("title", { required: "El titulo es obligatorio"  })}
       />
       <FormInput
-        title="Subtítulo del evento*"
+        title="Subtítulo del evento"
         inputName="subtitle"
-        register={register("subtitle", { required: "El subtítulo es obligatorio"  })}
+        register={register("subtitle")}
       />
       
       <div className="w-full gap-x-5 flex justify-between">
