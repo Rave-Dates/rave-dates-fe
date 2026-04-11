@@ -125,7 +125,7 @@ const EditUser = ({ userId } : { userId: number }) => {
         }
         <FormInput
           type="email"
-          title="Mail*"
+          title="Email*"
           inputName="email"
           register={register("email", { required: true, value: userById?.email })}
         />
@@ -152,7 +152,7 @@ const EditUser = ({ userId } : { userId: number }) => {
           userById?.role.name === "ORGANIZER" && 
           <FormInput
             type="number"
-            title="Entradas cortesia (una cada)*" 
+            title="Cortesía cada X ventas" 
             inputName="tickets"
             register={register("tickets")}
           />
@@ -170,7 +170,7 @@ const EditUser = ({ userId } : { userId: number }) => {
           type="submit"
           className="bg-primary text-black input-button"
         >
-          Editar
+          Guardar
         </button>
       </DefaultForm>
     </div>

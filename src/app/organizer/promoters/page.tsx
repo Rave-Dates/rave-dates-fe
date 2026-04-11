@@ -23,7 +23,7 @@ export default function UserManagement() {
       <div className="rounded-md overflow-hidden">
         {/* Table Header */}
         <div className="grid grid-cols-[2fr_1fr] border-b border-divider text-text-inactive gap-x-2 text-sm py-2 px-3">
-          <div className="text-start">Nombre y apellido</div>
+          <div className="text-start">Nombre</div>
           <div className="text-end">Acciones</div>
         </div>
 

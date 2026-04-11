@@ -60,7 +60,7 @@ export default function AddAttendee() {
       />
       <FormInput
         type="email"
-        title="Mail*"
+        title="Email*"
         inputName="email"
         register={register("email", { required: true })}
       />

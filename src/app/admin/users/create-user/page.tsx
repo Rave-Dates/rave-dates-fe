@@ -78,7 +78,7 @@ export default function CreateUser() {
         />
       <FormInput
         type="email"
-        title="Mail*"
+        title="Email*"
         inputName="email"
         register={register("email", { required: true })}
       />

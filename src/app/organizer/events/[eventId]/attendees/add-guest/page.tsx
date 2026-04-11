@@ -60,7 +60,7 @@ export default function AddGuest() {
       />
       <FormInput
         type="email"
-        title="Mail*"
+        title="Email*"
         inputName="email"
         register={register("email", { required: true })}
       />

@@ -135,7 +135,7 @@ export default function DataForm() {
   return (
     <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Ingresa tus datos">
       <FormInput
-        title="Nombre y apellido*"
+        title="Nombre*"
         inputName="name"
         register={register("name", { required: "El nombre es obligatorio"  })}
       />
