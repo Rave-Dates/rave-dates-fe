@@ -55,9 +55,9 @@ export function TicketCard({
               stageId: 1,
               date: "",
               dateMax: "",
-              price: ticket.stages?.[0]?.price ?? 0,
-              quantity: ticket.stages?.[0]?.quantity ?? 0,
-              promoterFee: ticket.stages?.[0]?.promoterFee ?? 0,
+              price: ticket.stages?.[0]?.price ?? undefined,
+              quantity: ticket.stages?.[0]?.quantity ?? undefined,
+              promoterFee: ticket.stages?.[0]?.promoterFee ?? undefined,
             },
           ],
     }));
@@ -95,17 +95,24 @@ export function TicketCard({
           register={register(`tickets.${index}.name`, { required: "El nombre es obligatorio" })}
         />
         <FormInput
+          type="number"
           className="bg-cards-container! py-1!"
           title="Cantidad"
           inputName="quantity"
-          register={register(`tickets.${index}.stages.0.quantity`, { required: "La cantidad es obligatoria", valueAsNumber: true })}
+          register={register(`tickets.${index}.stages.0.quantity`, { 
+            required: "La cantidad es obligatoria", 
+            setValueAs: (v) => v === "" ? undefined : Number(v) 
+          })}
         />
         <FormInput
           type="number"
           className="bg-cards-container! py-1!"
           title="Precio"
           inputName="price"
-          register={register(`tickets.${index}.stages.0.price`, { required: "El precio es obligatorio", valueAsNumber: true})}
+          register={register(`tickets.${index}.stages.0.price`, { 
+            required: "El precio es obligatorio", 
+            setValueAs: (v) => v === "" ? undefined : Number(v) 
+          })}
         />
         <div className="col-span-3"> 
           <Controller

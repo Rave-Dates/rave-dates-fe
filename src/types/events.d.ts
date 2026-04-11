@@ -133,9 +133,9 @@ interface IEventStages {
   stageId?: number;
   date: string;
   dateMax: string;
-  price: number;
-  quantity: number;
-  promoterFee: number;
+  price: number | undefined;
+  quantity: number | undefined;
+  promoterFee: number | undefined;
   feeType?: "percentage" | "fixed";
 }
 

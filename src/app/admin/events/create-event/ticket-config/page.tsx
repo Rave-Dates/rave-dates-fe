@@ -200,27 +200,41 @@ export default function TicketConfiguration() {
                 title="Comisión Rave Dates"
                 inputName="feeRD"
                 typeOfValue="%"
-                register={register("feeRD", {required: "La comisión RD es obligatoria (Max: 100%)", valueAsNumber: true, max: 100})}
+                register={register("feeRD", {
+                  required: "La comisión RD es obligatoria (Max: 100%)", 
+                  setValueAs: (v) => v === "" ? undefined : Number(v), 
+                  max: 100
+                })}
               />
               <FormInput 
                 type="number"
                 title="Comisión de Alcancía" 
                 inputName="feePB" 
                 typeOfValue="%"
-                register={register("feePB", { valueAsNumber: true, required: "La comisión de alcancía es obligatoria (Max: 100%)", max: 100 })} 
+                register={register("feePB", { 
+                  required: "La comisión de alcancía es obligatoria (Max: 100%)", 
+                  setValueAs: (v) => v === "" ? undefined : Number(v), 
+                  max: 100 
+                })} 
               />
             </div>
             <div className="flex flex-col xs:flex-row gap-x-5">
               <FormInput
                 title="Costo transferencia de ticket"
                 inputName="transferCost"
-                register={register("transferCost", {required: "El costo de transferencia es obligatorio", valueAsNumber: true})}
+                register={register("transferCost", {
+                  required: "El costo de transferencia es obligatorio", 
+                  setValueAs: (v) => v === "" ? undefined : Number(v)
+                })}
               />
               <FormInput
                 title="Descuento"
                 inputName="discount"
                 typeOfValue="%"
-                register={register("discount", { valueAsNumber: true, max: 100 })}
+                register={register("discount", { 
+                  setValueAs: (v) => v === "" ? undefined : Number(v), 
+                  max: 100 
+                })}
               />
             </div>
             <div className="flex flex-col xs:flex-row gap-x-5">
@@ -228,14 +242,19 @@ export default function TicketConfiguration() {
                 type="number"
                 title="Máx. de tickets p/ persona"
                 inputName="maxPurchase"
-                register={register("maxPurchase", {valueAsNumber: true})}
+                register={register("maxPurchase", {
+                  setValueAs: (v) => v === "" ? undefined : Number(v)
+                })}
               />
               <FormInput
                 type="number"
                 title="Tiempo de compra (minutos)"
                 inputName="timeOut"
                 typeOfValue="min"
-                register={register("timeOut", {required: "El tiempo de compra es obligatorio", valueAsNumber: true})}
+                register={register("timeOut", {
+                  required: "El tiempo de compra es obligatorio", 
+                  setValueAs: (v) => v === "" ? undefined : Number(v)
+                })}
               />
             </div>
             <FormInput

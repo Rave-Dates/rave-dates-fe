@@ -34,17 +34,24 @@ export function StageCard({
       <div className="flex flex-col gap-3">
         <div className="flex w-full justify-center items-center gap-x-3">
           <FormInput
+            type="number"
             className="bg-cards-container!"
             title="Cantidad"
             inputName="quantity"
-            register={register(`stages.${index}.quantity`, { required: true, valueAsNumber: true })}
+            register={register(`stages.${index}.quantity`, { 
+              required: true, 
+              setValueAs: (v) => v === "" ? undefined : Number(v) 
+            })}
           />
           <FormInput
             type="number"
             className="bg-cards-container!"
             title="Precio"
             inputName="price"
-            register={register(`stages.${index}.price`, { required: true, valueAsNumber: true })}
+            register={register(`stages.${index}.price`, { 
+              required: true, 
+              setValueAs: (v) => v === "" ? undefined : Number(v) 
+            })}
           />
           <FormInput
             type="number"
@@ -52,7 +59,10 @@ export function StageCard({
             title="Comisión de promotor"
             typeOfValue="$"
             inputName="promoterFee"
-            register={register(`stages.${index}.promoterFee`, { required: true, valueAsNumber: true })}
+            register={register(`stages.${index}.promoterFee`, { 
+              required: true, 
+              setValueAs: (v) => v === "" ? undefined : Number(v) 
+            })}
           />
         </div>
         <div className="flex w-full justify-center items-center gap-x-3">
