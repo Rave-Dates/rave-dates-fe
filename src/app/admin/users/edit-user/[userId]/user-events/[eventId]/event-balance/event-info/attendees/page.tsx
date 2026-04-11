@@ -6,7 +6,7 @@ import { useState } from "react";
 import DefaultButton from "@/components/ui/buttons/DefaultButton";
 import UserSvg from "@/components/svg/UserSvg";
 import { useReactiveCookiesNext } from "cookies-next";
-import { useAdminGetGuests, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData";
+import { useAdminEvent, useAdminGetGuests, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData";
 import { useParams } from "next/navigation";
 import SearchInput from "@/components/ui/inputs/search-input/SearchInput";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
@@ -23,6 +23,7 @@ export default function UsersList() {
   const params = useParams();
   const eventId = Number(params.eventId);
 
+  const { selectedEvent } = useAdminEvent({ token, eventId });
   const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });
   const { guests } = useAdminGetGuests({ token, eventId });
 
@@ -48,7 +49,8 @@ export default function UsersList() {
     <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen pt-0 pb-40 sm:pt-32">
       <div className="max-w-xl w-full mx-auto animate-fade-in">
         {/* Search and Add User Section */}
-        <div className="flex items-center bg-main-container gap-2 pt-10 pb-4 px-4 mb-4">
+        <h1 className="text-2xl text-center bg-main-container pt-8 pb-6 font-semibold">{selectedEvent?.title}</h1>
+        <div className="flex items-center bg-main-container gap-2 pb-4 px-4 mb-4">
           <GoBackButton className="animate-fade-in !rounded-lg p-2.5" />
           <SearchInput
             placeholder="Busca un usuario"
@@ -71,7 +73,7 @@ export default function UsersList() {
         <div className="rounded-md overflow-hidden px-4">
           {/* Table Header */}
           <div className="grid grid-cols-[2fr_1fr] border-b border-divider text-text-inactive gap-x-2 text-sm py-2 px-3">
-            <div className="text-start">Nombre y apellido</div>
+            <div className="text-start">Nombre</div>
             <div className="text-end">Acciones</div>
           </div>
 

@@ -4,7 +4,7 @@ import { DropdownItem } from "@/components/roles/admin/events/DropDownItem"
 import { StageItem } from "@/components/roles/admin/events/StageItem"
 import UserSvg from "@/components/svg/UserSvg"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
-import { useAdminBinnacles, useAdminGetOrganizerFromEvent, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes, useAdminUserById } from "@/hooks/admin/queries/useAdminData"
+import { useAdminBinnacles, useAdminEvent, useAdminGetOrganizerFromEvent, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes, useAdminUserById } from "@/hooks/admin/queries/useAdminData"
 import { useReactiveCookiesNext } from "cookies-next"
 import Link from "next/link"
 import { useParams, useSearchParams } from "next/navigation"
@@ -21,6 +21,8 @@ export default function EventInfo() {
   const eventId = Number(params.eventId);
   const organizerId = Number(searchParams.get("organizerId"));
 
+
+  const { selectedEvent } = useAdminEvent({ token, eventId });
   const { data: user } = useAdminUserById({ token, userId });
   const { ticketTypes } = useAdminTicketTypes({ token, eventId });
   const { organizerFromEvent } = useAdminGetOrganizerFromEvent({ token, eventId: eventId });
@@ -67,6 +69,8 @@ export default function EventInfo() {
       </Link>
       <div className="w-full pt-24">
         {/* Header */}
+        <h1 className="text-2xl mb-7 text-center font-semibold">{selectedEvent?.title}</h1>
+
         <div className="flex justify-between text-xl font-medium items-center mb-4">
           <h1>Asistentes totales</h1>
           <span>{ticketMetricsToUse?.ticketsPurchased.toLocaleString()}</span>
