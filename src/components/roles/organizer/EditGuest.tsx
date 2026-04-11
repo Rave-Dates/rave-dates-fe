@@ -91,7 +91,7 @@ export default function EditGuest({ clientId }: {clientId: number}) {
         />
         <FormInput
           type="email"
-          title="Mail*"
+          title="Email*"
           inputName="email"
           register={register("email", { required: true })}
         />
@@ -133,7 +133,7 @@ export default function EditGuest({ clientId }: {clientId: number}) {
           type="submit"
           className="bg-primary rounded-lg py-4 font-medium w-full text-black mx-6"
         >
-          Editar
+          Guardar
         </button>
       </div>
     </div>

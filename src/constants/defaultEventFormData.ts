@@ -15,8 +15,6 @@ export const defaultEventFormData: IEventFormData = {
   images: [],
   tickets: [
     { ticketId: 1, ticketTypeId: 1, maxDate: yyyyMmDd, eventId: 1 , name: "Ticket 1", stages: [{ stageId: 1, date: yyyyMmDd, dateMax: yyyyMmDd, price: 0, quantity: 0, promoterFee: 0, feeType: "fixed" }] },
-    { ticketId: 2, ticketTypeId: 2, maxDate: yyyyMmDd, eventId: 1 , name: "Ticket 2", stages: [{ stageId: 2, date: yyyyMmDd, dateMax: yyyyMmDd, price: 0, quantity: 0, promoterFee: 0, feeType: "fixed" }] },
-    { ticketId: 3, ticketTypeId: 3, maxDate: yyyyMmDd, eventId: 1 , name: "Ticket 3", stages: [{ stageId: 3, date: yyyyMmDd, dateMax: yyyyMmDd, price: 0, quantity: 0, promoterFee: 0, feeType: "fixed" }] },
   ],
   feeRD: 0,
   feePB: 0,

@@ -50,8 +50,7 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
   };
 
   const handleClick = () => {
-    deleteCookie("token");
-    router.push("/");
+    router.back();
   };
 
   useEffect(() => {
@@ -174,7 +173,7 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
           )
         : null}
         <button onClick={handleClick} className="bg-primary hover:opacity-80 transition-opacity mt-5 text-primary-black font-medium py-3 w-full rounded-lg flex items-center justify-center text-center">
-          Salir
+          Atras
         </button>
       </div>
     </div>

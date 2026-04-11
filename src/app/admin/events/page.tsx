@@ -9,7 +9,8 @@ import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { extractPlaceFromGeo } from "@/utils/formatGeo";
 import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
 
 export default function Page() {
   const { getCookie } = useReactiveCookiesNext();
@@ -18,6 +19,25 @@ export default function Page() {
   const token = getCookie("token");
   
   const { allEvents, isErrorEvent, isEventLoading } = useAdminAllEvents({ token });
+
+  const [filters, setFilters] = useState<string[]>(["Activo", "Inactivo"]);
+
+  const isEventFuture = (date: string) => {
+    return new Date(date).getTime() > new Date().getTime();
+  };
+
+  const getEventStatus = (event: IEvent) => {
+    if (!isEventFuture(event.date)) return "Finalizado";
+    return event.isActive ? "Activo" : "Inactivo";
+  };
+
+  const toggleFilter = (statusName: string) => {
+    setFilters((prev) =>
+      prev.includes(statusName)
+        ? prev.filter((s) => s !== statusName)
+        : [...prev, statusName]
+    );
+  };
 
   useEffect(() => {
     console.log("campos resetados")
@@ -39,9 +59,9 @@ export default function Page() {
     }
   ];
 
-  const isEventPast = (date: string) => {
-    return new Date(date).getTime() > new Date().getTime();
-  }
+  const filteredEvents = allEvents?.filter((event) =>
+    filters.includes(getEventStatus(event))
+  );
 
   return (
     <div className="w-full flex flex-col gap-y-5 bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
@@ -53,15 +73,27 @@ export default function Page() {
       </Link>
 
       <div className="flex gap-x-2 mx-auto">
-        {eventStatus.map((status) => (
-          <div
-            key={status.name}
-            className="px-2 text-sm py-1 rounded-md flex items-center gap-x-2"
-          >
-            <div className={`h-2 w-2 ${status.className} rounded-full`}></div>
-            {status.name}
-          </div>
-        ))}
+        {eventStatus.map((status) => {
+          const isSelected = filters.includes(status.name);
+          return (
+            <button
+              key={status.name}
+              onClick={() => toggleFilter(status.name)}
+              className={`px-3 text-sm py-1.5 rounded-full flex items-center gap-x-2 transition-all duration-300 border ${
+                isSelected
+                  ? "bg-white/10 border-white/20 text-white"
+                  : "bg-transparent border-transparent text-white/40 grayscale"
+              }`}
+            >
+              <div
+                className={`h-2 w-2 ${status.className} rounded-full ${
+                  isSelected ? "animate-pulse" : ""
+                }`}
+              ></div>
+              {status.name}
+            </button>
+          );
+        })}
       </div>
       <div>
         <div className="max-w-xl mx-auto animate-fade-in">
@@ -77,10 +109,10 @@ export default function Page() {
 
           {/* Table Body */}
           <div className="divide-y divide-divider w-full">
-            {allEvents?.map((data) => (
+            {filteredEvents?.map((data) => (
               <div
                 key={data.eventId}
-                className={`grid grid-cols-[1fr_1fr_1fr_0.1fr_1.2fr] items-center py-3 px-3 gap-x-2 text-xs ${isEventPast(data.date) ? "text-white" : "text-white/60"}`}
+                className={`grid grid-cols-[1fr_1fr_1fr_0.1fr_1.2fr] items-center py-3 px-3 gap-x-2 text-xs ${isEventFuture(data.date) ? "text-white" : "text-white/60"}`}
               >
                 <div className="text-start flex flex-col">
                   <h3>{formatDateToColombiaTime(data.date).date} {formatDateToColombiaTime(data.date).time}hs</h3>
@@ -89,7 +121,7 @@ export default function Page() {
                 <div className="text-center tabular-nums">{extractPlaceFromGeo(data.geo) || data.geo}</div>
                 <div className="text-center tabular-nums">
                   {
-                    isEventPast(data.date) ?
+                    isEventFuture(data.date) ?
                     data.isActive ? 
                     <div className="h-2 w-2 bg-green-500 rounded-full"></div> 
                     :
@@ -100,7 +132,7 @@ export default function Page() {
                 </div>
                 <div className="flex justify-end gap-x-2">
                   {
-                    isEventPast(data.date) &&
+                    isEventFuture(data.date) &&
                     <Link
                       href={`/admin/events/edit-event/${data.eventId}`}
                       className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-black"
