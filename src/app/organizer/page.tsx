@@ -35,10 +35,7 @@ export default function OrganizerHome() {
       <div className="max-w-md mx-auto space-y-4">
         {/* Available Balance Header */}
         <div className="flex w-full justify-between items-center">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-semibold ">Disponible</h1>
-            <p className="text-primary text-2xl">COP ${getTotalAvalible()}</p>
-          </div>
+          <h1 className="text-3xl max-w-70 font-semibold">{user?.name}</h1>
 
           <ConfirmationModal
             isLogout
@@ -56,6 +53,11 @@ export default function OrganizerHome() {
               </button>
             }
           />
+        </div>
+
+        <div className="space-y-1">
+          <h1 className="text-3xl font-semibold ">Disponible</h1>
+          <p className="text-primary text-2xl">COP ${getTotalAvalible()}</p>
         </div>
 
         {/* Event Cards */}
