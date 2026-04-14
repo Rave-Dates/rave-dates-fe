@@ -5,6 +5,7 @@ import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { useAdminAllEvents, useAdminEvent, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { assignOrganizerToEvent, assignPromoterToEvent } from "@/services/admin-events";
+import { formatDate } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
@@ -112,11 +113,17 @@ export default function AssignEvent() {
         >
           <option value="" disabled hidden>Seleccioná un evento</option>
           {
-            allEvents?.map((event) => (
-              <option key={event.eventId} value={String(event.eventId)}>
-                {event.title}
-              </option>
-            ))
+            allEvents
+              ?.filter((event) => {
+                const todayStr = formatDate(new Date());
+                const eventDateStr = formatDate(event.date);
+                return eventDateStr >= todayStr;
+              })
+              .map((event) => (
+                <option key={event.eventId} value={String(event.eventId)}>
+                  {event.title}
+                </option>
+              ))
           }
         </FormDropDown>
       </DefaultForm>

@@ -30,7 +30,7 @@ export default function Page() {
     }
   });
   
-  const { allEvents } = useAdminAllEvents({ token });
+  const { data: user } = useAdminUserById({ token, userId });
   const { data: selectedUser } = useAdminUserById({ token, userId });
 
   const watchedImage = useWatch({ name: "image", control });
@@ -77,11 +77,16 @@ export default function Page() {
         >
           <option value="" disabled hidden>Selecciona un evento</option>
           {
-            allEvents?.map((event) => (
+            user?.organizer?.events?.map((event) => (
               <option key={event.eventId} value={String(event.eventId)}>
                 {event.title}
               </option>
             ))
+          }
+          {
+            user?.organizer?.events?.length === 0 && (
+              <option value="" disabled hidden>No hay eventos</option>
+            )
           }
         </FormDropDown>
         <FormInput
