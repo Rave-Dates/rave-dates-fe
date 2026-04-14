@@ -27,6 +27,14 @@ export default function FreeTicketConfiguration() {
   const router = useRouter()
 
   const { ticketTypes } = useAdminTicketTypes({ token, eventId });
+
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    setValue("tickets.0.stages.0.date", today);
+    if (eventFormData.date) {
+      setValue("tickets.0.stages.0.dateMax", eventFormData.date);
+    }
+  }, [setValue, eventFormData.date]);
   
   useEffect(() => {
     if (ticketTypes && !hasLoadedTickets) {
@@ -147,6 +155,8 @@ export default function FreeTicketConfiguration() {
                 })}
               />
             </div>
+            <h2 className="mt-10 text-center">Opcional</h2>
+
               <div className="w-full gap-x-5 flex justify-between">
                 <Controller
                   name="tickets.0.stages.0.date"

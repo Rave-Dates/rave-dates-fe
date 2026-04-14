@@ -62,18 +62,27 @@ export default function StageConfig() {
   };
 
   const handleAddStage = () => {
-    const currentStages = getValues("stages");
-    const newId = (currentStages?.at(-1)?.stageId ?? 0) + 1;
+    const currentStages = getValues("stages") || [];
+    const newId = (currentStages.at(-1)?.stageId ?? 0) + 1;
 
     const today = new Date();
     const yyyyMmDd = today.toISOString().split('T')[0];
 
+    const lastDate = currentStages.at(-1)?.dateMax;
+    let nextDate = yyyyMmDd;
+
+    if (lastDate) {
+      const d = new Date(lastDate);
+      d.setDate(d.getDate() + 1);
+      nextDate = d.toISOString().split('T')[0];
+    }
+
     const newStage: IEventStages = {
       stageId: newId,
-      dateMax: "",
+      dateMax: nextDate,
       price: 0,
       quantity: 0,
-      date: yyyyMmDd,
+      date: nextDate,
       feeType: "fixed",
       promoterFee: 0
     };
@@ -89,7 +98,7 @@ export default function StageConfig() {
     if (ticketIndex !== -1) {
       updatedTickets[ticketIndex] = {
         ...updatedTickets[ticketIndex],
-        stages: [...(updatedTickets[ticketIndex].stages || []), newStage],
+        stages: [...currentStages, newStage],
       };
 
       updateEventFormData({
@@ -111,12 +120,12 @@ export default function StageConfig() {
     const ticketIndex = updatedTickets.findIndex(t => t.ticketTypeId === editingTicketId);
 
     if (ticketIndex !== -1) {
-      const updatedStages = [...(updatedTickets[ticketIndex].stages || [])];
-      updatedStages.splice(index, 1); // eliminar stage por índice
+      // Obtenemos los stages actuales del form (que ya no tienen el eliminado)
+      const currentStages = getValues("stages") || [];
 
       updatedTickets[ticketIndex] = {
         ...updatedTickets[ticketIndex],
-        stages: updatedStages,
+        stages: currentStages,
       };
 
       updateEventFormData({ tickets: updatedTickets });
