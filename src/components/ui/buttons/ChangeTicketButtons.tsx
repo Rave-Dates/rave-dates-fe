@@ -30,7 +30,7 @@ const ChangeTicketButtons = ({ ticket, totalQuantity, fixedQuantity, isOldTicket
 
   const validStage = ticket.stages.find((stage) => {
     const now = Date.now();
-    return new Date(stage.dateMax).getTime() > now && stage.quantity > 0;
+    return new Date(stage.dateMax).getTime() > now && (stage.quantity ?? 0) > 0;
   });
 
   console.log("validStage", validStage)
@@ -44,9 +44,9 @@ const ChangeTicketButtons = ({ ticket, totalQuantity, fixedQuantity, isOldTicket
           <div className="font-semibold text-center xs:text-start text-body">{ticket.name}</div>
           <div className="text-body lg:text-subtitle text-primary-white/50">
             {validStage ? 
-              validStage.price > 0 
+              (validStage.price ?? 0) > 0 
                 ?
-                `$${validStage.price.toLocaleString()} COP` 
+                `$${(validStage.price ?? 0).toLocaleString()} COP` 
                 :
                 "Gratuito"
               : 
@@ -60,8 +60,8 @@ const ChangeTicketButtons = ({ ticket, totalQuantity, fixedQuantity, isOldTicket
               onClick={() => {
                 subtract(ticket.ticketTypeId);
                 if (isOldTicket && ticket.ticketTypeId) {
-                  subtractOldTicket(ticket.ticketTypeId, ticket.stages[0].price);
-                  addSubtractedOldTicket(ticket.ticketTypeId, ticket.stages[0].price);
+                  subtractOldTicket(ticket.ticketTypeId, ticket.stages[0].price ?? 0);
+                  addSubtractedOldTicket(ticket.ticketTypeId, ticket.stages[0].price ?? 0);
                 }
               }}
               disabled={isOldTicket ? oldTickets[ticket.ticketTypeId]?.actualQuantity === 0 : currentQuantity <= 0}
@@ -85,7 +85,7 @@ const ChangeTicketButtons = ({ ticket, totalQuantity, fixedQuantity, isOldTicket
             disabled={isOldTicket || totalQuantity === oldTicketsTotal - totalOldTickets }
             className={`p-3 rounded-r-xl flex items-center justify-center text-black transition-colors ${
               validStage &&
-              currentQuantity < validStage.quantity &&
+              currentQuantity < (validStage.quantity ?? 0) &&
               totalQuantity !== oldTicketsTotal - totalOldTickets
                 ? "bg-primary hover:bg-primary/70"
                 : "bg-inactive text-text-inactive pointer-events-none"

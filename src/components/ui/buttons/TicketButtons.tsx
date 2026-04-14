@@ -26,7 +26,7 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
 
   const validStage = ticket.stages.find((stage) => {
     const now = Date.now();
-    return new Date(stage.dateMax).getTime() > now && stage.quantity > 0;
+    return new Date(stage.dateMax).getTime() > now && (stage.quantity ?? 0) > 0;
   });
 
   if (validStage?.price === 0) {
@@ -42,9 +42,9 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
           <div className="font-semibold text-center xs:text-start text-body">{ticket.name}</div>
           <div className="text-body lg:text-subtitle text-primary-white/50">
             {validStage ? 
-              validStage.price > 0 
+              (validStage.price ?? 0) > 0 
                 ?
-                `$${validStage.price.toLocaleString()} COP` 
+                `$${(validStage.price ?? 0).toLocaleString()} COP` 
                 :
                 "Gratuito"
               : 
@@ -69,15 +69,15 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
           </span>
 
           <button
-            onClick={() => validStage && add({ ticketTypeId: ticket.ticketTypeId, price: validStage.price, quantity: validStage.quantity })}
+            onClick={() => validStage && add({ ticketTypeId: ticket.ticketTypeId, price: validStage.price ?? 0, quantity: validStage.quantity ?? 0 })}
             disabled={
               !validStage ||
-              currentQuantity >= validStage.quantity ||
+              currentQuantity >= (validStage.quantity ?? 0) ||
               totalQuantity >= controlledMaxPurchase
             }            
             className={`p-3 rounded-r-xl flex items-center justify-center text-black transition-colors ${
               validStage &&
-              currentQuantity < validStage.quantity &&
+              currentQuantity < (validStage.quantity ?? 0) &&
               totalQuantity < controlledMaxPurchase
                 ? "bg-primary hover:bg-primary/70"
                 : "bg-inactive text-text-inactive pointer-events-none"
