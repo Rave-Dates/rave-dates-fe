@@ -1,3 +1,5 @@
+import { formatDateToDDMMYYYY } from "@/utils/formatDate";
+
 export function StageItem({stage, quantity, index}: { stage: IStageDetail, quantity: number, index: number }) {
   return (
     <div className="p-4 mb-3 space-y-3 bg-cards-container rounded-lg">
@@ -22,7 +24,7 @@ export function StageItem({stage, quantity, index}: { stage: IStageDetail, quant
         <div className="flex justify-between items-center ml-2">
           <span className="text-text-inactive text-sm">Fecha de inicio</span>
           <div className="flex items-center gap-2">
-            <span className="text-primary text-sm tabular-nums">{stage.date}</span>
+            <span className="text-primary text-sm tabular-nums">{formatDateToDDMMYYYY(stage.date)}</span>
           </div>
         </div>
       </div>
@@ -30,7 +32,7 @@ export function StageItem({stage, quantity, index}: { stage: IStageDetail, quant
         <div className="flex justify-between items-center ml-2">
           <span className="text-text-inactive text-sm">Fecha final</span>
           <div className="flex items-center gap-2">
-            <span className="text-primary text-sm tabular-nums">{stage.dateMax}</span>
+            <span className="text-primary text-sm tabular-nums">{formatDateToDDMMYYYY(stage.dateMax)}</span>
           </div>
         </div>
       </div>

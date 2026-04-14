@@ -67,3 +67,24 @@ export const validateDateYyyyMmDd = (value: string | undefined): true | string |
   if (isNaN(date.getTime())) return "Fecha inválida";
   return true;
 };
+
+export const formatDateToDDMMYYYY = (value: string | Date | null | undefined): string => {
+  if (!value) return "";
+
+  if (typeof value === "string") {
+    const datePart = value.split("T")[0];
+    const parts = datePart.split("-");
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+  }
+
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return String(value);
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+};
