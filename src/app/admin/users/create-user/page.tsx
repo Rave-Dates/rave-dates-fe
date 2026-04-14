@@ -59,7 +59,7 @@ export default function CreateUser() {
   };
 
   return (
-    <DefaultForm handleSubmit={handleSubmit(onSubmit)} title="Crear usuario">
+    <DefaultForm autocomplete="off" handleSubmit={handleSubmit(onSubmit)} title="Crear usuario">
       <FormInput
         title="Nombre completo*"
         inputName="name"

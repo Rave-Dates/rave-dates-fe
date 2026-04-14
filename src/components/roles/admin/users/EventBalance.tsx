@@ -108,7 +108,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
           user?.role.name === "ORGANIZER" &&
           <div className="flex h-[44px] justify-between items-center text-sm gap-y-2 py-3 px-3">
             <div className="text-text-inactive">
-              Comisión de promotor
+              Comisión Promotores
             </div>
             <div className="tabular-nums flex items-center justify-center">
               <span className="text-system-error text-2xl">-</span>

@@ -87,7 +87,7 @@ export default function CreateCategoryValues() {
   const currentPreviewCategory = categories?.find(c => c.categoryId === selectedPreviewCategory);
 
   return (
-    <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
+    <form autoComplete="off" className="w-full" onSubmit={handleSubmit(onSubmit)}>
       <h1 className="text-2xl font-semibold mb-4">Crear valor de categoría</h1>
 
       <div className="flex flex-col items-start my-3">

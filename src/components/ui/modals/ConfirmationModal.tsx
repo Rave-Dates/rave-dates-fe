@@ -24,7 +24,7 @@ export default function ConfirmationModal({
   onConfirm,
   isLogout = false,
   variant = "danger",
-  showModal = false,
+  showModal = true,
 }: ConfirmationModalProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { deleteCookie } = useReactiveCookiesNext();

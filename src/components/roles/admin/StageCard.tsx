@@ -59,7 +59,7 @@ export function StageCard({
           <FormInput
             type="number"
             className="bg-cards-container!"
-            title="Comisión de promotor"
+            title="Comisión Promotores"
             labelClassname="block h-8 sm:h-auto"
             typeOfValue="$"
             inputName="promoterFee"

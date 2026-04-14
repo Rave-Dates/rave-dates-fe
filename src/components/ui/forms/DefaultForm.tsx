@@ -12,6 +12,7 @@ type Props = {
   ticketButtons?: boolean;
   className?: string;
   isPending?: boolean;
+  autocomplete?: "off" | "on";
 };
 
 export default function DefaultForm({
@@ -22,6 +23,7 @@ export default function DefaultForm({
   ticketButtons = false,
   className = "min-h-screen pb-40 sm:pb-32 px-6",
   isPending,
+  autocomplete = "on",
 }: Props) {
   return (
     <div className={`${className} pt-32 md:pt-44 bg-primary-black md:justify-center md:items-center text-white flex`}>
@@ -48,7 +50,7 @@ export default function DefaultForm({
             {title}
           </h1>
         )}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form autoComplete={autocomplete} onSubmit={handleSubmit} className="space-y-4">
           {children}
         </form>
       </div>

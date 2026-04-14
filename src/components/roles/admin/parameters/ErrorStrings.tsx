@@ -51,7 +51,7 @@ export default function ErrorStrings() {
   };
 
   return (
-    <div className="w-full mt-5">
+    <form autoComplete="off" className="w-full mt-5">
 
       <h2 className="text-system-error text-lg font-medium">
         ¡Precaución!
@@ -80,6 +80,6 @@ export default function ErrorStrings() {
           </button>
         }
       />
-    </div>
+    </form>
   );
 }

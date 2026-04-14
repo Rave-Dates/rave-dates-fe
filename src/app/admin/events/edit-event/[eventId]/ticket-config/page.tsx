@@ -153,35 +153,6 @@ export default function EditTicketConfiguration() {
       }
     );
   }
-  
-  // const handleAddTicket = () => {
-  //   const formTickets = getValues("tickets") || [];
-
-  //   // Buscar el ticketTypeId más alto
-  //   const maxId = Math.max(...formTickets.map(t => t.ticketTypeId || 0))
-
-  //   const newId = maxId + 1;
-
-  //   const newTicket = {
-  //     ticketTypeId: newId,
-  //     name: "",
-  //     stages: [
-  //       {
-  //         stageId: 1,
-  //         date: null,
-  //         dateMax: null,
-  //         price: 0,
-  //         quantity: 0,
-  //       },
-  //     ],
-  //   };
-
-  //   append(newTicket);
-  //   updateEventFormData({
-  //     ...eventFormData,
-  //     tickets: [...(eventFormData.tickets || []), newTicket],
-  //   });
-  // };
 
   const handleDeleteTicket = (index: number) => {
     if (fields.length === 1) return
@@ -221,13 +192,6 @@ export default function EditTicketConfiguration() {
             />
           ))}
         </div>
-
-        {/* <button
-          onClick={handleAddTicket}
-          className="w-full bg-primary outline-none text-black font-medium py-3 rounded-lg text-sm flex items-center justify-center gap-2"
-        >
-          + Incorporar ticket
-        </button> */}
 
         <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4 pt-4">
           {/* Inputs de configuración */}

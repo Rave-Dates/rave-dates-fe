@@ -18,9 +18,10 @@ interface DatePickerProps {
   onChange?: (value: string) => void;
   title?: string;
   className?: string;
+  wrapperClassname?: string;
 }
 
-export default function DatePicker({ value, onChange, title = "Fecha*", className }: DatePickerProps) {
+export default function DatePicker({ value, onChange, title = "Fecha*", className, wrapperClassname }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 
   // Parse the string value into a Date object for the Calendar
@@ -42,7 +43,7 @@ export default function DatePicker({ value, onChange, title = "Fecha*", classNam
   };
 
   return (
-    <div className="w-full flex flex-col gap-y-2 flex-1 min-w-0">
+    <div className={`${wrapperClassname} w-full flex flex-col gap-y-2 flex-1 min-w-0`}>
       <label className="text-primary-white text-xs font-medium">
         {title}
       </label>

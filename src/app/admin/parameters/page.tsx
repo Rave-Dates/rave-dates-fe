@@ -13,7 +13,7 @@ export default function Parameters() {
       <h1 className="text-title font-semibold mb-10 text-center">Parámetros</h1>
       <div className="max-w-xl flex flex-col justify-center items-center mx-auto gap-y-20">
         <CreateLabel />
-        <CreateTicketType />
+        {/* <CreateTicketType /> */}
         <CreateCategory />
         <CreateCategoryValues />
         <ErrorStrings />

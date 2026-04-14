@@ -58,7 +58,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
 
   useEffect(() => {
-    setGlobalExpandedSections(["Vendidas y dinero generado"]);
+    setGlobalExpandedSections(["Cantidad vendida"]);
   }, []);
 
   const toggleSection = (section: string) => {
@@ -173,7 +173,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
     setValue("ticketTypeMap", newMap, { shouldValidate: true, shouldDirty: true });
   };
 
-  const types = ["Vendidas y dinero generado", "Dinero", "Promotores", "Link de controlador"]
+  const types = ["Cantidad vendida", "Dinero", "Promotores", "Link Escáner QRs"]
 
   return (
     <div className="rounded-lg text-white w-full flex items-start justify-center mb-44 h-full">
@@ -189,7 +189,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
             >
               <div className="bg-input px-2 py-1 rounded-b-lg">
                 {
-                  type === "Vendidas y dinero generado" && 
+                  type === "Cantidad vendida" && 
                   <div className="mb-2">
                     <div className="flex bg-main-container justify-between p-3 rounded-lg items-center">
                       <h1>Total vendido:</h1>
@@ -240,7 +240,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                     </div>
 
                     <div className="flex text-sm justify-between items-center">
-                      <h2>Comisión de promotor</h2>
+                      <h2>Comisión Promotores</h2>
                       <h2 className="text-red-400/80 text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feePromoter?? "0").toLocaleString()}</h2>
                     </div>
 
@@ -277,7 +277,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                   </div>
                 }
                 {
-                  type === "Link de controlador" && 
+                  type === "Link Escáner QRs" && 
                     <div className="bg-input rounded-lg px-5 py-2">
                       <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="flex flex-col gap-y-3 justify-between items-center">
                         <div className="flex w-full gap-x-3 items-center justify-between">
@@ -451,10 +451,10 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
         }
 
         {
-          isPromoterBinnacle && ["Vendidas y dinero generado"].map((type) => (
+          isPromoterBinnacle && ["Cantidad vendida"].map((type) => (
             <div key={type} className="bg-input px-2 py-3 rounded-lg mt-2">
               {
-                type === "Vendidas y dinero generado" && 
+                type === "Cantidad vendida" && 
                 <div>
                   <h1 className="p-3 pt-1 text-lg">Entradas vendidas</h1>
                   <div className="flex bg-main-container justify-between p-3 rounded-lg items-center">
