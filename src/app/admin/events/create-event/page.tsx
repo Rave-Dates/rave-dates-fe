@@ -100,9 +100,28 @@ export default function Page() {
 
     delete formattedData.categories;
 
+    const eventDate = data.date || "";
+    const updatedTickets: IEventTicket[] = (eventFormData.tickets || []).map((ticket, index) => {
+      // Solo actualizamos el primer ticket si tiene los valores por defecto
+      if (index === 0 && ticket.name === "Ticket 1") {
+        return {
+          ...ticket,
+          maxDate: eventDate,
+          stages: ticket.stages.map(stage => ({
+            ...stage,
+            date: eventDate,
+            dateMax: eventDate
+          }))
+        }
+      }
+      return ticket;
+    });
+
     updateEventFormData({
       ...eventFormData,
       ...formattedData,
+      tickets: updatedTickets,
+      maxDate: eventDate
     })
 
     setHasLoadedEvent(true)

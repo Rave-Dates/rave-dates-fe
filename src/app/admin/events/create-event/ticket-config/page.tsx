@@ -108,18 +108,29 @@ export default function TicketConfiguration() {
 
   const handleAddTicket = () => {
     const formTickets = getValues("tickets") || [];
+    const today = new Date();
+    const yyyyMmDd = today.toISOString().split('T')[0];
+
+    const lastDate = formTickets.at(-1)?.maxDate;
+    let nextDate = yyyyMmDd;
+
+    if (lastDate) {
+      const d = new Date(lastDate);
+      d.setDate(d.getDate() + 1);
+      nextDate = d.toISOString().split('T')[0];
+    }
 
     const newId = (formTickets.at(-1)?.ticketId ?? 0) + 1;
 
     const newTicket: IEventTicket = {
       ticketId: newId,
       name: '',
-      maxDate: "",
+      maxDate: nextDate,
       stages: [
         {
           stageId: 1, // stageId comienza en 1
-          date: "",
-          dateMax: "",
+          date: nextDate,
+          dateMax: nextDate,
           price: 0,
           quantity: 0,
           promoterFee: 0,

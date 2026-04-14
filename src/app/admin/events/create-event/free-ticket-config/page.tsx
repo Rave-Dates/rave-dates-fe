@@ -8,14 +8,23 @@ import { useCreateFullEvent } from "@/hooks/admin/mutations/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { combineDateAndTimeToISO, formatColombiaTimeToUTC, validateDateYyyyMmDd } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 export default function FreeTicketConfiguration() {
   const { eventFormData, updateEventFormData } = useCreateEventStore();
-  const { register, handleSubmit, reset, control } = useForm<IEventFormData>({
+  const { register, handleSubmit, reset, control, setValue } = useForm<IEventFormData>({
     defaultValues: eventFormData
   });
   const { mutate: createFullEvent } = useCreateFullEvent({reset});
+
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    setValue("tickets.0.stages.0.date", today);
+    if (eventFormData.date) {
+      setValue("tickets.0.stages.0.dateMax", eventFormData.date);
+    }
+  }, [setValue, eventFormData.date]);
 
   const onSubmit = (data: IEventFormData) => {
     const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
@@ -103,6 +112,8 @@ export default function FreeTicketConfiguration() {
                 })}
               />
             </div>
+
+            <h2 className="mt-10 text-center">Opcional</h2>
               <div className="w-full gap-x-5 flex justify-between">
                 <Controller
                   name="tickets.0.stages.0.date"
@@ -112,7 +123,7 @@ export default function FreeTicketConfiguration() {
                     <DatePicker 
                       value={field.value} 
                       onChange={field.onChange} 
-                      title="Fecha inicio*" 
+                      title="Fecha inicio" 
                     />
                   )}
                 />
@@ -124,7 +135,7 @@ export default function FreeTicketConfiguration() {
                     <DatePicker 
                       value={field.value} 
                       onChange={field.onChange} 
-                      title="Fecha máx.*" 
+                      title="Fecha máx." 
                     />
                   )}
                 />
