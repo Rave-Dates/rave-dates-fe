@@ -57,7 +57,7 @@ export function OrganizerEventCard({event, href = "organizer/event", totalSold, 
         </p>
         <p className="text-xs">
           {/* {amountSold} vendidos - {price} */}
-          {metricsToUse?.ticketsPurchased ?? 0} vendidos - {event.type === "free" ? "Gratis" : `COP ${totalSold?.toLocaleString() ?? 0}`}
+          {metricsToUse?.ticketsPurchased ?? 0} Total vendido - {event.type === "free" ? "Gratis" : `COP ${totalSold?.toLocaleString() ?? 0}`}
         </p>
       </div>
     </Link>

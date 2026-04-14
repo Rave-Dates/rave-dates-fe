@@ -21,13 +21,13 @@ export default function OrganizerHome() {
   const { organizerBinnacles } = useAdminBinnacles({ organizerId: organizerId ?? 0, token: token?.toString() });
 
   const getTotalAvalible = () => {
-    let total = 0;
+    let pendingPayment = 0;
     if (organizerBinnacles) {
       organizerBinnacles.forEach((binnacle) => {
-        total += Number(binnacle.total);
+        pendingPayment += Number(binnacle.pendingPayment);
       });
     }
-    return total.toLocaleString('es-CO');
+    return pendingPayment.toLocaleString('es-CO');
   }
 
   return (
