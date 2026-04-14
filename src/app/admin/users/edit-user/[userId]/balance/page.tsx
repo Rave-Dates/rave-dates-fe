@@ -1,5 +1,6 @@
 "use client";
 
+import EyeSvg from "@/components/svg/EyeSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { useAdminAllEvents, useAdminPayments, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
@@ -41,10 +42,11 @@ export default function Balance() {
           {/* Users Table/List */}
           <div className="rounded-md overflow-hidden mt-5">
           {/* Table Header */}
-          <div className="grid grid-cols-[1fr_1fr_1fr] border-b border-divider text-text-inactive gap-x-2 text-xs py-2 px-3">
+          <div className="grid grid-cols-[1fr_1fr_1fr_1fr] border-b border-divider text-text-inactive gap-x-2 text-xs py-2 px-3">
             <div className="text-start">Últ. fecha</div>
             <div className="text-center">Concepto</div>
-            <div className="text-end">Monto</div>
+            <div className="text-center">Monto</div>
+            <div className="text-end">Comprobante</div>
           </div>
 
           {/* Table Body */}
@@ -52,14 +54,16 @@ export default function Balance() {
             {filteredPayments?.map((data) => (
               <div
                 key={data.paymentId}
-                className="grid grid-cols-[1fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-xs"
+                className="grid grid-cols-[1fr_1fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-xs"
               >
                 <div className="text-start">{data.createdAt && formatDateToColombiaTime(data.createdAt).date}</div>
                 <div className="text-center">
                   {eventMap.get(data.eventId) || "Evento desconocido"}
                 </div>
                 <div className="text-end tabular-nums">${data.paymentAmount?.toLocaleString("es-ES")}</div>
-                {/* <div className="text-end tabular-nums">${data.balance.toLocaleString("es-ES")}</div> */}
+                <Link href={`/admin/users/edit-user/${userId}/balance/withdraw-info/${data.paymentId}?e=${data.eventId}&oid=${data.organizerId}`} className="justify-self-end flex tabular-nums bg-primary text-black text-xl p-1.5 rounded-lg">
+                  <EyeSvg className="w-5 h-5" />
+                </Link>
               </div>
             ))}
           </div>

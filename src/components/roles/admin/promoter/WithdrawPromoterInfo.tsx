@@ -6,16 +6,23 @@ import { useAdminPromoterBinnacles, useServeMovementImage } from "@/hooks/admin/
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 
 export default function WithdrawPromoterInfo({ paymentId }: { paymentId: number }) {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
+  const searchParams = useSearchParams();
+
+  const eventIdFromQuery = Number(searchParams.get("e"));
+  const promoterIdFromQuery = Number(searchParams.get("pid"));
 
   const { promoterBinnacles } = useAdminPromoterBinnacles({
-    promoterId: decoded?.promoterId ?? 0,
+    promoterId: decoded?.promoterId ?? promoterIdFromQuery,
     token: token?.toString() ?? "",
   });
+
+
 
   const selectedMovement = promoterBinnacles?.movements.find(m => m.paymentId === paymentId);
 

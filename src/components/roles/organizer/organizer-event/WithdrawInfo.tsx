@@ -6,18 +6,22 @@ import { useAdminBinnacles, useServeMovementImage } from "@/hooks/admin/queries/
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 export default function WithdrawInfo({ paymentId }: { paymentId: number }) {
   const params = useParams();
-  const eventId = Number(params.eventId);
+  const searchParams = useSearchParams();
+  const eventIdFromQuery = Number(searchParams.get("e"));
+  const organizerIdFromQuery = Number(searchParams.get("oid"));
 
+  const eventId = Number(params.eventId) || eventIdFromQuery;
+  
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
 
   const { organizerBinnacles } = useAdminBinnacles({
-    organizerId: decoded?.organizerId ?? 0,
+    organizerId: decoded?.organizerId ?? organizerIdFromQuery,
     token: token?.toString() ?? "",
   });
 
