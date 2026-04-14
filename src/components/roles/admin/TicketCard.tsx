@@ -35,7 +35,11 @@ export function TicketCard({
   const { eventFormData, updateEventFormData, setEditingTicketId } = useCreateEventStore();
 
   useEffect(() => {
-    if (isEditing) {
+    const formValues = getValues(); // obtiene todos los datos del formulario
+    const formTickets = formValues.tickets;
+
+    const selectedTicket = formTickets?.[index];
+    if (selectedTicket?.stages.length > 1) {
       setStagesEnabled(true)
     }
   }, [isEditing, setStagesEnabled]);
@@ -115,7 +119,7 @@ export function TicketCard({
             setValueAs: (v) => v === "" ? undefined : Number(v) 
           })}
         />
-        <div className="col-span-3"> 
+        <div className={`col-span-3 grid grid-cols-2 gap-3 ${stagesEnabled && "grid-cols-1! mt-1.5!"}`}> 
           <Controller
             name={stagesEnabled ? `tickets.${index}.maxDate` : `tickets.${index}.stages.0.dateMax`}
             control={control}
@@ -126,9 +130,22 @@ export function TicketCard({
                 onChange={field.onChange} 
                 title="Fecha máx.*" 
                 className="h-9 bg-cards-container"
+                wrapperClassname="justify-end"
               />
             )}
           />
+
+          {
+            !stagesEnabled && (
+              <FormInput
+                className="bg-cards-container! py-1!"
+                title="Comisión Promotores"
+                inputName="promoterFee"
+                typeOfValue="$"
+                register={register(`tickets.${index}.stages.0.promoterFee`, { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+              />
+            )
+          }
         </div>
       </div>
 
