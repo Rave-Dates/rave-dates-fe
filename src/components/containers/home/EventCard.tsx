@@ -55,11 +55,11 @@ const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?:
     <div className="bg-cards-container rounded-sm overflow-hidden shadow-2xl w-xl h-fit mx-auto mb-5">
       {
         loadingImages ?
-        <div className='h-[36rem] flex items-center justify-center w-full bg-cards-container'>
+        <div className='aspect-[1080/1350] flex items-center justify-center w-full bg-cards-container'>
           <SpinnerSvg className='fill-primary w-10 sm:w-14' />
         </div>
         :
-        <ImagesSwiper images={servedImages} className='w-full aspect-square object-cover h-[36rem]' />
+        <ImagesSwiper images={servedImages} className='w-full h-auto' />
       }
 
       {/* Event Details */}

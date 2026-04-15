@@ -15,7 +15,7 @@ export default function ScanQRPage() {
   const [cameras, setCameras] = useState<CameraDevice[]>([]);
   const [currentCameraId, setCurrentCameraId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [scanResult, setScanResult] = useState<{ success: boolean; text: string } | null>(null);
+  const [scanResult, setScanResult] = useState<{ success: boolean; text: string; userName?: string; ticketName?: string } | null>(null);
   const isProcessingRef = useRef(false);
   const [isScanning, setIsScanning] = useState(false);
   const router = useRouter();
@@ -42,7 +42,14 @@ export default function ScanQRPage() {
       .then((devices) => {
         if (mounted && devices.length) {
           setCameras(devices);
-          setCurrentCameraId(devices[0].id);
+          
+          // Buscar cámara trasera por el label
+          const backCamera = devices.find((cam) => {
+            const label = cam.label.toLowerCase();
+            return label.includes('back') || label.includes('rear') || label.includes('environment') || label.includes('trasera');
+          });
+
+          setCurrentCameraId(backCamera ? backCamera.id : devices[0].id);
         }
       })
       .catch((err) => {
@@ -103,7 +110,13 @@ export default function ScanQRPage() {
               });
 
               console.log('📦 Respuesta API:', res);
-              setScanResult({ success: true, text: `Ticket leído correctamente` });
+              setScanResult({ 
+                success: true, 
+                text: `Ticket leído correctamente`,
+                // TODO: Ajusta aquí los campos exactos según lo devuelva tu backend ('res.user.name', 'res.ticket.id', etc.)
+                userName: res?.user?.name || res?.ticket?.user?.name || 'Nombre Desconocido',
+                ticketName: res?.ticketType?.name || res?.ticket?.ticketType?.name || 'Boleta Desconocida'
+              });
             } catch (error) {
               const err = error as AxiosError<{ message: string }>;
 
@@ -146,22 +159,41 @@ export default function ScanQRPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-4 flex flex-col items-center justify-start pt-10 relative">
+    <div className="min-h-screen bg-black text-white p-4 flex flex-col items-center justify-start pt-10 pb-32 relative">
       <h1 className="text-2xl mb-4">Escanear QR</h1>
 
-      <div className="mb-4">
+      <div className="mb-4 flex items-center justify-center flex-col gap-y-3">
         <label className="mr-2">Seleccionar cámara:</label>
         <select
           onChange={handleCameraChange}
           value={currentCameraId || ''}
-          className="text-primary-white border p-2 rounded-lg border-primary/70 outline-none"
+          className="text-primary-white bg-transparent border p-2 rounded-lg border-primary/70 outline-none"
         >
           {cameras.map((cam) => (
-            <option key={cam.id} value={cam.id}>
+            <option className="bg-primary-black" key={cam.id} value={cam.id}>
               {cam.label || `Cámara ${cam.id}`}
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="flex text-sm py-4 px-5 gap-y-2 w-full max-w-sm mb-5 bg-[#17171e] rounded-lg flex-col items-center justify-center">
+        Tickets habilitados para escanear
+        <div className="flex flex-wrap justify-center gap-3 text-primary-black text-sm font-medium">
+          {
+            checker?.checker?.ticketTypeIds?.map((ticketType) => (
+              <div key={ticketType.ticketTypeId} className="flex items-center gap-x-2">
+                <div className="bg-primary rounded-lg px-3 py-1">{ticketType.name}</div>
+              </div>
+            ))
+          }
+          {
+            (checker?.checker?.ticketTypeIds?.length === 0 || !checker?.checker?.ticketTypeIds) &&
+              <div className="flex items-center gap-x-2">
+                <div className="bg-inactive text-primary-white rounded-lg px-4 py-0.5">No puedes leer tickets de este evento</div>
+              </div>
+          }
+        </div>
       </div>
 
       <div id={qrCodeRegionId} className="w-full max-w-sm rounded overflow-hidden" />
@@ -186,6 +218,15 @@ export default function ScanQRPage() {
             } shadow-lg`}
           >
             <p className="text-lg font-semibold">{scanResult.text}</p>
+            {scanResult.success && scanResult.userName && (
+              <div className="mt-4 flex flex-col items-center justify-center gap-y-2">
+                <span className="text-sm font-medium text-white/80">Asistente:</span>
+                <span className="text-xl font-bold text-white">{scanResult.userName}</span>
+                <div className="bg-primary text-primary-black px-3 py-1 rounded-lg text-sm font-bold mt-2">
+                  {scanResult.ticketName}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

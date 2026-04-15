@@ -2,9 +2,10 @@
 
 import QRSvg from "@/components/svg/QRSvg";
 import Link from "next/link";
-import { CircularProgress } from "../organizer/create-event/ProgressCircular";
+
 import { useAdminCheckerTicketMetrics } from "@/hooks/admin/queries/useAdminData";
 import { ProgressBar } from "../organizer/create-event/ProgressBar";
+import { CircularProgress } from "../organizer/create-event/ProgressCircular";
 
 type Props = {
   eventId: number | undefined;
@@ -34,12 +35,20 @@ export default function ControllerPanelSection({ token, eventId }: Props) {
         </div>
         <div className="bg-input mt-3 space-y-4 rounded-lg pt-3 pb-5 px-4">
           {
-            checkerTicketMetrics?.ticketsTypesMetrics.map((ticketType) => (
-              <div key={ticketType.name}>
-                <h2 className="text-text-inactive">{ticketType.name}</h2>
-                <ProgressBar current={ticketType.read} total={ticketType.quantity} />
-              </div>
-            ))
+            checkerTicketMetrics?.ticketsTypesMetrics.map((ticketType) => {
+              const percentage = ticketType.quantity > 0 ? Math.round((ticketType.read / ticketType.quantity) * 100) : 0;
+              return (
+                <div key={ticketType.name} className="flex items-end justify-between gap-x-4">
+                  <div className="flex-1">
+                    <h2 className="text-text-inactive mb-1">{ticketType.name}</h2>
+                    <ProgressBar current={ticketType.read} total={ticketType.quantity} />
+                  </div>
+                  <div className="flex-shrink-0 mt-6 text-primary font-bold">
+                    {percentage}%
+                  </div>
+                </div>
+              );
+            })
           }
           {
             checkerTicketMetrics?.ticketsTypesMetrics.length === 0 &&

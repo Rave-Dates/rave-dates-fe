@@ -110,7 +110,7 @@ console.log(checker)
   return (
     <div className="bg-primary-black min-h-screen flex flex-col text-primary-white pt-10 rounded-lg p-4 items-center">
       <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3" />
-      <h1 className="text-3xl pt-18 max-w-full font-semibold">{checker?.name} Maximiliano</h1>
+      <h1 className="text-3xl pt-15 max-w-full font-semibold">{checker?.name}</h1>
       <div className="absolute top-10 right-5">
         <ConfirmationModal
           isLogout
