@@ -17,7 +17,8 @@ export default function ControllerPanelSection({ token, eventId }: Props) {
   return (
     <div className="rounded-lg text-white w-full flex items-start justify-center mb-24 h-full">
       <div className="w-full h-full">
-        <Link href="/checker/scan-qr" prefetch={false} className="bg-input h-[400px] flex justify-center items-center px-2 py-1 rounded-lg mt-3">
+        <Link href="/checker/scan-qr" prefetch={false} className="bg-input h-[300px] flex py-5 flex-col justify-start gap-y-5 items-center px-2 rounded-lg mt-3">
+          <h1 className="text-lg text-pretty w-60 font-medium text-center text-primary">Toca aquí para empezar a escanear</h1>
           <QRSvg />
         </Link>
         <div className="bg-input h-[80px] flex px-5 justify-between items-center py-1 rounded-lg mt-3">

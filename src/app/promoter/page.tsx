@@ -8,7 +8,7 @@ import { useReactiveCookiesNext } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
 import Link from "next/link"
 
-export default function OrganizerHome() {
+export default function PromoterHome() {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const decoded: { id: number } = (token && jwtDecode(token.toString())) || {id: 0};
@@ -22,7 +22,7 @@ export default function OrganizerHome() {
   // const selectedPromoterBinnacle = promoterBinnacles?.find(b => b.eventId === eventId);
 
   return (
-    <div className="bg-primary-black pt-14 text-primary-white min-h-screen p-4">
+    <div className="bg-primary-black pt-14 pb-40 text-primary-white min-h-screen p-4">
       <div className="max-w-md mx-auto space-y-4">
         {/* Available Balance Header */}
 
@@ -86,7 +86,7 @@ export default function OrganizerHome() {
           <h1 className="font-medium px-2 my-2">Dinero</h1>
           <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
             <div className="flex text-sm justify-between items-center">
-              <h2>Total</h2>
+              <h2>Total comisiones</h2>
               <h2 className="text-primary text-base text-end tabular-nums">COP ${Number(promoterBinnacles?.total ?? 0).toLocaleString() ?? 0}</h2>
             </div>
 

@@ -182,6 +182,8 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
 
   const types = ["Cantidad vendida", "Dinero", "Promotores", "Link Escáner QRs"]
 
+  console.log(selectedEvent)
+
   return (
     <div className="rounded-lg text-white w-full flex items-start justify-center mb-44 h-full">
       <div className="w-full">
@@ -362,27 +364,29 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
         {
           isPromoter &&
           <>
-            <div className="bg-input mt-2 rounded-lg px-3 py-2">
-              <h1 className="font-medium px-2 mt-2">Link de afiliado</h1>
-              <div className="border-t-2 flex flex-col gap-y-3 pt-3 mt-3 px-2 pb-2 border-dashed border-inactive">
-                <div className="flex justify-between items-center">
-                  <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/20">
-                    { promoterLink }
-                  </h2>                  
-                  <button
-                    onClick={() => {
-                      if (promoterLink) {
-                        navigator.clipboard.writeText(promoterLink);
-                        notifySuccess("Link copiado al portapapeles");
-                      }
-                    }}
-                    className="border border-primary hover:opacity-75 transition-opacity px-4 py-1.5 font-medium text-primary rounded-lg text-sm"
-                  >
-                    Copiar
-                  </button>
-                </div>
-              </div> 
-            </div>
+            {selectedEvent?.isActive &&
+              <div className="bg-input mt-2 rounded-lg px-3 py-2">
+                <h1 className="font-medium px-2 mt-2">Link de afiliado</h1>
+                <div className="border-t-2 flex flex-col gap-y-3 pt-3 mt-3 px-2 pb-2 border-dashed border-inactive">
+                  <div className="flex justify-between items-center">
+                    <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/20">
+                      { promoterLink }
+                    </h2>                  
+                    <button
+                      onClick={() => {
+                        if (promoterLink) {
+                          navigator.clipboard.writeText(promoterLink);
+                          notifySuccess("Link copiado al portapapeles");
+                        }
+                      }}
+                      className="border border-primary hover:opacity-75 transition-opacity px-4 py-1.5 font-medium text-primary rounded-lg text-sm"
+                    >
+                      Copiar
+                    </button>
+                  </div>
+                </div> 
+              </div>
+            }
             <div className="bg-input flex flex-col items-center rounded-lg p-4 ps-3 mt-2">
               Entradas de cortesía disponibles:
               <div className="flex gap-x-3">
