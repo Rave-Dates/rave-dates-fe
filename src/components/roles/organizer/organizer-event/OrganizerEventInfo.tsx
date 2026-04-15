@@ -173,6 +173,13 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
     setValue("ticketTypeMap", newMap, { shouldValidate: true, shouldDirty: true });
   };
 
+  const handleRemoveTicketType = (idToRemove: string) => {
+    if (!selectedTickets) return;
+    const updatedMap = { ...selectedTickets };
+    delete updatedMap[Number(idToRemove)];
+    setValue("ticketTypeMap", updatedMap, { shouldValidate: true, shouldDirty: true });
+  };
+
   const types = ["Cantidad vendida", "Dinero", "Promotores", "Link Escáner QRs"]
 
   return (
@@ -307,16 +314,23 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                             ))}
                           </FormDropDown>
                         </div>
-                        <div className="text-sm flex justify-start w-full h-7 items-center gap-x-1">
+                        <div className="text-sm flex flex-wrap justify-start w-full min-h-7 items-center gap-x-1 gap-y-1">
                           <h2>Tickets seleccionados:</h2>
                           {selectedTickets &&
                             Object.entries(selectedTickets).map(([id, name]) => (
-                              <span key={id} className="bg-inactive px-2 py-1 rounded">
+                              <span key={id} className="bg-inactive flex items-center gap-x-1 px-2 py-1 rounded">
                                 {name}
+                                <button 
+                                  type="button" 
+                                  onClick={() => handleRemoveTicketType(id)} 
+                                  className="text-primary-white hover:text-red-400 font-bold ml-1"
+                                >
+                                  ✕
+                                </button>
                               </span>
                             ))}
                         </div>
-                        <button type="submit" className="bg-primary rounded-lg py-2.5 w-3/4 sm:w-1/2 font-medium text-sm text-primary-black">
+                        <button type="submit" className="bg-primary rounded-lg py-2.5 mt-3 w-3/4 sm:w-1/2 font-medium text-sm text-primary-black">
                           Generar link
                         </button>
                       </form>
