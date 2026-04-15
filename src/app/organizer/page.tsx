@@ -6,6 +6,7 @@ import ConfirmationModal from "@/components/ui/modals/ConfirmationModal"
 import { useAdminBinnacles, useAdminUserById } from "@/hooks/admin/queries/useAdminData"
 import { useReactiveCookiesNext } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
+import { useState } from "react"
 
 export default function OrganizerHome() {
   
@@ -20,6 +21,45 @@ export default function OrganizerHome() {
 
   const { organizerBinnacles } = useAdminBinnacles({ organizerId: organizerId ?? 0, token: token?.toString() });
 
+  const [filters, setFilters] = useState<string[]>(["Activo"]);
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+
+  const isEventFuture = (date: string) => {
+    return new Date(date).getTime() > new Date().getTime();
+  };
+
+  const getEventStatus = (event: IOrganizerEvent) => {
+    if (!isEventFuture(event.date ?? "")) return "Finalizado";
+    return event.isActive ? "Activo" : "Inactivo";
+  };
+
+  const toggleFilter = (statusName: string) => {
+    setFilters((prev) =>
+      prev.includes(statusName)
+        ? prev.filter((s) => s !== statusName)
+        : [...prev, statusName]
+    );
+  };
+
+  const eventStatus = [
+    {
+      name: "Activo",
+      className: "bg-green-500"
+    },
+    {
+      name: "Finalizado",
+      className: "bg-gray-400"
+    }
+  ];
+
+  const filteredEvents = user?.organizer?.events?.filter((event: IOrganizerEvent) =>
+    filters.includes(getEventStatus(event))
+  ).sort((a, b) => {
+    const timeA = new Date(a.date ?? "").getTime();
+    const timeB = new Date(b.date ?? "").getTime();
+    return sortOrder === "desc" ? timeB - timeA : timeA - timeB;
+  });
+
   const getTotalAvalible = () => {
     let pendingPayment = 0;
     if (organizerBinnacles) {
@@ -31,7 +71,7 @@ export default function OrganizerHome() {
   }
 
   return (
-    <div className="bg-primary-black pt-14 text-primary-white min-h-screen pb-40 p-4">
+    <div className="bg-primary-black pt-14 md:pt-32 text-primary-white min-h-screen pb-40 p-4">
       <div className="max-w-md mx-auto space-y-4">
         {/* Available Balance Header */}
         <div className="flex w-full justify-between items-center">
@@ -61,14 +101,57 @@ export default function OrganizerHome() {
         </div>
 
         {/* Event Cards */}
-        <div className="space-y-3">
+        <div className="flex justify-between items-center w-full gap-x-4">
+          <div className="flex gap-x-2 overflow-x-auto no-scrollbar pb-1">
+            {eventStatus.map((status) => {
+              const isSelected = filters.includes(status.name);
+              return (
+                <button
+                  key={status.name}
+                  onClick={() => toggleFilter(status.name)}
+                  className={`px-3 whitespace-nowrap text-sm py-1.5 rounded-full flex items-center gap-x-2 transition-all duration-300 border ${
+                    isSelected
+                      ? "bg-white/10 border-white/20 text-white"
+                      : "bg-transparent border-transparent text-white/40 grayscale"
+                  }`}
+                >
+                  <div
+                    className={`h-2 w-2 flex-shrink-0 ${status.className} rounded-full ${
+                      isSelected ? "animate-pulse" : ""
+                    }`}
+                  ></div>
+                  {status.name}
+                </button>
+              );
+            })}
+          </div>
+
+          <button 
+            onClick={() => setSortOrder(prev => prev === "desc" ? "asc" : "desc")}
+            className="flex items-center justify-center p-2 rounded-full border border-white/20 bg-white/10 text-white transition-all active:scale-95 shrink-0"
+            title={sortOrder === "desc" ? "Más recientes primero" : "Más antiguos primero"}
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              strokeWidth={1.5} 
+              stroke="currentColor" 
+              className={`w-4 h-4 transition-transform duration-300 ${sortOrder === "asc" ? "rotate-180" : ""}`}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="space-y-3 mt-2">
           {
-            !user?.organizer?.events && !isUserLoading &&
+            (!filteredEvents || filteredEvents.length === 0) && !isUserLoading &&
             <div className="w-full text-text-inactive h-23 rounded-xl gap-x-1 p-4 flex items-center justify-center">
-              No tienes eventos asignados
+              No se encontraron eventos
             </div>
           }
-          {!isUserLoading && user?.organizer?.events && user.organizer.events.map((event) => (
+          {!isUserLoading && filteredEvents && filteredEvents.map((event: IOrganizerEvent) => (
             <OrganizerEventCard
               href="organizer/event"
               key={event.eventId}
