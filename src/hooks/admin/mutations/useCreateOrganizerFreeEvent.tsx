@@ -25,6 +25,8 @@ export function useCreateOrganizerFreeEvent({reset, successHref = "/admin/events
       const createdEvent = await createEvent(token, cleanedEvent);
       const eventId = createdEvent.eventId;
 
+      await assignOrganizerToEvent(token, { organizerId: organizerId }, eventId);
+
       if (formPromoters) {
         const formattedData = {
           promoters: 
@@ -37,7 +39,6 @@ export function useCreateOrganizerFreeEvent({reset, successHref = "/admin/events
         await assignPromoterToEvent(token, formattedData, eventId);
       }
 
-      await assignOrganizerToEvent(token, { organizerId: organizerId }, eventId);
       
       // 2. Crear categorías
       console.log(eventCategoryValues)

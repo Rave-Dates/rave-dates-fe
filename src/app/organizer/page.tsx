@@ -6,7 +6,8 @@ import ConfirmationModal from "@/components/ui/modals/ConfirmationModal"
 import { useAdminBinnacles, useAdminUserById } from "@/hooks/admin/queries/useAdminData"
 import { useReactiveCookiesNext } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
-import { useState, useEffect } from "react"
+import Link from "next/link"
+import { useState } from "react"
 
 export default function OrganizerHome() {
   
@@ -206,6 +207,13 @@ export default function OrganizerHome() {
             </button>
           </div>
         )}
+
+        <Link
+          href="organizer/events/create-event"
+          className="bg-primary block text-center max-w-xl self-center text-black input-button"
+        >
+          Crear evento gratuito
+        </Link>
       </div>
     </div>
   )

@@ -43,7 +43,7 @@ export default function Page() {
         href="events/create-event"
         className="bg-primary block text-center max-w-xl self-center text-black input-button"
       >
-        Nuevo evento gratuito
+        Crear evento gratuito
       </Link>
       <div>
         <div className="max-w-xl mx-auto animate-fade-in">

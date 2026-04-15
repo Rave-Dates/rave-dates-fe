@@ -361,20 +361,30 @@ useEffect(() => {
           })}
         />
        </div>
-        <div className="flex gap-x-5">
-          <FormInput
-            className="!bg-cards-container"
-            title="Fecha inicio"
-            placeholder="yyyy-mm-dd"
-            inputName="date"
-            register={register("tickets.0.stages.0.date", { required: "La fecha es obligatoria", validate: validateDateYyyyMmDd })}
+        <div className="w-full gap-x-5 flex justify-between">
+          <Controller
+            name="tickets.0.stages.0.date"
+            control={control}
+            rules={{ required: "La fecha de inicio es obligatoria", validate: validateDateYyyyMmDd }}
+            render={({ field }) => (
+              <DatePicker 
+                value={field.value} 
+                onChange={field.onChange} 
+                title="Fecha inicio" 
+              />
+            )}
           />
-          <FormInput
-            className="!bg-cards-container"
-            title="Fecha máx."
-            placeholder="yyyy-mm-dd"
-            inputName="dateMax"
-            register={register(`tickets.0.stages.0.dateMax`, { required: "La fecha máx. es obligatoria", validate: validateDateYyyyMmDd })}
+          <Controller
+            name="tickets.0.stages.0.dateMax"
+            control={control}
+            rules={{ required: "La fecha máx. es obligatoria", validate: validateDateYyyyMmDd }}
+            render={({ field }) => (
+              <DatePicker 
+                value={field.value} 
+                onChange={field.onChange} 
+                title="Fecha máx." 
+              />
+            )}
           />
         </div>
 
