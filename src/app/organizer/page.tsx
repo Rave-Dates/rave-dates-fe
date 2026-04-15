@@ -6,7 +6,7 @@ import ConfirmationModal from "@/components/ui/modals/ConfirmationModal"
 import { useAdminBinnacles, useAdminUserById } from "@/hooks/admin/queries/useAdminData"
 import { useReactiveCookiesNext } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export default function OrganizerHome() {
   
@@ -23,6 +23,7 @@ export default function OrganizerHome() {
 
   const [filters, setFilters] = useState<string[]>(["Activo"]);
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const isEventFuture = (date: string) => {
     return new Date(date).getTime() > new Date().getTime();
@@ -34,6 +35,7 @@ export default function OrganizerHome() {
   };
 
   const toggleFilter = (statusName: string) => {
+    setCurrentPage(1);
     setFilters((prev) =>
       prev.includes(statusName)
         ? prev.filter((s) => s !== statusName)
@@ -59,6 +61,13 @@ export default function OrganizerHome() {
     const timeB = new Date(b.date ?? "").getTime();
     return sortOrder === "desc" ? timeB - timeA : timeA - timeB;
   });
+
+  const ITEMS_PER_PAGE = 5;
+  const totalPages = Math.ceil((filteredEvents?.length || 0) / ITEMS_PER_PAGE);
+  const paginatedEvents = filteredEvents?.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   const getTotalAvalible = () => {
     let pendingPayment = 0;
@@ -127,7 +136,10 @@ export default function OrganizerHome() {
           </div>
 
           <button 
-            onClick={() => setSortOrder(prev => prev === "desc" ? "asc" : "desc")}
+            onClick={() => {
+              setSortOrder(prev => prev === "desc" ? "asc" : "desc");
+              setCurrentPage(1);
+            }}
             className="flex items-center justify-center p-2 rounded-full border border-white/20 bg-white/10 text-white transition-all active:scale-95 shrink-0"
             title={sortOrder === "desc" ? "Más recientes primero" : "Más antiguos primero"}
           >
@@ -151,7 +163,7 @@ export default function OrganizerHome() {
               No se encontraron eventos
             </div>
           }
-          {!isUserLoading && filteredEvents && filteredEvents.map((event: IOrganizerEvent) => (
+          {!isUserLoading && paginatedEvents && paginatedEvents.map((event: IOrganizerEvent) => (
             <OrganizerEventCard
               href="organizer/event"
               key={event.eventId}
@@ -171,6 +183,29 @@ export default function OrganizerHome() {
             </div>
           }
         </div>
+
+        {/* Pagination Controls */}
+        {!isUserLoading && totalPages > 1 && (
+          <div className="flex items-center justify-between pt-4 pb-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 text-sm rounded-lg border border-white/20 bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
+            >
+              Anterior
+            </button>
+            <span className="text-sm text-text-inactive">
+              Página {currentPage} de {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 text-sm rounded-lg border border-white/20 bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
