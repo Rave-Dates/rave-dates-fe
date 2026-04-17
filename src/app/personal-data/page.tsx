@@ -16,7 +16,6 @@ import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type React from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";

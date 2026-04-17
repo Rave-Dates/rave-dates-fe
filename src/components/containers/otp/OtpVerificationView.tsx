@@ -28,7 +28,6 @@ export default function OtpVerificationView() {
   const { emailOrWhatsapp, redirectToCheckout, isEmailOrWhatsapp } = useClientAuthStore()
   const { setEventId } = useTicketStore();
   const router = useRouter();
-  
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const {
     register,
@@ -45,9 +44,17 @@ export default function OtpVerificationView() {
   
   const code = watch("code");
   const tempToken = getCookie("tempToken");
+  const clientToken = getCookie("clientToken");
   const searchParams = useSearchParams()
   const whereRedirect = searchParams.get('redirect')
   const eventId = searchParams.get('eid')
+
+  useEffect(() => {
+    if (clientToken) {
+      notifyError("Ya tienes una sesión activa")
+      router.replace("/");
+    }
+  }, [clientToken, router]);
   
   useEffect(() => {
     if (tempToken) {
@@ -122,6 +129,7 @@ export default function OtpVerificationView() {
         });
         
         deleteCookie("tempToken")
+        
         if (redirectToCheckout) {
           router.replace("/checkout");
         } else if (whereRedirect === "transfer") {

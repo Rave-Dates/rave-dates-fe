@@ -11,6 +11,7 @@ type FormInputProps = {
   labelClassname?: string;
   placeholder?: string;
   register: UseFormRegisterReturn;
+  disabled?: boolean;
   onInput?: React.InputHTMLAttributes<HTMLInputElement>["onInput"];
 };
 
@@ -23,6 +24,7 @@ const FormInput = ({
   labelClassname,
   placeholder,
   register,
+  disabled = false,
   onInput,
 }: FormInputProps) => {
   return (
@@ -51,8 +53,9 @@ const FormInput = ({
           placeholder={placeholder}
           type={type}
           onInput={onInput}
+          disabled={disabled}
           {...register}
-          className={`${className} ${typeOfValue && "ps-8"} w-full mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white`}
+          className={`${className} ${typeOfValue && "ps-8"} w-full mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white disabled:opacity-80 disabled:cursor-not-allowed disabled:select-none`}
         />
       </div>
     </div>

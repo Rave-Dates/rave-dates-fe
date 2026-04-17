@@ -81,9 +81,9 @@ export default function Checkout() {
   let urlToReturn = ""
 
   if (tempToken && !clientToken) {
-    urlToReturn = `${process.env.NEXT_PUBLIC_BASE_URL_PROD}/otp?redirect=transfer?eid=${eventId}`
+    urlToReturn = `${process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_FRONT_URL_DEV : process.env.NEXT_PUBLIC_FRONT_URL_PROD}/auth?redirect=transfer&eid=${eventId}`
   } else if (!tempToken && clientToken) {
-    urlToReturn = `${process.env.NEXT_PUBLIC_BASE_URL_PROD}/transfer-confirm?eid=${eventId}`
+    urlToReturn = `${process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_FRONT_URL_DEV : process.env.NEXT_PUBLIC_FRONT_URL_PROD}/transfer-confirm?eid=${eventId}`
   }
 
   const handleContinue = async () => {
@@ -125,7 +125,7 @@ export default function Checkout() {
           eventId: eventId,
           method: "BOLD",
           boldMethod: selectedMethod.toUpperCase() === "BOLD" ? ["CREDIT_CARD"] : ["NEQUI"],
-          returnUrl: `${process.env.NEXT_PUBLIC_BASE_URL_PROD}/tickets`,
+          returnUrl: `${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets`,
         },
         purchaseId: storePurchaseId ?? 0,
         clientToken: clientToken,
@@ -133,7 +133,7 @@ export default function Checkout() {
 
       if (data === "PAY NOT NEEDED") {
         notifySuccess("No se necesita pagar")
-        router.push(`${process.env.NEXT_PUBLIC_BASE_URL_PROD}/tickets`)
+        router.push(`${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets`)
         return
       }
       router.push(data)
@@ -144,7 +144,7 @@ export default function Checkout() {
       const ticketData = {
         method: "BOLD",
         boldMethod: "CREDIT_CARD",
-        returnUrl: `${process.env.NEXT_PUBLIC_BASE_URL_PROD}/tickets/event-ticket/${eventId}`,
+        returnUrl: `${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets/event-ticket/${eventId}`,
       };
 
       notifyPending(

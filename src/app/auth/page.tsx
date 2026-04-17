@@ -7,8 +7,8 @@ import FormInput from "@/components/ui/inputs/FormInput";
 import { useClientAuthStore } from "@/store/useClientAuthStore";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
-import { redirect, useRouter } from "next/navigation";
-import type React from "react";
+import { jwtDecode } from "jwt-decode";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
@@ -20,14 +20,15 @@ type ClientForm = {
 export default function ClientAuth() {
   const { getCookie } = useReactiveCookiesNext();
   const { setClientAuthData, setIsEmailOrWhatsapp, isEmailOrWhatsapp } = useClientAuthStore()
+  const searchParams = useSearchParams()
   const router = useRouter()
   const tempToken = getCookie("tempToken");
   const clientToken = getCookie("clientToken");
+  const whereRedirect = searchParams.get('redirect')
+  const eventId = searchParams.get('eid')
+
   
   useEffect(() => {
-    if (tempToken) {
-      router.push('/otp');
-    }
     if (clientToken) {
       redirect('/my-data');
     }
@@ -37,13 +38,35 @@ export default function ClientAuth() {
     watch,
     register,
     handleSubmit,
+    setValue
   } = useForm<ClientForm>();
+
+  useEffect(() => {
+    if (!isEmailOrWhatsapp) {
+      setIsEmailOrWhatsapp("Email")
+    }
+  }, [isEmailOrWhatsapp, setIsEmailOrWhatsapp]);
+  
+  useEffect(() => {
+    if (tempToken) {
+      const decoded: { id: number; email: string, whatsapp: string; exp: number; iat: number } = jwtDecode(tempToken.toString());
+      setClientAuthData({emailOrWhatsapp: isEmailOrWhatsapp === "Email" ? decoded.email : decoded.whatsapp})
+      setValue("emailOrWhatsapp", isEmailOrWhatsapp === "Email" ? decoded.email : decoded.whatsapp)
+    }
+  }, [tempToken, isEmailOrWhatsapp, setValue]);
   
   const receiveInfo = watch("receiveInfo", false);
 
   const onSubmit = (data: ClientForm) => {
-    if(!data.emailOrWhatsapp) return
-    setClientAuthData({emailOrWhatsapp: data.emailOrWhatsapp})
+    if (!data.emailOrWhatsapp) (
+      setClientAuthData({emailOrWhatsapp: data.emailOrWhatsapp})
+    )
+
+    if (whereRedirect === "transfer") {
+      router.push('/otp?redirect=transfer&eid=' + eventId);
+      return;
+    }
+
     router.push('/otp');
   };
 
@@ -61,6 +84,7 @@ export default function ClientAuth() {
       {
         isEmailOrWhatsapp === "Email" ?
         <FormInput
+          disabled={!!tempToken}
           title="Email*"
           type="email"
           inputName="emailOrWhatsapp"
@@ -68,6 +92,7 @@ export default function ClientAuth() {
         />
         :
         <FormInput
+          disabled={!!tempToken}
           title="WhatsApp*"
           type="tel"
           inputName="emailOrWhatsapp"

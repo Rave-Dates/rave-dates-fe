@@ -2,6 +2,7 @@
 
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormInput from "@/components/ui/inputs/FormInput";
+import PhoneInput from "@/components/ui/inputs/PhoneInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { editClient, getClientById } from "@/services/clients-login";
 import { useClientAuthStore } from "@/store/useClientAuthStore";
@@ -30,7 +31,8 @@ export default function DataForm() {
     handleSubmit,
     setValue,
     getValues,
-    watch
+    watch,
+    control
   } = useForm<IClient>();
 
   const watchedEmail = watch("email");
@@ -190,12 +192,12 @@ export default function DataForm() {
           </button>
         </div>
         <div className="flex gap-x-3">
-          <FormInput
-            type="tel"
+          <PhoneInput
             title="Celular con WhatsApp*"
-            inputName="whatsapp"
+            name="whatsapp"
             className={`${!(client?.isWhatsappVerified && watchedWhatsapp === client?.whatsapp) ? "border-b border-b-system-error/50 text-red-400" : "border-b border-b-primary/50 text-primary"}`}
-            register={register("whatsapp", { required: "El WhatsApp es obligatorio"  })}
+            control={control}
+            rules={{ required: "El WhatsApp es obligatorio" }}
           />
           <button
             disabled={client?.isWhatsappVerified && watchedWhatsapp === client?.whatsapp}
