@@ -10,6 +10,7 @@ interface Props {
   ticketType: string;
   eventImage: string;
   logoRD: string;
+  purchaseTicketId: string | number;
 }
 
 export const GenerateJPGButton = ({
@@ -20,6 +21,7 @@ export const GenerateJPGButton = ({
   ticketType,
   eventImage,
   logoRD,
+  purchaseTicketId,
 }: Props) => {
   const handleDownload = async () => {
     await generateTicketImage({
@@ -30,6 +32,7 @@ export const GenerateJPGButton = ({
       ticketType,
       eventImage,
       logoRD,
+      purchaseTicketId,
       fileName: `ticket-${ticketType}.jpg`,
     });
   };

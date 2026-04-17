@@ -91,6 +91,7 @@ export const generateTicketImage = async ({
   ticketType,
   eventImage,
   logoRD,
+  purchaseTicketId,
   fileName,
   mode = "download", // 👈 nuevo parámetro opcional
 }: {
@@ -101,6 +102,7 @@ export const generateTicketImage = async ({
   ticketType: string
   eventImage: string
   logoRD: string
+  purchaseTicketId: string | number
   fileName: string
   mode?: "download" | "return"
 }) => {
@@ -157,7 +159,13 @@ export const generateTicketImage = async ({
 
   const qrSize = 400
   ctx.drawImage(qrImg, (canvasWidth - qrSize) / 2, y, qrSize, qrSize)
-  y += qrSize + 40
+  
+  // Dibujar ID debajo del QR
+  ctx.font = "bold 28px InterCustom"
+  ctx.fillStyle = "rgba(255, 255, 255, 0.9)" // Un poco más opaco también
+  ctx.fillText(`ID: ${purchaseTicketId}`, canvasWidth / 2, y + qrSize + 35)
+
+  y += qrSize + 80
 
   const ticketHeight = 60
   const ticketWidth = 600

@@ -55,6 +55,7 @@ export function TicketRow({
             ticketType: ticket.ticketType.name,
             eventImage: servedImageUrl ?? "/images/event-placeholder.png",
             logoRD: "/logo.svg",
+            purchaseTicketId: ticket.purchaseTicketId,
             mode: "return",
           });
           setTicketCanvas(dataUrl);
@@ -126,6 +127,7 @@ export function TicketRow({
                     time={`${formatDateToColombiaTime(eventInfo.date).date}, ${formatDateToColombiaTime(eventInfo.date).time}hs`}
                     ticketType={ticket.ticketType.name}
                     logoRD="/logo.svg"
+                    purchaseTicketId={ticket.purchaseTicketId}
                   />
                 </div>
               );
