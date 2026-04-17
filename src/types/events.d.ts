@@ -20,6 +20,7 @@ interface IEvent {
   timeOut: number;
   isActive: boolean;
   labels: IEventLabel[];
+  quantityComplimentaryTickets?: number;
   organizer?: {
     userId: number;
     organizerId: number;
@@ -60,6 +61,7 @@ interface IEventFormData extends Partial<IEvent> {
   formPromoters?: {
     promoterId?: number;
   }[];
+  quantityComplimentaryTickets?: number;
 }
 
 interface IEventForUpdate extends Partial<IEventFormData>, Omit<IEventFormData, 'labels'> {

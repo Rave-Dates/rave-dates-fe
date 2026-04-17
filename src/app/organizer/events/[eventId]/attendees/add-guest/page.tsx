@@ -3,6 +3,7 @@
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
+import PhoneInput from "@/components/ui/inputs/PhoneInput";
 import { notifyPending } from "@/components/ui/toast-notifications";
 import { useCreateGuest } from "@/hooks/admin/mutations/useCreateGuest";
 import { useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData";
@@ -12,7 +13,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 
 export default function AddGuest() {
-  const { register, handleSubmit} = useForm<IFormGuest>();
+  const { register, handleSubmit, control } = useForm<IFormGuest>();
   const params = useParams();
   const eventId = Number(params.eventId);
   const { getCookie } = useReactiveCookiesNext();
@@ -69,10 +70,11 @@ export default function AddGuest() {
         inputName="idCard"
         register={register("idCard", { required: true })}
       />
-      <FormInput
+      <PhoneInput
         title="Celular*"
-        inputName="whatsapp"
-        register={register("whatsapp", { required: true })}
+        name="whatsapp"
+        control={control}
+        rules={{ required: true }}
       />
 
       <FormDropDown

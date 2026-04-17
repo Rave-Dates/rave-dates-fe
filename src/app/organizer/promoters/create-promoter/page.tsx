@@ -2,6 +2,7 @@
 
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormInput from "@/components/ui/inputs/FormInput";
+import PhoneInput from "@/components/ui/inputs/PhoneInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { useAdminAllRoles } from "@/hooks/admin/queries/useAdminData";
 import { createUser } from "@/services/admin-users";
@@ -14,7 +15,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 
 export default function CreateUser() {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, control } = useForm();
   const { getCookie } = useReactiveCookiesNext();
   const router = useRouter();
 
@@ -80,11 +81,11 @@ export default function CreateUser() {
         inputName="email"
         register={register("email", { required: true })}
       />
-      <FormInput
-        type="number"
+      <PhoneInput
         title="Celular*"
-        inputName="phone"
-        register={register("phone", { required: true })}
+        name="phone"
+        control={control}
+        rules={{ required: true }}
       />
 
       <button

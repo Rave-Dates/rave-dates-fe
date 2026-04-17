@@ -80,6 +80,7 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       isActive: event.isActive,
       timeOut: event.timeOut,
       piggyBank: event.piggyBank,
+      quantityComplimentaryTickets: event.quantityComplimentaryTickets,
     };
 
     Object.entries(setters).forEach(([key, value]) => {
@@ -277,7 +278,17 @@ useEffect(() => {
             </FormDropDown>
           ))
         }
+
+      <FormInput
+        type="number"
+        title="Cortesía cada X ventas"
+        inputName="quantityComplimentaryTickets"
+        register={register("quantityComplimentaryTickets", {
+          setValueAs: (v) => v === "" || v === undefined ? undefined : Number(v)
+        })}
+      />
       <br />
+
       {
         labelsTypes && watchedLabels &&
         <LabelTagButton setValue={setValue} watchedLabels={watchedLabels} labelsTypes={labelsTypes} title="Etiquetas" />

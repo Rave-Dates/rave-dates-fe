@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import DefaultForm from '@/components/ui/forms/DefaultForm';
 import FormInput from '@/components/ui/inputs/FormInput';
+import PhoneInput from '@/components/ui/inputs/PhoneInput';
 import { usePathname, useRouter } from 'next/navigation';
 import FormDropDown from '@/components/ui/inputs/FormDropDown';
 import Link from 'next/link';
@@ -19,7 +20,7 @@ import { useAdminAllRoles, useAdminUserById } from '@/hooks/admin/queries/useAdm
 
 const EditUser = ({ userId } : { userId: number }) => {
   const pathname = usePathname();
-  const { register, handleSubmit, reset, watch } = useForm();
+  const { register, handleSubmit, reset, watch, control } = useForm();
   const roleId = watch("roleId");
   const { getCookie } = useReactiveCookiesNext();
   const router = useRouter();
@@ -116,14 +117,11 @@ const EditUser = ({ userId } : { userId: number }) => {
         />
         {
           userById?.role.name !== "ADMIN" &&
-          <FormInput
-            type='number'
+          <PhoneInput
             title="Número de celular*"
-            inputName="phone"
-            register={register("phone", { 
-              required: true, 
-              setValueAs: (v) => v === "" ? undefined : Number(v) 
-            })}
+            name="phone"
+            control={control}
+            rules={{ required: true }}
           />
         }
         <FormInput
@@ -148,21 +146,6 @@ const EditUser = ({ userId } : { userId: number }) => {
             ))
           }
         </FormDropDown>
-        {/* <FormInput
-          type="number"
-          title="Comisión (%)*"
-          inputName="commission"
-          register={register("commission")}
-        /> */}
-        {
-          userById?.role.name === "ORGANIZER" && 
-          <FormInput
-            type="number"
-            title="Cortesía cada X ventas" 
-            inputName="tickets"
-            register={register("tickets")}
-          />
-        }
         {
           userById?.role.name !== "ADMIN" &&
           <Link

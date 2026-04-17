@@ -3,6 +3,7 @@
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
 import FormInput from "@/components/ui/inputs/FormInput";
+import PhoneInput from "@/components/ui/inputs/PhoneInput";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { useClientEvent } from "@/hooks/client/queries/useClientData";
 import { createClient } from "@/services/clients-login";
@@ -39,7 +40,7 @@ export default function DataForm() {
       notifyError("Debes seleccionar un ticket para continuar")
       router.push('/');
     } else if ((tempToken || clientToken) && !withoutTickets) {
-      notifySuccess("Tenes cuenta y seleccionaste tickets");
+      // notifySuccess("Tenes cuenta y seleccionaste tickets");
       router.replace("/checkout");
     } else if ((!tempToken || !clientToken) && !withoutTickets) {
       return
@@ -50,6 +51,7 @@ export default function DataForm() {
     watch,
     register,
     handleSubmit,
+    control,
   } = useForm<ClientForm>();
   
   const receiveInfo = watch("receiveInfo", false);
@@ -151,11 +153,11 @@ export default function DataForm() {
         inputName="email"
         register={register("email", { required: "El email es obligatorio"  })}
       />
-      <FormInput
-        type="tel"
+      <PhoneInput
         title="Celular con WhatsApp*"
-        inputName="whatsapp"
-        register={register("whatsapp", { required: "El WhatsApp es obligatorio"  })}
+        name="whatsapp"
+        control={control}
+        rules={{ required: "El WhatsApp es obligatorio" }}
       />
 
        <CheckFormInput

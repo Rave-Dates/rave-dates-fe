@@ -164,7 +164,7 @@ export function TicketRow({
               }
               return (
                 <div key={action} className="text-xs py-3 px-4 text-primary/80 italic">
-                  Ticket ya leído por el destinatario
+                  Ticket transferido
                 </div>
                 );
             }

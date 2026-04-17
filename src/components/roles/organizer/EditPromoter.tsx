@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import DefaultForm from '@/components/ui/forms/DefaultForm';
 import FormInput from '@/components/ui/inputs/FormInput';
+import PhoneInput from '@/components/ui/inputs/PhoneInput';
 import { onInvalid } from '@/utils/onInvalidFunc';
 import { useMutation } from '@tanstack/react-query';
 import { editUserById } from '@/services/admin-users';
@@ -13,7 +14,7 @@ import { useReactiveCookiesNext } from 'cookies-next';
 import { useRouter } from 'next/navigation';
 
 const EditPromoter = ({ userId } : { userId: number }) => {
-  const { register, handleSubmit, reset} = useForm();
+  const { register, handleSubmit, reset, control } = useForm();
   const { getCookie } = useReactiveCookiesNext();
   const router = useRouter();
 
@@ -72,11 +73,11 @@ const EditPromoter = ({ userId } : { userId: number }) => {
         inputName="email"
         register={register("email", { required: true })}
       />
-      <FormInput
-        type="number"
+      <PhoneInput
         title="Celular*"
-        inputName="phone"
-        register={register("phone", { required: true })}
+        name="phone"
+        control={control}
+        rules={{ required: true }}
       />
 
       <button

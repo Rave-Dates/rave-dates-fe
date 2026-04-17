@@ -6,6 +6,7 @@ import TitleCard from "../../common/TitleCard";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import FormInput from "@/components/ui/inputs/FormInput";
+import PhoneInput from "@/components/ui/inputs/PhoneInput";
 import { transferTickets } from "@/services/clients-tickets";
 import { useReactiveCookiesNext } from "cookies-next";
 import { onInvalid } from "@/utils/onInvalidFunc";
@@ -37,7 +38,7 @@ const TicketTransferredForm = ({
   const { selectedEvent, isEventLoading } = useClientEvent(eventId);
   const { servedImageUrl, isImageLoading } = useClientEventServedOneImage(eventId);
 
-  const { register, handleSubmit, reset } = useForm<ITransferUser>();
+  const { register, handleSubmit, reset, control } = useForm<ITransferUser>();
 
   useEffect(() => {
     reset({
@@ -141,12 +142,11 @@ const TicketTransferredForm = ({
         inputName="email"
         register={register("email", { required: "El email es obligatorio" })}
       />
-      <FormInput
+      <PhoneInput
         title="Celular con WhatsApp*"
-        inputName="whatsapp"
-        register={register("whatsapp", {
-          required: "El WhatsApp es obligatorio",
-        })}
+        name="whatsapp"
+        control={control}
+        rules={{ required: "El WhatsApp es obligatorio" }}
       />
 
       <p className="text-sm">
