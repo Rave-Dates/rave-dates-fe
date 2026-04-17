@@ -71,7 +71,7 @@ export default function StageConfig() {
       dateMax: nextDate,
       price: 0,
       quantity: 0,
-      date: nextDate,
+      date: yyyyMmDd,
       feeType: "fixed",
       promoterFee: 0
     };

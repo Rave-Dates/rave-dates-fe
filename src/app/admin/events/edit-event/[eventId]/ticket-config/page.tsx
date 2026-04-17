@@ -127,6 +127,7 @@ export default function EditTicketConfiguration() {
       labels: data.labels || [],
       tickets: formattedTickets,
       piggyBank: data.piggyBank,
+      quantityComplimentaryTickets: data.quantityComplimentaryTickets,
     }
 
     console.log("cleanedEventData",cleanedEventData)

@@ -105,6 +105,7 @@ export default function FreeTicketConfiguration() {
       images: data.images,
       timeOut: data.timeOut,
       labels: data.labels || [],
+      quantityComplimentaryTickets: data.quantityComplimentaryTickets,
       tickets: [formattedTickets[0]],
     }
 

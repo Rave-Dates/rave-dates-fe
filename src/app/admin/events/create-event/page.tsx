@@ -71,6 +71,7 @@ export default function Page() {
       type: eventFormData.type,
       labels: eventFormData.labels || [],
       images: eventFormData.images,
+      quantityComplimentaryTickets: eventFormData.quantityComplimentaryTickets,
     };
 
     Object.entries(setters).forEach(([key, value]) => {
@@ -109,7 +110,7 @@ export default function Page() {
           maxDate: eventDate,
           stages: ticket.stages.map(stage => ({
             ...stage,
-            date: eventDate,
+            date: new Date().toISOString().split('T')[0],
             dateMax: eventDate
           }))
         }
@@ -214,6 +215,15 @@ export default function Page() {
             </FormDropDown>
           ))
         }
+
+      <FormInput
+        type="number"
+        title="Cortesía cada X ventas" 
+        inputName="quantityComplimentaryTickets"
+        register={register("quantityComplimentaryTickets", {
+          setValueAs: (v) => v === "" || v === undefined ? undefined : Number(v)
+        })}
+      />
       <br />
 
     {labelsTypes && watchedLabels && (

@@ -29,6 +29,7 @@ export const defaultEventFormData: IEventFormData = {
   timeOut: undefined,
   commission: undefined,
   isActive: false,
+  quantityComplimentaryTickets: undefined,
   labels: [],
   formPromoters: [],
   promoters: [],

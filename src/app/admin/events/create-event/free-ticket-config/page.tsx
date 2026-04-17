@@ -69,6 +69,7 @@ export default function FreeTicketConfiguration() {
       timeOut: data.timeOut,
       labels: data.labels || [],
       tickets: [validTickets[0]],
+      quantityComplimentaryTickets: data.quantityComplimentaryTickets,
     };
 
     console.log(cleanedEventData)

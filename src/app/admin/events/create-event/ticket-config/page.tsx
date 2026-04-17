@@ -89,6 +89,7 @@ export default function TicketConfiguration() {
       timeOut: data.timeOut,
       labels: data.labels || [],
       tickets: validTickets,
+      quantityComplimentaryTickets: data.quantityComplimentaryTickets,
     };
 
     notifyPending(
@@ -129,7 +130,7 @@ export default function TicketConfiguration() {
       stages: [
         {
           stageId: 1, // stageId comienza en 1
-          date: nextDate,
+          date: yyyyMmDd,
           dateMax: nextDate,
           price: 0,
           quantity: 0,
@@ -271,7 +272,6 @@ export default function TicketConfiguration() {
               inputName="discountCode"
               register={register("discountCode")}
             />
-
               <div className="flex items-center justify-between mt-5">
                 <span className="text-white text-lg">Alcancía</span>
                 <button
