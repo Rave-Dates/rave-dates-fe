@@ -114,8 +114,8 @@ export default function ScanQRPage() {
                 success: true, 
                 text: `Ticket leído correctamente`,
                 // TODO: Ajusta aquí los campos exactos según lo devuelva tu backend ('res.user.name', 'res.ticket.id', etc.)
-                userName: res?.user?.name || res?.ticket?.user?.name || 'Nombre Desconocido',
-                ticketName: res?.ticketType?.name || res?.ticket?.ticketType?.name || 'Boleta Desconocida'
+                userName: res?.user?.name || 'Nombre Desconocido',
+                ticketName: res?.ticketType?.name || 'Boleta Desconocida'
               });
             } catch (error) {
               const err = error as AxiosError<{ message: string }>;
@@ -125,7 +125,10 @@ export default function ScanQRPage() {
                 return
               }
               if (err.response?.data.message === "Ticket not pending") {
-                setScanResult({ success: false, text: 'Ticket ya utilizado o vencido' });
+                setScanResult({ 
+                  success: false, 
+                  text: 'Ticket ya utilizado o vencido' 
+                });
                 return
               }
               console.error('Error al procesar QR:', err);

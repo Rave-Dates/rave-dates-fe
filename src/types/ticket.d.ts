@@ -116,3 +116,20 @@ type IChangeTicketsPayload = {
   boldMethod: string | string[] | undefined | object;
   returnUrl: string;
 };
+
+interface ticketQrResponse {
+  purchaseTicketId: number;
+  purchaseId: number;
+  isInvite: boolean;
+  ticketTypeId: number;
+  status: "READ" | "DEFEATED" | "PENDING";
+  checkerId: number | null;
+  isTransferred: boolean;
+  transferredClientId: number | null;
+  clientId: number;
+  createdAt: string;
+  updatedAt: string;
+  ticketType: {
+    name: string;
+  }
+}

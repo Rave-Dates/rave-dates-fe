@@ -51,7 +51,6 @@ export default function OtpVerificationView() {
 
   useEffect(() => {
     if (clientToken) {
-      notifyError("Ya tienes una sesión activa")
       router.replace("/");
     }
   }, [clientToken, router]);

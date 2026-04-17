@@ -9,7 +9,8 @@ export const readQr = async ({ token, qr, controllerId }: { token: CookieValueTy
       "Authorization": `Bearer ${token}`,
     },
   });
-  return res.data;
+  const data: ticketQrResponse = res.data;
+  return data;
 };
 
 export const generateCheckerLink = async ({ eventId, checkerEmail }: { eventId: number, checkerEmail: string }) => {

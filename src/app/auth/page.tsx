@@ -19,7 +19,7 @@ type ClientForm = {
 
 export default function ClientAuth() {
   const { getCookie } = useReactiveCookiesNext();
-  const { setClientAuthData, setIsEmailOrWhatsapp, isEmailOrWhatsapp } = useClientAuthStore()
+  const { setClientAuthData, setIsEmailOrWhatsapp, isEmailOrWhatsapp, emailOrWhatsapp } = useClientAuthStore()
   const searchParams = useSearchParams()
   const router = useRouter()
   const tempToken = getCookie("tempToken");
@@ -58,7 +58,7 @@ export default function ClientAuth() {
   const receiveInfo = watch("receiveInfo", false);
 
   const onSubmit = (data: ClientForm) => {
-    if (!data.emailOrWhatsapp) (
+    if (!data.emailOrWhatsapp || !emailOrWhatsapp) (
       setClientAuthData({emailOrWhatsapp: data.emailOrWhatsapp})
     )
 
