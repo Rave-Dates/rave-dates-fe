@@ -176,7 +176,7 @@ export default function OtpVerificationView() {
           type="button"
           onClick={handleSendCode}
           disabled={loadingSend}
-          className={`${loadingSend ? "opacity-70 pointer-events-none" : "opacity-100 pointer-events-auto"} w-full bg-primary text-center flex items-center justify-center text-black py-3 rounded-lg transition-all animate-fade-in`}
+          className={`${loadingSend ? "opacity-70 pointer-events-none" : "opacity-100 pointer-events-auto"} w-full bg-primary text-center flex items-center justify-center text-primary-white py-3 rounded-lg transition-all animate-fade-in`}
         >
           {
             loadingSend ? <i><SpinnerSvg className="text-primary fill-inactive w-6" /></i> : <p>Enviar código de validación</p>
@@ -213,7 +213,7 @@ export default function OtpVerificationView() {
           <button
             type="submit"
             disabled={!isCodeComplete || loadingValidate}
-            className={`${loadingValidate ? "opacity-70 pointer-events-none" : "opacity-100 pointer-events-auto"} w-full bg-primary text-black py-3 rounded-lg font-medium disabled:pointer-events-none disabled:opacity-60`}
+            className={`${loadingValidate ? "opacity-70 pointer-events-none" : "opacity-100 pointer-events-auto"} w-full bg-primary text-primary-white py-3 rounded-lg font-medium disabled:pointer-events-none disabled:opacity-60`}
           >
             {
               loadingValidate ? <i><SpinnerSvg className="text-primary fill-inactive w-6" /></i> : <p>Continuar</p>

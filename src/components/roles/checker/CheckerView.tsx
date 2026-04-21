@@ -121,7 +121,7 @@ console.log(checker)
           trigger={
             <button
               type="button"
-              className="bg-system-error text-primary-black text-2xl p-2.5 rounded-lg flex items-center justify-center text-center transition-all active:scale-95"
+              className="bg-system-error text-primary-white text-2xl p-2.5 rounded-lg flex items-center justify-center text-center transition-all active:scale-95"
               aria-label="Desloguearse"
             >
               <LogoutSvg />
@@ -170,11 +170,11 @@ console.log(checker)
         
       <div className="flex text-sm py-4 px-5 gap-y-2 w-full mt-3 bg-input rounded-lg flex-col items-center justify-center">
         Tickets habilitados para escanear
-        <div className="flex gap-x-3 text-primary-black text-sm font-medium">
+        <div className="flex gap-x-3 text-primary-white text-sm font-medium">
           {
             checker?.checker?.ticketTypeIds?.map((ticketType) => (
               <div key={ticketType.ticketTypeId} className="flex items-center gap-x-2">
-                <div className="bg-primary rounded-lg px-3 py-1">{ticketType.name}</div>
+                <div className="bg-neutral-700 rounded-lg px-3 py-1">{ticketType.name}</div>
               </div>
             ))
           }

@@ -31,7 +31,7 @@ function FilterModal() {
   return (
     <>
       <button 
-        className="bg-primary text-primary-black hover:bg-primary/70 transition-colors px-3.5 content-center mx-2 rounded-2xl"
+        className="bg-primary text-primary-white hover:bg-primary/70 transition-colors px-3.5 content-center mx-2 rounded-2xl"
         onClick={() => setIsModalOpen(true)}
       >
         <FilterSvg />
@@ -51,7 +51,7 @@ function FilterModal() {
               <h2 className="text-title">Filtros</h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="bg-primary text-primary-black rounded-xl p-1.5"
+                className="bg-primary text-primary-white rounded-xl p-1.5"
               >
                 <AddSvg className="rotate-45 w-7 h-7" />
               </button>
@@ -89,7 +89,7 @@ function FilterModal() {
               <button
                 type="submit"
                 form="filter-form"
-                className="w-full bg-primary text-black py-3 rounded-lg font-medium hover:opacity-85 transition-opacity"
+                className="w-full bg-primary text-primary-white py-3 rounded-lg font-medium hover:opacity-85 transition-opacity"
                 onClick={applyFilters}
               >
                 Aplicar filtros

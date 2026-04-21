@@ -109,7 +109,7 @@ export default function UsersList() {
               notifyError("No hay invitados para exportar.");
             }
           }}          
-          className="bg-primary mt-20 text-black input-button" 
+          className="bg-primary mt-20 text-primary-white input-button" 
         >
           Descargar
         </button>

@@ -58,7 +58,7 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
             onClick={() => subtract(ticket.ticketTypeId)}
             disabled={currentQuantity === 0}
             className={`p-3 rounded-l-xl transition-opacity ${
-              currentQuantity > 0 ? "bg-primary-white text-black hover:opacity-75" : "bg-inactive text-text-inactive pointer-events-none"
+              currentQuantity > 0 ? "bg-primary-white text-primary-white hover:opacity-75" : "bg-inactive text-text-inactive pointer-events-none"
             }`}
           >
             <SubtractSvg />
@@ -75,7 +75,7 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
               currentQuantity >= (validStage.quantity ?? 0) ||
               totalQuantity >= controlledMaxPurchase
             }            
-            className={`p-3 rounded-r-xl flex items-center justify-center text-black transition-colors ${
+            className={`p-3 rounded-r-xl flex items-center justify-center text-primary-white transition-colors ${
               validStage &&
               currentQuantity < (validStage.quantity ?? 0) &&
               totalQuantity < controlledMaxPurchase

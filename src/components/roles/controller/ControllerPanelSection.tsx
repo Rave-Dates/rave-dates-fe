@@ -19,7 +19,7 @@ export default function ControllerPanelSection({ token, eventId }: Props) {
     <div className="rounded-lg text-white w-full flex items-start justify-center mb-24 h-full">
       <div className="w-full h-full">
         <Link href="/checker/scan-qr" prefetch={false} className="bg-input h-[300px] flex py-5 flex-col justify-start gap-y-5 items-center px-2 rounded-lg mt-3">
-          <h1 className="text-lg text-pretty w-60 font-medium text-center text-primary">Toca aquí para empezar a escanear</h1>
+          <h1 className="text-lg text-pretty w-60 font-medium text-center">Toca aquí para empezar a escanear</h1>
           <QRSvg />
         </Link>
         <div className="bg-input h-[80px] flex px-5 justify-between items-center py-1 rounded-lg mt-3">
@@ -43,7 +43,7 @@ export default function ControllerPanelSection({ token, eventId }: Props) {
                     <h2 className="text-text-inactive mb-1">{ticketType.name}</h2>
                     <ProgressBar current={ticketType.read} total={ticketType.quantity} />
                   </div>
-                  <div className="flex-shrink-0 mt-6 text-primary font-bold">
+                  <div className="flex-shrink-0 mt-6 text-primary-white font-bold">
                     {percentage}%
                   </div>
                 </div>
@@ -59,7 +59,7 @@ export default function ControllerPanelSection({ token, eventId }: Props) {
         </div>
         <Link
           href={`/checker/${eventId}/attendees`}
-          className="w-full block text-center bg-primary mt-5 text-black py-4 rounded-lg font-medium hover:opacity-85 transition-opacity"
+          className="w-full block text-center bg-primary mt-5 text-primary-white py-4 rounded-lg font-medium hover:opacity-85 transition-opacity"
         >
           Ver escaneados
         </Link>

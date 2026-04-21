@@ -84,7 +84,7 @@ export default function EditableItem({
             type="text"
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="text-sm px-3 py-1 text-primary-black font-semibold bg-white/30 outline-none w-fit border-none focus:ring-0"
+            className="text-sm px-3 py-1 text-primary-white font-semibold bg-white/30 outline-none w-fit border-none focus:ring-0"
             autoFocus
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSave();
@@ -93,7 +93,7 @@ export default function EditableItem({
             disabled={isSaving}
           />
         ) : (
-          <h1 className="text-sm px-3 py-1 text-primary-black font-semibold truncate max-w-[150px]">
+          <h1 className="text-sm px-3 py-1 text-primary-white font-semibold truncate max-w-[150px]">
             {initialValue}
           </h1>
         )}

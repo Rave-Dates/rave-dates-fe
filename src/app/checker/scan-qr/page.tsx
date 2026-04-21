@@ -182,11 +182,11 @@ export default function ScanQRPage() {
 
       <div className="flex text-sm py-4 px-5 gap-y-2 w-full max-w-sm mb-5 bg-[#17171e] rounded-lg flex-col items-center justify-center">
         Tickets habilitados para escanear
-        <div className="flex flex-wrap justify-center gap-3 text-primary-black text-sm font-medium">
+        <div className="flex flex-wrap justify-center gap-3 text-primary-white text-sm font-medium">
           {
             checker?.checker?.ticketTypeIds?.map((ticketType) => (
               <div key={ticketType.ticketTypeId} className="flex items-center gap-x-2">
-                <div className="bg-primary rounded-lg px-3 py-1">{ticketType.name}</div>
+                <div className="bg-neutral-700 rounded-lg px-3 py-1">{ticketType.name}</div>
               </div>
             ))
           }
@@ -225,7 +225,7 @@ export default function ScanQRPage() {
               <div className="mt-4 flex flex-col items-center justify-center gap-y-2">
                 <span className="text-sm font-medium text-white/80">Asistente:</span>
                 <span className="text-xl font-bold text-white">{scanResult.userName}</span>
-                <div className="bg-primary text-primary-black px-3 py-1 rounded-lg text-sm font-bold mt-2">
+                <div className="bg-neutral-700 text-primary-white px-3 py-1 rounded-lg text-sm font-bold mt-2">
                   {scanResult.ticketName}
                 </div>
               </div>

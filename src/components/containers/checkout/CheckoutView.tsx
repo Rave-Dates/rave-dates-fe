@@ -279,11 +279,11 @@ export default function Checkout() {
             setHasDiscountFlag={setHasDiscountFlag}
             hasDiscountFlag={hasDiscountFlag}
           />
-          <button onClick={() => handleContinue()} className="lg:block hidden w-full order-last bg-primary text-black font-medium py-3 rounded-lg text-lg">
+          <button onClick={() => handleContinue()} className="lg:block hidden w-full order-last bg-primary text-primary-white font-medium py-3 rounded-lg text-lg">
             Continuar
           </button>
         </div>
-        <button onClick={() => handleContinue()} className="lg:hidden block mt-5 w-full order-last bg-primary text-black font-medium py-3 rounded-lg text-lg">
+        <button onClick={() => handleContinue()} className="lg:hidden block mt-5 w-full order-last bg-primary text-primary-white font-medium py-3 rounded-lg text-lg">
           Continuar
         </button>
       </div>

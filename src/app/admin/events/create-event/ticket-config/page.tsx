@@ -198,7 +198,7 @@ export default function TicketConfiguration() {
 
         <button
           onClick={() => handleAddTicket()}
-          className="w-full bg-primary outline-none text-black font-medium py-3 rounded-lg text-sm flex items-center justify-center gap-2"
+          className="w-full bg-primary outline-none text-primary-white font-medium py-3 rounded-lg text-sm flex items-center justify-center gap-2"
         >
           +
           Incorporar ticket
@@ -297,7 +297,7 @@ export default function TicketConfiguration() {
 
               <button
                 type="submit"
-                className="w-full bg-primary text-black font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
+                className="w-full bg-primary text-primary-white font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
               >
                 Crear evento
               </button>

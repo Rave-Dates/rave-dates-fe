@@ -157,7 +157,7 @@ const EditUser = ({ userId } : { userId: number }) => {
         }
         <button
           type="submit"
-          className="bg-primary text-black input-button"
+          className="bg-primary text-primary-white input-button"
         >
           Guardar
         </button>

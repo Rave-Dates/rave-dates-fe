@@ -72,7 +72,7 @@ export default function Page() {
   };
   
   return (
-    <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Iniciar sesión">
+    <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Iniciar sesión" goHomeButton>
       <FormInput
         type="email"
         title="Usuario*"
@@ -94,7 +94,7 @@ export default function Page() {
 
       <button
         type="submit"
-        className="bg-primary text-black input-button"
+        className="bg-primary text-primary-white input-button"
         disabled={isPending}
       >
          {isPending ? "Cargando..." : "Iniciar sesión"}

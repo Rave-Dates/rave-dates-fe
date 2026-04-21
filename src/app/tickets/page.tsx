@@ -95,13 +95,13 @@ const TicketsEventList: React.FC = () => {
         ></div>
         <button
           onClick={() => setIsUpcoming(true)}
-          className={`${isUpcoming && "text-primary-black"} w-1/2 py-2 sm:px-3 z-10`}
+          className={`${isUpcoming && "text-primary-white"} w-1/2 py-2 sm:px-3 z-10`}
         >
           Próximos
         </button>
         <button
           onClick={() => setIsUpcoming(false)}
-          className={`${!isUpcoming && "text-primary-black"} w-1/2 py-2 sm:px-3 z-10`}
+          className={`${!isUpcoming && "text-primary-white"} w-1/2 py-2 sm:px-3 z-10`}
         >
           Finalizados
         </button>

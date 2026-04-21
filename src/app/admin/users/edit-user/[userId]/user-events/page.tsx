@@ -70,7 +70,7 @@ export default function Page() {
                   </Link>
                   <Link
                     href={`${pathname}/edit-event/${event.eventId}`}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-black"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end bg-primary  text-primary-white"
                   >
                     <EditSvg className="text-xl" />
                   </Link>
@@ -90,7 +90,7 @@ export default function Page() {
       </div>
       <Link
         href={`${pathname}/assign-event`}
-        className="bg-primary block text-center max-w-xl self-center text-black input-button"
+        className="bg-primary block text-center max-w-xl self-center text-primary-white input-button"
       >
         Asignar nuevo evento
       </Link>

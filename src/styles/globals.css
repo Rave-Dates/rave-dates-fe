@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #B2FF00;
+  --color-primary: #DB0913;
   --color-primary-black: #050505;
   --color-primary-white: #FFFFFF;
   --color-cards-container: #151515;
@@ -11,6 +11,7 @@
   --color-input: #1A1A1A;
   --color-divider: #262626;
   --color-system-error: #B31215;
+  --color-system-success: #B2FF00;
 
   --text-title: 2.25rem;
   --text-subtitle: 1.5rem;

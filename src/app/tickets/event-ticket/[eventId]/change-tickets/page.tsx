@@ -269,7 +269,7 @@ const ChangeTicketsView = () => {
 
           <div className="flex justify-between gap-x-5 items-center mb-4">
             {totalPages && totalPages > 1 ? (
-              <div className="flex justify-center items-center text-primary-black gap-2">
+              <div className="flex justify-center items-center text-primary-white gap-2">
                 <button
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
@@ -287,7 +287,7 @@ const ChangeTicketsView = () => {
                     key={purchaseId}
                     className={`px-4 py-2 rounded-lg tabular-nums text-sm font-medium transition-colors whitespace-nowrap ${
                       activeTab === Number(purchaseId)
-                        ? "bg-primary text-black"
+                        ? "bg-primary text-primary-white"
                         : "bg-secondary text-white"
                     }`}
                     onClick={() => handleSetActiveTab(Number(purchaseId))}
@@ -297,7 +297,7 @@ const ChangeTicketsView = () => {
                 ))}
             </div>
             {totalPages && totalPages > 1 ? (
-              <div className="flex justify-center items-center text-primary-black gap-2">
+              <div className="flex justify-center items-center text-primary-white gap-2">
                 <button
                   onClick={() =>
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
@@ -387,7 +387,7 @@ const ChangeTicketsView = () => {
                 && totalQuantity === oldTicketsTotal - totalOldTickets
               )
             }
-            className="w-full text-center py-3 rounded-lg transition-colors text-black bg-primary hover:bg-primary/70 disabled:bg-primary/60 disabled:pointer-events-none"
+            className="w-full text-center py-3 rounded-lg transition-colors text-primary-white bg-primary hover:bg-primary/70 disabled:bg-primary/60 disabled:pointer-events-none"
           >
             Confirmar pedido
           </button>

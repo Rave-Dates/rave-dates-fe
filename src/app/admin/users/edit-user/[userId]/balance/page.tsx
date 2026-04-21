@@ -61,7 +61,7 @@ export default function Balance() {
                   {eventMap.get(data.eventId) || "Evento desconocido"}
                 </div>
                 <div className="text-end tabular-nums">${data.paymentAmount?.toLocaleString("es-ES")}</div>
-                <Link href={`/admin/users/edit-user/${userId}/balance/withdraw-info/${data.paymentId}?e=${data.eventId}&oid=${data.organizerId}`} className="justify-self-end flex tabular-nums bg-primary text-black text-xl p-1.5 rounded-lg">
+                <Link href={`/admin/users/edit-user/${userId}/balance/withdraw-info/${data.paymentId}?e=${data.eventId}&oid=${data.organizerId}`} className="justify-self-end flex tabular-nums bg-primary text-primary-white text-xl p-1.5 rounded-lg">
                   <EyeSvg className="w-5 h-5" />
                 </Link>
               </div>
@@ -79,7 +79,7 @@ export default function Balance() {
       </div>
       <Link
         href={`${pathname}/add`}
-        className="bg-primary block text-center max-w-xl self-center text-black input-button mt-10"
+        className="bg-primary block text-center max-w-xl self-center text-primary-white input-button mt-10"
       >
         Ingresar movimiento
       </Link>

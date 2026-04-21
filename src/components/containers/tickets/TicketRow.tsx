@@ -189,7 +189,7 @@ export function TicketRow({
       </div>
       {showQR && (
         <div
-          className="fixed inset-0 bg-black/70 text-primary-black backdrop-blur-sm z-50 flex items-center justify-center"
+          className="fixed inset-0 bg-black/70 text-primary-white backdrop-blur-sm z-50 flex items-center justify-center"
           onClick={() => setShowQR(false)}
         >
           <div

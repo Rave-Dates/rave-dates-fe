@@ -7,15 +7,15 @@ export function StageItem({stage, quantity, index}: { stage: IStageDetail, quant
       <div className="flex justify-between items-center ml-2 mt-3">
         <span className="text-text-inactive text-sm">Cantidad vendida</span>
         <div className="flex items-center gap-1">
-          <span className="text-primary text-sm">{quantity}</span>
+          <span className="text-primary-white text-sm">{quantity}</span>
         </div>
       </div>
       <div className="space-y-2">
         <div className="flex justify-between items-center ml-2 text-sm">
           <span className="text-text-inactive">Precio</span>
           <div className="flex items-center gap-2">
-            <span className="text-primary">
-              <span className="text-primary">${stage.price.toLocaleString()}</span>
+            <span className="text-primary-white">
+              <span className="text-primary-white">${stage.price.toLocaleString()}</span>
             </span>
           </div>
         </div>
@@ -24,7 +24,7 @@ export function StageItem({stage, quantity, index}: { stage: IStageDetail, quant
         <div className="flex justify-between items-center ml-2">
           <span className="text-text-inactive text-sm">Fecha de inicio</span>
           <div className="flex items-center gap-2">
-            <span className="text-primary text-sm tabular-nums">{formatDateToDDMMYYYY(stage.date)}</span>
+            <span className="text-primary-white text-sm tabular-nums">{formatDateToDDMMYYYY(stage.date)}</span>
           </div>
         </div>
       </div>
@@ -32,7 +32,7 @@ export function StageItem({stage, quantity, index}: { stage: IStageDetail, quant
         <div className="flex justify-between items-center ml-2">
           <span className="text-text-inactive text-sm">Fecha final</span>
           <div className="flex items-center gap-2">
-            <span className="text-primary text-sm tabular-nums">{formatDateToDDMMYYYY(stage.dateMax)}</span>
+            <span className="text-primary-white text-sm tabular-nums">{formatDateToDDMMYYYY(stage.dateMax)}</span>
           </div>
         </div>
       </div>

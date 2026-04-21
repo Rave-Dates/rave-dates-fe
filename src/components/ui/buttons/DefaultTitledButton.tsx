@@ -17,7 +17,7 @@ const DefaultTitledButton = ({
       {href ? (
         <Link
           href={href}
-          className={`${className} bg-primary text-black px-2 py-1 min-w-[65px] justify-items-center rounded-md flex flex-col items-center justify-center hover:opacity-80 transition-opacity`}
+          className={`${className} bg-primary text-primary-white px-2 py-1 min-w-[65px] justify-items-center rounded-md flex flex-col items-center justify-center hover:opacity-80 transition-opacity`}
           aria-label={`Ver ${href}`}
         >
           {children}
@@ -25,7 +25,7 @@ const DefaultTitledButton = ({
       ) : (
         <button
           onClick={handleOnClick}
-          className={`${className} bg-primary text-black px-2 py-1 min-w-[65px] justify-items-center rounded-md flex flex-col items-center justify-center hover:opacity-80 transition-opacity`}
+          className={`${className} bg-primary text-primary-white px-2 py-1 min-w-[65px] justify-items-center rounded-md flex flex-col items-center justify-center hover:opacity-80 transition-opacity`}
         >
           {children}
         </button>

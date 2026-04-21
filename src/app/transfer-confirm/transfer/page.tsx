@@ -108,7 +108,7 @@ export default function Verification() {
                 <div className="bg-cards-container pe-4 py-5 rounded-r-lg">
                   <Link
                     href={`transfer/${ticket.purchaseTicketId}/receiver-data`}
-                    className="block text-center bg-primary hover:opacity-80 text-black rounded px-4 py-2 text-sm transition-opacity"
+                    className="block text-center bg-primary hover:opacity-80 text-primary-white rounded px-4 py-2 text-sm transition-opacity"
                   >
                     Transferir
                   </Link>

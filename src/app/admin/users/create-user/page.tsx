@@ -108,7 +108,7 @@ export default function CreateUser() {
 
       <button
         type="submit"
-        className="bg-primary text-black input-button"
+        className="bg-primary text-primary-white input-button"
       >
         Crear usuario
       </button>

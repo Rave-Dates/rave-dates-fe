@@ -23,7 +23,7 @@ const CheckFormInput = ({ register, name = "receiveInfo", value }: Props) => {
 
       <div
         className={`w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors border
-          ${value ? "bg-primary text-primary-black border-primary" : "border-inactive text-transparent"}`}
+          ${value ? "bg-primary text-primary-white border-primary" : "border-inactive text-transparent"}`}
       >
         <CheckSvg />
       </div>

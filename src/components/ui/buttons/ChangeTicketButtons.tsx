@@ -66,7 +66,7 @@ const ChangeTicketButtons = ({ ticket, totalQuantity, fixedQuantity, isOldTicket
               }}
               disabled={isOldTicket ? oldTickets[ticket.ticketTypeId]?.actualQuantity === 0 : currentQuantity <= 0}
             className={`p-3 rounded-l-xl transition-opacity ${
-              currentQuantity > 0 ? "bg-primary-white text-black hover:opacity-75" : "bg-inactive text-text-inactive pointer-events-none"
+              currentQuantity > 0 ? "bg-primary-white text-primary-black hover:opacity-75" : "bg-inactive text-text-inactive pointer-events-none"
             }`}
           >
             <SubtractSvg />
@@ -83,7 +83,7 @@ const ChangeTicketButtons = ({ ticket, totalQuantity, fixedQuantity, isOldTicket
               }
             }}
             disabled={isOldTicket || totalQuantity === oldTicketsTotal - totalOldTickets }
-            className={`p-3 rounded-r-xl flex items-center justify-center text-black transition-colors ${
+            className={`p-3 rounded-r-xl flex items-center justify-center text-primary-white transition-colors ${
               validStage &&
               currentQuantity < (validStage.quantity ?? 0) &&
               totalQuantity !== oldTicketsTotal - totalOldTickets

@@ -258,7 +258,7 @@ export default function EditAssignEvent() {
         <button
           type="submit"
           onClick={handleSubmit(onSubmit, onInvalid)}
-          className="bg-primary max-w-xl self-center text-black input-button"
+          className="bg-primary max-w-xl self-center text-primary-white input-button"
         >
           Guardar cambios
         </button>

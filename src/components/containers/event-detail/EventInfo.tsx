@@ -42,7 +42,7 @@ const EventInfo= ({ labels, eventCategoryValues, isLoading, description, organiz
             <h3 className="text-small-title font-semibold text-white mb-3">Información adicional</h3>
             <div className="flex flex-wrap gap-2">
               {labels?.map((label, index) => (
-                <span key={index} className="bg-primary text-black px-3 py-1.5 rounded-xl text-sm">
+                <span key={index} className="bg-primary text-primary-white px-3 py-1.5 rounded-xl text-sm">
                   {label.name}
                 </span>
               ))}
@@ -52,7 +52,7 @@ const EventInfo= ({ labels, eventCategoryValues, isLoading, description, organiz
           {/* Organizer */}
           <div>
             <h3 className="text-small-title font-semibold text-white mb-2">Organizador</h3>
-              <span className="bg-primary text-black px-3 py-1.5 rounded-xl text-sm">
+              <span className="bg-primary text-primary-white px-3 py-1.5 rounded-xl text-sm">
                 {organizerName || "Organizador no disponible"}
               </span>
           </div>
@@ -61,7 +61,7 @@ const EventInfo= ({ labels, eventCategoryValues, isLoading, description, organiz
           <div>
             <h3 className="text-small-title font-semibold text-white mb-3">Géneros</h3>
             <div className="flex gap-2">
-              <span className="bg-primary text-black px-3 py-1.5 rounded-xl text-sm">
+              <span className="bg-primary text-primary-white px-3 py-1.5 rounded-xl text-sm">
                 {genre?.categoryValue || "Genero no disponible"}
               </span>
             </div>

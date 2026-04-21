@@ -63,7 +63,7 @@ export default function EventInfo() {
       <GoBackButton className="absolute z-30 top-10 left-5 p-3 animate-fade-in" />
       <Link
         href="event-info/attendees"
-        className="absolute block text-center z-30 top-10 right-5 p-3 animate-fade-in bg-primary text-primary-black rounded-xl"
+        className="absolute block text-center z-30 top-10 right-5 p-3 animate-fade-in bg-primary text-primary-white rounded-xl"
       >
         <UserSvg stroke={1.7} className="text-2xl" />
       </Link>

@@ -43,7 +43,7 @@ export default function UsersList({
             trigger={
               <button
                 type="button"
-                className="bg-system-error text-primary-black text-2xl p-2.5 rounded-lg flex items-center justify-center text-center transition-all active:scale-95"
+                className="bg-system-error text-primary-white text-2xl p-2.5 rounded-lg flex items-center justify-center text-center transition-all active:scale-95"
                 aria-label="Desloguearse"
               >
                 <LogoutSvg />
@@ -62,7 +62,7 @@ export default function UsersList({
           )}
           <Link
             href={createHref}
-            className={`${!hasSearch && "w-full" } bg-primary text-primary-black text-2xl p-2.5 rounded-lg flex items-center justify-center text-center`} 
+            className={`${!hasSearch && "w-full" } bg-primary text-primary-white text-2xl p-2.5 rounded-lg flex items-center justify-center text-center`} 
             aria-label="Añadir usuario"
           >
             {

@@ -125,7 +125,7 @@ const TicketSelector = ({
               onClick={handleClick}
               className={`w-full md:w-1/2 text-center py-3 rounded-lg transition-colors ${
                 totalQuantity > 0
-                  ? "bg-primary hover:bg-primary/70 text-black"
+                  ? "bg-primary hover:bg-primary/70 text-primary-white"
                   : "bg-inactive text-text-inactive pointer-events-none"
               }`}
             >

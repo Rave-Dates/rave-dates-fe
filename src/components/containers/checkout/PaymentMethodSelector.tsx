@@ -73,7 +73,7 @@ export default function PaymentMethodSelector({ clientData, selected, setSelecte
             <div
               onClick={() => setCheck(!check)}
               className={`w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors cursor-pointer border
-                ${check ? "bg-primary text-primary-black border-primary" : "border-inactive text-transparent"}
+                ${check ? "bg-primary text-primary-white border-primary" : "border-inactive text-transparent"}
                 ${clientData?.balance <= 0 && "pointer-events-none"}
               `}
             >

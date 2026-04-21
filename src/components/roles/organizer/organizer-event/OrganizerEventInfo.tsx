@@ -202,7 +202,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                   <div className="mb-2">
                     <div className="flex bg-main-container justify-between p-3 rounded-lg items-center">
                       <h1>Total vendido:</h1>
-                      <span className="text-primary">
+                      <span className="text-primary-white">
                         {ticketMetrics?.ticketsPurchased}
                       </span>
                     </div>
@@ -235,27 +235,27 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                   <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
                     <div className="flex text-sm justify-between items-center">
                       <h2>Total</h2>
-                      <h2 className="text-primary text-base text-end tabular-nums">COP ${Number(selectedBinnacle?.total?? "0").toLocaleString()}</h2>
+                      <h2 className="text-primary-white text-base text-end tabular-nums">COP ${Number(selectedBinnacle?.total?? "0").toLocaleString()}</h2>
                     </div>
 
                     <div className="flex text-sm justify-between items-center">
                       <h2>Dinero entregado</h2>
-                      <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedBinnacle?.alreadyPaid.toLocaleString()?? 0}</h2>
+                      <h2 className="text-primary-white text-base text-end tabular-nums">COP ${selectedBinnacle?.alreadyPaid.toLocaleString()?? 0}</h2>
                     </div>
                         
                     <div className="flex text-sm justify-between items-center">
                       <h2>Comisión Rave Dates</h2>
-                      <h2 className="text-red-400/80 text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feeRD?? "0").toLocaleString()}</h2>
+                      <h2 className="text-red-300/80 text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feeRD?? "0").toLocaleString()}</h2>
                     </div>
 
                     <div className="flex text-sm justify-between items-center">
                       <h2>Comisión Promotores</h2>
-                      <h2 className="text-red-400/80 text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feePromoter?? "0").toLocaleString()}</h2>
+                      <h2 className="text-red-300/80 text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feePromoter?? "0").toLocaleString()}</h2>
                     </div>
 
                     <div className="flex text-sm justify-between items-center">
                       <h2>Dinero disponible</h2>
-                      <h2 className="text-primary text-base text-end tabular-nums">COP ${selectedBinnacle?.pendingPayment.toLocaleString()?? 0}</h2>
+                      <h2 className="text-primary-white text-base text-end tabular-nums">COP ${selectedBinnacle?.pendingPayment.toLocaleString()?? 0}</h2>
                     </div>
 
                     <Link href={`/organizer/event/${eventId}/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-black bg-primary">
@@ -337,7 +337,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                         </button>
                       </form>
                       <div className="flex w-full gap-x-1 mt-3 justify-between py-2 items-center">
-                        <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/20">
+                        <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/50">
                           {checkerLink ? checkerLink : "Aqui aparecerá el link ..."}
                         </h2>                  
                         <button
@@ -349,7 +349,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                               notifySuccess("Link copiado al portapapeles");
                             }
                           }}
-                          className="border border-primary disabled:opacity-60 disabled:pointer-events-none hover:opacity-75 transition-opacity px-4 py-1.5 font-medium text-primary rounded-lg text-sm"
+                          className="border border-primary disabled:opacity-60 disabled:pointer-events-none hover:opacity-75 transition-opacity px-4 py-1.5 font-medium text-primary-white rounded-lg text-sm"
                         >
                           Copiar
                         </button>
@@ -477,7 +477,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                   <h1 className="p-3 pt-1 text-lg">Entradas vendidas</h1>
                   <div className="flex bg-main-container justify-between p-3 rounded-lg items-center">
                     <h1>Total vendido:</h1>
-                    <span className="text-primary">
+                    <span className="text-primary-white">
                       {promoterTicketMetrics?.ticketsPurchased}
                     </span>
                   </div>
@@ -493,7 +493,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                                   <span> vendidas:</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <span className="text-primary text-sm">{ticket.quantity} de {ticket.total} disponibles</span>
+                                  <span className="text-primary-white text-sm">{ticket.quantity} de {ticket.total} disponibles</span>
                                 </div>
                               </div>
                             </div>

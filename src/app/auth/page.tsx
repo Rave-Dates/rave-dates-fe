@@ -108,7 +108,7 @@ export default function ClientAuth() {
 
       <button
         type="submit"
-        className="bg-primary text-black input-button"
+        className="bg-primary text-primary-white input-button"
       >
          Iniciar sesión
       </button>

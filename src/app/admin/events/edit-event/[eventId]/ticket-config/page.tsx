@@ -237,7 +237,7 @@ export default function EditTicketConfiguration() {
             </button>
           </div>
 
-          <button type="submit" className="w-full bg-primary text-black font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2">
+          <button type="submit" className="w-full bg-primary text-primary-white font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2">
             Actualizar evento
           </button>
         </form>

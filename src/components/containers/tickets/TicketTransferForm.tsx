@@ -137,7 +137,7 @@ const TicketTransferForm = ({
         Te enviaremos los tickets vía email y/o WhatsApp
       </p>
 
-      <button type="submit" className="bg-primary text-black input-button">
+      <button type="submit" className="bg-primary text-primary-white input-button">
         Transferir
       </button>
     </DefaultForm>

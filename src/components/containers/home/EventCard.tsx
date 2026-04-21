@@ -103,7 +103,7 @@ const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?:
 
         {/* Buy Button and Price */}
         <div className={`${text === "Finalizado" && "hidden"} flex items-center gap-6 justify-between`}>
-          <Link href={`${href}/${eventId}`} className="bg-primary text-center text-black font-medium text-body py-3 px-8 rounded-md hover:bg-primary/80 transition-all flex-1">
+          <Link href={`${href}/${eventId}`} className="bg-primary text-center text-primary-white font-medium text-body py-3 px-8 rounded-md hover:bg-primary/80 transition-all flex-1">
             {text}
           </Link>
         </div>

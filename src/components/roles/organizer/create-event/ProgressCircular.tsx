@@ -20,7 +20,7 @@ export function CircularProgress({ current, total, size = 60 }: CircularProgress
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="#c1ff00"
+          stroke="#DB0913"
           strokeWidth="4"
           fill="transparent"
           strokeDasharray={circumference}
@@ -29,7 +29,7 @@ export function CircularProgress({ current, total, size = 60 }: CircularProgress
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-primary text-sm font-bold">{Math.round(percentage)}%</span>
+        <span className="text-primary-white text-sm font-bold">{Math.round(percentage)}%</span>
       </div>
     </div>
   )

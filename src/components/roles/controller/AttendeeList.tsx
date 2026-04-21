@@ -149,7 +149,7 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
       <div className="flex flex-col gap-y-2">
           {/* Paginación */}
           {totalPages && totalPages > 1 ? (
-            <div className="flex justify-center items-center text-primary-black gap-2 mt-4">
+            <div className="flex justify-center items-center text-primary-white gap-2 mt-4">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
@@ -172,7 +172,7 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
             </div>
           )
         : null}
-        <button onClick={handleClick} className="bg-primary hover:opacity-80 transition-opacity mt-5 text-primary-black font-medium py-3 w-full rounded-lg flex items-center justify-center text-center">
+        <button onClick={handleClick} className="bg-primary hover:opacity-80 transition-opacity mt-5 text-primary-white font-medium py-3 w-full rounded-lg flex items-center justify-center text-center">
           Atras
         </button>
       </div>

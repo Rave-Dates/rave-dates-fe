@@ -17,7 +17,7 @@ export const notifySuccess = (message: string) => {
       borderColor: "#b3ff0020"
     },
     duration: 2500,
-    icon: <CheckSvg className="text-primary text-xl" />,
+    icon: <CheckSvg className="text-system-success text-xl" />,
   });
 };
 
@@ -44,7 +44,7 @@ export const notifyPending = (promise: Promise<unknown>, options?: {  loading?: 
     ),
     success: () => (
       <div className="flex items-center gap-2">
-        <CheckSvg className="text-primary text-xl" />
+        <CheckSvg className="text-system-success text-xl" />
         {options?.success || "Operación completada correctamente"}
       </div>
     ),

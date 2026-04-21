@@ -102,7 +102,7 @@ export default function Page() {
         />
         <button
           type="submit"
-          className="bg-primary max-w-xl self-center text-black input-button"
+          className="bg-primary max-w-xl self-center text-primary-white input-button"
         >
           Ingresar movimiento
         </button>

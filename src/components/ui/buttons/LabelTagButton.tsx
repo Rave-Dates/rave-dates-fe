@@ -31,7 +31,7 @@ const LabelTagButton = ({
             onClick={() => toggle(item)}
             className={`px-2.5 py-1.5 rounded-xl border text-sm font-normal transition-all duration-200 ${
               watchedLabels.map((l) => l.labelId).includes(item.labelId)
-                ? "bg-primary text-primary-black hover:opacity-80"
+                ? "bg-primary text-primary-white hover:opacity-80"
                 : "bg-transparent text-text-inactive border-inactive hover:bg-inactive hover:text-primary-white/60"
             }`}
           >

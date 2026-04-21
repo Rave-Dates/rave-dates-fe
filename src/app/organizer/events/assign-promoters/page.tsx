@@ -85,7 +85,7 @@ export default function UserManagement() {
               <div className="flex justify-end gap-x-2">
                 {
                   !isIn ?
-                  <button onClick={() => handlePromoterAdd(user.promoter?.promoterId)} className="w-40 font-medium border border-primary bg-primary rounded-lg text-primary-black py-2">
+                  <button onClick={() => handlePromoterAdd(user.promoter?.promoterId)} className="w-40 font-medium border border-primary bg-primary rounded-lg text-primary-white py-2">
                     Asignar al evento
                   </button>
                   :

@@ -6,7 +6,7 @@ const DefaultButton = ({ href, text, className, icon = <EyeSvg /> }: { href: str
   return (
     <Link
       href={href}
-      className={`${className} bg-primary text-primary-black p-1.5 rounded-md flex items-center justify-center`}
+      className={`${className} bg-primary text-primary-white p-1.5 rounded-md flex items-center justify-center`}
       aria-label={`Ver ${href}`}
     >
       {

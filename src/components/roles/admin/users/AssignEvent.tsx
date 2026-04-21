@@ -130,7 +130,7 @@ export default function AssignEvent() {
       <button
         onClick={handleSubmit(onSubmit, onInvalid)}
         type="submit"
-        className="bg-primary max-w-xl self-center text-black input-button"
+        className="bg-primary max-w-xl self-center text-primary-white input-button"
       >
         Asignar evento
       </button>

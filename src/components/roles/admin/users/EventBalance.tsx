@@ -47,7 +47,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
             (user?.role.name === "ORGANIZER" || user?.role.name === "PROMOTER") &&
             <Link
               href={user?.role.name === "ORGANIZER" ? "event-balance/event-info" : `/admin/users/edit-user/2/user-events/${eventId}/event-balance/event-info?organizerId=true`}
-              className="bg-primary text-primary-black p-3 text-sm px-5 rounded-lg font-medium flex items-center justify-center text-center"
+              className="bg-primary text-primary-white p-3 text-sm px-5 rounded-lg font-medium flex items-center justify-center text-center"
               aria-label="Añadir usuario"
             >
               Ver asistentes

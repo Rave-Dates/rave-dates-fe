@@ -169,7 +169,7 @@ export function TicketCard({
         <button
           onClick={onEditStages}
           type="submit"
-          className={`${stagesEnabled ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"} block text-center transition-all duration-300 w-full bg-primary text-black font-medium py-3 rounded-lg text-sm`} 
+          className={`${stagesEnabled ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"} block text-center transition-all duration-300 w-full bg-primary text-primary-white font-medium py-3 rounded-lg text-sm`} 
         >
           Editar etapa
         </button>

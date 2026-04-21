@@ -56,7 +56,7 @@ export default function Contact() {
               <i className="absolute left-10 sm:left-28">
                 {item.icon}
               </i>
-              <span className="text-lg">
+              <span className="text-lg text-primary-white">
                 {item.label}
               </span>
             </a>

@@ -288,7 +288,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
         ) : null}
         <Link
           href={`${pathname}/change-tickets`}
-          className="block text-center w-full bg-primary text-black font-medium py-3 rounded-lg mb-3 mt-10 hover:opacity-80 transition-opacity"
+          className="block text-center w-full bg-primary text-primary-white font-medium py-3 rounded-lg mb-3 mt-10 hover:opacity-80 transition-opacity"
         >
           Mejorar tickets
         </Link>

@@ -22,7 +22,7 @@ const TicketsSkeleton = () => {
             <div className="px-4 h-12 flex items-center justify-center tabular-nums w-[76px] bg-text-inactive/70">
               <div className="h-8 w-8 rounded bg-inactive animate-pulse"></div>
             </div>
-            <button className="p-3 rounded-r-xl flex items-center justify-center text-black bg-primary">
+            <button className="p-3 rounded-r-xl flex items-center justify-center text-primary-white bg-primary">
               <AddSvg />
             </button>
           </div>

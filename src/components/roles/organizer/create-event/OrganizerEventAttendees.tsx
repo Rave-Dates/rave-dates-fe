@@ -121,7 +121,7 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
           {guests?.map((guest) => (
             <div key={guest.clientId} className="flex items-center justify-between py-2">
               <span className="text-primary-white">{guest.name}</span>
-              <Link href={`attendees/${guest.clientId}/edit-guest`} className="bg-primary text-primary-black p-1.5 rounded-lg">
+              <Link href={`attendees/${guest.clientId}/edit-guest`} className="bg-primary text-primary-white p-1.5 rounded-lg">
                 <EditSvg className="text-2xl" />
               </Link>
             </div>
@@ -144,7 +144,7 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
               notifyError("No hay invitados para exportar.");
             }
           }}
-          className="w-full bg-primary text-primary-black font-medium py-4 rounded-lg"
+          className="w-full bg-primary text-primary-white font-medium py-4 rounded-lg"
         >
           Descargar lista
         </button>      

@@ -151,7 +151,7 @@ export default function StageConfig() {
           </button>
 
           <button
-            className="w-full bg-primary text-black font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
+            className="w-full bg-primary text-primary-white font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
           >
             Guardar
           </button>

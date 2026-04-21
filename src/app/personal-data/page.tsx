@@ -167,7 +167,7 @@ export default function DataForm() {
 
       <button
         type="submit"
-        className="bg-primary text-black input-button"
+        className="bg-primary text-primary-white input-button"
         disabled={isPending}
       >
          {isPending ? "Cargando..." : "Continuar"}

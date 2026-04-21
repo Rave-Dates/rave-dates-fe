@@ -34,7 +34,7 @@ export default function SuccessView({
         }
         <Link
           href={link2.href}
-          className="bg-primary text-center text-black mt-1 input-button"
+          className="bg-primary text-center text-primary-white mt-1 input-button"
         >
           {link2.text}
         </Link>

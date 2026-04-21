@@ -51,7 +51,7 @@ export default function MoneyWithdrawn() {
                 </div>
                 <div className="text-center">{movement?.reference ?? "Concepto"}</div>
                 <div className="text-end tabular-nums">${movement.paymentAmount.toLocaleString("es-ES")}</div>
-                <Link href={`${pathname}/${movement.paymentId}/withdraw-info`} className="justify-self-end tabular-nums bg-primary text-black text-xl p-1.5 rounded-lg w-fit">
+                <Link href={`${pathname}/${movement.paymentId}/withdraw-info`} className="justify-self-end tabular-nums bg-primary text-primary-white text-xl p-1.5 rounded-lg w-fit">
                   <EyeSvg />
                 </Link>
               </div>

@@ -133,7 +133,7 @@ export default function EditGuest({ clientId }: {clientId: number}) {
         <button
           onClick={handleSubmit(onSubmit, onInvalid)}
           type="submit"
-          className="bg-primary rounded-lg py-4 font-medium w-full text-black mx-6"
+          className="bg-primary rounded-lg py-4 font-medium w-full text-primary-white mx-6"
         >
           Guardar
         </button>

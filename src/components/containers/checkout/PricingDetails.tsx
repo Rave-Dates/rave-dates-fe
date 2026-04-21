@@ -158,7 +158,7 @@ export default function PricingDetails({check, clientData, selectedPayment, part
             {...register("discountCode")}
           />
           <div className="bg-inactive rounded-r-lg">
-            <button onClick={handleClick} className="bg-primary hover:opacity-80 transition-opacity text-black rounded m-2 px-4 py-2 text-sm">Aceptar</button>
+            <button onClick={handleClick} className="bg-primary hover:opacity-80 transition-opacity text-primary-white rounded m-2 px-4 py-2 text-sm">Aceptar</button>
           </div>
         </div>
       }

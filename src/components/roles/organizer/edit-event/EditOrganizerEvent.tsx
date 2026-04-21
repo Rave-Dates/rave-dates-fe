@@ -431,7 +431,7 @@ useEffect(() => {
       </button>
       <button
         type="submit"
-        className="bg-primary block text-center text-black input-button"
+        className="bg-primary block text-center text-primary-white input-button"
       >
         Continuar
       </button>

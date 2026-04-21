@@ -99,7 +99,7 @@ export default function UserManagement() {
           </div>
           {/* Paginación */}
           {totalPages && totalPages > 1 ? (
-            <div className="flex justify-center items-center text-primary-black gap-2 mt-4">
+            <div className="flex justify-center items-center text-primary-white gap-2 mt-4">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}

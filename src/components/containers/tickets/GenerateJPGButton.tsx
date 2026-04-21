@@ -40,7 +40,7 @@ export const GenerateJPGButton = ({
   return (
     <button
       onClick={handleDownload}
-      className="bg-primary text-black px-2 py-1 min-w-[65px] justify-items-center rounded-md flex flex-col items-center justify-center hover:opacity-80 transition-opacity"
+      className="bg-primary text-primary-white px-2 py-1 min-w-[65px] justify-items-center rounded-md flex flex-col items-center justify-center hover:opacity-80 transition-opacity"
     >
       <DownloadSvg className="w-6 h-6" />
       <h2 className="text-[10px]">Descargar</h2>
