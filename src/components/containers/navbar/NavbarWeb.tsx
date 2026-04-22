@@ -10,12 +10,16 @@ import FilterModal from '../../ui/modals/FilterModal';
 import SearchInput from '@/components/ui/inputs/search-input/SearchInput';
 import Image from 'next/image';
 import { useClientAllRawEvents } from '@/hooks/client/queries/useClientData';
+import { useReactiveCookiesNext } from 'cookies-next';
 
 const NavbarWeb: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<IEvent[]>([]);
 
   const { data: events} = useClientAllRawEvents();
+  const { getCookie } = useReactiveCookiesNext();
+
+  const token = getCookie("token");
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
@@ -83,12 +87,16 @@ const NavbarWeb: React.FC = () => {
               <FilterModal />
             }
           </div>
-          <Link href="/tickets" className={`${pathname.includes("/tickets") ? "text-primary" : "text-text-inactive"} md:block hidden min-w-[81px] hover:text-primary-white transition-colors`}>
-            Mis tickets
-          </Link>
-          <Link href="/auth" className={`${pathname === "/auth" || pathname === "/my-data" ? "text-primary" : "text-text-inactive"} md:block hidden min-w-[75px] hover:text-primary-white transition-colors`}>
-            Mi cuenta
-          </Link>
+          {!token &&
+            <>
+              <Link href="/tickets" className={`${pathname.includes("/tickets") ? "text-primary" : "text-text-inactive"} md:block hidden min-w-[81px] hover:text-primary-white transition-colors`}>
+                Mis tickets
+              </Link>
+              <Link href="/auth" className={`${pathname === "/auth" || pathname === "/my-data" ? "text-primary" : "text-text-inactive"} md:block hidden min-w-[75px] hover:text-primary-white transition-colors`}>
+                Mi cuenta
+              </Link>
+            </>
+          }
         </div>
 
         {/* Navigation Links and Icons */}

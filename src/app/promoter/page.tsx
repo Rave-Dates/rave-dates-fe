@@ -22,7 +22,7 @@ export default function PromoterHome() {
   // const selectedPromoterBinnacle = promoterBinnacles?.find(b => b.eventId === eventId);
 
   return (
-    <div className="bg-primary-black pt-14 pb-40 text-primary-white min-h-screen p-4">
+    <div className="bg-primary-black pt-14 md:pt-32 pb-40 text-primary-white min-h-screen p-4">
       <div className="max-w-md mx-auto space-y-4">
         {/* Available Balance Header */}
 

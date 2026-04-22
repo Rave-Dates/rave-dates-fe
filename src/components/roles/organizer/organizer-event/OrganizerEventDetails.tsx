@@ -9,6 +9,8 @@ import { formatDateToColombiaTime } from "@/utils/formatDate"
 import { useEventImage } from "@/hooks/admin/queries/useEventImage"
 import SpinnerSvg from "@/components/svg/SpinnerSvg"
 import { useAdminEvent } from "@/hooks/admin/queries/useAdminData"
+import Link from "next/link"
+import EditSvg from "@/components/svg/EditSvg"
 
 export function OrganizerEventDetails({ eventId, isPromoter, isPromoterBinnacle, promoterId }: { eventId: number, isPromoter?: boolean, isPromoterBinnacle?: boolean, promoterId?: number }) {
   const { getCookie } = useReactiveCookiesNext();
@@ -18,9 +20,19 @@ export function OrganizerEventDetails({ eventId, isPromoter, isPromoterBinnacle,
   const { selectedEvent, isEventLoading } = useAdminEvent({ eventId, token: token?.toString() });
 
   return (
-    <div className="bg-primary-black min-h-screen flex flex-col text-primary-white pt-10 rounded-lg p-4 items-center">
+    <div className="bg-primary-black min-h-screen flex flex-col text-primary-white pt-12 md:pt-32 rounded-lg p-4 items-center">
       {/* Avatar */}
-      <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3" />
+      <GoBackButton className="absolute z-30 top-10 md:top-30 left-5 px-3 py-3" />
+
+      {
+        selectedEvent?.type === "free" &&
+        <Link
+          href={`/organizer/events/${selectedEvent.eventId}/edit-event`}
+          className="absolute bg-primary rounded-xl z-30 top-10 md:top-10 right-5 px-3 py-3"
+        >
+          <EditSvg className="text-2xl" />
+        </Link>
+      }
 
       <div className="flex py-4 px-5 w-full mt-16 bg-input rounded-lg flex-col items-start justify-center">
         {

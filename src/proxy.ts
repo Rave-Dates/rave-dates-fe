@@ -6,13 +6,14 @@ export function proxy(req: NextRequest) {
   const isAdminRoute = path.startsWith("/admin");
   const isOrganizerRoute = path.startsWith("/organizer");
   const isPromoterRoute = path.startsWith("/promoter");
+  const isCheckerRoute = path.startsWith("/checker");
 
   const token = req.cookies.get("token")?.value;
   const tempToken = req.cookies.get("tempToken")?.value;
   const clientToken = req.cookies.get("clientToken")?.value;
 
   // Rutas públicas sin token
-  if (!isAdminRoute && !isOrganizerRoute && !isPromoterRoute) {
+  if (!isAdminRoute && !isOrganizerRoute && !isPromoterRoute && !isCheckerRoute) {
     return NextResponse.next();
   }
 
@@ -59,18 +60,17 @@ export function proxy(req: NextRequest) {
     try {
       const decoded: IUserLogin = jwtDecode(token);
 
+      // Si intenta entrar a /admin o /admin/auth y ya tiene un rol, redirigir a su área correspondiente
+      if (path === "/admin" || path === "/admin/auth") {
+        if (decoded.role === "ADMIN") return NextResponse.redirect(new URL("/admin/users", req.url));
+        if (decoded.role === "ORGANIZER") return NextResponse.redirect(new URL("/organizer", req.url));
+        if (decoded.role === "PROMOTER") return NextResponse.redirect(new URL("/promoter", req.url));
+        // if (decoded.role === "CHECKER") return NextResponse.redirect(new URL("/checker", req.url));
+      }
+
       if (decoded.role !== "ADMIN") {
         const res = NextResponse.redirect(new URL("/", req.url));
         return res;
-      }
-
-      // Si ya está logueado y entra a /admin/auth, redirigir al dashboard
-      if (path === "/admin/auth") {
-        return NextResponse.redirect(new URL("/admin/users", req.url));
-      }
-      
-      if (path === "/admin") {
-        return NextResponse.redirect(new URL("/admin/users", req.url));
       }
 
     } catch {

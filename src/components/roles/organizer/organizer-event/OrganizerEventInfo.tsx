@@ -18,6 +18,7 @@ import { jwtDecode } from "jwt-decode"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
+import OrganizerEventAttendees from "../create-event/OrganizerEventAttendees"
 
 type Props = {
   eventId: number;
@@ -180,7 +181,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
     setValue("ticketTypeMap", updatedMap, { shouldValidate: true, shouldDirty: true });
   };
 
-  const types = ["Cantidad vendida", "Dinero", "Promotores", "Link Escáner QRs"]
+  const types = ["Cantidad vendida", "Dinero", "Promotores", "Link Escáner QRs", "Asistentes registrados"]
 
   console.log(selectedEvent)
 
@@ -355,6 +356,10 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                         </button>
                       </div>
                     </div>
+                }
+                {
+                  type === "Asistentes registrados" &&
+                  <OrganizerEventAttendees eventId={eventId} />
                 }
               </div>
             </DropdownItem>

@@ -52,12 +52,15 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
   
 
   return (
-    <div className="bg-primary-black text-primary-white min-h-screen px-5 pb-40">
+    <div className={`text-primary-white min-h-screen px-5 pb-40 ${isPromoter ? "bg-primary-black" : ""}`}>
       {/* Header */}
-      <div className="flex justify-start items-center gap-x-3 pt-8">
-        <GoBackButton className="z-30 top-10 left-5 px-3 py-3" />
-        <h1 className="text-3xl font-medium">{selectedEvent?.title}</h1>
-      </div>
+      {
+        isPromoter &&
+        <div className="flex justify-start items-center gap-x-3 pt-8">
+          <GoBackButton className="z-30 top-10 left-5 px-3 py-3" />
+          <h1 className="text-3xl font-medium">{selectedEvent?.title}</h1>
+        </div>
+      }
 
       <div className="py-4 space-y-6">
         {/* Stats Section */}
