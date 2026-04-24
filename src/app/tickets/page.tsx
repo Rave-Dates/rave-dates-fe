@@ -84,7 +84,7 @@ const TicketsEventList: React.FC = () => {
   }, [isUpcoming]);
 
   return (
-    <div className="py-8 pb-32 min-h-screen flex flex-col sm:pb-8 sm:pt-[7.5rem] text-primary-white bg-primary-black px-6">
+    <div className="py-8 pb-32 min-h-screen flex flex-col sm:pb-42 sm:pt-[7.5rem] text-primary-white bg-primary-black px-6">
       <div className="w-full sm:w-xl flex items-center justify-center mt-4 gap-1 relative bg-main-container mx-auto rounded-md px-2 py-1">
         <div
           className={`absolute bg-primary z-10 w-[47%] sm:w-1/2 h-10 pointer-events-auto rounded-md transition-all duration-300 ${

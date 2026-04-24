@@ -141,7 +141,7 @@ export default function Page() {
                     </Link>
                   }
                   <Link
-                    href={`/admin/users/edit-user/2/user-events/${data.eventId}/event-balance/event-info?organizerId=true`}
+                    href={`/admin/events/${data.eventId}/event-info`}
                     className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end border border-primary text-primary"
                   >
                     <InfoSvg className="text-xl" />

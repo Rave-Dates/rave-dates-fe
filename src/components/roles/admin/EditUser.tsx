@@ -84,8 +84,8 @@ const EditUser = ({ userId } : { userId: number }) => {
 
   return (
     <div>
-      <div className='absolute flex w-full px-5 gap-x-2 pt-10 items-center justify-between top-0 sm:top-20 z-20'>
-        <GoBackButton className="px-3 rounded-xl py-3 sm:opacity-0" />
+      <div className='absolute flex w-full px-5 gap-x-2 pt-10 items-center justify-between top-0 md:top-20 z-20'>
+        <GoBackButton className="px-3 rounded-xl py-3" />
         <div className='flex items-center gap-x-3'>
           {
             userById?.role.name === "ORGANIZER" && (

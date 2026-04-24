@@ -49,7 +49,7 @@ const EventCardList: React.FC = () => {
   }, [page, paginatedEvents.length, upcomingEvents.length]);
 
   return (
-    <div className="py-8 pb-40 sm:pb-8 sm:pt-[7.5rem] bg-primary-black mx-auto px-6">
+    <div className="py-8 pb-40 sm:pb-50 sm:pt-[7.5rem] bg-primary-black mx-auto px-6">
       <div className="animate-fade-in">
         {!isError ? (
           <>

@@ -21,3 +21,13 @@ export const getAllBinnaclesFromPromoter = async ({token, promoterId}: { token: 
   const data: IEventPromoterPaymentSummary = res.data;
   return data;
 };
+
+export const getAllBinnaclesFromEvent = async ({token, eventId}: { token: CookieValueTypes, eventId: number }) => {
+  const res = await axios.get(`${BASE_URL}/admin/binnacles/event/${eventId}`, {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  const data: IEventPaymentSummary[] = res.data;
+  return data;
+};

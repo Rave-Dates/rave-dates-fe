@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { CookieValueTypes } from "cookies-next";
 import { getAllEvents, getCheckerTicketMetrics, getComplimentaryAvailable, getEventById, getEventCategoriesById, getOrganizerByEventId, getPromoterTicketMetrics, getTicketMetrics, getTicketTypesById } from "@/services/admin-events";
-import { getAllBinnaclesFromOrganizer, getAllBinnaclesFromPromoter } from "@/services/admin-binnacles";
+import { getAllBinnaclesFromOrganizer, getAllBinnaclesFromPromoter, getAllBinnaclesFromEvent } from "@/services/admin-binnacles";
 import { getEventImages, getImageById } from "@/services/admin-events";
 import { getAllCategories } from "@/services/admin-categories";
 import { getAllLabels } from "@/services/admin-labels";
@@ -82,6 +82,26 @@ export function useAdminBinnacles({
   });
 
   return { organizerBinnacles, isBinnaclesLoading };
+}
+
+export function useAdminEventBinnacles({
+  eventId,
+  token,
+}: {
+  eventId: number | undefined;
+  token: string | undefined;
+}) {
+  const { data: eventBinnacles, isLoading: isBinnaclesLoading } = useQuery({
+    queryKey: [`eventBinnacles-${eventId}`],
+    queryFn: async () => {
+      if (!token || !eventId) throw new Error("Token or eventId missing");
+      const binnacles = await getAllBinnaclesFromEvent({ token, eventId });
+      return binnacles;
+    },
+    enabled: !!eventId && !!token,
+  });
+
+  return { eventBinnacles, isBinnaclesLoading };
 }
 
 export function useAdminEventCategories({

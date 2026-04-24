@@ -10,8 +10,22 @@ interface IEventPaymentSummary {
   movements: IPaymentMovement[];
 }
 
+interface IPromoterEventPaymentSummary {
+  eventId: number;
+  total: string;
+  feePromoter: string;
+  feeRD: string;
+  feeOrganizer: string;
+  stages: {
+    stages: IStageDetail[][];
+  };
+  alreadyPaid: number;
+  pendingPayment: number;
+  movements: IPaymentMovement[];
+}
+
 interface IEventPromoterPaymentSummary {
-  events: IEventPaymentSummary[];
+  events: IPromoterEventPaymentSummary[];
   movements: IPaymentMovement[];
   total: number;
   alreadyPaid: number;
