@@ -1,5 +1,6 @@
 'use client';
 
+import AddSvg from '@/components/svg/AddSvg';
 import { notifyError } from '@/components/ui/toast-notifications';
 import { useAdminGetCheckerById } from '@/hooks/admin/queries/useAdminData';
 import { readQr } from '@/services/admin-qr';
@@ -15,7 +16,14 @@ export default function ScanQRPage() {
   const [cameras, setCameras] = useState<CameraDevice[]>([]);
   const [currentCameraId, setCurrentCameraId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [scanResult, setScanResult] = useState<{ success: boolean; text: string; userName?: string; ticketName?: string } | null>(null);
+  const [scanResult, setScanResult] = useState<{ 
+    success: boolean; 
+    text: string; 
+    userName?: string; 
+    ticketName?: string;
+    clientEmail?: string;
+    lastModified?: string;
+  } | null>(null);
   const isProcessingRef = useRef(false);
   const [isScanning, setIsScanning] = useState(false);
   const router = useRouter();
@@ -25,6 +33,25 @@ export default function ScanQRPage() {
 
   const decoded: { id: number } = (token && jwtDecode(token.toString())) || {id: 0};
   const { checker } = useAdminGetCheckerById({ token: token?.toString(), userId: decoded.id });
+
+  const parseTicketMessage = (message: string) => {
+    if (!message) return {};
+    const lastModifiedMatch = message.match(/lastModified:\s*(.*?)\s*clientId:/);
+    const clientNameMatch = message.match(/clientName:\s*(.*?)\s*clientEmail:/);
+    const clientEmailMatch = message.match(/clientEmail:\s*(.*)$/);
+
+    return {
+      lastModified: lastModifiedMatch ? lastModifiedMatch[1].trim() : undefined,
+      userName: clientNameMatch ? clientNameMatch[1].trim() : undefined,
+      clientEmail: clientEmailMatch ? clientEmailMatch[1].trim() : undefined,
+    };
+  };
+
+  const handleCloseModal = () => {
+    setScanResult(null);
+    isProcessingRef.current = false;
+    scannerRef.current?.resume();
+  };
 
   useEffect(() => {
     if (!token) {
@@ -110,12 +137,14 @@ export default function ScanQRPage() {
               });
 
               console.log('📦 Respuesta API:', res);
+              
+              const extraInfo = parseTicketMessage((res as any).message);
+
               setScanResult({ 
                 success: true, 
                 text: `Ticket leído correctamente`,
-                // TODO: Ajusta aquí los campos exactos según lo devuelva tu backend ('res.user.name', 'res.ticket.id', etc.)
-                userName: res?.user?.name || 'Nombre Desconocido',
-                ticketName: res?.ticketType?.name || 'Boleta Desconocida'
+                ticketName: res?.ticketType?.name || 'Boleta Desconocida',
+                ...extraInfo
               });
             } catch (error) {
               const err = error as AxiosError<{ message: string }>;
@@ -124,25 +153,22 @@ export default function ScanQRPage() {
                 setScanResult({ success: false, text: 'No tienes permiso para leer este ticket' });
                 return
               }
-              if (err.response?.data.message === "Ticket not pending") {
+              if (err.response?.data.message.includes("Ticket already used")) {
+                const extraInfo = parseTicketMessage(err.response.data.message);
+
                 setScanResult({ 
                   success: false, 
-                  text: 'Ticket ya utilizado o vencido' 
+                  text: 'Ticket ya utilizado',
+                  ...extraInfo
                 });
                 return
               }
+
               console.error('Error al procesar QR:', err);
               setScanResult({ success: false, text: 'QR Inválido o error al procesar' });
             } finally {
               setLoading(false);
               scannerRef.current?.pause(true);
-
-              setTimeout(() => {
-                setLoading(false);
-                setScanResult(null);
-                isProcessingRef.current = false;
-                scannerRef.current?.resume();
-              }, 3000);
             }
           },
           () => {}
@@ -212,7 +238,7 @@ export default function ScanQRPage() {
       {scanResult && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
           <div
-            className={`max-w-xs border w-full px-6 py-4 rounded-lg text-center ${
+            className={`max-w-xs border w-full px-6 py-4 rounded-lg text-center relative ${
               scanResult.success 
               ? 'border-green-600 brightness-150 text-green-600' 
               : scanResult.text === "No tienes permiso para leer este ticket" 
@@ -220,14 +246,41 @@ export default function ScanQRPage() {
                 : "border-system-error brightness-150  text-system-error"
             } shadow-lg`}
           >
+            <button 
+              onClick={handleCloseModal}
+              className="absolute top-3 right-3 text-white/50 hover:text-white transition-colors  font-bold"
+            >
+              <AddSvg className="rotate-45 w-8 h-8" />
+            </button>
             <p className="text-lg font-semibold">{scanResult.text}</p>
-            {scanResult.success && scanResult.userName && (
+            {scanResult.userName && (
               <div className="mt-4 flex flex-col items-center justify-center gap-y-2">
-                <span className="text-sm font-medium text-white/80">Asistente:</span>
+                <span className="text-sm font-medium text-white/80">
+                  {scanResult.success ? "Asistente:" : "Fue usado por:"}
+                </span>
                 <span className="text-xl font-bold text-white">{scanResult.userName}</span>
-                <div className="bg-neutral-700 text-primary-white px-3 py-1 rounded-lg text-sm font-bold mt-2">
-                  {scanResult.ticketName}
-                </div>
+                
+                {scanResult.clientEmail && (
+                  <span className="text-sm text-white/60">{scanResult.clientEmail}</span>
+                )}
+
+                {scanResult.lastModified && (
+                  <span className="text-xs text-white/40 mt-1">
+                    Leído el: {new Date(scanResult.lastModified).toLocaleString('es-CO', { 
+                      day: '2-digit', 
+                      month: 'long', 
+                      year: 'numeric', 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </span>
+                )}
+
+                {scanResult.ticketName && (
+                  <div className="bg-neutral-700 text-primary-white px-3 py-1 rounded-lg text-sm font-bold mt-2">
+                    {scanResult.ticketName}
+                  </div>
+                )}
               </div>
             )}
           </div>

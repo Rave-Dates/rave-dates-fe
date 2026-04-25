@@ -17,7 +17,7 @@ import { useEffect } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import GeoAutocomplete from "./GeoAutocomplete";
 import { onInvalid } from "@/utils/onInvalidFunc";
-import { useAdminAllCategories, useAdminEvent, useAdminEventCategories, useAdminEventImages, useAdminImagesData, useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
+import { useAdminAllCategories, useAdminAllUsers, useAdminEvent, useAdminEventCategories, useAdminEventImages, useAdminGetOrganizerFromEvent, useAdminImagesData, useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
 import DatePicker from "@/components/ui/date-picker/date-picker";
 import { InputTime } from "@/components/ui/date-picker/input-time";
 
@@ -50,6 +50,10 @@ export default function EditEvent({ eventId }: { eventId: number }) {
   const { labelsTypes } = useAdminLabelsTypes({ token }); 
   const { eventImages, isErrorEventImages } = useAdminEventImages({ token, eventId }); 
   const { errorImages, imagesData, loadingImages } = useAdminImagesData({ token, eventImages }); 
+  const { data: allUsers } = useAdminAllUsers({ token });
+  const { organizerFromEvent } = useAdminGetOrganizerFromEvent({ token, eventId });
+
+  const organizers = allUsers?.filter((user) => user.role.name === "ORGANIZER" && user.organizer?.organizerId);
   
   useEffect(() => {
     if (!event) return;
@@ -60,6 +64,8 @@ export default function EditEvent({ eventId }: { eventId: number }) {
 
     const validDate = combineDateAndTimeToISO(result.date, result.time)
     const formattedTimeZone = formatDateToColombiaTime(validDate)
+
+    const formattedPromoters = event.promoters?.map((p) => ({ promoterId: p.promoterId })) || [];
 
     // Seteamos todo al formulario
     const setters = {
@@ -81,6 +87,7 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       timeOut: event.timeOut,
       piggyBank: event.piggyBank,
       quantityComplimentaryTickets: event.quantityComplimentaryTickets,
+      formPromoters: formattedPromoters,
     };
 
     Object.entries(setters).forEach(([key, value]) => {
@@ -91,10 +98,16 @@ export default function EditEvent({ eventId }: { eventId: number }) {
     setValue("labels", finalLabels);
 
     // Guardamos en Zustand
-    updateEventFormData({ ...event });
+    updateEventFormData({ ...event, formPromoters: formattedPromoters });
     setHasLoadedEvent(true);
     setHasLoadedTickets(false);
   }, [event]);
+
+  useEffect(() => {
+    if (organizerFromEvent?.organizerId) {
+      setValue("organizerId", organizerFromEvent.organizerId);
+    }
+  }, [organizerFromEvent]);
 
   useEffect(() => {
     if (imagesData) {
@@ -169,7 +182,8 @@ useEffect(() => {
       ...data,
       isActive: watchedIsActive,
       geo: formattedGeo,
-      categoriesToUpdate
+      categoriesToUpdate,
+      organizerId: data.organizerId
     })
 
     router.push(
@@ -253,6 +267,19 @@ useEffect(() => {
         inputName="description"
         register={register("description")}
       />
+      <FormDropDown
+        title="Organizador"
+        register={register("organizerId", {
+          setValueAs: (v) => (v === "" || v === undefined ? undefined : Number(v)),
+        })}
+      >
+        <option value="">Selecciona un organizador</option>
+        {organizers?.map((organizer) => (
+          <option key={organizer.userId} value={organizer.organizer?.organizerId}>
+            {organizer.name}
+          </option>
+        ))}
+      </FormDropDown>
 
        { 
           categories?.map((category) => (

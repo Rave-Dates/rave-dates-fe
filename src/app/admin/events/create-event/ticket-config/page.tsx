@@ -25,6 +25,7 @@ export default function TicketConfiguration() {
     name: "tickets",
   });
   register("piggyBank");
+  register("organizerId");
   const watchedPiggyBank = useWatch({ name: "piggyBank", control });
 
   useEffect(() => {
@@ -90,6 +91,8 @@ export default function TicketConfiguration() {
       labels: data.labels || [],
       tickets: validTickets,
       quantityComplimentaryTickets: data.quantityComplimentaryTickets,
+      organizerId: data.organizerId,
+      formPromoters: eventFormData.formPromoters,
     };
 
     notifyPending(
@@ -106,6 +109,15 @@ export default function TicketConfiguration() {
       }
     );
   };
+
+  const handleGoToPromoters = (data: IEventFormData) => {
+    updateEventFormData({
+      ...eventFormData,
+      ...data,
+    });
+
+    router.push("/admin/events/assign-promoters");
+  }
 
   const handleAddTicket = () => {
     const formTickets = getValues("tickets") || [];
@@ -296,8 +308,16 @@ export default function TicketConfiguration() {
               </div> */}
 
               <button
+                type="button"
+                onClick={handleSubmit(handleGoToPromoters, onInvalid)}
+                className="w-full border border-primary text-primary font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
+              >
+                Promotores
+              </button>
+
+              <button
                 type="submit"
-                className="w-full bg-primary text-primary-white font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
+                className="w-full bg-primary text-primary-white font-medium py-4 text-lg rounded-lg mt-4 flex items-center justify-center gap-2"
               >
                 Crear evento
               </button>

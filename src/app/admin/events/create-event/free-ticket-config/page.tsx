@@ -70,6 +70,7 @@ export default function FreeTicketConfiguration() {
       labels: data.labels || [],
       tickets: [validTickets[0]],
       quantityComplimentaryTickets: data.quantityComplimentaryTickets,
+      organizerId: data.organizerId,
     };
 
     console.log(cleanedEventData)

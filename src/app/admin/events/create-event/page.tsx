@@ -7,7 +7,7 @@ import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
-import { useAdminAllCategories, useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
+import { useAdminAllCategories, useAdminAllUsers, useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { validateDateYyyyMmDd } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
@@ -42,6 +42,11 @@ export default function Page() {
   
   const { categories } = useAdminAllCategories({ token });
   const { labelsTypes } = useAdminLabelsTypes({ token });
+  const { data: allUsers } = useAdminAllUsers({ token });
+
+  const organizers = allUsers?.filter((user) => user.role.name === "ORGANIZER");
+
+  console.log("organizers", organizers)
 
   useEffect(() => {
     register("geo", {
@@ -72,6 +77,7 @@ export default function Page() {
       labels: eventFormData.labels || [],
       images: eventFormData.images,
       quantityComplimentaryTickets: eventFormData.quantityComplimentaryTickets,
+      organizerId: eventFormData.organizerId,
     };
 
     Object.entries(setters).forEach(([key, value]) => {
@@ -191,6 +197,19 @@ export default function Page() {
         inputName="description"
         register={register("description")}
       />
+      <FormDropDown
+        title="Organizador"
+        register={register("organizerId", {
+          setValueAs: (v) => (v === "" || v === undefined ? undefined : Number(v)),
+        })}
+      >
+        <option value="">Selecciona un organizador</option>
+        {organizers?.map((organizer) => (
+          <option key={organizer.userId} value={organizer.organizer?.organizerId}>
+            {organizer.name}
+          </option>
+        ))}
+      </FormDropDown>
 
        { 
         categories?.map((category) => (

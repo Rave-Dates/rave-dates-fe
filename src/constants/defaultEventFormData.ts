@@ -33,4 +33,5 @@ export const defaultEventFormData: IEventFormData = {
   labels: [],
   formPromoters: [],
   promoters: [],
+  organizerId: undefined,
 };

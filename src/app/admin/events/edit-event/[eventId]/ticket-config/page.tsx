@@ -27,6 +27,7 @@ export default function EditTicketConfiguration() {
     control,
     name: "tickets",
   })
+  register("organizerId");
 
   const { getCookie } = useReactiveCookiesNext()
   const token = getCookie("token")
@@ -128,6 +129,8 @@ export default function EditTicketConfiguration() {
       tickets: formattedTickets,
       piggyBank: data.piggyBank,
       quantityComplimentaryTickets: data.quantityComplimentaryTickets,
+      organizerId: data.organizerId,
+      formPromoters: eventFormData.formPromoters,
     }
 
     console.log("cleanedEventData",cleanedEventData)
@@ -153,6 +156,15 @@ export default function EditTicketConfiguration() {
         error: "Error al editar el evento",
       }
     );
+  }
+
+  const handleGoToPromoters = (data: IEventFormData) => {
+    updateEventFormData({
+      ...eventFormData,
+      ...data,
+    });
+
+    route.push("/admin/events/assign-promoters");
   }
 
   const handleDeleteTicket = (index: number) => {
@@ -237,7 +249,15 @@ export default function EditTicketConfiguration() {
             </button>
           </div>
 
-          <button type="submit" className="w-full bg-primary text-primary-white font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2">
+          <button
+            type="button"
+            onClick={handleSubmit(handleGoToPromoters, onInvalid)}
+            className="w-full border border-primary text-primary font-medium py-4 text-lg rounded-lg mt-10 flex items-center justify-center gap-2"
+          >
+            Promotores
+          </button>
+
+          <button type="submit" className="w-full bg-primary text-primary-white font-medium py-4 text-lg rounded-lg mt-4 flex items-center justify-center gap-2">
             Actualizar evento
           </button>
         </form>

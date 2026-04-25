@@ -107,6 +107,7 @@ export default function FreeTicketConfiguration() {
       labels: data.labels || [],
       quantityComplimentaryTickets: data.quantityComplimentaryTickets,
       tickets: [formattedTickets[0]],
+      organizerId: data.organizerId,
     }
 
 

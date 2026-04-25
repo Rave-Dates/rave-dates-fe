@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { createEvent, createEventCategories, createImage, createTicketTypes } from "../../../services/admin-events";
+import { assignOrganizerToEvent, assignPromoterToEvent, createEvent, createEventCategories, createImage, createTicketTypes } from "../../../services/admin-events";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
@@ -13,7 +13,7 @@ export function useCreateFullEvent({reset, successHref = "/admin/events", errorH
 
   return useMutation({
     mutationFn: async (formData: IEventFormData) => {
-      const { eventCategoryValues ,tickets, images, ...eventData } = formData;
+      const { organizerId ,eventCategoryValues ,tickets, images, formPromoters, ...eventData } = formData;
 
       // 1. Crear el evento
       const validLabels = eventData.labels?.map((label) => (label.labelId));
@@ -26,6 +26,22 @@ export function useCreateFullEvent({reset, successHref = "/admin/events", errorH
       const eventId = createdEvent.eventId;
 
       console.log("eventId",eventId)
+      
+      if (organizerId) {
+        await assignOrganizerToEvent(token, { organizerId: organizerId }, eventId);
+      }
+
+      if (formPromoters) {
+        const formattedData = {
+          promoters: 
+            formPromoters?.map((promoter) => ({
+              promoterId: promoter.promoterId || 0,
+            }))
+          ,
+        };
+  
+        await assignPromoterToEvent(token, formattedData, eventId);
+      }
 
       // 2. Crear categorías
       console.log(eventCategoryValues)

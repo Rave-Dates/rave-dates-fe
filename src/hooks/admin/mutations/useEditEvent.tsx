@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { assignPromoterToEvent, createImage, editEvent, editEventCategories, editTicketTypes } from "../../../services/admin-events";
+import { assignOrganizerToEvent, assignPromoterToEvent, createImage, editEvent, editEventCategories, editTicketTypes } from "../../../services/admin-events";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
@@ -11,11 +11,15 @@ export function useEditEvent(reset: (data: IEventFormData) => void) {
 
   return useMutation({
     mutationFn: async ({formData, isOrganizer = false}: { formData: IEventFormData, isOrganizer?: boolean }) => {
-      const { categoriesToUpdate, tickets, images, formPromoters, eventId, ...eventData } = formData;
+      const { categoriesToUpdate, organizerId, tickets, images, formPromoters, eventId, ...eventData } = formData;
 
       if (!eventId) return
+      
+      if (formData.organizerId) {
+        await assignOrganizerToEvent(token, { organizerId: formData.organizerId }, eventId);
+      }
 
-      if (isOrganizer) {
+      if (formPromoters) {
         const formattedData = {
           promoters: 
             formPromoters?.map((promoter) => ({
