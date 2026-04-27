@@ -144,3 +144,25 @@ export const getErrorStrings = async ({token}: { token: CookieValueTypes }) => {
 
   return res.data;
 };
+
+export const updateAdminConfig = async ({token, data}: { token: CookieValueTypes, data: { email?: string, boldFeePorcentage?: number} }) => {
+  const res = await axios.put(`${BASE_URL}/admin/config`, data, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
+
+export const getAdminConfig = async ({token}: { token: CookieValueTypes }) => {
+  const res = await axios.get(`${BASE_URL}/admin/config`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};

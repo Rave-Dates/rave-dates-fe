@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form";
 import ConfirmationModal from "@/components/ui/modals/ConfirmationModal";
 
 export default function ErrorStrings() {
-  const { register, handleSubmit, reset } = useForm<{ email: string }>();
+  const { register, handleSubmit, reset } = useForm<{ email: string, boldFeePorcentage: number }>();
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
 

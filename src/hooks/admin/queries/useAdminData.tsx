@@ -8,7 +8,7 @@ import { getAllLabels } from "@/services/admin-labels";
 import { getAllCheckers, getAllCheckerUsers, getAllPromoters, getAllUsers, getCheckerById, getGuests, getPromoterLink, getUserById } from "@/services/admin-users";
 import { getAllRoles } from "@/services/admin-roles";
 import { getAllPayments, servedMovementImage } from "@/services/admin-payments";
-import { getErrorStrings } from "@/services/admin-parameters";
+import { getAdminConfig, getErrorStrings } from "@/services/admin-parameters";
 import { jwtDecode } from "jwt-decode";
 
 export function useAdminEvent({ eventId, token }: { eventId: number | undefined; token: CookieValueTypes }) {
@@ -367,4 +367,14 @@ export function useAdminGetComplimentaryAvailable({ token, eventId, promoterId }
   });
 
   return { complimentaryAvailable, isLoading };
+}
+
+export function useAdminGetConfig({ token }: { token: CookieValueTypes }) {
+  const { data: adminConfig } = useQuery<{ email: string, boldFeePorcentage: number }>({
+    queryKey: ["adminConfig"],
+    queryFn: () => getAdminConfig({token}),
+    enabled: !!token,
+  });
+
+  return { adminConfig };
 }
