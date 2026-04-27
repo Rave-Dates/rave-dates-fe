@@ -1,6 +1,7 @@
 "use client"
 
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
+import UserSvg from "@/components/svg/UserSvg";
 import { useAdminPromoterTicketMetrics, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData";
 import { useEventImage } from "@/hooks/admin/queries/useEventImage";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
@@ -60,6 +61,18 @@ export function OrganizerEventCard({event, href = "organizer/event", totalSold, 
           {metricsToUse?.ticketsPurchased ?? 0} Total vendido - {event.type === "free" ? "Gratis" : `COP ${totalSold?.toLocaleString() ?? 0}`}
         </p>
       </div>
+
+        {
+          promoterId &&
+          <div className="flex justify-end gap-x-2">
+            <Link
+              href={`events/${eventId}/attendees`}
+              className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end border border-primary text-primary"
+            >
+              <UserSvg stroke={1.5} className="text-xl" />
+            </Link>
+          </div>
+        }
     </Link>
   )
 }

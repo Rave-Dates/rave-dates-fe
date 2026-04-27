@@ -333,7 +333,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                               </span>
                             ))}
                         </div>
-                        <button type="submit" className="bg-primary rounded-lg py-2.5 mt-3 w-3/4 sm:w-1/2 font-medium text-sm text-primary-black">
+                        <button type="submit" className="bg-primary rounded-lg py-2.5 mt-3 w-3/4 sm:w-1/2 font-medium text-sm">
                           Generar link
                         </button>
                       </form>
@@ -359,7 +359,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                 }
                 {
                   type === "Asistentes registrados" &&
-                  <OrganizerEventAttendees eventId={eventId} />
+                  <OrganizerEventAttendees eventId={eventId} disableHeader />
                 }
               </div>
             </DropdownItem>
@@ -405,6 +405,13 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                     </div>
                   </div>
                 ))}
+                {
+                  complimentaryAvailable?.length === 0 && (
+                    <div className="text-center pt-4 pb-2 text-neutral-400">
+                      No se encontraron entradas de cortesía
+                    </div>
+                  )
+                }
               </div>
             </div>
             <div className="bg-input mt-2 rounded-lg px-3 py-2">

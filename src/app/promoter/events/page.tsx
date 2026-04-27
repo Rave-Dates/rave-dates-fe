@@ -1,15 +1,11 @@
 "use client"
 
-import UserSvg from "@/components/svg/UserSvg";
+import { OrganizerEventCard } from "@/components/roles/organizer/organizer-event/OrganizerEventCard";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
-import { useAdminUserById } from "@/hooks/admin/queries/useAdminData";
-import { getAllClientEvents } from "@/services/clients-events";
+import { useAdminPromoterBinnacles, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { formatDateToColombiaTime } from "@/utils/formatDate";
-import { useQuery } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
-import Link from "next/link";
 import { useEffect } from "react";
 
 export default function Page() {
@@ -19,89 +15,53 @@ export default function Page() {
   const decoded: { id: number } = (token && jwtDecode(token.toString())) || {id: 0};
   
   // obtenemos user por id
-  const { data: user } = useAdminUserById({ token, userId: decoded.id }); 
+  const { data: user, isPending: isUserLoading } = useAdminUserById({ token, userId: decoded.id }); 
+  const promoterId = user?.promoter?.promoterId;
+
+  const { promoterBinnacles } = useAdminPromoterBinnacles({ promoterId: promoterId ?? 0, token: token?.toString() });
 
   useEffect(() => {
     updateEventFormData(defaultEventFormData);
     setHasLoadedEvent(false);
-  }, []);
+  }, [setHasLoadedEvent, updateEventFormData]);
 
   useEffect(() => {
     console.log("desde la lista",eventFormData)
   }, [eventFormData]);
   
-  const { data: events, isLoading, isError } = useQuery<IEvent[]>({
-    queryKey: ["events"],
-    queryFn: () => getAllClientEvents(1, 1000),
-  });
-
   return (
-    <div className="w-full flex flex-col gap-y-5 bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
-      <div>
-        <div className="max-w-xl mx-auto animate-fade-in">
-          {/* Users Table/List */}
-          <div className="rounded-md overflow-hidden mt-5">
-          {/* Table Header */}
-          <div className="grid grid-cols-[1fr_1fr_0.5fr] border-b border-divider text-text-inactive gap-x-2 text-xs py-2 px-3">
-            <div className="text-start">Fecha</div>
-            <div className="text-center">Título</div>
-            <div className="text-end">Acciones</div>
-          </div>
+    <div className="w-full flex flex-col gap-y-5 bg-primary-black text-primary-white min-h-screen pt-10 p-4 pb-40 md:pt-32">
+        <h1 className="text-3xl font-semibold mx-auto pb-3">Eventos asignados</h1>
 
-          {/* Table Body */}
-          <div className="divide-y divide-divider w-full">
-            {user?.promoter?.events && user.promoter.events.map((data) => (
-              <div
-                key={data.eventId}
-                className="grid grid-cols-[1fr_1fr_0.5fr] items-center py-3 px-3 gap-x-2 text-xs"
-              >
-                <div className="text-start flex flex-col">
-                  <h3>{data.date && formatDateToColombiaTime(data.date).date} {data.date && formatDateToColombiaTime(data.date).time}hs</h3>
-                </div>
-                <div className="text-center tabular-nums">{data.title}</div>
-                <div className="flex justify-end gap-x-2">
-                  <Link
-                    href={`events/${data.eventId}/attendees`}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center justify-self-end border border-primary text-primary"
-                  >
-                    <UserSvg stroke={1.5} className="text-xl" />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-          {!events &&!isError && (
-            Array.from(Array(6).keys()).map((user) => (
-            <div
-              key={user}
-              className="grid grid-cols-[1fr_1fr_1fr_1.5fr] items-center py-3 px-3 gap-x-2 text-sm"
-            >
-              <div className="text-start w-20 h-4 rounded animate-pulse bg-inactive"></div>
-              <div className="justify-self-center w-14 h-4 rounded animate-pulse bg-inactive"></div>
-              <div className="justify-self-center w-14 h-4 rounded animate-pulse bg-inactive"></div>
-              <div className="justify-self-end flex gap-x-2">
-                <div className="w-8 h-8 rounded animate-pulse bg-inactive"></div>
-                <div className="w-8 h-8 rounded animate-pulse bg-inactive"></div>
+        {/* Event Cards */}
+        <div className="space-y-3">
+          {
+            !user?.promoter?.events && !isUserLoading &&
+            <div className="w-full text-text-inactive h-23 rounded-xl gap-x-1 p-4 flex items-center justify-center">
+              No tienes eventos asignados
+            </div>
+          }
+          {!isUserLoading && user?.promoter?.events && user.promoter.events.map((event) => (
+            <OrganizerEventCard
+              href="event"
+              key={event.eventId}
+              event={event}
+              promoterId={promoterId}
+              totalSold={Number(promoterBinnacles?.events?.find(b => b.eventId === event.eventId)?.feePromoter?? 0)}
+            />
+          ))}
+          {
+            isUserLoading &&
+            <div className="w-full bg-cards-container h-23 rounded-xl gap-x-1 p-4 flex items-center justify-start">
+              <div className="w-14 h-14 animate-pulse bg-inactive rounded-full"></div>
+              <div className="flex flex-col gap-y-2 items-start justify-center">
+                <div className="w-44 h-4 animate-pulse bg-inactive rounded"></div>
+                <div className="w-28 h-3 animate-pulse bg-inactive rounded"></div>
+                <div className="w-28 h-3 animate-pulse bg-inactive rounded"></div>
               </div>
             </div>
-            ))
-          )}
-
-          {!isLoading && Array.isArray(events) && events?.length === 0 &&  (
-            <div className="text-center py-8 text-text-inactive">
-              No se encontraron eventos
-            </div>
-          )}
-
-          {isError &&  (
-            <div className="text-center text-sm py-8 text-system-error">
-              Error cargando eventos
-            </div>
-          )}
+          }
         </div>
-      </div>
     </div>
   );
 }

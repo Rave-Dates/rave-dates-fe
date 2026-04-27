@@ -52,36 +52,6 @@ export default function PromoterHome() {
           <p className="text-primary-white text-2xl"><span className="text-primary">COP $</span>{promoterBinnacles?.total?.toLocaleString() ?? 0}</p>
         </div>
 
-        {/* Event Cards */}
-        <div className="space-y-3">
-          {
-            !user?.promoter?.events && !isUserLoading &&
-            <div className="w-full text-text-inactive h-23 rounded-xl gap-x-1 p-4 flex items-center justify-center">
-              No tienes eventos asignados
-            </div>
-          }
-          {!isUserLoading && user?.promoter?.events && user.promoter.events.map((event) => (
-            <OrganizerEventCard
-              href="promoter/event"
-              key={event.eventId}
-              event={event}
-              promoterId={promoterId}
-              totalSold={Number(promoterBinnacles?.events?.find(b => b.eventId === event.eventId)?.feePromoter?? 0)}
-            />
-          ))}
-          {
-            isUserLoading &&
-            <div className="w-full bg-cards-container h-23 rounded-xl gap-x-1 p-4 flex items-center justify-start">
-              <div className="w-14 h-14 animate-pulse bg-inactive rounded-full"></div>
-              <div className="flex flex-col gap-y-2 items-start justify-center">
-                <div className="w-44 h-4 animate-pulse bg-inactive rounded"></div>
-                <div className="w-28 h-3 animate-pulse bg-inactive rounded"></div>
-                <div className="w-28 h-3 animate-pulse bg-inactive rounded"></div>
-              </div>
-            </div>
-          }
-        </div>
-
         <div className="bg-input mt-2 rounded-lg px-3 py-2">
           <h1 className="font-medium px-2 my-2">Dinero</h1>
           <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
