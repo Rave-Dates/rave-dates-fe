@@ -14,9 +14,10 @@ type Props = {
   children: React.ReactNode;
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   labelClassname?: string;
+  selectClassname?: string;
 };
 
-const FormDropDown = ({ register, title, children, value, onChange, labelClassname }: Props) => {
+const FormDropDown = ({ register, title, children, value, onChange, labelClassname, selectClassname }: Props) => {
   return (
     <div className="relative w-full">
       <label
@@ -31,7 +32,7 @@ const FormDropDown = ({ register, title, children, value, onChange, labelClassna
           value={value}
           onChange={onChange}
           id="countries"
-          className="w-full appearance-none mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white relative"
+          className={`w-full appearance-none mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white relative ${selectClassname}`}
         >
           {children}
         </select>

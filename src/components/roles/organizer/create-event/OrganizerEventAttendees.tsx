@@ -14,7 +14,7 @@ import { exportGuestsToExcel } from "@/utils/exportExcel"
 import { jwtDecode } from "jwt-decode"
 import { notifyError } from "@/components/ui/toast-notifications"
 
-export default function OrganizerEventAttendees({eventId, isPromoter = false}: {eventId: number, isPromoter?: boolean}) {
+export default function OrganizerEventAttendees({eventId, isPromoter = false, disableHeader = false}: {eventId: number, isPromoter?: boolean, disableHeader?: boolean}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<IGuest[]>([]);
 
@@ -55,7 +55,7 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
     <div className={`text-primary-white min-h-screen px-5 pb-40 ${isPromoter ? "bg-primary-black" : ""}`}>
       {/* Header */}
       {
-        isPromoter &&
+        !disableHeader &&
         <div className="flex justify-start items-center gap-x-3 pt-8">
           <GoBackButton className="z-30 top-10 left-5 px-3 py-3" />
           <h1 className="text-3xl font-medium">{selectedEvent?.title}</h1>
@@ -72,7 +72,7 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false}: {
 
           <div className="flex items-center justify-between bg-cards-container rounded-lg py-2 px-4">
             <div>
-              <div className="text-text-inactive text-sm">Total registrados</div>
+              <div className="text-text-inactive text-sm">Asistentes / Aforo</div>
               <div className="text-primary-white text-xl font-medium">
                 {metricsToUse?.ticketsPurchased}/{metricsToUse?.totalTickets}
               </div>
