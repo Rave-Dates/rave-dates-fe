@@ -186,8 +186,8 @@ export default function EditTicketConfiguration() {
   }
 
   return (
-    <div className="bg-primary-black text-primary-white min-h-screen px-6 pt-28 pb-44">
-      <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
+    <div className="bg-primary-black text-primary-white min-h-screen px-6 pt-28 md:pt-40 pb-44">
+      <GoBackButton className="absolute z-30 top-10 md:top-35 md:left-10 left-5 px-3 py-3 animate-fade-in" />
       <div className="max-w-md mx-auto space-y-4">
         <h1 className="text-title font-bold mb-6">Configura los tickets</h1>
 

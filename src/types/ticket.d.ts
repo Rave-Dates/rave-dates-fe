@@ -129,6 +129,10 @@ interface ticketQrResponse {
   clientId: number;
   createdAt: string;
   updatedAt: string;
+  client: {
+    name: string;
+    email: string;
+  }
   ticketType: {
     name: string;
   }

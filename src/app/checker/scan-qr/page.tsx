@@ -38,12 +38,14 @@ export default function ScanQRPage() {
     if (!message) return {};
     const lastModifiedMatch = message.match(/lastModified:\s*(.*?)\s*clientId:/);
     const clientNameMatch = message.match(/clientName:\s*(.*?)\s*clientEmail:/);
-    const clientEmailMatch = message.match(/clientEmail:\s*(.*)$/);
+    const clientEmailMatch = message.match(/clientEmail:\s*(.*?)(?:\s*ticketType:|$)/);
+    const ticketTypeMatch = message.match(/ticketType:\s*(.*)$/);
 
     return {
       lastModified: lastModifiedMatch ? lastModifiedMatch[1].trim() : undefined,
       userName: clientNameMatch ? clientNameMatch[1].trim() : undefined,
       clientEmail: clientEmailMatch ? clientEmailMatch[1].trim() : undefined,
+      ticketName: ticketTypeMatch ? ticketTypeMatch[1].trim() : undefined,
     };
   };
 
@@ -136,15 +138,12 @@ export default function ScanQRPage() {
                 controllerId: checker?.checker?.checkerId,
               });
 
-              console.log('📦 Respuesta API:', res);
-              
-              const extraInfo = parseTicketMessage((res as any).message);
-
               setScanResult({ 
                 success: true, 
                 text: `Ticket leído correctamente`,
                 ticketName: res?.ticketType?.name || 'Boleta Desconocida',
-                ...extraInfo
+                clientEmail: res?.client?.email || 'Email no encontrado',
+                userName: res?.client?.name || 'Nombre no encontrado',
               });
             } catch (error) {
               const err = error as AxiosError<{ message: string }>;
@@ -238,7 +237,7 @@ export default function ScanQRPage() {
       {scanResult && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
           <div
-            className={`max-w-xs border w-full px-6 py-4 rounded-lg text-center relative ${
+            className={`max-w-xs border w-full px-6 py-8 rounded-lg text-center relative ${
               scanResult.success 
               ? 'border-green-600 brightness-150 text-green-600' 
               : scanResult.text === "No tienes permiso para leer este ticket" 
