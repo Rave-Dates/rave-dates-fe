@@ -4,11 +4,17 @@ import { DropdownItem } from "@/components/roles/admin/events/DropDownItem"
 import { StageItem } from "@/components/roles/admin/events/StageItem"
 import UserSvg from "@/components/svg/UserSvg"
 import GoBackButton from "@/components/ui/buttons/GoBackButton"
-import { useAdminBinnacles, useAdminEvent, useAdminEventBinnacles, useAdminGetOrganizerFromEvent, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes, useAdminUserById } from "@/hooks/admin/queries/useAdminData"
+import FormDropDown from "@/components/ui/inputs/FormDropDown"
+import { notifyError, notifySuccess } from "@/components/ui/toast-notifications"
+import { useAdminBinnacles, useAdminEvent, useAdminEventBinnacles, useAdminGetCheckers, useAdminGetOrganizerFromEvent, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes, useAdminUserById } from "@/hooks/admin/queries/useAdminData"
+import { generateCheckerLink, updateCheckerTicketTypes } from "@/services/admin-qr"
+import { onInvalid } from "@/utils/onInvalidFunc"
+import { useMutation } from "@tanstack/react-query"
 import { useReactiveCookiesNext } from "cookies-next"
 import Link from "next/link"
 import { useParams, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
 
 export default function EventInfo() {
   const { getCookie } = useReactiveCookiesNext();
@@ -20,6 +26,15 @@ export default function EventInfo() {
   const userId = Number(params.userId);
   const eventId = Number(params.eventId);
   const organizerId = Number(searchParams.get("organizerId"));
+
+  const [checkerLink, setCheckerLink] = useState<string>()
+  const { register, handleSubmit, setValue, watch, reset } = useForm<{
+    checkerData: string;
+    eventId: number;
+    ticketTypeMap: Record<number, string>;
+  }>();
+
+  const selectedTickets = watch("ticketTypeMap");
 
 
   const { selectedEvent } = useAdminEvent({ token, eventId });
@@ -40,6 +55,7 @@ export default function EventInfo() {
   
   const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });
   const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId: user?.promoter?.promoterId });
+  const { allCheckers } = useAdminGetCheckers({ token });
   
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
   const selectedPromoterBinnacle = promoterBinnacles?.events.find(b => b.eventId === eventId);
@@ -62,6 +78,64 @@ export default function EventInfo() {
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => (prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section]))
   }
+
+  const { mutate } = useMutation({
+    mutationFn: generateCheckerLink,
+    onSuccess: (data) => {
+      setCheckerLink(data);
+      notifySuccess('Link creado correctamente');
+    },
+    onError: (error) => {
+      console.log(error)
+      notifyError("Error al creado link");
+    },
+  });
+
+  const { mutate: updateTicketTypes } = useMutation({
+    mutationFn: updateCheckerTicketTypes,
+    onError: (error) => {
+      console.log(error)
+      notifyError("Error al asignar tickets");
+    },
+  });
+
+  const onSubmit = (data: { checkerData: string }) => {
+    if (!selectedTickets || Object.keys(selectedTickets).length === 0) {
+      notifyError("Debes seleccionar al menos un ticket");
+      return;
+    }
+
+    const parsedData: { email: string, id: number } = JSON.parse(data.checkerData);
+    
+    updateTicketTypes({
+      checkerId: parsedData.id,
+      ticketTypeIds: Object.keys(selectedTickets).map(id => Number(id)),
+      token
+    });
+    mutate({ 
+      eventId,
+      checkerEmail: parsedData.email,
+    });
+  };
+
+  const handleTicketTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedOptions = Array.from(e.target.selectedOptions);
+    const selectedObj: Record<number, string> = {};
+
+    selectedOptions.forEach((option) => {
+      selectedObj[Number(option.value)] = option.label;
+    });
+
+    const newMap = { ...selectedTickets, ...selectedObj };
+    setValue("ticketTypeMap", newMap, { shouldValidate: true, shouldDirty: true });
+  };
+
+  const handleRemoveTicketType = (idToRemove: string) => {
+    if (!selectedTickets) return;
+    const updatedMap = { ...selectedTickets };
+    delete updatedMap[Number(idToRemove)];
+    setValue("ticketTypeMap", updatedMap, { shouldValidate: true, shouldDirty: true });
+  };
   
   return (
     <div className="bg-primary-black text-white w-full flex items-start justify-center lg:pt-44 pb-44 min-h-screen p-4">
@@ -139,6 +213,83 @@ export default function EventInfo() {
                 No se encontró información para mostrar
               </div>
             }
+            <DropdownItem
+              title="Link Escáner QRs"
+              className="mt-2"
+              isExpanded={expandedSections.includes("Link Escáner QRs")}
+              onToggle={() => toggleSection("Link Escáner QRs")}
+            >
+              <div className="bg-main-container px-5 py-2 rounded-b-lg">
+                <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="flex flex-col gap-y-3 justify-between items-center">
+                  <div className="flex w-full gap-x-3 items-center justify-between">
+                    <FormDropDown
+                      labelClassname="!mb-0"
+                      title="Elegir controlador*"
+                      selectClassname="bg-input!"
+                      register={register("checkerData")}
+                    >
+                      <option value="" disabled selected>Controlador</option>
+                      {allCheckers?.map((checker) => (
+                        <option key={checker.userId} value={JSON.stringify({ email: checker.email, id: checker.checker?.checkerId })}>
+                          {checker.name}
+                        </option>
+                      ))}
+                    </FormDropDown>
+                    <FormDropDown
+                      labelClassname="!mb-0"
+                      title="Tipos de tickets*"
+                      selectClassname="bg-input!"
+                      register={register("ticketTypeMap")}
+                      onChange={handleTicketTypeChange}
+                    >
+                      <option value="" disabled selected>Selecciona un tipo de ticket</option>
+                      {ticketTypes?.map((ticket) => (
+                        <option key={ticket.ticketTypeId} value={ticket.ticketTypeId}>
+                          {ticket.name}
+                        </option>
+                      ))}
+                    </FormDropDown>
+                  </div>
+                  <div className="text-sm flex flex-wrap justify-start w-full min-h-7 items-center gap-x-1 gap-y-1">
+                    <h2>Tickets seleccionados:</h2>
+                    {selectedTickets &&
+                      Object.entries(selectedTickets).map(([id, name]) => (
+                        <span key={id} className="bg-inactive flex items-center gap-x-1 px-2 py-1 rounded">
+                          {name}
+                          <button 
+                            type="button" 
+                            onClick={() => handleRemoveTicketType(id)} 
+                            className="text-primary-white hover:text-red-400 font-bold ml-1"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                  </div>
+                  <button type="submit" className="bg-primary rounded-lg py-2.5 mt-3 w-3/4 sm:w-1/2 font-medium text-sm">
+                    Generar link
+                  </button>
+                </form>
+                <div className="flex w-full gap-x-1 mt-3 justify-between py-2 items-center">
+                  <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/50">
+                    {checkerLink ? checkerLink : "Aqui aparecerá el link ..."}
+                  </h2>                  
+                  <button
+                    type="button"
+                    disabled={!checkerLink}
+                    onClick={() => {
+                      if (checkerLink) {
+                        navigator.clipboard.writeText(checkerLink);
+                        notifySuccess("Link copiado al portapapeles");
+                      }
+                    }}
+                    className="border border-primary disabled:opacity-60 disabled:pointer-events-none hover:opacity-75 transition-opacity px-4 py-1.5 font-medium text-primary-white rounded-lg text-sm"
+                  >
+                    Copiar
+                  </button>
+                </div>
+              </div>
+            </DropdownItem>
         </div>
       </div>
     </div>
