@@ -5,14 +5,17 @@ import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 import { assignOrganizerToEvent, assignPromoterToEvent, deleteOrganizerEvent, deletePromoterEvent, getAllEvents } from "@/services/admin-events";
 import { getUserById } from "@/services/admin-users";
+import { useAdminUserById } from "@/hooks/admin/queries/useAdminData";
+import { formatDate } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
+import { jwtDecode } from "jwt-decode";
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function EditAssignEvent() {
+export default function EditAssignEvent({ isOrganizer = false }: { isOrganizer?: boolean }) {
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [assignedEventValue, setAssignedEventValue] = useState("");
 
@@ -23,6 +26,10 @@ export default function EditAssignEvent() {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const router = useRouter();
+
+  // Decode JWT to get the logged-in organizer's user data
+  const decoded: IUserLogin | null = isOrganizer && token ? jwtDecode(token.toString()) : null;
+  const { data: loggedInUser } = useAdminUserById({ token, userId: decoded?.id ?? 0 });
 
   interface FormValues {
     assignedEvent: string;
@@ -66,6 +73,30 @@ export default function EditAssignEvent() {
     enabled: !!token && !!selectedEventId,
   });
 
+  // Filter events based on role:
+  // - Organizer: only show events assigned to the logged-in organizer
+  // - Admin: show all events except free ones
+  const filteredEvents = useMemo(() => {
+    if (!clientEvents) return [];
+
+    const todayStr = formatDate(new Date());
+    let events = clientEvents.filter((event) => {
+      const eventDateStr = formatDate(event.date);
+      return eventDateStr >= todayStr;
+    });
+
+    if (isOrganizer) {
+      // Only show events assigned to this organizer
+      const organizerEventIds = new Set(
+        loggedInUser?.organizer?.events?.map((e) => e.eventId) ?? []
+      );
+      return events.filter((event) => organizerEventIds.has(event.eventId));
+    } else {
+      // Admin: filter out free events
+      return events.filter((event) => event.type !== 'free');
+    }
+  }, [clientEvents, isOrganizer, loggedInUser?.organizer?.events]);
+
   useEffect(() => {
     if (!selectedUser) return;
     if (selectedUser.role.name === "ORGANIZER" && !selectedUser.organizer?.events?.length) return;
@@ -78,8 +109,6 @@ export default function EditAssignEvent() {
       selectedUser.role.name === "PROMOTER" && selectedUser.promoter?.events.find(e => e.eventId === eventId);
 
     if (assignedOrganizerEvent) {
-      console.log("assignedEvent", assignedOrganizerEvent);
-      console.log("selectedEventId", selectedEventId);
       setAssignedEventValue(assignedOrganizerEvent.OrganizerEvent.eventId.toString());
       reset({
         assignedEvent: assignedOrganizerEvent.OrganizerEvent.eventId.toString(),
@@ -87,10 +116,6 @@ export default function EditAssignEvent() {
     }
 
     if (assignedPromotorEvent && assignedPromotorEvent.eventId) {
-      console.log("assignedPromotorEvent", assignedPromotorEvent);
-      console.log("assignedPromotorEvent.eventId.toString()", assignedPromotorEvent.eventId.toString());
-
-      console.log("assignedPromotorEvent", assignedPromotorEvent);
       setAssignedEventValue(assignedPromotorEvent.eventId.toString());
       reset({
         assignedEvent: assignedPromotorEvent.eventId.toString(),
@@ -172,7 +197,6 @@ export default function EditAssignEvent() {
   };
   
   const handleDelete = (data: FormValues) => {
-    console.log("handleDelete")
     const selectedEventId = Number(data["assignedEvent"]);
     if (selectedUser?.role.name === "ORGANIZER") {
       const formattedData = {
@@ -190,7 +214,6 @@ export default function EditAssignEvent() {
           router.back();
         },
         onError: (error) => {
-          console.log(error)
           notifyError("Error al eliminar evento de un organizador");
         },
       });
@@ -212,11 +235,9 @@ export default function EditAssignEvent() {
           router.back();
         },
         onError: (error) => {
-          console.log(error)
           notifyError("Error al eliminar evento de un promotor");
         },
       });
-      console.log("PROMOTER formattedData",formattedData)
     }
   }
 
@@ -238,7 +259,7 @@ export default function EditAssignEvent() {
         >
           <option value="" disabled hidden>Seleccioná un evento</option>
           {
-            clientEvents?.map((event) => (
+            filteredEvents.map((event) => (
               <option key={event.eventId} value={String(event.eventId)}>
                 {event.title}
               </option>

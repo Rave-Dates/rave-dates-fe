@@ -9,11 +9,12 @@ import { formatDate } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
+import { jwtDecode } from "jwt-decode";
 import { useParams, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function AssignEvent() {
+export default function AssignEvent({ isOrganizer = false }: { isOrganizer?: boolean }) {
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
 
   const queryClient = useQueryClient();
@@ -22,6 +23,10 @@ export default function AssignEvent() {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const router = useRouter();
+
+  // Decode JWT to get the logged-in organizer's user data
+  const decoded: IUserLogin | null = isOrganizer && token ? jwtDecode(token.toString()) : null;
+  const { data: loggedInUser } = useAdminUserById({ token, userId: decoded?.id ?? 0 });
 
   const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
@@ -46,6 +51,32 @@ export default function AssignEvent() {
   const { data: selectedUser } = useAdminUserById({ token, userId });
   const { allEvents } = useAdminAllEvents({ token });
   const { selectedEvent: eventById } = useAdminEvent({ token, eventId: selectedEventId! });
+
+  // Filter events based on role:
+  // - Organizer: only show events assigned to the logged-in organizer
+  // - Admin: show all events except free ones
+  const filteredEvents = useMemo(() => {
+    if (!allEvents) return [];
+
+    const todayStr = formatDate(new Date());
+    let events = allEvents.filter((event) => {
+      const eventDateStr = formatDate(event.date);
+      return eventDateStr >= todayStr;
+    });
+
+    if (isOrganizer) {
+      // Only show events assigned to this organizer
+      const organizerEventIds = new Set(
+        loggedInUser?.organizer?.events?.map((e) => e.eventId) ?? []
+      );
+      events = events.filter((event) => organizerEventIds.has(event.eventId));
+    } else {
+      // Admin: filter out free events
+      events = events.filter((event) => event.type !== 'free');
+    }
+
+    return events;
+  }, [allEvents, isOrganizer, loggedInUser?.organizer?.events]);
 
   const onSubmit = (data: FormValues) => {
     if (!selectedUser) return;
@@ -113,17 +144,11 @@ export default function AssignEvent() {
         >
           <option value="" disabled hidden>Seleccioná un evento</option>
           {
-            allEvents
-              ?.filter((event) => {
-                const todayStr = formatDate(new Date());
-                const eventDateStr = formatDate(event.date);
-                return eventDateStr >= todayStr;
-              })
-              .map((event) => (
-                <option key={event.eventId} value={String(event.eventId)}>
-                  {event.title}
-                </option>
-              ))
+            filteredEvents.map((event) => (
+              <option key={event.eventId} value={String(event.eventId)}>
+                {event.title}
+              </option>
+            ))
           }
         </FormDropDown>
       </DefaultForm>
