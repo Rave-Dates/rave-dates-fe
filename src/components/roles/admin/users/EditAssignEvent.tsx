@@ -80,7 +80,7 @@ export default function EditAssignEvent({ isOrganizer = false }: { isOrganizer?:
     if (!clientEvents) return [];
 
     const todayStr = formatDate(new Date());
-    let events = clientEvents.filter((event) => {
+    const events = clientEvents.filter((event) => {
       const eventDateStr = formatDate(event.date);
       return eventDateStr >= todayStr;
     });

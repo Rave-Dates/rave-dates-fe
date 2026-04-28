@@ -14,7 +14,7 @@ import { exportGuestsToExcel } from "@/utils/exportExcel"
 import { jwtDecode } from "jwt-decode"
 import { notifyError } from "@/components/ui/toast-notifications"
 
-export default function OrganizerEventAttendees({eventId, isPromoter = false, disableHeader = false}: {eventId: number, isPromoter?: boolean, disableHeader?: boolean}) {
+export default function OrganizerEventAttendees({eventId, disableHeader = false}: {eventId: number, disableHeader?: boolean}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<IGuest[]>([]);
 
@@ -23,7 +23,7 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false, di
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
   
 
-  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId, isPromoter });
+  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });
   const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId: decoded?.promoterId ?? 0 });
   const { selectedEvent } = useAdminEvent({ eventId, token });
   const { guests } = useAdminGetGuests({ token, eventId });
@@ -52,7 +52,7 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false, di
   
 
   return (
-    <div className={`text-primary-white min-h-screen px-5 pb-40 ${isPromoter ? "bg-primary-black" : ""}`}>
+    <div className="text-primary-white min-h-screen px-5 pb-40">
       {/* Header */}
       {
         !disableHeader &&
@@ -114,7 +114,7 @@ export default function OrganizerEventAttendees({eventId, isPromoter = false, di
             type="guest"
             setSearchTerm={setSearchTerm}
           />
-          <Link href={isPromoter && promoterLink ? promoterLink : "attendees/add-guest"} className="border-primary flex justify-center items-center border text-primary text-2xl px-3 rounded-xl">
+          <Link href="attendees/add-guest" className="border-primary flex justify-center items-center border text-primary text-2xl px-3 rounded-xl">
             <AddSvg />
           </Link>
         </div>
