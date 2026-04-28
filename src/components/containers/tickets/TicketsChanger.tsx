@@ -133,6 +133,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
         time: `${formatDateToColombiaTime(eventInfo.date).date}, ${
           formatDateToColombiaTime(eventInfo.date).time
         }hs`,
+        purchaseTicketId: ticket.purchaseTicketId,
         ticketType: ticket.ticketType.name,
         eventImage: servedImageUrl,
         logoRD: "/logo.svg",

@@ -9,7 +9,7 @@ import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 type ClientForm = {
@@ -17,7 +17,15 @@ type ClientForm = {
   receiveInfo?: boolean;
 };
 
-export default function ClientAuth() {
+export default function ClientAuthPage() {
+  return (
+    <Suspense>
+      <ClientAuth />
+    </Suspense>
+  );
+}
+
+function ClientAuth() {
   const { getCookie } = useReactiveCookiesNext();
   const { setClientAuthData, setIsEmailOrWhatsapp, isEmailOrWhatsapp, emailOrWhatsapp } = useClientAuthStore()
   const searchParams = useSearchParams()

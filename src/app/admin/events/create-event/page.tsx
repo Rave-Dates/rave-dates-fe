@@ -205,7 +205,7 @@ export default function Page() {
       >
         <option value="">Selecciona un organizador</option>
         {organizers?.map((organizer) => (
-          <option key={organizer.userId} value={organizer.organizer?.organizerId}>
+          <option key={organizer.userId} value={organizer.organizer?.organizerId ?? ""}>
             {organizer.name}
           </option>
         ))}
