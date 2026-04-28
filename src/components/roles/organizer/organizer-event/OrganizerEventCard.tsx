@@ -52,7 +52,20 @@ export function OrganizerEventCard({event, href = "organizer/event", totalSold, 
 
       {/* Event Details */}
       <div className="flex-1 min-w-0">
-        <h3 className="text-white font-medium text-sm mb-1 truncate">{title} - {subtitle}</h3>
+        <div className="flex items-center gap-x-2 mb-1">
+          {
+            !promoterId && (
+              new Date(date ?? "").getTime() > new Date().getTime() ?
+              event.isActive ? 
+              <div className="h-2 w-2 flex-shrink-0 bg-green-500 rounded-full"></div> 
+              :
+              <div className="h-2 w-2 flex-shrink-0 bg-orange-400 rounded-full"></div>
+              :
+              <div className="h-2 w-2 flex-shrink-0 bg-gray-400 rounded-full"></div>
+            )
+          }
+          <h3 className="text-white font-medium text-sm truncate">{title} - {subtitle}</h3>
+        </div>
         <p className="text-xs mb-1 truncate">
           {date && formatDateToColombiaTime(date).date} - {geo && extractPlaceFromGeo(geo)}
         </p>

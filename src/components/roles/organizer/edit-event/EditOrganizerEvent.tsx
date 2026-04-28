@@ -55,20 +55,13 @@ export default function EditOrganizerEvent({ eventId }: { eventId: number }) {
   useEffect(() => {
     if (!event) return;
     if (event.type !== 'free') {
-      router.replace("/organizer/events")
+      router.replace("/organizer")
     }
 
     const result = parseISODate(event.date)
 
     const validDate = combineDateAndTimeToISO(result.date, result.time)
     const formattedTimeZone = formatDateToColombiaTime(validDate)
-
-    const formattedPromoters = event.promoters?.map((promoter) => ({
-      promoterId: promoter.promoterId,
-    }))
-
-    const validatedFormPromoters = 
-      hasLoadedEvent ? eventFormData.formPromoters : formattedPromoters;
 
     // Seteamos todo al formulario
     const setters = {
@@ -88,7 +81,7 @@ export default function EditOrganizerEvent({ eventId }: { eventId: number }) {
       type: event.type,
       isActive: event.isActive,
       timeOut: event.timeOut,
-      formPromoters: validatedFormPromoters,
+      quantityComplimentaryTickets: event.quantityComplimentaryTickets,
     };
 
     Object.entries(setters).forEach(([key, value]) => {
@@ -168,15 +161,6 @@ useEffect(() => {
 }, [eventCategories, categories]);
 
 
-  const handleGoToPromoters = (data: IEventFormData) => {
-    updateEventFormData({
-      ...eventFormData,
-      ...data,
-    });
-
-    router.push("/organizer/events/assign-promoters");
-  }
-
   // creamos evento local
   const onSubmit = (data: IEventFormData) => {
     const formattedTickets = data.tickets.map((ticket) => ({
@@ -244,7 +228,7 @@ useEffect(() => {
       timeOut: data.timeOut,
       labels: data.labels || [],
       tickets: [formattedTickets[0]],
-      formPromoters: data.formPromoters
+      quantityComplimentaryTickets: data.quantityComplimentaryTickets,
     }
 
     notifyPending(
@@ -252,12 +236,12 @@ useEffect(() => {
         editEvent({formData: cleanedEventData, isOrganizer: true}, {
           onSuccess: () => {
             resolve("");
-            router.push("/organizer/events");
+            router.push("/organizer");
           },
           onError: (err) => {
             console.log(err)
             reject(err);
-            router.push("/organizer/events");
+            router.push("/organizer");
           },
         });
       }),
@@ -414,6 +398,15 @@ useEffect(() => {
             </FormDropDown>
           ))
         }
+
+      <FormInput
+        type="number"
+        title="Cortesía cada X ventas" 
+        inputName="quantityComplimentaryTickets"
+        register={register("quantityComplimentaryTickets", {
+          setValueAs: (v) => v === "" || v === undefined ? undefined : Number(v)
+        })}
+      />
       <br />
       {
         labelsTypes && watchedLabels &&
@@ -422,13 +415,6 @@ useEffect(() => {
 
       <br />
 
-      <button
-        type="button"
-        onClick={handleSubmit(handleGoToPromoters, onInvalid)}
-        className="border border-primary text-primary mt-10 input-button"
-      >
-        Promotores
-      </button>
       <button
         type="submit"
         className="bg-primary block text-center text-primary-white input-button"

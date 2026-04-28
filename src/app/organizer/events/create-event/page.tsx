@@ -17,8 +17,6 @@ import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
-import type React from "react";
 import { useEffect } from "react";
 
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -27,13 +25,12 @@ const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/Ge
 
 export default function Page() {
   const { eventFormData, updateEventFormData } = useCreateEventStore();
-  
-  const router = useRouter()
+
   const { register, handleSubmit, setValue, control, reset } = useForm<IEventFormData>({
     defaultValues: defaultEventFormData
   });
 
-  const { mutate: createFullEvent } = useCreateOrganizerFreeEvent({reset, errorHref: "/organizer/events", successHref: "/organizer/events"});
+  const { mutate: createFullEvent } = useCreateOrganizerFreeEvent({reset, errorHref: "/organizer", successHref: "/organizer"});
   const { getCookie } = useReactiveCookiesNext();
 
   const token = getCookie("token");
@@ -79,7 +76,7 @@ export default function Page() {
       images: eventFormData.images,
       tickets: eventFormData.tickets,
       categories: eventFormData.categories,
-      formPromoters: eventFormData.formPromoters,
+      quantityComplimentaryTickets: eventFormData.quantityComplimentaryTickets,
     };
 
     Object.entries(setters).forEach(([key, value]) => {
@@ -92,16 +89,6 @@ export default function Page() {
     
   const watchedLabels = useWatch({ name: "labels", control });
   const watchedImages = useWatch({ name: "images", control });
-
-  const handleGoToPromoters = (data: IEventFormData) => {
-    updateEventFormData({
-      ...eventFormData,
-      ...data,
-    });
-    
-
-    router.push("assign-promoters");
-  }
 
   // creamos el evento 
   const onSubmit = (data: IEventFormData) => {
@@ -158,7 +145,7 @@ export default function Page() {
       labels: data.labels || [],
       organizerId: decoded?.organizerId || 0,
       tickets: [validTickets[0]],
-      formPromoters: data.formPromoters,
+      quantityComplimentaryTickets: data.quantityComplimentaryTickets,
     };
 
      notifyPending(
@@ -304,6 +291,15 @@ export default function Page() {
             </FormDropDown>
           ))
         }
+
+      <FormInput
+        type="number"
+        title="Cortesía cada X ventas" 
+        inputName="quantityComplimentaryTickets"
+        register={register("quantityComplimentaryTickets", {
+          setValueAs: (v) => v === "" || v === undefined ? undefined : Number(v)
+        })}
+      />
       <br />
 
       {labelsTypes && watchedLabels && (
@@ -315,13 +311,6 @@ export default function Page() {
         />
       )}
 
-      <button
-        type="button"
-        onClick={handleSubmit(handleGoToPromoters, onInvalid)}
-        className="border border-primary text-primary mt-10 input-button"
-      >
-        Promotores
-      </button>
       <button
         type="submit"
         className="bg-primary block text-center text-primary-white input-button"

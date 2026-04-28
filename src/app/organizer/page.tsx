@@ -7,10 +7,13 @@ import { useAdminBinnacles, useAdminUserById } from "@/hooks/admin/queries/useAd
 import { useReactiveCookiesNext } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useCreateEventStore } from "@/store/createEventStore";
+import { defaultEventFormData } from "@/constants/defaultEventFormData"
 
 export default function OrganizerHome() {
   
+  const { updateEventFormData } = useCreateEventStore();
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const decoded: { id: number } = (token && jwtDecode(token.toString())) || {id: 0};
@@ -22,9 +25,14 @@ export default function OrganizerHome() {
 
   const { organizerBinnacles } = useAdminBinnacles({ organizerId: organizerId ?? 0, token: token?.toString() });
 
-  const [filters, setFilters] = useState<string[]>(["Activo"]);
+  const [filters, setFilters] = useState<string[]>(["Activo", "Inactivo"]);
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    console.log("campos resetados")
+    updateEventFormData(defaultEventFormData);
+  }, []);
 
   const isEventFuture = (date: string) => {
     return new Date(date).getTime() > new Date().getTime();
@@ -48,6 +56,10 @@ export default function OrganizerHome() {
     {
       name: "Activo",
       className: "bg-green-500"
+    },
+    {
+      name: "Inactivo",
+      className: "bg-orange-400"
     },
     {
       name: "Finalizado",
