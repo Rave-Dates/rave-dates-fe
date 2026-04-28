@@ -5,33 +5,50 @@ import { useForm } from 'react-hook-form';
 import { useClientAllCategories } from '@/hooks/client/queries/useClientData';
 import CheckFilterInput from '@/components/ui/inputs/CheckFilterInput';
 import { useEventStore } from '@/store/useEventStore';
+import { useCityStore } from '@/store/useCityStore';
 
 function FilterModal() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { clientCategories } = useClientAllCategories();
-  const { setFilters } = useEventStore();
+  const { filters, setFilters } = useEventStore();
+  const { selectedCity } = useCityStore();
   const { register, handleSubmit, reset, watch } = useForm();
 
   // Evitar scroll del body cuando está abierto el modal
   useEffect(() => {
-    document.body.style.overflow = isModalOpen ? 'hidden' : '';
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+      reset(filters);
+    } else {
+      document.body.style.overflow = '';
+    }
     return () => { document.body.style.overflow = ''; };
-  }, [isModalOpen]);
+  }, [isModalOpen, reset, filters]);
 
   const applyFilters = handleSubmit((data) => {
-    setFilters(data); // guarda los valores seleccionados por categoría
+    // Si tenemos una ciudad seleccionada, nos aseguramos de no perderla
+    const cityFilter = Object.entries(filters).find(([k, v]) => v === selectedCity);
+    const finalFilters = { ...data };
+    if (cityFilter && selectedCity) {
+      finalFilters[cityFilter[0]] = selectedCity;
+    }
+    setFilters(finalFilters);
     setIsModalOpen(false);
   });
 
   const clearFilters = () => {
-    reset(); // limpia los campos
-    setFilters({});
+    // Preservar solo el filtro de ciudad
+    const cityFilter = Object.entries(filters).find(([k, v]) => v === selectedCity);
+    const newFilters = (cityFilter && selectedCity) ? { [cityFilter[0]]: selectedCity } : {};
+    
+    reset(newFilters);
+    setFilters(newFilters);
   };
 
   return (
     <>
       <button 
-        className="bg-primary text-primary-white hover:bg-primary/70 transition-colors px-3.5 content-center mx-2 rounded-2xl"
+        className="bg-primary text-primary-white hover:bg-primary/70 transition-colors px-3.5 py-3.5 content-center mx-2 rounded-2xl"
         onClick={() => setIsModalOpen(true)}
       >
         <FilterSvg />
@@ -62,19 +79,25 @@ function FilterModal() {
               onSubmit={applyFilters}
               className="flex-1 overflow-y-auto py-6 px-6 space-y-8 font-light"
             >
-              {clientCategories?.map((category) => (
-                <CheckFilterInput
-                  key={category.categoryId}
-                  name={`category-${category.categoryId}`}
-                  title={category.name}
-                  items={category.values.map((v) => ({
-                    label: v.value,
-                    value: v.value,
-                  }))}
-                  register={register}
-                  selected={watch(`category-${category.categoryId}`)}
-                />
-              ))}
+              {clientCategories
+                ?.filter((category) => 
+                  !category.name.toLowerCase().includes("ubicacion") && 
+                  !category.name.toLowerCase().includes("ubicación") &&
+                  !category.name.toLowerCase().includes("ciudad")
+                )
+                .map((category) => (
+                  <CheckFilterInput
+                    key={category.categoryId}
+                    name={`category-${category.categoryId}`}
+                    title={category.name}
+                    items={category.values.map((v) => ({
+                      label: v.value,
+                      value: v.value,
+                    }))}
+                    register={register}
+                    selected={watch(`category-${category.categoryId}`)}
+                  />
+                ))}
             </form>
 
             {/* Footer fijo abajo */}

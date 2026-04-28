@@ -7,7 +7,7 @@ import { useClientAllEvents } from "@/hooks/client/queries/useClientData";
 import { useEventStore } from "@/store/useEventStore";
 
 const EventCardList: React.FC = () => {
-  const { filters, setEvents } = useEventStore();
+  const { setEvents } = useEventStore();
 
   const [page, setPage] = useState(1);
   const limit = 10;
@@ -24,6 +24,7 @@ const EventCardList: React.FC = () => {
   // Filtrar para mostrar solo eventos próximos o que suceden el día de hoy
   const upcomingEvents = clientEvents.filter((event) => {
     if (!event.date) return false;
+    
     const eventDate = new Date(event.date);
     const today = new Date();
     // Reiniciar la hora de "today" para que los eventos de hoy sigan viéndose
@@ -49,7 +50,7 @@ const EventCardList: React.FC = () => {
   }, [page, paginatedEvents.length, upcomingEvents.length]);
 
   return (
-    <div className="py-8 pb-40 sm:pb-50 sm:pt-[7.5rem] bg-primary-black mx-auto px-6">
+    <div className="py-8 pb-40 sm:pb-50 sm:pt-10 bg-primary-black mx-auto px-6">
       <div className="animate-fade-in">
         {!isError ? (
           <>
