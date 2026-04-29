@@ -28,7 +28,7 @@ const EventInfo= ({ labels, eventCategoryValues, isLoading, description, organiz
       {
         isLoading ? <InfoSkeleton />
         :
-        <div className="space-y-6 mb-8">
+        <div className="space-y-6 pb-32">
           {/* About Event */}
           <div>
             <h2 className="text-small-title font-bold text-white mb-3">Acerca del evento</h2>

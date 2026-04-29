@@ -99,7 +99,7 @@ const NavbarWeb: React.FC = () => {
                 >
                   <LocationSvg className="w-5 h-5 text-primary" />
                   <span className="text-sm font-medium">
-                    {selectedCity || "Ciudad"}
+                     Ciudad
                   </span>
                 </button>
                 <FilterModal />

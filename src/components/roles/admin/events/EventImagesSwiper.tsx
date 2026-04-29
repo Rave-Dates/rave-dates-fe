@@ -42,16 +42,6 @@ export default function EventImageSwiper({ setImages, images, isLoading, isError
 
     const newImages: ImageData[] = []
 
-    // Array.from(files).forEach((file) => {
-    //   if (file.type.startsWith("image/")) {
-    //     const url = URL.createObjectURL(file)
-    //     newImages.push({
-    //       id: Math.random().toString(36).slice(2, 9),
-    //       url,
-    //       file,
-    //     })
-    //   }
-    // })
     Array.from(files).forEach((file) => {
       const fileSizeMB = file.size / (1024 * 1024) // convertir bytes a MB
 

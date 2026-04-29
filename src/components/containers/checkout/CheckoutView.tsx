@@ -20,7 +20,7 @@ import { useChangeTicketStore } from "@/store/useChangeTicketStore";
 
 export default function Checkout() {
   const [selectedPayment, setSelectedPayment] = useState<"Pago total" | "Abonar a la alcancía">("Pago total");
-  const [selectedMethod, setSelectedMethod] = useState<"Nequi" | "Bold">("Bold");
+  const [selectedMethod, setSelectedMethod] = useState<"Nequi" | "Bold">("Nequi");
   const [hasDiscountFlag, setHasDiscountFlag] = useState<boolean>(false);
   const { selected, eventId } = useTicketStore();
   const { eventTickets } = useClientEventTickets(eventId);
