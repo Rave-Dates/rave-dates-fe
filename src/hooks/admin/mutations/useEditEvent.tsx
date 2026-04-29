@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { assignOrganizerToEvent, assignPromoterToEvent, createImage, editEvent, editEventCategories, editTicketTypes } from "../../../services/admin-events";
+import { assignOrganizerToEvent, assignPromoterToEvent, createImage, deleteImage, editEvent, editEventCategories, editTicketTypes, getEventImages } from "../../../services/admin-events";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
@@ -62,13 +62,19 @@ export function useEditEvent(reset: (data: IEventFormData) => void) {
         );
       }
 
-      // 4. Subir imágenes
-      console.log("iamges",images)
-      await Promise.all(
-        images
+      // 4. Gestionar imágenes
+      const currentImages = await getEventImages({ token, eventId });
+      
+      const imagesToDelete = currentImages.filter((currImg: IEventImages) => 
+        !images.some((img: IImageData) => String(img.id) === String(currImg.imageId))
+      );
+
+      await Promise.all([
+        ...imagesToDelete.map((img: IEventImages) => deleteImage(token, img.imageId)),
+        ...images
           .filter((img): img is { id: string; url: string; file: File } => 'file' in img && !!img.file)
           .map((img) => createImage(token, { eventId, file: img.file }))
-      );
+      ]);
       
       updateEventFormData(defaultEventFormData); // reset Zustand
       reset(defaultEventFormData); // reset React Hook Form

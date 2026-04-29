@@ -272,3 +272,13 @@ export const getComplimentaryAvailable = async (token: CookieValueTypes, eventId
   });
   return res.data;
 }
+
+export const deleteImage = async (token: CookieValueTypes, imageId: number) => {
+  const res = await axios.delete(`${BASE_URL}/admin/images/${imageId}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
