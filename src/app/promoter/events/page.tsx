@@ -30,7 +30,7 @@ export default function Page() {
   }, [eventFormData]);
   
   return (
-    <div className="w-full flex flex-col gap-y-5 bg-primary-black text-primary-white min-h-screen pt-10 p-4 pb-40 md:pt-32">
+    <div className="w-full flex flex-col gap-y-5 bg-primary-black text-primary-white min-h-screen pt-10 p-4 pb-40 lg:pt-32">
         <h1 className="text-3xl font-semibold mx-auto pb-3">Eventos asignados</h1>
 
         {/* Event Cards */}

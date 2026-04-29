@@ -187,7 +187,7 @@ export default function ScanQRPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-4 flex flex-col items-center justify-start pt-10 pb-32 relative">
+    <div className="min-h-screen bg-black text-white p-4 flex flex-col items-center justify-start pt-10 lg:pt-32 pb-32 relative">
       <h1 className="text-2xl mb-4">Escanear QR</h1>
 
       <div className="mb-4 flex items-center justify-center flex-col gap-y-3">

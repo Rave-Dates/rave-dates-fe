@@ -30,9 +30,9 @@ export default function Balance() {
   const eventMap = new Map(allEvents?.map(event => [event.eventId, event.title]));
 
   return (
-    <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
+    <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 lg:pt-32">
       <div>
-        <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
+        <GoBackButton className="absolute z-30 top-10 lg:top-32 left-5 px-3 py-3 animate-fade-in" />
         <div className="max-w-xl pt-24 mx-auto animate-fade-in">
           {/* Search and Add User Section */}
 

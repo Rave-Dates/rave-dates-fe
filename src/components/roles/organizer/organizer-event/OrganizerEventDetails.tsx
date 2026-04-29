@@ -20,14 +20,14 @@ export function OrganizerEventDetails({ eventId, isPromoter, isPromoterBinnacle,
   const { selectedEvent, isEventLoading } = useAdminEvent({ eventId, token: token?.toString() });
 
   return (
-    <div className="bg-primary-black min-h-screen flex flex-col text-primary-white pt-12 md:pt-32 rounded-lg p-4 items-center">
+    <div className="bg-primary-black min-h-screen flex flex-col text-primary-white pt-12 lg:pt-32 rounded-lg p-4 items-center">
       {/* Avatar */}
-      <GoBackButton className="absolute z-30 top-10 md:top-30 left-5 px-3 py-3" />
+      <GoBackButton className="absolute z-30 top-10 lg:top-30 left-5 px-3 py-3" />
 
       {
         selectedEvent?.type === "free" &&
         <Link
-          href={`/organizer/events/${selectedEvent.eventId}/edit-event`}
+          href={`/organizer/event/${selectedEvent.eventId}/edit-event`}
           className="absolute bg-primary rounded-xl z-30 top-10 md:top-10 right-5 px-3 py-3"
         >
           <EditSvg className="text-2xl" />

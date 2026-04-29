@@ -75,7 +75,7 @@ export default function ConfirmationModal({
           >
             <div className="flex flex-col items-center gap-2 p-8 text-center">
               <h2 className="text-xl font-bold">{title}</h2>
-              <p className="text-text-inactive text-sm">
+              <p className="text-neutral-400 text-sm">
                 {description}
               </p>
             </div>

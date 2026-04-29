@@ -64,7 +64,7 @@ export default function Page() {
   );
 
   return (
-    <div className="w-full flex flex-col gap-y-5 bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
+    <div className="w-full flex flex-col gap-y-5 bg-primary-black text-primary-white min-h-screen p-4 pb-40 lg:pt-32">
       <Link
         href="/admin/events/create-event"
         className="bg-primary block text-center max-w-xl self-center text-primary-white input-button"

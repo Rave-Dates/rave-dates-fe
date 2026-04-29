@@ -93,7 +93,7 @@ export default function OrganizerHome() {
   }
 
   return (
-    <div className="bg-primary-black pt-14 md:pt-32 text-primary-white min-h-screen pb-40 p-4">
+    <div className="bg-primary-black pt-14 lg:pt-32 text-primary-white min-h-screen pb-40 p-4">
       <div className="max-w-md mx-auto space-y-4">
         {/* Available Balance Header */}
         <div className="flex w-full justify-between items-center">
@@ -221,7 +221,7 @@ export default function OrganizerHome() {
         )}
 
         <Link
-          href="organizer/events/create-event"
+          href="organizer/event/create-event"
           className="bg-primary block text-center max-w-xl self-center text-primary-white input-button"
         >
           Crear evento gratuito

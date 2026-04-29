@@ -122,7 +122,7 @@ export default function EditGuest({ clientId }: {clientId: number}) {
         </FormDropDown> */}
 
       </DefaultForm>
-      <div className="flex flex-col items-center justify-center w-full px-6 gap-y-5">
+      <div className="flex pt-10 max-w-2xl w-full mx-auto flex-col items-center justify-center w-full px-6 gap-y-5">
         <button
           onClick={handleResendTicket}
           type="submit"

@@ -75,7 +75,7 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
   const totalPages = checkerUsers && Math.ceil(checkerUsers.length / itemsPerPage);
 
   return (
-    <div className="w-full bg-primary-black flex flex-col justify-between text-primary-white min-h-screen p-4 pb-20 md:pt-32">
+    <div className="w-full bg-primary-black flex flex-col justify-between text-primary-white min-h-screen p-4 pb-20 lg:pt-32">
       <div className="max-w-xl w-full mx-auto animate-fade-in">
         {/* Search and Add User Section */}
         <div className="flex items-center gap-2 mb-4">
@@ -172,7 +172,7 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
             </div>
           )
         : null}
-        <button onClick={handleClick} className="bg-primary hover:opacity-80 transition-opacity mt-5 text-primary-white font-medium py-3 w-full rounded-lg flex items-center justify-center text-center">
+        <button onClick={handleClick} className="bg-primary max-w-xl self-center hover:opacity-80 transition-opacity mt-5 text-primary-white font-medium py-3 w-full rounded-lg flex items-center justify-center text-center">
           Atras
         </button>
       </div>

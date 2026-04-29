@@ -138,11 +138,11 @@ export default function EventInfo() {
   };
   
   return (
-    <div className="bg-primary-black text-white w-full flex items-start justify-center lg:pt-44 pb-44 min-h-screen p-4">
-      <GoBackButton className="absolute z-30 top-10 left-5 p-3 animate-fade-in" />
+    <div className="bg-primary-black text-white w-full flex items-start justify-center lg:pt-24 pb-44 min-h-screen p-4">
+      <GoBackButton className="absolute z-30 top-10 lg:top-32 left-5 lg:left-10 p-3 animate-fade-in" />
       <Link
         href="event-info/attendees"
-        className="absolute block text-center z-30 top-10 right-5 p-3 animate-fade-in bg-primary text-primary-white rounded-xl"
+        className="absolute block text-center z-30 top-10 right-5 lg:top-32 lg:right-10 p-3 animate-fade-in bg-primary text-primary-white rounded-xl"
       >
         <UserSvg stroke={1.7} className="text-2xl" />
       </Link>

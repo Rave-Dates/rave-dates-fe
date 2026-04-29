@@ -52,7 +52,7 @@ const EventCardList: React.FC = () => {
   }, [page, paginatedEvents.length, upcomingEvents.length]);
 
   return (
-    <div className="py-8 pb-40 sm:pb-50 sm:pt-32 bg-primary-black mx-auto px-6">
+    <div className="py-8 pb-40 sm:pb-50 lg:pt-32 bg-primary-black mx-auto px-6">
       <p className="text-primary-white flex flex-col  max-w-xl mx-auto text-4xl font-semibold text-left py-4 pb-10">
         Próximos eventos
         <span className={`${!selectedCity && "hidden" } text-primary text-2xl`}>

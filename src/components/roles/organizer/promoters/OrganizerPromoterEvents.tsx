@@ -31,7 +31,7 @@ export default function OrganizerPromoterEvents({ userId }: {userId: number}) {
   }, [assignedEvents]);
   
   return (
-    <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 sm:pt-32">
+    <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 lg:pt-32">
       <div>
         <div className="flex justify-start items-center gap-x-3 mt-6 ps-1">
           <GoBackButton className="px-3 py-3 animate-fade-in" />

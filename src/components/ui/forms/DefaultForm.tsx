@@ -28,9 +28,9 @@ export default function DefaultForm({
   autocomplete = "on",
 }: Props) {
   return (
-    <div className={`${className} pt-32 md:pt-44 bg-primary-black md:justify-center md:items-center text-white flex`}>
+    <div className={`${className} pt-28 lg:pt-32 bg-primary-black md:justify-center md:items-center text-white flex`}>
       {goBackButton && (
-        <GoBackButton goHomeButton={goHomeButton} className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
+        <GoBackButton goHomeButton={goHomeButton} className="absolute z-30 top-10 lg:top-32 left-5 px-3 py-3 animate-fade-in" />
       )}
       <div className="w-full max-w-2xl relative animate-fade-in">
         {ticketButtons ? (
