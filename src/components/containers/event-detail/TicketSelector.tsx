@@ -34,6 +34,24 @@ const TicketSelector = ({
   const params = useParams();
   const eventId = Number(params.eventId);
   const { selectedEvent } = useClientEvent(eventId);
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      // Aparecer después de 300px de scroll (pasando el hero y el header)
+      if (window.scrollY > 200) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    // Verificar posición inicial
+    handleScroll();
+    
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const totalQuantity = Object.values(selected).reduce(
     (acc, curr) => acc + curr.quantity,
@@ -106,8 +124,8 @@ const TicketSelector = ({
             </>
           )}
 
-          {/* Total */}
-          <div className="w-full flex flex-col items-end mb-7 md:mb-0">
+          {/* Total y Botón - Desktop */}
+          <div className="hidden md:flex w-full flex-col items-end">
             <div className="w-full sm:w-1/2 mb-3">
               <div className="flex justify-between items-center text-white font-bold">
                 <span>TOTAL</span>
@@ -131,6 +149,35 @@ const TicketSelector = ({
             >
               {totalQuantity > 0 ? "Comprar tickets" : "Selecciona tickets"}
             </button>
+          </div>
+
+          {/* Total y Botón - Mobile Flotante */}
+          <div className={`md:hidden fixed bottom-[100px] left-0 right-0 px-6 z-30 transition-all duration-500 ease-in-out ${
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0 pointer-events-none"
+          }`}>
+            <div className="bg-[#0D0D0D]/90 backdrop-blur-md border border-divider p-4 rounded-2xl shadow-2xl flex flex-col gap-3">
+              <div className="flex justify-between items-center text-white font-bold px-1">
+                <span className="text-sm">TOTAL</span>
+                <span className="font-light tabular-nums text-primary text-lg">
+                  {totalQuantity > 0
+                    ? <div><span className="text-primary">$</span><span className="tabular-nums text-primary-white">{totalPrice.toLocaleString()} COP</span></div>
+                    : "0"}
+                </span>
+              </div>
+
+              <button
+                tabIndex={totalQuantity === 0 ? -1 : undefined}
+                aria-disabled={totalQuantity === 0}
+                onClick={handleClick}
+                className={`w-full text-center py-4 rounded-xl font-bold transition-all active:scale-95 ${
+                  totalQuantity > 0
+                    ? "bg-primary text-primary-white shadow-lg shadow-primary/20"
+                    : "bg-inactive text-text-inactive pointer-events-none"
+                }`}
+              >
+                {totalQuantity > 0 ? "Comprar tickets" : "Selecciona tickets"}
+              </button>
+            </div>
           </div>
         </>
       )}
