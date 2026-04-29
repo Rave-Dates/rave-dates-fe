@@ -5,6 +5,7 @@ import EditSvg from "../svg/EditSvg";
 import TrashSvg from "../svg/TrashSvg";
 import CheckSvg from "../svg/CheckSvg";
 import SubtractSvg from "../svg/SubtractSvg";
+import ConfirmationModal from "./modals/ConfirmationModal";
 
 interface EditableItemProps {
   initialValue: string;
@@ -99,15 +100,23 @@ export default function EditableItem({
         )}
 
 
-        <button
-          type="button"
-          onClick={onDelete}
-          className="text-system-error w-10 h-full rounded-r-md flex items-center justify-center bg-divider hover:bg-system-error/80 transition-colors border-l border-primary-black/10"
-          title="Eliminar"
-          disabled={isSaving}
-        >
-          <TrashSvg className="text-xl stroke-2" />
-        </button>
+        <ConfirmationModal
+          title="Eliminar ítem"
+          description={`¿Estás seguro de que deseas eliminar "${initialValue}"? Esta acción no se puede deshacer.`}
+          confirmText="Eliminar"
+          onConfirm={onDelete}
+          variant="danger"
+          trigger={
+            <button
+              type="button"
+              className="text-system-error py-1.5 w-10 h-full rounded-r-md flex items-center justify-center bg-divider hover:bg-system-error/80 transition-colors border-l border-primary-black/10"
+              title="Eliminar"
+              disabled={isSaving}
+            >
+              <TrashSvg className="text-xl stroke-2" />
+            </button>
+          }
+        />
       </div>
     </div>
   );

@@ -232,11 +232,11 @@ export function useAdminAllPromoters({ token, organizerId }: { token: CookieValu
   return { promoters, isLoading, isError };
 }
 
-export function useAdminUserById({ token, userId }: { token: CookieValueTypes, userId: number }) {
+export function useAdminUserById({ token, userId }: { token: CookieValueTypes, userId: number | undefined | null }) {
   const { data, isPending } = useQuery({
     queryKey: ["user"],
-    queryFn: () => getUserById({ token, id: userId }),
-    enabled: !!token,
+    queryFn: () => getUserById({ token, id: userId! }),
+    enabled: !!token && !!userId,
   });
 
   return { data, isPending };

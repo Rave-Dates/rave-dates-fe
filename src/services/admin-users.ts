@@ -166,3 +166,13 @@ export const getClientByEmail = async ({token, email}: { token: CookieValueTypes
   const data: IClient = res.data;
   return data;
 };
+
+export const exportClientsAsCSV = async ({token, eventId}: { token: CookieValueTypes, eventId: number }) => {
+  const res = await axios.get(`${BASE_URL}/admin/clients/all-by-event/${eventId}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
