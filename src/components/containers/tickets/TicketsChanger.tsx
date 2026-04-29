@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TicketRow } from "./TicketRow";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -15,6 +15,7 @@ import { generateTicketImage } from "./generateTicketImage";
 import { useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
 import { notifyError } from "@/components/ui/toast-notifications";
 import { useTicketStore } from "@/store/useTicketStore";
+import { useChangeTicketStore } from "@/store/useChangeTicketStore";
 
 type Props = {
   eventInfo: { date: string; title: string };
@@ -47,13 +48,29 @@ export default function TicketsChanger({ eventInfo }: Props) {
   const router = useRouter();
   const params = useParams();
   const eventId = Number(params.eventId);
+  const { resetSelected } = useTicketStore();
+  const {
+    resetStore,
+    resetOldTicketsTotal,
+    resetOldTicketsPriceTotal,
+    resetSubtracted,
+  } = useChangeTicketStore();
 
-  // Estados de paginación
+  // Reinicia todos los stores de tickets al montar para asegurar un estado limpio al volver de los flujos de mejora
+  useEffect(() => {
+    resetStore();
+    resetSelected();
+    resetOldTicketsTotal();
+    resetOldTicketsPriceTotal();
+    resetSubtracted();
+  }, []);
+
+  // Estados de paginación para las diferentes categorías de tickets
   const [pageNonTransferred, setPageNonTransferred] = useState(1);
   const [pageTransferred, setPageTransferred] = useState(1);
   const [pagePending, setPagePending] = useState(1);
 
-  // Filtros
+  // Filtro: Tickets que han sido transferidos A otra persona
   const transferredTickets = purchasedTickets?.filter(
     (ticket) =>
       ticket.isTransferred &&
@@ -63,6 +80,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
       ticket.ticketType.eventId === eventId
   );
 
+  // Filtro: Tickets que actualmente posee el usuario (originales o recibidos por transferencia)
   const nonTransferredTickets = purchasedTickets?.filter(
     (ticket) =>
       ((!ticket.isTransferred && ticket.purchase?.paymentStatus === "PAID") &&
@@ -71,10 +89,12 @@ export default function TicketsChanger({ eventInfo }: Props) {
       ticket.ticketType.eventId === eventId
   );
 
+  // Filtro: Tickets de compras con pagos pendientes (PiggyBank/Parcial)
   const pendingTickets = purchasedTickets
     ?.map((t) => t)
     .filter((t) => t.purchase?.paymentStatus === "PARTIAL" && t.ticketType.eventId === eventId);
 
+  // Agrupa los tickets pendientes por ID de compra para mostrar los montos restantes totales
   const groupedPendingPurchases: {
     [purchaseId: number]: {
       tickets: IPurchaseTicket[];
@@ -112,12 +132,14 @@ export default function TicketsChanger({ eventInfo }: Props) {
     return
   }
 
+  // Navega al checkout para completar un pago parcial (Piggy Bank)
   const handleCompletePiggyBank = async (purchase: PendingPurchases) => {
     setEventId(eventId);
     setPendimPaymentAmount(purchase.remainingAmount)
     router.push(`/checkout?pp=${purchase.purchaseId}`)
   };
 
+  // Genera y descarga imágenes para todos los tickets válidos (excluyendo tickets ya usados/READ)
   const handleDownloadAll = async () => {
     const downloadableTickets = nonTransferredTickets?.filter(
       (ticket) => ticket.status !== "READ"

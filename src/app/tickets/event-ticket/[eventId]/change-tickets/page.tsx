@@ -58,9 +58,11 @@ const ChangeTicketsView = () => {
   });
 
 
+  // Lista memorizada de IDs de compra que contienen tickets elegibles para mejora
   const purchaseIds = React.useMemo(() => {
     const ids = new Set<number>();
     purchasedTickets?.forEach((ticket) => {
+      // Lógica para determinar si el ticket está actualmente en posesión del usuario
       const isMine =
         ((!ticket.isTransferred && ticket.purchase?.paymentStatus === "PAID") &&
           ticket.transferredClientId === null) ||
@@ -69,8 +71,8 @@ const ChangeTicketsView = () => {
       if (
         ticket.ticketType.eventId === eventId &&
         isMine &&
-        !ticket.purchase?.meta?.changeTickets &&
-        ticket.status === "PENDING"
+        !ticket.purchase?.meta?.changeTickets && // Excluye tickets que ya han sido mejorados
+        ticket.status === "PENDING" // Solo los tickets pendientes (sin usar) pueden ser mejorados
       ) {
         ids.add(ticket.purchaseId);
       }
@@ -78,6 +80,7 @@ const ChangeTicketsView = () => {
     return Array.from(ids).sort((a, b) => a - b);
   }, [purchasedTickets, eventId, clientId]);
 
+  // Agrupa los tickets poseídos por el usuario por tipo para la pestaña de compra activa
   const oldTicketsGrouped = React.useMemo(() => {
     if (!activeTab || !purchasedTickets) return [];
 
@@ -117,6 +120,7 @@ const ChangeTicketsView = () => {
 
 
 
+  // Selecciona automáticamente la primera pestaña de compra al montar
   useEffect(() => {
     if (purchaseIds.length > 0 && activeTab === null) {
       setActiveTab(purchaseIds[0]);
@@ -124,6 +128,7 @@ const ChangeTicketsView = () => {
     }
   }, [purchaseIds, activeTab]);
 
+  // Sincroniza el estado local de los tickets antiguos con el store global cuando cambia la pestaña
   useEffect(() => {
     if (activeTab === null) return;
 
@@ -136,12 +141,17 @@ const ChangeTicketsView = () => {
     });
   }, [oldTicketsGrouped, activeTab]);
 
+  // Maneja la confirmación final de la mejora de tickets
   const handleConfirm = async () => {
     let totalNew = 0;
     let totalOld = 0;
+    
+    // Calcula el valor total de los nuevos tickets seleccionados
     for (const [key, value] of Object.entries(selected)) {
       totalNew += value.quantity * value.stage.price;
     }
+    
+    // Calcula el valor total de los tickets antiguos que están siendo reemplazados
     oldTicketsGrouped.forEach((ticket) => {
       totalOld += ticket.quantity * ticket.price;
     });
@@ -151,6 +161,7 @@ const ChangeTicketsView = () => {
     
     const formattedOldTickets = []
     
+    // Construye el array de tickets antiguos para la API
     for (const [key, value] of Object.entries(oldTickets)) {
       if (value.actualQuantity === 0) continue;
       formattedOldTickets.push({
@@ -162,6 +173,7 @@ const ChangeTicketsView = () => {
     
     const total = (totalPrice - totalSubtracted)
 
+    // Si hay un saldo positivo a pagar, redirige al checkout
     if (total > 0) {
       setOldTicketsPriceTotal(totalOld);
       router.push("/checkout?change-tickets=true");
@@ -170,6 +182,7 @@ const ChangeTicketsView = () => {
 
     const formattedNewTickets = []
 
+    // Construye el array de nuevos tickets para la API
     for (const [key, value] of Object.entries(selected)) {
       formattedNewTickets.push({
         ticketTypeId: Number(key),
