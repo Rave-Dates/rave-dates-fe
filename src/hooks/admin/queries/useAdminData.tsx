@@ -370,7 +370,7 @@ export function useAdminGetComplimentaryAvailable({ token, eventId, promoterId }
 }
 
 export function useAdminGetConfig({ token }: { token: CookieValueTypes }) {
-  const { data: adminConfig } = useQuery<{ email: string, boldFeePorcentage: number }>({
+  const { data: adminConfig } = useQuery<{ email: string, feeBoldPorcentage: number, minFeeRdPlain: number }>({
     queryKey: ["adminConfig"],
     queryFn: () => getAdminConfig({token}),
     enabled: !!token,

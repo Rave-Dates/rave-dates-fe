@@ -11,17 +11,17 @@ import { useForm } from "react-hook-form";
 
 import ConfirmationModal from "@/components/ui/modals/ConfirmationModal";
 
-export default function BoldFeePorcentage() {
-  const { register, handleSubmit, reset } = useForm<{ boldFeePorcentage: number }>();
+export default function FeeBoldPorcentage() {
+  const { register, handleSubmit, reset } = useForm<{ feeBoldPorcentage: number }>();
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
 
   const { adminConfig } = useAdminGetConfig({ token });
 
   useEffect(() => {
-    if (adminConfig && adminConfig.boldFeePorcentage !== undefined){
+    if (adminConfig && adminConfig.feeBoldPorcentage !== undefined){
       reset({
-        boldFeePorcentage: adminConfig.boldFeePorcentage
+        feeBoldPorcentage: adminConfig.feeBoldPorcentage
       })
     }
   }, [adminConfig, reset])
@@ -37,11 +37,11 @@ export default function BoldFeePorcentage() {
     },
   });
 
-  const onSubmit = ({ boldFeePorcentage }: { boldFeePorcentage: number }) => {
+  const onSubmit = ({ feeBoldPorcentage }: { feeBoldPorcentage: number }) => {
     mutate({
       token,
       data: {
-        boldFeePorcentage: Number(boldFeePorcentage),
+        feeBoldPorcentage: Number(feeBoldPorcentage),
       },
     });
   };
@@ -57,10 +57,10 @@ export default function BoldFeePorcentage() {
 
       <FormInput
         title="Porcentaje Comisión Bold*"
-        inputName="boldFeePorcentage"
+        inputName="feeBoldPorcentage"
         type="number"
         typeOfValue="%"
-        register={register("boldFeePorcentage", { required: true, valueAsNumber: true })}
+        register={register("feeBoldPorcentage", { required: true, valueAsNumber: true })}
       />
 
       <ConfirmationModal

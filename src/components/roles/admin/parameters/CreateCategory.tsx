@@ -103,7 +103,7 @@ export default function CreateCategory() {
 
       <button
         type="submit"
-        className="text-primary border border-primary input-button"
+        className="text-primary-white border border-primary input-button"
       >
         Crear categoría
       </button>

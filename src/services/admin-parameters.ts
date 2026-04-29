@@ -145,7 +145,7 @@ export const getErrorStrings = async ({token}: { token: CookieValueTypes }) => {
   return res.data;
 };
 
-export const updateAdminConfig = async ({token, data}: { token: CookieValueTypes, data: { email?: string, boldFeePorcentage?: number} }) => {
+export const updateAdminConfig = async ({token, data}: { token: CookieValueTypes, data: { email?: string, feeBoldPorcentage?: number, minFeeRdPlain?: number} }) => {
   const res = await axios.put(`${BASE_URL}/admin/config`, data, {
     headers: {
       "Accept": "application/json",

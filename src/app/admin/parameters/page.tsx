@@ -4,7 +4,8 @@ import CreateCategory from "@/components/roles/admin/parameters/CreateCategory";
 import CreateCategoryValues from "@/components/roles/admin/parameters/CreateCategoryValues";
 import CreateLabel from "@/components/roles/admin/parameters/CreateLabel";
 import ErrorStrings from "@/components/roles/admin/parameters/ErrorStrings";
-import BoldFeePorcentage from "@/components/roles/admin/parameters/BoldFeePorcentage";
+import FeeBoldPorcentage from "@/components/roles/admin/parameters/FeeBoldPorcentage";
+import MinFeeRdPlain from "@/components/roles/admin/parameters/MinFeeRdPlain";
 import React from "react";
 
 export default function Parameters() {
@@ -16,7 +17,8 @@ export default function Parameters() {
         {/* <CreateTicketType /> */}
         <CreateCategory />
         <CreateCategoryValues />
-        <BoldFeePorcentage />
+        <FeeBoldPorcentage />
+        <MinFeeRdPlain />
         <ErrorStrings />
       </div>
     </div>
