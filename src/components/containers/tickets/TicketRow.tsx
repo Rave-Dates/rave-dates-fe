@@ -86,7 +86,15 @@ export function TicketRow({
   return (
     <div className="bg-cards-container flex-wrap rounded-lg py-3 px-4 gap-x-2 sm:gap-x-5 flex items-center justify-between">
       <div className="flex flex-wrap items-center justify-start font-medium mb-1 gap-x-2">
-        <div>{ticket.ticketType.name}</div>
+        <div>
+          {ticket.ticketType.name}  
+          <span className="text-[#bc5d5e] text-xs">
+            {" "} #
+          </span>
+          <span className="text-sm font-thin text-primary-white/70">
+            {ticket.purchaseTicketId}
+          </span>
+        </div>
         {
           ticket.isTransferred && !isTransferred &&
           <div className="text-xs text-primary/70 mt-1 italic">
