@@ -41,6 +41,8 @@ export default function TicketsChanger({ eventInfo }: Props) {
     clientId,
     clientToken: token,
   });
+
+  console.log("purchasedTickets", purchasedTickets)
   const { setEventId, setPendimPaymentAmount } = useTicketStore();
   const router = useRouter();
   const params = useParams();
@@ -117,9 +119,13 @@ export default function TicketsChanger({ eventInfo }: Props) {
   };
 
   const handleDownloadAll = async () => {
-    if (!nonTransferredTickets?.length) return;
+    const downloadableTickets = nonTransferredTickets?.filter(
+      (ticket) => ticket.status !== "READ"
+    );
 
-    for (const [i, ticket] of nonTransferredTickets.entries()) {
+    if (!downloadableTickets?.length) return;
+
+    for (const [i, ticket] of downloadableTickets.entries()) {
       const eventId = ticket.ticketType.eventId;
       const images = await getClientEventImagesById(eventId);
       const blob = await getClientImageById(Number(images[0].imageId));
@@ -186,13 +192,13 @@ export default function TicketsChanger({ eventInfo }: Props) {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-medium">Mis tickets</h2>
-            <button
-              onClick={handleDownloadAll}
-              className="text-primary text-sm hover:underline"
-            >
-              Descargar todos
-            </button>
-          </div>
+              <button
+                onClick={handleDownloadAll}
+                className="text-primary text-sm hover:underline"
+              >
+                Descargar todos
+              </button>
+            </div>
           <div className="space-y-3">
             {paginate(nonTransferredTickets, pageNonTransferred)?.map(
               (ticket) => (
