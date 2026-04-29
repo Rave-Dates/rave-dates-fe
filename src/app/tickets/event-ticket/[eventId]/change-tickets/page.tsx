@@ -29,9 +29,7 @@ const ChangeTicketsView = () => {
   const clientId = Number(decoded?.id);
   const eventId = Number(params.eventId);
   const [activeTab, setActiveTab] = useState<number | null>(null);
-
   const { purchasedTickets } = useClientPurchasedTickets({clientId, clientToken: clientToken});
-
   const { clientData } = useClientGetById({clientId, clientToken: clientToken});
 
   const { 
@@ -44,15 +42,11 @@ const ChangeTicketsView = () => {
     oldTicketsTotal, 
     setOldTicketsPriceTotal,
     setStorePurchaseId,
-    oldTicketsPriceTotal,
     resetOldTicketsPriceTotal,
-    getTotalOldSubtracted,
     oldSubtracted,
     resetSubtracted
   } = useChangeTicketStore();
   const totalOldTickets = getTotalOldTickets();
-  const totalOldSubtracted = getTotalOldSubtracted();
-
 
   const { data: ticketTypes } = useQuery({
     queryKey: ["ticketTypes"],
@@ -63,40 +57,64 @@ const ChangeTicketsView = () => {
     enabled: !!clientToken,
   });
 
-  console.log("ticketTypes", ticketTypes)
 
   const purchaseIds = React.useMemo(() => {
     const ids = new Set<number>();
     purchasedTickets?.forEach((ticket) => {
+      const isMine =
+        ((!ticket.isTransferred && ticket.purchase?.paymentStatus === "PAID") &&
+          ticket.transferredClientId === null) ||
+        ticket.transferredClientId === clientId;
+
       if (
-        ticket.ticketType.eventId === eventId && 
-        (ticket.transferredClientId === null || 
-          ticket.transferredClientId !== clientId) && 
-          !ticket.purchase?.meta?.changeTickets &&
-          ticket.status === "PENDING"
-        ) {
-          console.log("este paso", ticket)
+        ticket.ticketType.eventId === eventId &&
+        isMine &&
+        !ticket.purchase?.meta?.changeTickets &&
+        ticket.status === "PENDING"
+      ) {
         ids.add(ticket.purchaseId);
       }
     });
     return Array.from(ids).sort((a, b) => a - b);
-  }, [purchasedTickets, eventId]);
+  }, [purchasedTickets, eventId, clientId]);
 
-  const oldTicketsQueries = useQueries({
-    queries:
-      purchaseIds.map((purchaseId) => ({
-        queryKey: ["oldTickets", purchaseId],
-        queryFn: async () => {
-          const data = await getTicketsByPurchaseId({ pruchaseId: purchaseId, clientId, clientToken });
-          return data.map((ticket) => ({ ...ticket, purchaseId }));
-        },
-        enabled: !!clientToken && !!clientId,
-      })) ?? [],
-  });
+  const oldTicketsGrouped = React.useMemo(() => {
+    if (!activeTab || !purchasedTickets) return [];
 
-  const oldTicketsDb = oldTicketsQueries
-    .filter((query) => query.data)
-    .flatMap((query) => query.data);
+    const grouped: Record<
+      number,
+      { ticketType: string; ticketTypeId: number; price: number; quantity: number }
+    > = {};
+
+    purchasedTickets
+      .filter((ticket) => {
+        const isMine =
+          ((!ticket.isTransferred && ticket.purchase?.paymentStatus === "PAID") &&
+            ticket.transferredClientId === null) ||
+          ticket.transferredClientId === clientId;
+        return (
+          ticket.ticketType.eventId === eventId &&
+          ticket.purchaseId === activeTab &&
+          isMine &&
+          !ticket.purchase?.meta?.changeTickets &&
+          ticket.status === "PENDING"
+        );
+      })
+      .forEach((t) => {
+        if (!grouped[t.ticketTypeId]) {
+          grouped[t.ticketTypeId] = {
+            ticketType: t.ticketType.name,
+            ticketTypeId: t.ticketTypeId,
+            price: Number(t.ticketType.stages[0].price),
+            quantity: 0,
+          };
+        }
+        grouped[t.ticketTypeId].quantity += 1;
+      });
+
+    return Object.values(grouped);
+  }, [purchasedTickets, activeTab, eventId, clientId]);
+
 
 
   useEffect(() => {
@@ -109,36 +127,24 @@ const ChangeTicketsView = () => {
   useEffect(() => {
     if (activeTab === null) return;
 
-    oldTicketsDb
-      ?.filter((ticket) => ticket?.purchaseId === activeTab)
-      .forEach((ticket) => {
-        if (!ticket) return;
-        if (!oldTickets[ticket.ticketTypeId]) {
-          setOldQuantity(ticket.ticketTypeId, ticket.quantity, ticket.price);
-          setOldTicketsTotal(ticket.quantity);
-          setOldTicketsPriceTotal(ticket.price * ticket.quantity);
-        }
-      });
-  }, [oldTicketsDb, activeTab]);
-
-  console.log("oldTickets", oldTicketsDb)
-
+    oldTicketsGrouped.forEach((ticket) => {
+      if (!oldTickets[ticket.ticketTypeId]) {
+        setOldQuantity(ticket.ticketTypeId, ticket.quantity, ticket.price);
+        setOldTicketsTotal(ticket.quantity);
+        setOldTicketsPriceTotal(ticket.price * ticket.quantity);
+      }
+    });
+  }, [oldTicketsGrouped, activeTab]);
 
   const handleConfirm = async () => {
     let totalNew = 0;
     let totalOld = 0;
     for (const [key, value] of Object.entries(selected)) {
-      console.log(key)
       totalNew += value.quantity * value.stage.price;
     }
-    {oldTicketsDb
-      ?.filter((ticket) => ticket?.purchaseId === activeTab)
-      .map((ticket, index) => {
-        console.log(index)
-        if (!ticket) return;
-        totalOld += ticket.quantity * ticket.price;
-      })
-    }
+    oldTicketsGrouped.forEach((ticket) => {
+      totalOld += ticket.quantity * ticket.price;
+    });
 
     
     if (!activeTab) return
@@ -172,9 +178,6 @@ const ChangeTicketsView = () => {
       });
     }
 
-    console.log("formattedOldTickets", formattedOldTickets)
-    console.log("formattedNewTickets", formattedNewTickets)
-
     const res = await changeTicketPurchase({
       ticketData: {
         clientId,
@@ -195,11 +198,6 @@ const ChangeTicketsView = () => {
       router.push("/tickets");
       return
     }
-
-    console.log("totalNew", totalNew)
-    console.log("totalOld", totalOld)
-    // console.log("viejos",restados)
-    // console.log("nuevos",selected)
   };
 
   const totalPrice = Object.values(selected).reduce(
@@ -212,10 +210,6 @@ const ChangeTicketsView = () => {
     0
   );
 
-  // const maxPurchase = oldTickets
-  //   .filter((ticket) => ticket?.purchaseId === activeTab)
-  //   .reduce((acc, curr) => acc + (curr?.quantity ?? 0), 0);
-
   const handleSetActiveTab = (purchaseId: number) => {
     setStorePurchaseId(purchaseId);
     setActiveTab(purchaseId);
@@ -226,19 +220,27 @@ const ChangeTicketsView = () => {
     resetSubtracted();
   }
 
-  console.log("totalQuantity", totalQuantity)
-  console.log("totalOldTickets", totalOldTickets)
-  console.log("oldTicketsPriceTotal", oldTicketsPriceTotal)
-  console.log("totalOldSubtracted", totalOldSubtracted)
-  console.log("oldSubtracted", oldSubtracted)
-
   let totalSubtracted = 0;
   for (const [key, value] of Object.entries(oldSubtracted)) {
-    console.log(key)
     totalSubtracted += value.currentSubtracted * value.price;
   }
 
-    console.log("totalSubtracted", totalSubtracted)
+  const handleReset = () => {
+    resetStore();
+    resetSelected();
+    resetOldTicketsTotal();
+    resetOldTicketsPriceTotal();
+    resetSubtracted();
+    
+    // Re-populate old tickets for the current active tab
+    if (activeTab !== null) {
+      oldTicketsGrouped.forEach((ticket) => {
+        setOldQuantity(ticket.ticketTypeId, ticket.quantity, ticket.price);
+        setOldTicketsTotal(ticket.quantity);
+        setOldTicketsPriceTotal(ticket.price * ticket.quantity);
+      });
+    }
+  };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -263,9 +265,17 @@ const ChangeTicketsView = () => {
       <GoBackButton className="absolute z-30 top-10 left-5 px-3 py-3 animate-fade-in" />
       <div className="w-full sm:h-full px-6 sm:pt-32 pt-28 pb-20 flex flex-col items-center justify-between sm:justify-center max-w-2xl relative animate-fade-in overflow-y-scroll">
         <div className="w-full pb-5">
-          <h3 className="text-subtitle font-semibold mb-4">
-            Entradas por compra
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-subtitle font-semibold">
+              Entradas por compra
+            </h3>
+            <button 
+              onClick={handleReset}
+              className="text-primary text-sm hover:underline"
+            >
+              Reiniciar
+            </button>
+          </div>
 
           <div className="flex justify-between gap-x-5 items-center mb-4">
             {totalPages && totalPages > 1 ? (
@@ -316,39 +326,35 @@ const ChangeTicketsView = () => {
           
           {activeTab !== null && (
             <div className="space-y-4 mb-10">
-              {oldTicketsDb
-                ?.filter((ticket) => ticket?.purchaseId === activeTab)
-                .map((ticket, index) => {
-                  if (!ticket) return;
-                  console.log("ticket", ticket)
-                  const futureDate = new Date();
-                  futureDate.setDate(futureDate.getDate() + 1);
+              {oldTicketsGrouped.map((ticket, index) => {
+                const futureDate = new Date();
+                futureDate.setDate(futureDate.getDate() + 1);
 
-                  const newTicket = {
-                    name: ticket.ticketType,
-                    ticketTypeId: ticket.ticketTypeId,
-                    maxDate: futureDate.toISOString(),
-                    stages: [
-                      {
-                        stageId: 1,
-                        price: ticket.price,
-                        quantity: ticket.quantity,
-                        dateMax: futureDate.toISOString(),
-                        date: futureDate.toISOString(),
-                        promoterFee: 0,
-                      },
-                    ],
-                  };
+                const newTicket = {
+                  name: ticket.ticketType,
+                  ticketTypeId: ticket.ticketTypeId,
+                  maxDate: futureDate.toISOString(),
+                  stages: [
+                    {
+                      stageId: 1,
+                      price: ticket.price,
+                      quantity: ticket.quantity,
+                      dateMax: futureDate.toISOString(),
+                      date: futureDate.toISOString(),
+                      promoterFee: 0,
+                    },
+                  ],
+                };
 
-                  return (
-                    <ChangeTicketButtons
-                      key={index}
-                      isOldTicket={true}
-                      totalQuantity={totalQuantity}
-                      ticket={newTicket}
-                      fixedQuantity={ticket.quantity} 
-                    />
-                  );
+                return (
+                  <ChangeTicketButtons
+                    key={index}
+                    isOldTicket={true}
+                    totalQuantity={totalQuantity}
+                    ticket={newTicket}
+                    fixedQuantity={ticket.quantity}
+                  />
+                );
               })}
             </div>
           )}
