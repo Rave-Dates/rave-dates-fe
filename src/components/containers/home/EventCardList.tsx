@@ -5,9 +5,11 @@ import EventCard from "./EventCard";
 import EventCardSkeleton from "@/utils/skeletons/event-skeletons/EventCardSkeleton";
 import { useClientAllEvents } from "@/hooks/client/queries/useClientData";
 import { useEventStore } from "@/store/useEventStore";
+import { useCityStore } from "@/store/useCityStore";
 
 const EventCardList: React.FC = () => {
   const { setEvents } = useEventStore();
+  const { selectedCity } = useCityStore();
 
   const [page, setPage] = useState(1);
   const limit = 10;
@@ -50,7 +52,14 @@ const EventCardList: React.FC = () => {
   }, [page, paginatedEvents.length, upcomingEvents.length]);
 
   return (
-    <div className="py-8 pb-40 sm:pb-50 sm:pt-10 bg-primary-black mx-auto px-6">
+    <div className="py-8 pb-40 sm:pb-50 sm:pt-32 bg-primary-black mx-auto px-6">
+      <p className="text-primary-white flex flex-col  max-w-xl mx-auto text-4xl font-semibold text-left py-4 pb-10">
+        Próximos eventos
+        <span className={`${!selectedCity && "hidden" } text-primary text-2xl`}>
+          <span className="text-primary-white text-base">en </span>
+          {selectedCity}
+        </span>
+      </p>
       <div className="animate-fade-in">
         {!isError ? (
           <>

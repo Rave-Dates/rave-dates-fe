@@ -12,6 +12,7 @@ const CitySelectorModal: React.FC = () => {
   const { filters, setFilters } = useEventStore();
   const { clientCategories, isCategoriesLoading } = useClientAllCategories();
   const [locationCategory, setLocationCategory] = useState<IEventCategories | null>(null);
+  const [typeCategory, setTypeCategory] = useState<IEventCategories | null>(null);
 
   useEffect(() => {
     hydrate();
@@ -19,13 +20,22 @@ const CitySelectorModal: React.FC = () => {
 
   useEffect(() => {
     if (clientCategories) {
-      const found = clientCategories.find(c => 
+      // Buscar la categoría de ubicación (ciudad)
+      const foundLocation = clientCategories.find(c => 
         c.name.toLowerCase().includes("ubicacion") || 
         c.name.toLowerCase().includes("ubicación") ||
         c.name.toLowerCase().includes("ciudad")
       );
-      if (found) {
-        setLocationCategory(found);
+      if (foundLocation) {
+        setLocationCategory(foundLocation);
+      }
+
+      // Buscar la categoría "Tipo de evento" para aplicar el filtro automático de Rave
+      const foundType = clientCategories.find(c => 
+        c.name.toLowerCase().includes("tipo de evento")
+      );
+      if (foundType) {
+        setTypeCategory(foundType);
       }
     }
   }, [clientCategories]);
@@ -40,29 +50,53 @@ const CitySelectorModal: React.FC = () => {
     return () => { document.body.style.overflow = ""; };
   }, [isModalOpen]);
 
+  // Sincronizar los filtros globales cuando cambia la ciudad seleccionada
   useEffect(() => {
     if (locationCategory && selectedCity) {
-      const filterKey = `category-${locationCategory.categoryId}`;
-      // Solo actualizamos si el filtro no está ya puesto para evitar bucles o sobreescrituras innecesarias
-      if (filters[filterKey] !== selectedCity) {
-        setFilters({
-          ...filters,
-          [filterKey]: selectedCity
-        });
+      const locationFilterKey = `category-${locationCategory.categoryId}`;
+      const newFilters = { ...filters };
+      let changed = false;
+
+      // Aplicar filtro de ciudad
+      if (filters[locationFilterKey] !== selectedCity) {
+        newFilters[locationFilterKey] = selectedCity;
+        changed = true;
+      }
+
+      // Si existe la categoría "Tipo de evento", forzar el filtro "Rave" automáticamente
+      if (typeCategory) {
+        const typeFilterKey = `category-${typeCategory.categoryId}`;
+        const raveValue = typeCategory.values.find(v => v.value.toLowerCase() === "rave")?.value;
+        if (raveValue && filters[typeFilterKey] !== raveValue) {
+          newFilters[typeFilterKey] = raveValue;
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        setFilters(newFilters);
       }
     }
-  }, [locationCategory, selectedCity, filters, setFilters]);
+  }, [locationCategory, typeCategory, selectedCity, filters, setFilters]);
 
   const handleCitySelect = (city: string) => {
     setSelectedCity(city);
     
-    // Also update global event filters
+    // Actualizar filtros globales al seleccionar una ciudad
     if (locationCategory) {
-      const filterKey = `category-${locationCategory.categoryId}`;
-      setFilters({
-        ...filters,
-        [filterKey]: city
-      });
+      const locationFilterKey = `category-${locationCategory.categoryId}`;
+      const newFilters = { ...filters, [locationFilterKey]: city };
+
+      // Al seleccionar una ciudad, también forzamos el filtro de tipo "Rave"
+      if (typeCategory) {
+        const typeFilterKey = `category-${typeCategory.categoryId}`;
+        const raveValue = typeCategory.values.find(v => v.value.toLowerCase() === "rave")?.value;
+        if (raveValue) {
+          newFilters[typeFilterKey] = raveValue;
+        }
+      }
+
+      setFilters(newFilters);
     }
     
     setIsModalOpen(false);
@@ -71,9 +105,16 @@ const CitySelectorModal: React.FC = () => {
   const handleClear = () => {
     clearCity();
     if (locationCategory) {
-      const filterKey = `category-${locationCategory.categoryId}`;
+      const locationFilterKey = `category-${locationCategory.categoryId}`;
       const newFilters = { ...filters };
-      delete newFilters[filterKey];
+      delete newFilters[locationFilterKey];
+
+      // Al limpiar la ciudad, también removemos el filtro forzado de "Rave"
+      if (typeCategory) {
+        const typeFilterKey = `category-${typeCategory.categoryId}`;
+        delete newFilters[typeFilterKey];
+      }
+
       setFilters(newFilters);
     }
     setIsModalOpen(false);
@@ -114,7 +155,7 @@ const CitySelectorModal: React.FC = () => {
                       key={city}
                       onClick={() => handleCitySelect(city)}
                       className={`
-                        py-4 px-6 rounded-2xl text-left transition-all duration-200 border
+                        py-4 px-6 text-center rounded-2xl transition-all duration-200 border
                         ${
                           selectedCity === city
                             ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
