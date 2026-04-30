@@ -11,6 +11,8 @@ import { useReactiveCookiesNext } from 'cookies-next';
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import ChangePasswordModal from "@/components/ui/modals/ChangePasswordModal";
+import RecoverPasswordModal from "@/components/ui/modals/RecoverPasswordModal";
 
 type LoginForm = {
   email: string;
@@ -99,6 +101,23 @@ export default function Page() {
       >
          {isPending ? "Cargando..." : "Iniciar sesión"}
       </button>
+
+      <div className="flex flex-col sm:flex-row gap-4 mt-6 pt-6 border-t border-divider w-full">
+        <ChangePasswordModal 
+          trigger={
+            <button type="button" className="w-full h-10 bg-cards-container border border-divider text-primary-white/80 rounded-lg hover:bg-white/5 transition-colors text-sm font-medium">
+              Cambiar contraseña
+            </button>
+          }
+        />
+        <RecoverPasswordModal 
+          trigger={
+            <button type="button" className="w-full h-10 bg-cards-container border border-divider text-primary-white/80 rounded-lg hover:bg-white/5 transition-colors text-sm font-medium">
+              Recuperar contraseña
+            </button>
+          }
+        />
+      </div>
     </DefaultForm>
   );
 }

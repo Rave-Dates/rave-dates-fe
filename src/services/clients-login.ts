@@ -48,3 +48,24 @@ export const editClient = async ({id, formData, token}: {id: number, formData: P
   });
   return res.data;
 };
+
+export const forgotPasswordAdmin = async (email: string) => {
+  const res = await axios.post(`${BASE_URL}/admin/login/forgot-password`, { email }, {
+    headers: { "Accept": "application/json" },
+  });
+  return res.data;
+};
+
+export const recoverPasswordAdmin = async (data: { email: string; pin: string; newPassword: string }) => {
+  const res = await axios.post(`${BASE_URL}/admin/login/recover-password`, data, {
+    headers: { "Accept": "application/json" },
+  });
+  return res.data;
+};
+
+export const changePasswordAdmin = async (data: { email: string; oldPassword: string; newPassword: string }) => {
+  const res = await axios.post(`${BASE_URL}/admin/login/change-password`, data, {
+    headers: { "Accept": "application/json" },
+  });
+  return res.data;
+};
