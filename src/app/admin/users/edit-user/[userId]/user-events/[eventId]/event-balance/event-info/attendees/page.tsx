@@ -13,9 +13,12 @@ import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { exportGuestsToExcel } from "@/utils/exportExcel";
 import { notifyError } from "@/components/ui/toast-notifications";
 
+import DownloadAttendeesCSVButton from "@/components/ui/buttons/DownloadAttendeesCSVButton";
+
 export default function UsersList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<IGuest[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
@@ -45,6 +48,13 @@ export default function UsersList() {
     setResults(filtered);
   };
   
+  const ITEMS_PER_PAGE = 10;
+  const totalPages = Math.ceil((guests?.length || 0) / ITEMS_PER_PAGE);
+  const paginatedGuests = guests?.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen pt-0 pb-40 lg:pt-24">
       <div className="w-full mx-auto animate-fade-in">
@@ -79,7 +89,7 @@ export default function UsersList() {
 
           {/* Table Body */}
           <div className="divide-y divide-divider w-full">
-            {guests?.map((user) => (
+            {paginatedGuests?.map((user) => (
               <div
                 key={user.clientId}
                 className="grid grid-cols-[2fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
@@ -99,8 +109,32 @@ export default function UsersList() {
             No se encontraron usuarios
           </div>
         )}
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between pt-4 pb-2 px-4">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 text-sm rounded-lg border border-white/20 bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
+            >
+              Anterior
+            </button>
+            <span className="text-sm text-text-inactive">
+              Página {currentPage} de {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 text-sm rounded-lg border border-white/20 bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
       </div>
-      <div className="mx-5">
+      <div className="mx-5 flex flex-col gap-4 mt-20">
+        <DownloadAttendeesCSVButton eventId={eventId} token={token} eventName={selectedEvent?.title} />
         <button
           onClick={() => {
             if (guests && guests.length > 0) {
@@ -109,9 +143,9 @@ export default function UsersList() {
               notifyError("No hay invitados para exportar.");
             }
           }}          
-          className="bg-primary mt-20 text-primary-white input-button" 
+          className="bg-primary text-primary-white input-button" 
         >
-          Descargar
+          Descargar invitados
         </button>
       </div>
     </div>

@@ -14,9 +14,12 @@ import { exportGuestsToExcel } from "@/utils/exportExcel"
 import { jwtDecode } from "jwt-decode"
 import { notifyError } from "@/components/ui/toast-notifications"
 
+import DownloadAttendeesCSVButton from "@/components/ui/buttons/DownloadAttendeesCSVButton"
+
 export default function OrganizerEventAttendees({eventId, disableHeader = false}: {eventId: number, disableHeader?: boolean}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<IGuest[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
@@ -45,6 +48,12 @@ export default function OrganizerEventAttendees({eventId, disableHeader = false}
     setResults(filtered);
   };
   
+  const ITEMS_PER_PAGE = 10;
+  const totalPages = Math.ceil((guests?.length || 0) / ITEMS_PER_PAGE);
+  const paginatedGuests = guests?.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="text-primary-white min-h-full px-5">
@@ -116,7 +125,7 @@ export default function OrganizerEventAttendees({eventId, disableHeader = false}
 
         {/* Attendees List */}
         <div className="space-y-3">
-          {guests?.map((guest) => (
+          {paginatedGuests?.map((guest) => (
             <div key={guest.clientId} className="flex items-center justify-between py-2">
               <span className="text-primary-white">{guest.name}</span>
               <Link href={`${eventId}/attendees/${guest.clientId}/edit-guest`} className="bg-primary text-primary-white p-1.5 rounded-lg">
@@ -131,21 +140,52 @@ export default function OrganizerEventAttendees({eventId, disableHeader = false}
               No se encontraron invitados
             </div>
           }
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-4 pb-2">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 text-sm rounded-lg border border-white/20 bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
+              >
+                Anterior
+              </button>
+              <span className="text-sm text-text-inactive">
+                Página {currentPage} de {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 text-sm rounded-lg border border-white/20 bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
+              >
+                Siguiente
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Bottom Actions */}
-        <button
-          onClick={() => {
-            if (guests && guests.length > 0) {
-              exportGuestsToExcel(guests);
-            } else {
-              notifyError("No hay invitados para exportar.");
-            }
-          }}
-          className="w-full bg-primary text-primary-white font-medium py-4 rounded-lg"
-        >
-          Descargar lista
-        </button>      
+        <div className="flex flex-col gap-4">
+          <DownloadAttendeesCSVButton
+            eventId={eventId}
+            token={token}
+            eventName={selectedEvent?.title}
+            className="w-full bg-transparent border border-primary text-primary-white font-medium py-4 rounded-lg"
+          />
+          <button
+            onClick={() => {
+              if (guests && guests.length > 0) {
+                exportGuestsToExcel(guests);
+              } else {
+                notifyError("No hay invitados para exportar.");
+              }
+            }}
+            className="w-full bg-primary text-primary-white font-medium py-4 rounded-lg"
+          >
+            Descargar invitados
+          </button>
+        </div>      
       </div>
     </div>
   )
