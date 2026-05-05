@@ -96,7 +96,7 @@ const TicketsEventList: React.FC = () => {
             <EventCardSkeleton key={i} />
           ))}
         {isTicketsError && !isTicketsLoading && (
-          <div className="text-center h-screen py-8 text-system-error">
+          <div className="text-center h-screen py-8 text-primary">
             Error cargando tickets
           </div>
         )}

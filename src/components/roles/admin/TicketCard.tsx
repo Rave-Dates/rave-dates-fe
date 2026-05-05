@@ -82,7 +82,7 @@ export function TicketCard({
 
   return (
     <div className={`bg-main-container relative rounded-lg p-4 space-y-4 h-58 ${stagesEnabled && "h-73"} transition-all duration-300`}>
-      <button type="button" onClick={onDelete} className={`${isEditing && "hidden"} absolute right-0 top-0 text-primary-white px-2 py-1.5 rounded-bl-lg rounded-tr-lg bg-system-error`}>
+      <button type="button" onClick={onDelete} className={`${isEditing && "hidden"} absolute right-0 top-0 text-primary-white px-2 py-1.5 rounded-bl-lg rounded-tr-lg bg-primary`}>
         <TrashSvg />
       </button>
       

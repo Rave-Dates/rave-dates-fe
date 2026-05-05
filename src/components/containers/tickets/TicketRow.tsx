@@ -112,13 +112,13 @@ export function TicketRow({
         }
         {
           ticket.status === "DEFEATED" &&
-          <div className="flex h-[47px] items-center text-system-error justify-center text-sm gap-x-2">
+          <div className="flex h-[47px] items-center text-primary justify-center text-sm gap-x-2">
             <h2>Ticket vencido</h2>
           </div>
         }
         {
           isPendingToPay &&
-          <div className="flex h-[47px] items-center text-system-error justify-center text-sm gap-x-2">
+          <div className="flex h-[47px] items-center text-primary justify-center text-sm gap-x-2">
             <h2>Ticket pendiente</h2>
           </div>
         }

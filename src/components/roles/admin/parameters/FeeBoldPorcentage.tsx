@@ -49,7 +49,7 @@ export default function FeeBoldPorcentage() {
   return (
     <form autoComplete="off" className="w-full mt-5">
 
-      <h2 className="text-system-error text-lg font-medium">
+      <h2 className="text-primary text-lg font-medium">
         ¡Precaución!
       </h2>
       <p className="text-primary-white/60 text-sm mb-2">Modificar este campo afectará el cálculo de las comisiones para todos los pagos con Bold.</p>

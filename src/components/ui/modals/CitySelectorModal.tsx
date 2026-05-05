@@ -176,7 +176,7 @@ const CitySelectorModal: React.FC = () => {
               {selectedCity && (
                 <button
                   onClick={handleClear}
-                  className="w-full py-4 rounded-2xl border border-divider text-system-error hover:bg-system-error/5 transition-colors font-medium mb-4"
+                  className="w-full py-4 rounded-2xl border border-divider text-primary hover:bg-primary/5 transition-colors font-medium mb-4"
                 >
                   Limpiar selección actual
                 </button>

@@ -53,7 +53,7 @@ export default function EditableItem({
             <button
               type="button"
               onClick={handleSave}
-              className="text-primary rounded-l-md bg-divider w-8 h-full flex items-center justify-center hover:bg-white/20 transition-colors"
+              className="text-primary rounded-l-md bg-divider w-8 h-full flex items-center justify-center hover:bg-cards-container transition-colors"
               title="Guardar"
               disabled={isSaving}
             >
@@ -62,7 +62,7 @@ export default function EditableItem({
             <button
               type="button"
               onClick={handleCancel}
-              className="text-system-error bg-divider w-8 h-full flex items-center justify-center hover:bg-white/20 transition-colors border-l border-white/30"
+              className="text-primary bg-divider w-8 h-full flex items-center justify-center hover:bg-cards-container transition-colors border-l border-white/30"
               title="Cancelar"
               disabled={isSaving}
             >
@@ -73,7 +73,7 @@ export default function EditableItem({
           <button
             type="button"
             onClick={() => setIsEditing(true)}
-            className="text-orange-400 rounded-l-md w-8 bg-divider h-full flex items-center justify-center hover:bg-white/20 transition-colors border-l border-primary-black/10"
+            className="text-primary rounded-l-md w-8 bg-divider h-full flex items-center justify-center hover:bg-cards-container transition-colors border-l border-primary-black/10"
             title="Editar"
           >
             <EditSvg className="text-xl" />
@@ -85,7 +85,7 @@ export default function EditableItem({
             type="text"
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="text-sm px-3 py-1 text-primary-white font-semibold bg-white/30 outline-none w-fit border-none focus:ring-0"
+            className="text-sm px-3 py-1 text-primary-white font-semibold bg-primary outline-none w-fit border-none focus:ring-0"
             autoFocus
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSave();
@@ -109,7 +109,7 @@ export default function EditableItem({
           trigger={
             <button
               type="button"
-              className="text-system-error py-1.5 w-10 h-full rounded-r-md flex items-center justify-center bg-divider hover:bg-system-error/80 transition-colors border-l border-primary-black/10"
+              className="text-primary py-1.5 w-10 h-full rounded-r-md flex items-center justify-center bg-divider hover:bg-cards-container transition-colors border-l border-primary-black/10"
               title="Eliminar"
               disabled={isSaving}
             >

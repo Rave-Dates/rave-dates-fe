@@ -173,7 +173,7 @@ export default function EventImageSwiper({ setImages, images, isLoading, isError
         ) : (
           <div className="text-center min-w-40 flex flex-col items-center justify-center h-40 border-2 border-dashed border-inactive text-text-inactive rounded-lg">
             {
-              isLoading ? <SpinnerSvg className="p-14 text-inactive fill-primary" /> : <FileSvg className={`${(isError || isErrorEventImages) && "text-system-error"}`} />
+              isLoading ? <SpinnerSvg className="p-14 text-inactive fill-primary" /> : <FileSvg className={`${(isError || isErrorEventImages) && "text-primary"}`} />
             }
           </div>
         )}

@@ -152,7 +152,7 @@ export default function DataForm() {
           deleteCookie("clientToken")
           router.push('/')
         }}
-        className="border z-20 absolute w-36 top-10 md:top-32 right-5 lg:right-52 border-system-error text-system-error py-2.5 rounded-lg"
+        className="border z-20 absolute w-36 top-10 md:top-32 right-5 lg:right-52 border-primary text-primary py-2.5 rounded-lg"
         disabled={isPending}
       >
          Cerrar sesión
@@ -174,14 +174,14 @@ export default function DataForm() {
             type="email"
             title="Email*"
             inputName="email"
-            className={`${!(client?.isEmailVerified && watchedEmail === client?.email) ? "border-b border-b-system-error/50 text-red-400" : "border-b border-b-system-success/50 text-system-success"}`}
+            className={`${!(client?.isEmailVerified && watchedEmail === client?.email) ? "border-b border-b-primary/50 text-red-400" : "border-b border-b-system-success/50 text-system-success"}`}
             register={register("email", { required: "El email es obligatorio"  })}
           />
           <button
             disabled={client?.isEmailVerified && watchedEmail === client?.email}
             type="button"
             onClick={handleSubmit(onEmailSubmit, onInvalid)}
-            className={`${!(client?.isEmailVerified && watchedEmail === client?.email) ? "border-system-error text-red-400" : "border-system-success text-system-success"} border min-w-[100px] text-sm py-2 rounded-lg h-[50px] self-end px-2 disabled:opacity-80 disabled:pointer-events-none`}
+            className={`${!(client?.isEmailVerified && watchedEmail === client?.email) ? "border-primary text-red-400" : "border-system-success text-system-success"} border min-w-[100px] text-sm py-2 rounded-lg h-[50px] self-end px-2 disabled:opacity-80 disabled:pointer-events-none`}
           >
             {
               client?.isEmailVerified && watchedEmail === client?.email ?
@@ -195,7 +195,7 @@ export default function DataForm() {
           <PhoneInput
             title="Celular con WhatsApp*"
             name="whatsapp"
-            className={`${!(client?.isWhatsappVerified && watchedWhatsapp === client?.whatsapp) ? "border-b border-b-system-error/50 text-red-400" : "border-b border-b-system-success/50 text-system-success"}`}
+            className={`${!(client?.isWhatsappVerified && watchedWhatsapp === client?.whatsapp) ? "border-b border-b-primary/50 text-red-400" : "border-b border-b-system-success/50 text-system-success"}`}
             control={control}
             rules={{ required: "El WhatsApp es obligatorio" }}
           />
@@ -203,7 +203,7 @@ export default function DataForm() {
             disabled={client?.isWhatsappVerified && watchedWhatsapp === client?.whatsapp}
             type="button"
             onClick={handleSubmit(onWhatsappSubmit, onInvalid)}
-            className={`${!(client?.isWhatsappVerified && watchedWhatsapp === client?.whatsapp) ? "border-system-error text-red-400" : "border-system-success text-system-success"} border min-w-[100px] text-sm py-2 rounded-lg h-[50px] self-end px-2 disabled:opacity-80 disabled:pointer-events-none`}
+            className={`${!(client?.isWhatsappVerified && watchedWhatsapp === client?.whatsapp) ? "border-primary text-red-400" : "border-system-success text-system-success"} border min-w-[100px] text-sm py-2 rounded-lg h-[50px] self-end px-2 disabled:opacity-80 disabled:pointer-events-none`}
           >
             {
               client?.isWhatsappVerified && watchedWhatsapp === client?.whatsapp ?

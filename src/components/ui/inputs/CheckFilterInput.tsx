@@ -25,7 +25,7 @@ const CheckFilterInput = ({ name, title, items, register, selected }: Props) => 
             key={item.value}
             className="flex items-center py-3 not-last:border-b not-last:border-divider justify-between cursor-pointer group"
           >
-            <span className="text-primary-white group-hover:text-lime-200 transition-colors">
+            <span className="text-primary-white group-hover:text-primary transition-colors">
               {item.label}
             </span>
             <div className="relative">

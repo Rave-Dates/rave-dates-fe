@@ -97,7 +97,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
             Comisión de Rave Dates
           </div>
           <div className="tabular-nums flex items-center justify-center">
-            <span className="text-system-error text-2xl">-</span>
+            <span className="text-primary text-2xl">-</span>
             ${Number(binnacleToUse?.feeRD?? "0").toLocaleString()}
           </div>
         </div>
@@ -108,7 +108,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
               Comisión Promotores
             </div>
             <div className="tabular-nums flex items-center justify-center">
-              <span className="text-system-error text-2xl">-</span>
+              <span className="text-primary text-2xl">-</span>
               ${Number(binnacleToUse?.feePromoter?? "0").toLocaleString()}
             </div>
           </div>

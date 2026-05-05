@@ -58,7 +58,7 @@ function DeleteUserModal({ userId } : { userId: IUser["userId"] }) {
   return (
     <>
       <button 
-        className="bg-system-error text-primary-white active:bg-system-error/70 transition-all p-3 rounded-xl"
+        className="bg-primary text-primary-white active:bg-primary/70 transition-all p-3 rounded-xl"
         onClick={() => setIsModalOpen(true)}
       >
         <TrashSvg />
@@ -77,7 +77,7 @@ function DeleteUserModal({ userId } : { userId: IUser["userId"] }) {
               </button>
               <button
                 onClick={() => handleDeleteUser()}
-                className="text-system-error w-1/2 py-4 active:opacity-60"
+                className="text-primary w-1/2 py-4 active:opacity-60"
               >
                 Eliminar
               </button>

@@ -67,7 +67,7 @@ export const notifyPending = (promise: Promise<unknown>, options?: {  loading?: 
 
       return (
         <div className="flex items-center gap-2">
-          <AddSvg className="text-system-error text-xl rotate-45" />
+          <AddSvg className="text-primary text-xl rotate-45" />
           {displayMessage}
         </div>
       )

@@ -58,7 +58,7 @@ export default function UserManagement() {
             </div>
           )}
           {isError &&  (
-            <div className="text-center text-sm py-8 text-system-error">
+            <div className="text-center text-sm py-8 text-primary">
               Error cargando usuarios
             </div>
           )}

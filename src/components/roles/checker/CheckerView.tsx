@@ -121,7 +121,7 @@ console.log(checker)
           trigger={
             <button
               type="button"
-              className="bg-system-error text-primary-white text-2xl p-2.5 rounded-lg flex items-center justify-center text-center transition-all active:scale-95"
+              className="bg-primary text-primary-white text-2xl p-2.5 rounded-lg flex items-center justify-center text-center transition-all active:scale-95"
               aria-label="Desloguearse"
             >
               <LogoutSvg />

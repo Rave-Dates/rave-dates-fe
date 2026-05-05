@@ -90,7 +90,7 @@ export default function ConfirmationModal({
               <button
                 onClick={handleConfirm}
                 className={`${
-                  variant === "danger" ? "text-system-error" : "text-primary"
+                  variant === "danger" ? "text-primary" : "text-primary"
                 } w-1/2 py-4 font-bold transition-colors hover:bg-white/5 active:bg-white/10`}
               >
                 {confirmText}

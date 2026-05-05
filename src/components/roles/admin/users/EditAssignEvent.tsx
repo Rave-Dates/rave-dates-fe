@@ -272,7 +272,7 @@ export default function EditAssignEvent({ isOrganizer = false }: { isOrganizer?:
         <button
           type="button"
           onClick={handleSubmit(handleDelete, onInvalid)}
-          className="max-w-xl self-center text-system-error input-button"
+          className="max-w-xl self-center text-primary input-button"
         >
           Eliminar asignación de evento
         </button>

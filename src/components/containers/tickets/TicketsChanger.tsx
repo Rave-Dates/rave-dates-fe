@@ -306,7 +306,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
                 <button
                   key={purchase.purchaseId}
                   onClick={() => handleCompletePiggyBank(purchase)}
-                  className="block text-center w-full text-red-400 border border-system-error font-medium py-3 rounded-lg mb-3 hover:opacity-80 transition-opacity"
+                  className="block text-center w-full text-red-400 border border-primary font-medium py-3 rounded-lg mb-3 hover:opacity-80 transition-opacity"
                 >
                   Completar pago de compra N°{purchase.purchaseId} ($
                   {purchase.remainingAmount.toLocaleString()} COP)

@@ -63,7 +63,7 @@ export default function WithdrawPromoterInfo({ paymentId }: { paymentId: number 
               }
               {
                 isErrorMovementImage &&
-                <div className=" text-system-error">
+                <div className=" text-primary">
                   Error al cargar la imagen
                 </div>
               }

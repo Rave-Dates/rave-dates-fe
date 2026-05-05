@@ -49,7 +49,7 @@ export default function MinFeeRdPlain() {
   return (
     <form autoComplete="off" className="w-full mt-5">
  
-      <h2 className="text-system-error text-lg font-medium">
+      <h2 className="text-primary text-lg font-medium">
         ¡Precaución!
       </h2>
       <p className="text-primary-white/60 text-sm mb-2">Modificar este campo afectará el valor mínimo de comisión que Rave Dates cobra por entrada.</p>

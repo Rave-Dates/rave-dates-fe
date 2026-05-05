@@ -114,7 +114,7 @@ export default function ImageUploader({
             {isLoading ? (
               <SpinnerSvg className="p-14 text-inactive fill-primary" />
             ) : (
-              <FileSvg className={`${(isError || isErrorEventImages) && "text-system-error"}`} />
+              <FileSvg className={`${(isError || isErrorEventImages) && "text-primary"}`} />
             )}
           </div>
         )}

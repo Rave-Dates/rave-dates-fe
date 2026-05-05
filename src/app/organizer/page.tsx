@@ -108,7 +108,7 @@ export default function OrganizerHome() {
             trigger={
               <button
                 type="button"
-                className="bg-system-error text-primary-white text-2xl p-2.5 rounded-lg flex items-center justify-center text-center transition-all active:scale-95"
+                className="bg-primary text-primary-white text-2xl p-2.5 rounded-lg flex items-center justify-center text-center transition-all active:scale-95"
                 aria-label="Desloguearse"
               >
                 <LogoutSvg />
@@ -119,7 +119,7 @@ export default function OrganizerHome() {
 
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold ">Disponible</h1>
-          <p className="text-primary-white text-2xl"><span className="text-primary">COP $</span>{getTotalAvalible()}</p>
+          <p className="text-primary-white text-2xl">COP $ {getTotalAvalible()}</p>
         </div>
 
         {/* Event Cards */}

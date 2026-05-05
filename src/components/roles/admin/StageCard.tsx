@@ -25,7 +25,7 @@ export function StageCard({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-white font-medium">Etapa {index + 1}</h3>
-        <button type="button" onClick={onDelete} className="text-text-inactive active:text-system-error">
+        <button type="button" onClick={onDelete} className="text-text-inactive active:text-primary">
           <TrashSvg />
         </button>
       </div>

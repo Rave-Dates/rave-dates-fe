@@ -242,7 +242,7 @@ export default function ScanQRPage() {
               ? 'border-green-600 brightness-150 text-green-600' 
               : scanResult.text === "No tienes permiso para leer este ticket" 
                 ? "border-[#FFD64D] text-[#FFD64D]"
-                : "border-system-error brightness-150  text-system-error"
+                : "border-primary brightness-150  text-primary"
             } shadow-lg`}
           >
             <button 

@@ -281,7 +281,7 @@ export default function Page() {
                   )}
                 </div>
               </div>
-              <span className="text-primary-white group-hover:text-lime-200 transition-colors">
+              <span className="text-primary-white group-hover:text-primary transition-colors">
                 {item === 'free' ? 'Gratuito' : 'Pago'}
               </span>
             </label>

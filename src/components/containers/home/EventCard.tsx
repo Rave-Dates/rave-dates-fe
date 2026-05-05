@@ -81,7 +81,7 @@ const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?:
           
           {/* {
             status === "pending" && isTicketList ?
-              <div className="flex items-center text-system-error gap-2">
+              <div className="flex items-center text-primary gap-2">
                 <DollarSvg className='w-6 h-6' />
                 Saldo pendiente
               </div>
