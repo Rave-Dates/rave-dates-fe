@@ -59,7 +59,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
 
   useEffect(() => {
-    setGlobalExpandedSections(["Cantidad vendida"]);
+    setGlobalExpandedSections(["Asistentes y aforo"]);
   }, []);
 
   const toggleSection = (section: string) => {
@@ -181,7 +181,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
     setValue("ticketTypeMap", updatedMap, { shouldValidate: true, shouldDirty: true });
   };
 
-  const types = ["Cantidad vendida", "Dinero", "Promotores", "Link Escáner QRs", "Asistentes registrados"]
+  const types = ["Asistentes y aforo", "Cantidad vendida", "Dinero", "Promotores", "Link Escáner QRs"]
 
   console.log(selectedEvent)
 
@@ -198,6 +198,10 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
               onToggle={() => toggleGlobalSection(type)}
             >
               <div className="bg-input px-2 py-1 rounded-b-lg">
+                {
+                  type === "Asistentes y aforo" &&
+                  <OrganizerEventAttendees eventId={eventId} disableHeader />
+                }
                 {
                   type === "Cantidad vendida" && 
                   <div className="mb-2">
@@ -235,7 +239,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                   type === "Dinero" && 
                   <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
                     <div className="flex text-sm justify-between items-center">
-                      <h2>Total</h2>
+                      <h2>Total vendido</h2>
                       <h2 className="text-primary-white text-base text-end tabular-nums">COP ${Number(selectedBinnacle?.total?? "0").toLocaleString()}</h2>
                     </div>
 
@@ -246,12 +250,12 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                         
                     <div className="flex text-sm justify-between items-center">
                       <h2>Comisión Rave Dates</h2>
-                      <h2 className="text-red-300/80 text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feeRD?? "0").toLocaleString()}</h2>
+                      <h2 className="text-primary text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feeRD?? "0").toLocaleString()}</h2>
                     </div>
 
                     <div className="flex text-sm justify-between items-center">
                       <h2>Comisión Promotores</h2>
-                      <h2 className="text-red-300/80 text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feePromoter?? "0").toLocaleString()}</h2>
+                      <h2 className="text-primary text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feePromoter?? "0").toLocaleString()}</h2>
                     </div>
 
                     <div className="flex text-sm justify-between items-center">
@@ -259,8 +263,8 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                       <h2 className="text-primary-white text-base text-end tabular-nums">COP ${selectedBinnacle?.pendingPayment.toLocaleString()?? 0}</h2>
                     </div>
 
-                    <Link href={`/organizer/event/${eventId}/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-black bg-primary">
-                      Ver dinero entregado
+                    <Link href={`/organizer/event/${eventId}/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-white bg-primary">
+                      Ver dinero retirado
                     </Link>
                   </div>
                 }
@@ -273,7 +277,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                           <h2 className="text-sm">{promoter.user.name}</h2>
                           <div className="flex items-center gap-x-2">
                             <Link href={`/organizer/promoters/edit-promoter/${promoter.userId}`} className="border border-primary rounded-lg text-primary p-1 text-xl"><EditSvg /></Link>
-                            <Link href={`/organizer/events/${eventId}/promoter-binnacles/${promoter.promoterId}`} className="bg-primary p-1 text-xl text-primary-black rounded-lg"><EyeSvg /></Link>
+                            <Link href={`/organizer/event/${eventId}/promoter-binnacles/${promoter.promoterId}`} className="bg-primary p-1 text-xl text-primary-black rounded-lg"><EyeSvg /></Link>
                           </div>
                         </div>
                       ))
@@ -356,10 +360,6 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                         </button>
                       </div>
                     </div>
-                }
-                {
-                  type === "Asistentes registrados" &&
-                  <OrganizerEventAttendees eventId={eventId} disableHeader />
                 }
               </div>
             </DropdownItem>

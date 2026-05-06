@@ -6,6 +6,7 @@ import LabelTagButton from "@/components/ui/buttons/LabelTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
+import FormTextArea from "@/components/ui/inputs/FormTextArea";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { useAdminAllCategories, useAdminAllUsers, useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";
@@ -49,14 +50,7 @@ export default function Page() {
   console.log("organizers", organizers)
 
   useEffect(() => {
-    register("geo", {
-      required: "Debes seleccionar una ubicación válida",
-      validate: (value) => {
-        const parts = value?.split(";");
-        if (parts?.length !== 2) return "Ubicación inválida";
-        return true;
-      },
-    });
+    register("geo");
 
     register("editPlace");
   }, [register]);
@@ -192,7 +186,7 @@ export default function Page() {
 
       <EventImageSwiper setImages={setValue} images={watchedImages} />
 
-      <FormInput
+      <FormTextArea
         title="Información general"
         inputName="description"
         register={register("description")}

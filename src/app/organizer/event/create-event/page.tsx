@@ -7,6 +7,7 @@ import { InputTime } from "@/components/ui/date-picker/input-time";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
+import FormTextArea from "@/components/ui/inputs/FormTextArea";
 import { notifyPending } from "@/components/ui/toast-notifications";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { useCreateOrganizerFreeEvent } from "@/hooks/admin/mutations/useCreateOrganizerFreeEvent";
@@ -47,14 +48,7 @@ export default function Page() {
   const { labelsTypes } = useAdminLabelsTypes({ token });
 
   useEffect(() => {
-    register("geo", {
-      required: "Debes seleccionar una ubicación válida",
-      validate: (value) => {
-        const parts = value?.split(";");
-        if (parts?.length !== 2) return "Ubicación inválida";
-        return true;
-      },
-    });
+    register("geo");
 
     register("editPlace");
   }, [register]);
@@ -76,7 +70,7 @@ export default function Page() {
       images: eventFormData.images,
       tickets: eventFormData.tickets,
       categories: eventFormData.categories,
-      quantityComplimentaryTickets: eventFormData.quantityComplimentaryTickets,
+      quantityComplimentaryTickets: 0,
     };
 
     Object.entries(setters).forEach(([key, value]) => {
@@ -85,11 +79,23 @@ export default function Page() {
   }, [eventFormData, setValue]);
   
   useEffect(() => {
-  }, [eventFormData]);
+    const today = new Date().toISOString().split('T')[0];
+    setValue("tickets.0.stages.0.date", today);
+    if (eventFormData.date) {
+      setValue("tickets.0.stages.0.dateMax", eventFormData.date);
+    }
+  }, [setValue, eventFormData.date]);
     
   const watchedLabels = useWatch({ name: "labels", control });
   const watchedImages = useWatch({ name: "images", control });
+  const watchedDate = useWatch({ name: "date", control });
 
+  useEffect(() => {
+    if (watchedDate) {
+      setValue("tickets.0.stages.0.dateMax", watchedDate);
+    }
+  }, [watchedDate, setValue]);
+    
   // creamos el evento 
   const onSubmit = (data: IEventFormData) => {
     const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
@@ -145,7 +151,7 @@ export default function Page() {
       labels: data.labels || [],
       organizerId: decoded?.organizerId || 0,
       tickets: [validTickets[0]],
-      quantityComplimentaryTickets: data.quantityComplimentaryTickets,
+      quantityComplimentaryTickets: 0,
     };
 
      notifyPending(
@@ -217,7 +223,7 @@ export default function Page() {
 
       <EventImageSwiper setImages={setValue} images={watchedImages} />
 
-      <FormInput
+      <FormTextArea
         title="Información general"
         inputName="description"
         register={register("description")}
@@ -240,6 +246,7 @@ export default function Page() {
           })}
         />
        </div>
+        <h2 className="mt-10 text-center">Opcional</h2>
         <div className="w-full gap-x-5 flex justify-between">
           <Controller
             name="tickets.0.stages.0.date"
@@ -292,14 +299,6 @@ export default function Page() {
           ))
         }
 
-      <FormInput
-        type="number"
-        title="Cortesía cada X ventas" 
-        inputName="quantityComplimentaryTickets"
-        register={register("quantityComplimentaryTickets", {
-          setValueAs: (v) => v === "" || v === undefined ? undefined : Number(v)
-        })}
-      />
       <br />
 
       {labelsTypes && watchedLabels && (

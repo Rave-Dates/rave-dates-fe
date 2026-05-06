@@ -219,7 +219,7 @@ export default function EditTicketConfiguration() {
             })} />
           </div>
           <div className="flex flex-col xs:flex-row gap-x-5">
-            <FormInput labelClassname="whitespace-nowrap" title="Costo transferencia de ticket" inputName="transferCost" register={register("transferCost", { 
+            <FormInput labelClassname="whitespace-nowrap" title="Costo transferencia de ticket" typeOfValue="$" inputName="transferCost" register={register("transferCost", { 
               setValueAs: (v) => v === "" ? undefined : Number(v), 
             })} />
             <FormInput title="Descuento" typeOfValue="%" inputName="discount" register={register("discount", { 

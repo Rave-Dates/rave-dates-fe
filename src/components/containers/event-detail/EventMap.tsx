@@ -1,8 +1,13 @@
 'use client'
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { GestureHandling } from 'leaflet-gesture-handling';
+import 'leaflet-gesture-handling/dist/leaflet-gesture-handling.css';
+
+// Registramos el manejador de gestos en Leaflet
+L.Map.addInitHook("addHandler", "gestureHandling", GestureHandling);
 
 // Fix para que el ícono de marcador funcione bien en Next.js
 type IconWithOptionalPrivateUrl = {
@@ -32,7 +37,14 @@ export default function EventMap({ position, place }: { position: [number, numbe
 
   return (
     <>
-      <MapContainer center={position} zoom={13} scrollWheelZoom={true} style={{ height: '300px', width: '100%', zIndex: 10 }}>
+      <MapContainer 
+        center={position} 
+        zoom={13} 
+        scrollWheelZoom={true} 
+        // @ts-expect-error gestureHandling es una propiedad de leaflet-gesture-handling
+        gestureHandling={true}
+        style={{ height: '300px', width: '100%', zIndex: 10 }}
+      >
         <TileLayer
           attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

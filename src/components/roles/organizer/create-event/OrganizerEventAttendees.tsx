@@ -93,12 +93,20 @@ export default function OrganizerEventAttendees({eventId, disableHeader = false}
         {/* Progress Bars */}
         <div className="bg-cards-container space-y-4 rounded-lg pt-3 pb-5 px-4">
           {
-            metricsToUse?.ticketsTypesMetrics.map((ticketType) => (
-              <div key={ticketType.name}>
-                <h2 className="text-text-inactive">{ticketType.name}</h2>
-                <ProgressBar current={ticketType.quantity} total={ticketType.total} />
-              </div>
-            ))
+            metricsToUse?.ticketsTypesMetrics.map((ticketType) => {
+              const percentage = ticketType.total > 0 
+                ? ((ticketType.quantity / ticketType.total) * 100).toFixed(0) 
+                : 0;
+              return (
+                <div key={ticketType.name}>
+                  <p className="flex justify-between">
+                    <h2 className="text-text-inactive">{ticketType.name}</h2>
+                    <h3 className="text-primary-white">{percentage}%</h3>
+                  </p>
+                  <ProgressBar current={ticketType.quantity} total={ticketType.total} />
+                </div>
+              );
+            })
           }
           {
             metricsToUse?.ticketsTypesMetrics.length === 0 &&

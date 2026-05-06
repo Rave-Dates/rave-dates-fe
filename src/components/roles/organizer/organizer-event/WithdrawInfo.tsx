@@ -2,7 +2,7 @@
 
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
-import { useAdminBinnacles, useServeMovementImage } from "@/hooks/admin/queries/useAdminData";
+import { useAdminBinnacles, useAdminEvent, useServeMovementImage } from "@/hooks/admin/queries/useAdminData";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import Image from "next/image";
@@ -25,6 +25,8 @@ export default function WithdrawInfo({ paymentId }: { paymentId: number }) {
     token: token?.toString() ?? "",
   });
 
+  const { selectedEvent } = useAdminEvent({ eventId, token });
+
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
 
   const selectedMovement = selectedBinnacle?.movements.find(m => m.paymentId === paymentId);
@@ -39,6 +41,10 @@ export default function WithdrawInfo({ paymentId }: { paymentId: number }) {
         <GoBackButton className="absolute z-30 top-10 lg:top-32 left-5 px-3 py-3 animate-fade-in" />
         <div className="max-w-xl pt-24 mx-auto animate-fade-in space-y-2">
           <h2 className="text-title font-semibold">Información de retiro</h2>
+          <div className="flex flex-col items-start justify-center">
+            <h3 className="text-sm text-text-inactive">Evento</h3>
+            <h2 className="text-lg font-medium">{selectedEvent?.title}</h2>
+          </div>
           <div className="flex flex-col items-start justify-center">
             <h3 className="text-sm text-text-inactive">Fecha</h3>
             <h2 className="text-lg font-medium">{selectedMovement && new Date(selectedMovement.createdAt).toLocaleDateString("es-ES")}</h2>

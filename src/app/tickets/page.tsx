@@ -49,13 +49,17 @@ const TicketsEventList: React.FC = () => {
   const activeEvents = useMemo(() => {
     const now = new Date();
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    return events.filter(event => new Date(event.date) >= oneDayAgo);
+    return events
+      .filter(event => new Date(event.date) >= oneDayAgo)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }, [events]);
 
   const finishedEvents = useMemo(() => {
     const now = new Date();
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    return events.filter(event => new Date(event.date) < oneDayAgo);
+    return events
+      .filter(event => new Date(event.date) < oneDayAgo)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [events]);
 
   useEffect(() => {

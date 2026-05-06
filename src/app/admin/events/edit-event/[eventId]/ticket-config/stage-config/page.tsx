@@ -68,23 +68,23 @@ export default function StageConfig() {
     const today = new Date();
     const yyyyMmDd = today.toISOString().split('T')[0];
 
-    const lastDate = currentStages.at(-1)?.dateMax;
-    let nextDate = yyyyMmDd;
+    const lastStageDate = currentStages.at(-1)?.dateMax;
+    let nextStartDate = eventFormData.date || yyyyMmDd;
 
-    if (lastDate) {
-      const d = new Date(lastDate);
+    if (lastStageDate) {
+      const d = new Date(lastStageDate);
       d.setDate(d.getDate() + 1);
-      nextDate = d.toISOString().split('T')[0];
+      nextStartDate = d.toISOString().split('T')[0];
     }
 
     const newStage: IEventStages = {
       stageId: newId,
-      dateMax: nextDate,
-      price: 0,
-      quantity: 0,
-      date: nextDate,
+      dateMax: eventFormData.date || nextStartDate, // Siempre la fecha del evento
+      price: undefined,
+      quantity: undefined,
+      date: nextStartDate, // Inicio anterior + 1 día
       feeType: "fixed",
-      promoterFee: 0
+      promoterFee: undefined
     };
 
     // Agrega el stage al hook de formulario (React Hook Form)

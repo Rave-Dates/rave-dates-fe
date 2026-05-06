@@ -5,6 +5,7 @@ import LabelTagButton from "@/components/ui/buttons/LabelTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
+import FormTextArea from "@/components/ui/inputs/FormTextArea";
 import { notifyPending } from "@/components/ui/toast-notifications";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { useCreateEventStore } from "@/store/createEventStore";
@@ -181,7 +182,7 @@ useEffect(() => {
     if (!data.date || !data.time) return
     const validDate = combineDateAndTimeToISO(data.date, data.time)
     const formattedTimeUTC = formatColombiaTimeToUTC(validDate)
-    const formattedGeo = `${data.geo};${data.place?.trim()}`;
+    const formattedGeo = data.geo ? `${data.geo};${data.place?.trim()}` : data.place?.trim() || "";
 
     const parsedCategories = data.oldCategories && Object.values(data.oldCategories).map((cat) => JSON.parse(cat));
     const formattedOldCategories = eventCategories?.map((category) => ({
@@ -322,7 +323,7 @@ useEffect(() => {
 
       <EventImageSwiper isErrorEventImages={isErrorEventImages} isError={errorImages} isLoading={loadingImages} setImages={setValue} images={watchedImages} />
 
-      <FormInput
+      <FormTextArea
         title="Información general"
         inputName="description"
         register={register("description")}

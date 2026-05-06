@@ -5,15 +5,15 @@ import Image from 'next/image';
 
 const EventHero = ({ eventImages, isImagesLoading } : { eventImages: { id: string, url: string }[] | undefined, isImagesLoading: boolean }) => {
   return (
-    <div className="relative !mb-4">
+    <div className="relative mb-4!">
       <div className="relative h-full md:h-1/2 rounded-sm overflow-hidden">
         {
           isImagesLoading ? 
-          <div className="w-full h-[576px] bg-cards-container flex items-center justify-center rounded">
+          <div className="w-full aspect-[1080/1350] bg-cards-container flex items-center justify-center rounded">
             <SpinnerSvg className='fill-primary w-10 sm:w-20' />
           </div>
           :
-          <ImagesSwiper images={eventImages} className='w-full aspect-square object-cover h-[576px]' />
+          <ImagesSwiper images={eventImages} className='w-full h-auto' />
         }
         {
           !eventImages && !isImagesLoading &&
@@ -22,7 +22,7 @@ const EventHero = ({ eventImages, isImagesLoading } : { eventImages: { id: strin
             height={1000}
             src="/images/event-placeholder.png"
             alt="Sin imagen"
-            className="w-full aspect-square object-cover h-[576px]"
+            className="w-full h-auto"
           /> 
         }
       </div>

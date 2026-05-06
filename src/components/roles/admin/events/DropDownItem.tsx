@@ -41,7 +41,7 @@ export function DropdownItem({
 
       <div
         className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-          isExpanded ? "max-h-[1000px]" : "max-h-0"
+          isExpanded ? "max-h-[2000px]" : "max-h-0"
         }`}
       >
         {children}

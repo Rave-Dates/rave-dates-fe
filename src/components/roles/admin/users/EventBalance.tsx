@@ -125,7 +125,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
           <div className="text-text-inactive">
             DISPONIBLE
           </div>
-          <div className="tabular-nums text-primary">
+          <div className="tabular-nums">
             {
               user?.role.name === "ORGANIZER" ?
               `$${Number(binnacleToUse?.pendingPayment?? "0").toLocaleString()}`

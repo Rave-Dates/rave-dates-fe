@@ -45,13 +45,15 @@ export default function Page() {
       });
 
       notifySuccess("Logueado correctamente");
-      if (decoded.role === "ADMIN") {
-        router.push("/admin/users");
+      console.log(decoded);
+      const role = decoded.role?.toUpperCase();
+      if (role === "ADMIN") {
+        window.location.href = "/admin/users";
         return;
-      } else if (decoded.role === "ORGANIZER") {
+      } else if (role === "ORGANIZER") {
         router.push("/organizer");
         return;
-      } else if (decoded.role === "PROMOTER") {
+      } else if (role === "PROMOTER") {
         setCookie("isPromoter", true, {
           path: "/",
           expires: expirationDate,
@@ -77,7 +79,7 @@ export default function Page() {
     <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Iniciar sesión" goHomeButton>
       <FormInput
         type="email"
-        title="Usuario*"
+        title="Email*"
         inputName="email"
         register={register("email", { required: "El email es obligatorio" })}
       />

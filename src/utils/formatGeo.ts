@@ -1,11 +1,19 @@
 export function extractPlaceFromGeo(geoString: string): string {
+  if (!geoString) return "";
   const parts = geoString.split(";").map(part => part.trim());
-  return parts.length === 3 ? parts[2] : "";
+  if (parts.length === 3) return parts[2];
+  if (parts.length === 2 && parts[0] === "") return parts[1];
+  if (parts.length === 1 && !parts[0].includes(",")) return parts[0];
+  return "";
 }
 
 export function extractLatAndLng(geoString: string): string {
+  if (!geoString) return "";
   const parts = geoString.split(";").map(part => part.trim());
-  return parts.length === 3 ? `${parts[0]},${parts[1]}` : "";
+  if (parts.length === 3 && parts[0] && parts[1]) {
+    return `${parts[0]},${parts[1]}`;
+  }
+  return "";
 }
 
 export const validateGeo = (value: string): true | string => {

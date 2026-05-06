@@ -5,6 +5,7 @@ import LabelTagButton from "@/components/ui/buttons/LabelTagButton";
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
+import FormTextArea from "@/components/ui/inputs/FormTextArea";
 import { notifyError } from "@/components/ui/toast-notifications";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { useCreateEventStore } from "@/store/createEventStore";
@@ -175,7 +176,7 @@ useEffect(() => {
       })
       .filter(Boolean);
 
-    const formattedGeo = `${data.geo};${data.place?.trim()}`;
+    const formattedGeo = data.geo ? `${data.geo};${data.place?.trim()}` : data.place?.trim() || "";
     
     updateEventFormData({
       ...eventFormData,
@@ -262,7 +263,7 @@ useEffect(() => {
 
       <EventImageSwiper isErrorEventImages={isErrorEventImages} isError={errorImages} isLoading={loadingImages} setImages={setValue} images={watchedImages} />
 
-      <FormInput
+      <FormTextArea
         title="Información general"
         inputName="description"
         register={register("description")}

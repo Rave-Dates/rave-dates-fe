@@ -32,7 +32,7 @@ const EventCardList: React.FC = () => {
     // Reiniciar la hora de "today" para que los eventos de hoy sigan viéndose
     today.setHours(0, 0, 0, 0);
     return eventDate.getTime() >= today.getTime();
-  });
+  }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   useEffect(() => {
     if (data) {

@@ -16,6 +16,7 @@ const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?:
   eventId,
   // isTicketList = false,
   title,
+  subtitle,
   date,
   geo,
   // piggyBank
@@ -64,9 +65,11 @@ const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?:
 
       {/* Event Details */}
       <div className="p-3.5 pt-3">
-        <h3 className="text-white text-subtitle font-semibold text-center border-b border-divider pb-2.5 mb-4">
+        <h3 className="text-white text-subtitle font-semibold text-center border-b border-divider pb-1 mb-1">
           {title}
         </h3>
+        <p className="text-text-inactive text-center mb-3">{subtitle}</p>
+
         
         <div className="space-y-2 mb-4 text-text-inactive text-body">
           <div className="flex items-center capitalize gap-2">

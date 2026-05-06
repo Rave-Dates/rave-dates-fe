@@ -23,6 +23,7 @@ const NavbarWeb: React.FC = () => {
   const { selectedCity, setIsModalOpen } = useCityStore();
 
   const token = getCookie("token");
+  const clientToken = getCookie("clientToken");
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
@@ -108,7 +109,7 @@ const NavbarWeb: React.FC = () => {
           </div>
           {!token &&
             <>
-              <Link href="/tickets" className={`${pathname.includes("/tickets") ? "text-primary" : "text-text-inactive"} lg:block hidden min-w-[81px] hover:text-primary-white transition-colors`}>
+              <Link href={clientToken ? "/tickets" : "/auth"} className={`${pathname.includes("/tickets") ? "text-primary" : "text-text-inactive"} lg:block hidden min-w-[81px] hover:text-primary-white transition-colors`}>
                 Mis tickets
               </Link>
               <Link href="/auth" className={`${pathname === "/auth" || pathname === "/my-data" ? "text-primary" : "text-text-inactive"} lg:block hidden min-w-[75px] hover:text-primary-white transition-colors`}>

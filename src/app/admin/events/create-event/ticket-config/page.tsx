@@ -58,7 +58,7 @@ export default function TicketConfiguration() {
       }
     });
 
-    const formattedGeo = `${data.geo};${data.place?.trim()}`;
+    const formattedGeo = data.geo ? `${data.geo};${data.place?.trim()}` : data.place?.trim() || "";
 
     updateEventFormData({
       ...eventFormData,
@@ -124,14 +124,7 @@ export default function TicketConfiguration() {
     const today = new Date();
     const yyyyMmDd = today.toISOString().split('T')[0];
 
-    const lastDate = formTickets.at(-1)?.maxDate;
-    let nextDate = yyyyMmDd;
-
-    if (lastDate) {
-      const d = new Date(lastDate);
-      d.setDate(d.getDate() + 1);
-      nextDate = d.toISOString().split('T')[0];
-    }
+    const nextDate = eventFormData.date || "";
 
     const newId = (formTickets.at(-1)?.ticketId ?? 0) + 1;
 
@@ -144,9 +137,9 @@ export default function TicketConfiguration() {
           stageId: 1, // stageId comienza en 1
           date: yyyyMmDd,
           dateMax: nextDate,
-          price: 0,
-          quantity: 0,
-          promoterFee: 0,
+          price: undefined,
+          quantity: undefined,
+          promoterFee: undefined,
           feeType: "percentage",
         },
       ],
@@ -245,6 +238,7 @@ export default function TicketConfiguration() {
                 title="Costo transferencia de ticket"
                 labelClassname="whitespace-nowrap"
                 inputName="transferCost"
+                typeOfValue="$"
                 register={register("transferCost", {
                   setValueAs: (v) => v === "" ? undefined : Number(v)
                 })}

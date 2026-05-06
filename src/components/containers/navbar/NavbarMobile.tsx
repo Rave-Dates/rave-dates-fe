@@ -9,9 +9,13 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import CalendarSvg from '@/components/svg/CalendarSvg';
 import GraphSvg from '@/components/svg/GraphSvg';
+import { useReactiveCookiesNext } from 'cookies-next';
 
 const NavbarMobile: React.FC = () => {
   const pathname = usePathname();
+  const { getCookie } = useReactiveCookiesNext();
+  const token = getCookie("token");
+  const clientToken = getCookie("clientToken");
 
   const navItems = {
     "/": [
@@ -23,7 +27,7 @@ const NavbarMobile: React.FC = () => {
       },
       {
         id: 'tickets',
-        href: "/tickets",
+        href: clientToken ? "/tickets" : "/auth",
         label: 'Mis tickets',
         icon: <TicketSvg className='w-6 h-6' />,
       },
@@ -104,21 +108,24 @@ const NavbarMobile: React.FC = () => {
 
   const isSpecialPath = pathname.startsWith("/admin") || pathname.startsWith("/organizer") || pathname.startsWith("/promoter");
   const isChecker = pathname.startsWith("/checker");
+  const isAdminAuth = pathname === "/admin/auth" && !token;
 
   return (
-    <nav className={`${isChecker ? "hidden" : ""} ${isSpecialPath ? "" : "lg:hidden"} fixed bottom-0 left-0 right-0 rounded-t-[35px] bg-main-container px-2 py-2 pb-7 z-20`}>
+    <nav className={`${(isChecker || isAdminAuth) ? "hidden" : ""} ${isSpecialPath ? "" : "lg:hidden"} fixed bottom-0 left-0 right-0 rounded-t-[35px] bg-main-container px-2 py-2 pb-7 z-20`}>
       <div className="flex justify-around items-center max-w-md mx-auto">
         {getNavItems(pathname)?.map((item) => {
           const isActive = (
-            item.href === "/"
+            item.id === "home"
               ? pathname === "/" || /^\/event\/\d+/.test(pathname)
-              : item.href === "/auth"
+              : item.id === "auth"
                 ? ["/auth", "/my-data"].some((p) => pathname.startsWith(p))
-                : item.href === "/organizer" 
-                  ? pathname === "/organizer" || /^\/organizer\/event\/\d+/.test(pathname) 
-                  : item.href === "/promoter" 
-                    ? pathname === "/promoter" || /^\/promoter\/event\/\d+/.test(pathname) 
-                    : pathname.startsWith(item.href)
+                : item.id === "tickets"
+                  ? pathname.startsWith("/tickets")
+                  : item.href === "/organizer" 
+                    ? pathname === "/organizer" || /^\/organizer\/event\/\d+/.test(pathname) 
+                    : item.href === "/promoter" 
+                      ? pathname === "/promoter" || /^\/promoter\/event\/\d+/.test(pathname) 
+                      : pathname.startsWith(item.href)
           );
 
 

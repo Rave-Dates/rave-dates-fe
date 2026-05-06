@@ -2,20 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { Control, Controller, FieldValues, Path, UseControllerProps } from "react-hook-form";
 import ArrowDownSvg from "../../svg/ArrowDown";
 
-export const countryCodes = [
-  { code: "57", label: "COL", iso: "co" },
-  { code: "54", label: "ARG", iso: "ar" },
-  { code: "52", label: "MEX", iso: "mx" },
-  { code: "56", label: "CHL", iso: "cl" },
-  { code: "51", label: "PER", iso: "pe" },
-  { code: "58", label: "VEN", iso: "ve" },
-  { code: "593", label: "ECU", iso: "ec" },
-  { code: "55", label: "BRA", iso: "br" },
-  { code: "507", label: "PAN", iso: "pa" },
-  { code: "506", label: "CRI", iso: "cr" },
-  { code: "1", label: "USA", iso: "us" },
-  { code: "34", label: "ESP", iso: "es" },
-];
+import countryCodesList from "country-codes-list";
+
+export const countryCodes = countryCodesList.all().map((country) => ({
+  code: country.countryCallingCode,
+  label: country.countryCode,
+  iso: country.countryCode.toLowerCase(),
+}));
 
 type PhoneInputProps<T extends FieldValues> = {
   title: string;
@@ -102,7 +95,7 @@ export default function PhoneInput<T extends FieldValues>({
                         className="rounded-sm"
                       />
                     )}
-                    <span>{selectedCode}</span>
+                    <span>+{selectedCode}</span>
                   </div>
                   <ArrowDownSvg className="text-gray-500 w-3" />
                 </button>
@@ -114,7 +107,7 @@ export default function PhoneInput<T extends FieldValues>({
                   >
                     {countryCodes.map((c) => (
                       <button
-                        key={c.code}
+                        key={c.iso}
                         type="button"
                         className="w-full text-left px-3 py-2 flex items-center gap-x-3 hover:bg-main-container text-white text-sm transition-colors"
                         onClick={() => {
@@ -129,7 +122,7 @@ export default function PhoneInput<T extends FieldValues>({
                           className="rounded-sm"
                         />
                         <span>
-                          {c.label} {c.code}
+                          {c.label} +{c.code}
                         </span>
                       </button>
                     ))}

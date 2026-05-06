@@ -62,13 +62,13 @@ export function proxy(req: NextRequest) {
 
       // Si intenta entrar a /admin o /admin/auth y ya tiene un rol, redirigir a su área correspondiente
       if (path === "/admin" || path === "/admin/auth") {
-        if (decoded.role === "ADMIN") return NextResponse.redirect(new URL("/admin/users", req.url));
-        if (decoded.role === "ORGANIZER") return NextResponse.redirect(new URL("/organizer", req.url));
-        if (decoded.role === "PROMOTER") return NextResponse.redirect(new URL("/promoter", req.url));
-        // if (decoded.role === "CHECKER") return NextResponse.redirect(new URL("/checker", req.url));
+        const role = decoded.role?.toUpperCase();
+        if (role === "ADMIN") return NextResponse.redirect(new URL("/admin/users", req.url));
+        if (role === "ORGANIZER") return NextResponse.redirect(new URL("/organizer", req.url));
+        if (role === "PROMOTER") return NextResponse.redirect(new URL("/promoter", req.url));
       }
 
-      if (decoded.role !== "ADMIN") {
+      if (decoded.role?.toUpperCase() !== "ADMIN") {
         const res = NextResponse.redirect(new URL("/", req.url));
         return res;
       }
@@ -91,7 +91,7 @@ export function proxy(req: NextRequest) {
     try {
       const decoded: IUserLogin = jwtDecode(token);
 
-      if (decoded.role !== "ORGANIZER") {
+      if (decoded.role?.toUpperCase() !== "ORGANIZER") {
         const res = NextResponse.redirect(new URL("/", req.url));
         return res;
       }
@@ -114,7 +114,7 @@ export function proxy(req: NextRequest) {
     try {
       const decoded: IUserLogin = jwtDecode(token);
 
-      if (decoded.role !== "PROMOTER") {
+      if (decoded.role?.toUpperCase() !== "PROMOTER") {
         const res = NextResponse.redirect(new URL("/", req.url));
         return res;
       }

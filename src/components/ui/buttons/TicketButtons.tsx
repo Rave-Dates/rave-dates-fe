@@ -58,7 +58,7 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
             onClick={() => subtract(ticket.ticketTypeId)}
             disabled={currentQuantity === 0}
             className={`p-3 rounded-l-xl transition-opacity ${
-              currentQuantity > 0 ? "bg-primary-white text-primary-white hover:opacity-75" : "bg-inactive text-text-inactive pointer-events-none"
+              currentQuantity > 0 ? "bg-primary-white text-primary-black hover:opacity-75" : "bg-inactive text-text-inactive pointer-events-none"
             }`}
           >
             <SubtractSvg />

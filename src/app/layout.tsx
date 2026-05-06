@@ -78,8 +78,8 @@ export default function RootLayout({
             <NavbarWeb />
             {children}
           </ReactQueryProvider>
+          <NavbarMobile />
         </CookiesNextProvider>
-        <NavbarMobile />
         <Toaster position="top-center" />
       </body>
     </html>

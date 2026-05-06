@@ -21,6 +21,8 @@ export default function Page() {
   const { allEvents, isErrorEvent, isEventLoading } = useAdminAllEvents({ token });
 
   const [filters, setFilters] = useState<string[]>(["Activo", "Inactivo"]);
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const isEventFuture = (date: string) => {
     return new Date(date).getTime() > new Date().getTime();
@@ -32,6 +34,7 @@ export default function Page() {
   };
 
   const toggleFilter = (statusName: string) => {
+    setCurrentPage(1);
     setFilters((prev) =>
       prev.includes(statusName)
         ? prev.filter((s) => s !== statusName)
@@ -61,6 +64,17 @@ export default function Page() {
 
   const filteredEvents = allEvents?.filter((event) =>
     filters.includes(getEventStatus(event))
+  ).sort((a, b) => {
+    const timeA = new Date(a.date ?? "").getTime();
+    const timeB = new Date(b.date ?? "").getTime();
+    return sortOrder === "desc" ? timeB - timeA : timeA - timeB;
+  });
+
+  const ITEMS_PER_PAGE = 10;
+  const totalPages = Math.ceil((filteredEvents?.length || 0) / ITEMS_PER_PAGE);
+  const paginatedEvents = filteredEvents?.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
   );
 
   return (
@@ -72,28 +86,50 @@ export default function Page() {
         Nuevo evento
       </Link>
 
-      <div className="flex gap-x-2 mx-auto">
-        {eventStatus.map((status) => {
-          const isSelected = filters.includes(status.name);
-          return (
-            <button
-              key={status.name}
-              onClick={() => toggleFilter(status.name)}
-              className={`px-3 text-sm py-1.5 rounded-full flex items-center gap-x-2 transition-all duration-300 border ${
-                isSelected
-                  ? "bg-white/10 border-white/20 text-white"
-                  : "bg-transparent border-transparent text-white/40 grayscale"
-              }`}
-            >
-              <div
-                className={`h-2 w-2 ${status.className} rounded-full ${
-                  isSelected ? "animate-pulse" : ""
+      <div className="flex gap-x-4 mx-auto items-center">
+        <div className="flex gap-x-2">
+          {eventStatus.map((status) => {
+            const isSelected = filters.includes(status.name);
+            return (
+              <button
+                key={status.name}
+                onClick={() => toggleFilter(status.name)}
+                className={`px-3 text-sm py-1.5 rounded-full flex items-center gap-x-2 transition-all duration-300 border ${
+                  isSelected
+                    ? "bg-white/10 border-white/20 text-white"
+                    : "bg-transparent border-transparent text-white/40 grayscale"
                 }`}
-              ></div>
-              {status.name}
-            </button>
-          );
-        })}
+              >
+                <div
+                  className={`h-2 w-2 ${status.className} rounded-full ${
+                    isSelected ? "animate-pulse" : ""
+                  }`}
+                ></div>
+                {status.name}
+              </button>
+            );
+          })}
+        </div>
+        
+        <button 
+          onClick={() => {
+            setSortOrder(prev => prev === "desc" ? "asc" : "desc");
+            setCurrentPage(1);
+          }}
+          className="flex items-center justify-center p-2 rounded-full border border-white/20 bg-white/10 text-white transition-all active:scale-95 shrink-0"
+          title={sortOrder === "desc" ? "Más recientes primero" : "Más antiguos primero"}
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            strokeWidth={1.5} 
+            stroke="currentColor" 
+            className={`w-4 h-4 transition-transform duration-300 ${sortOrder === "asc" ? "rotate-180" : ""}`}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+          </svg>
+        </button>
       </div>
       <div>
         <div className="max-w-xl mx-auto animate-fade-in">
@@ -109,7 +145,7 @@ export default function Page() {
 
           {/* Table Body */}
           <div className="divide-y divide-divider w-full">
-            {filteredEvents?.map((data) => (
+            {paginatedEvents?.map((data) => (
               <div
                 key={data.eventId}
                 className={`grid grid-cols-[1fr_1fr_1fr_0.1fr_1.2fr] items-center py-3 px-3 gap-x-2 text-xs ${isEventFuture(data.date) ? "text-white" : "text-white/60"}`}
@@ -151,6 +187,29 @@ export default function Page() {
             ))}
           </div>
         </div>
+
+        {/* Pagination Controls */}
+        {!isEventLoading && totalPages > 1 && (
+          <div className="flex items-center justify-between pt-4 pb-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 text-sm rounded-lg border border-white/20 bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
+            >
+              Anterior
+            </button>
+            <span className="text-sm text-text-inactive">
+              Página {currentPage} de {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 text-sm rounded-lg border border-white/20 bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
 
           {!allEvents &&!isErrorEvent && (
             Array.from(Array(6).keys()).map((user) => (

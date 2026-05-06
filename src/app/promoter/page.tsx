@@ -49,7 +49,7 @@ export default function PromoterHome() {
 
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold ">Disponible</h1>
-          <p className="text-primary-white text-2xl">COP $ {promoterBinnacles?.total?.toLocaleString() ?? 0}</p>
+          <p className="text-primary-white text-2xl">COP $ {promoterBinnacles?.pendingPayment?.toLocaleString() ?? 0}</p>
         </div>
 
         <div className="bg-input mt-2 rounded-lg px-3 py-2">
@@ -71,7 +71,7 @@ export default function PromoterHome() {
             </div>
 
             <Link href={`/promoter/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-white bg-primary">
-              Ver dinero entregado
+              Ver dinero retirado
             </Link>
           </div> 
         </div>

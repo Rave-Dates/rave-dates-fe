@@ -31,7 +31,7 @@ export function useCreateFullEvent({reset, successHref = "/admin/events", errorH
         await assignOrganizerToEvent(token, { organizerId: organizerId }, eventId);
       }
 
-      if (formPromoters) {
+      if (formPromoters && organizerId) {
         const formattedData = {
           promoters: 
             formPromoters?.map((promoter) => ({

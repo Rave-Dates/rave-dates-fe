@@ -27,7 +27,7 @@ export default function MoneyWithdrawn() {
           {/* Search and Add User Section */}
 
           <h1 className="text-title font-semibold">Dinero retirado</h1>
-          <h2 className="text-xl text-primary">COP ${promoterBinnacles?.alreadyPaid.toLocaleString() ?? 0}</h2>
+          <h2 className="text-xl">COP ${promoterBinnacles?.alreadyPaid.toLocaleString() ?? 0}</h2>
 
           {/* Users Table/List */}
           <div className="rounded-md overflow-hidden mt-5">
