@@ -7,11 +7,12 @@ type Props = {
   selected: string;
   check: boolean;
   isPromoter?: boolean;
-  setSelected: React.Dispatch<SetStateAction<"Nequi" | "Bold">>;
+  setSelected: React.Dispatch<SetStateAction<"Nequi" | "Bold" | "Ninguno">>;
   setCheck: (value: boolean) => void;
+  isBalanceSufficient: boolean;
 };
 
-export default function PaymentMethodSelector({ clientData, selected, setSelected, check, setCheck, isPromoter = false }: Props) {
+export default function PaymentMethodSelector({ clientData, selected, setSelected, check, setCheck, isPromoter = false, isBalanceSufficient }: Props) {
   const methods: ["Nequi", "Bold"] = ["Nequi", "Bold"];
 
   return (
@@ -23,10 +24,11 @@ export default function PaymentMethodSelector({ clientData, selected, setSelecte
       {methods.map((item) => (
         <label
           key={item}
-          className="flex items-center w-full cursor-pointer group py-3 border-b border-inactive"
+          className={`flex items-center w-full cursor-pointer group py-3 border-b border-inactive ${isBalanceSufficient && "pointer-events-none"}`}
         >
           <div className="relative">
             <input
+              disabled={isBalanceSufficient}
               type="radio"
               name="paymentMethod"
               value={item}
@@ -44,7 +46,7 @@ export default function PaymentMethodSelector({ clientData, selected, setSelecte
               {selected === item && <div className="w-3.5 h-3.5 bg-primary rounded-full" />}
             </div>
           </div>
-          <div className="flex w-full items-center justify-between px-4">
+          <div className={`flex w-full items-center justify-between px-4 ${isBalanceSufficient && "opacity-40"}`}>
             <div className="flex flex-col items-start justify-center">
               <span className="group-hover:text-primary font-light transition-colors">{item} {item === "Bold" && "(Tarjeta)"}</span>
             </div>
@@ -53,7 +55,7 @@ export default function PaymentMethodSelector({ clientData, selected, setSelecte
               src={item === "Nequi" && "/images/nequi.webp" || item === "Bold" && "/images/bold.png" || ""}
               width={100}
               height={100}
-              alt="logo"
+              alt="Método de pago"
             />
           </div>
         </label>

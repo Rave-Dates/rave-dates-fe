@@ -17,10 +17,12 @@ import { useClientEvent, useClientEventTickets, useClientGetById } from "@/hooks
 import PartialAmount from "@/components/containers/checkout/PartialAmount";
 import { useForm } from "react-hook-form";
 import { useChangeTicketStore } from "@/store/useChangeTicketStore";
+import { useQuery } from "@tanstack/react-query";
+import { getAdminConfig } from "@/services/admin-parameters";
 
 export default function Checkout() {
   const [selectedPayment, setSelectedPayment] = useState<"Pago total" | "Abonar a la alcancía">("Pago total");
-  const [selectedMethod, setSelectedMethod] = useState<"Nequi" | "Bold">("Nequi");
+  const [selectedMethod, setSelectedMethod] = useState<"Nequi" | "Bold" | "Ninguno">("Nequi");
   const [hasDiscountFlag, setHasDiscountFlag] = useState<boolean>(false);
   const { selected, eventId } = useTicketStore();
   const { eventTickets } = useClientEventTickets(eventId);
@@ -58,10 +60,14 @@ export default function Checkout() {
   const { clientData } = useClientGetById({clientId: decoded?.id, clientToken: clientToken});
   const { selectedEvent } = useClientEvent(eventId);
 
-  if (selectedEvent?.type === "free") {
-    router.push("/tickets")
-  }
+  const { data: adminConfig } = useQuery({
+    queryKey: ["adminConfig"],
+    queryFn: () => getAdminConfig({ token: clientToken || tempToken }),
+    enabled: !!(clientToken || tempToken),
+  });
 
+  const effectiveFeePercentage = selectedEvent?.feeBoldPorcentage ?? adminConfig?.feeBoldPorcentage ?? 0;
+  
   const totalAmount = Object.entries(selected).reduce((acc, [ticketTypeIdStr, selectedData]) => {
     const ticketTypeId = Number(ticketTypeIdStr);
     const ticketInfo = eventTickets?.find(t => t.ticketTypeId === ticketTypeId);
@@ -69,6 +75,25 @@ export default function Checkout() {
 
     return acc + selectedData.quantity * price;
   }, 0);
+  
+  const actualDiscountValue = hasDiscountFlag ? totalAmount * ((selectedEvent?.discount || 0) / 100) : 0;
+  const subtotalWithDiscount = totalAmount - actualDiscountValue;
+
+  useEffect(() => {
+    if (check && clientData?.balance && clientData.balance >= subtotalWithDiscount) {
+      if (selectedMethod !== "Ninguno") {
+        setSelectedMethod("Ninguno");
+      }
+    } else if (selectedMethod === "Ninguno") {
+      setSelectedMethod("Nequi");
+    }
+  }, [check, clientData?.balance, subtotalWithDiscount, selectedMethod]);
+
+  const isBalanceSufficient = Boolean(check && clientData?.balance && clientData.balance >= subtotalWithDiscount);
+
+  if (selectedEvent?.type === "free") {
+    router.push("/tickets")
+  }
   
   useEffect(() => {
     if (!eventId) {
@@ -242,13 +267,14 @@ export default function Checkout() {
             isChangeTickets={isChangeTickets}
             isPendingPayment={pendingPaymentPurchaseId}
           />
-          <PaymentMethodSelector
+          <PaymentMethodSelector 
             selected={selectedMethod}
             setSelected={setSelectedMethod}
             check={check}
             setCheck={setCheck}
             clientData={clientData}
             isPromoter={Boolean(isPromoter)}
+            isBalanceSufficient={isBalanceSufficient}
           /> 
           {
           selectedPayment === "Abonar a la alcancía" && selectedEvent && selectedEvent.piggyBank && !isChangeTickets &&
@@ -259,6 +285,8 @@ export default function Checkout() {
               partialAmount={watchedPartialAmount}
               hasDiscountFlag={hasDiscountFlag}
               watchedDiscountCode={selectedEvent?.discount}
+              effectiveFeePercentage={effectiveFeePercentage}
+              selectedMethod={selectedMethod}
             />
           }
         </div>
@@ -278,6 +306,8 @@ export default function Checkout() {
             watchedDiscountCode={watchedDiscountCode}
             setHasDiscountFlag={setHasDiscountFlag}
             hasDiscountFlag={hasDiscountFlag}
+            effectiveFeePercentage={effectiveFeePercentage}
+            selectedMethod={selectedMethod}
           />
           <button onClick={() => handleContinue()} className="lg:block hidden w-full order-last bg-primary text-primary-white font-medium py-3 rounded-lg text-lg">
             Continuar

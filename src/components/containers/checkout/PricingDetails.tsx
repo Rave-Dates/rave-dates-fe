@@ -17,9 +17,11 @@ type Props = {
   setHasDiscountFlag: React.Dispatch<React.SetStateAction<boolean>>;
   hasDiscountFlag: boolean;
   eventDiscountAmount: number | undefined;
+  effectiveFeePercentage: number;
+  selectedMethod: "Nequi" | "Bold" | "Ninguno";
 };
 
-export default function PricingDetails({check, clientData, selectedPayment, partialAmount, totalAmount, register, eventDiscountCode, watchedDiscountCode, setHasDiscountFlag, hasDiscountFlag, eventDiscountAmount} : Props) {
+export default function PricingDetails({check, clientData, selectedPayment, partialAmount, totalAmount, register, eventDiscountCode, watchedDiscountCode, setHasDiscountFlag, hasDiscountFlag, eventDiscountAmount, effectiveFeePercentage, selectedMethod} : Props) {
   const { selected, eventId, pendingPaymentAmount } = useTicketStore();
   const { eventTickets } = useClientEventTickets(eventId);
   const searchParams = useSearchParams();
@@ -71,6 +73,9 @@ export default function PricingDetails({check, clientData, selectedPayment, part
     totalSubtracted += value.currentSubtracted * value.price;
   }
 
+  const gatewayFee = selectedMethod === "Bold" ? totalAmount * (effectiveFeePercentage / 100) : 0;
+  const actualDiscountValue = hasDiscountFlag ? totalAmount * ((eventDiscountAmount || 0) / 100) : 0;
+
   // if (!clientData?.balance) return null;
 
   // if (check && clientData?.balance >= totalAmount) {
@@ -103,11 +108,13 @@ export default function PricingDetails({check, clientData, selectedPayment, part
           <span className="text-end">${ticket.total.toLocaleString()} COP</span>
         </div>
       ))}
-
-      <div className="flex justify-between">
-        <span className="text-primary-white/50">Servicio</span>
-        <span className="text-end">$0 COP</span>
-      </div>
+      {
+        selectedMethod === "Bold" &&
+        <div className="flex justify-between">
+          <span className="text-primary-white/50">Comisión Bold</span>
+          <span className="text-end">${gatewayFee.toLocaleString()} COP</span>
+        </div>
+      }
       {
         isChangeTickets &&
         <div className="flex justify-between">
@@ -125,8 +132,8 @@ export default function PricingDetails({check, clientData, selectedPayment, part
       {
         hasDiscountFlag &&
         <div className="flex justify-between">
-          <span className="text-primary-white/50">Descuento</span>
-          <span className="text-end">- ${eventDiscountAmount?.toLocaleString()} COP</span>
+          <span className="text-primary-white/50">Descuento ({eventDiscountAmount}%)</span>
+          <span className="text-end">- ${actualDiscountValue.toLocaleString()} COP</span>
         </div>
       }
       <div className="flex justify-between text-lg">
@@ -135,9 +142,22 @@ export default function PricingDetails({check, clientData, selectedPayment, part
           !isPendingPayment ?
             <span className="text-end">
               ${ 
-                !isChangeTickets 
-                  ? (totalWithBalanceDiscount - (hasDiscountFlag && selectedPayment !== "Abonar a la alcancía" && totalWithBalanceDiscount !== 0 && eventDiscountAmount ? eventDiscountAmount : 0)).toLocaleString() 
-                  : (totalAmount - totalSubtracted).toLocaleString()
+                (() => {
+                  let finalTotal = 0;
+                  if (!isChangeTickets) {
+                    if (selectedPayment === "Abonar a la alcancía") {
+                      finalTotal = partialAmount;
+                    } else {
+                      finalTotal = totalAmount + gatewayFee - actualDiscountValue;
+                      if (check && clientData?.balance) {
+                        finalTotal -= clientData.balance;
+                      }
+                    }
+                  } else {
+                    finalTotal = totalAmount - totalSubtracted + gatewayFee;
+                  }
+                  return Math.max(finalTotal, 0).toLocaleString();
+                })()
               } COP
             </span>
             :
