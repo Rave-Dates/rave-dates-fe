@@ -48,7 +48,7 @@ export function OrganizerEventDetails({ eventId, isPromoter, isPromoterBinnacle,
                   src={servedImageUrl ?? "/images/event-placeholder.png"} 
                   width={60} 
                   height={60} 
-                  alt="logo" 
+                  alt="placeholder" 
                 />
               }            
             </TitleCard>

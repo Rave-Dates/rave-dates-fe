@@ -22,8 +22,10 @@ export default function UserManagement() {
     >
       <div className="rounded-md overflow-hidden">
         {/* Table Header */}
-        <div className="grid grid-cols-[2fr_1fr] border-b border-divider text-text-inactive gap-x-2 text-sm py-2 px-3">
+        <div className="grid grid-cols-[2.5fr_2fr_1.5fr_1.5fr] border-b border-divider text-text-inactive gap-x-2 text-sm py-2 px-3">
           <div className="text-start">Nombre</div>
+          <div className="text-center">Cantidad vendida</div>
+          <div className="text-center">Total vendidas</div>
           <div className="text-end">Acciones</div>
         </div>
 
@@ -32,9 +34,11 @@ export default function UserManagement() {
           {promoters?.map((user) => (
             <div
               key={user?.userId}
-              className="grid grid-cols-[2fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
+              className="grid grid-cols-[2.5fr_2fr_1.5fr_1.5fr] items-center py-3 px-3 gap-x-2 text-sm"
             >
               <div className="text-start">{user?.name}</div>
+              <div className="text-center">{user?.promoter?.totalTickets ?? 0}</div>
+              <div className="text-center">${(user?.promoter?.totalSales ?? 0).toLocaleString()}</div>
               <div className="flex justify-end gap-x-2">
                 <DefaultButton className="text-xl border bg-transparent border-primary" icon={<EditSvg className="text-primary" />} href={`promoters/edit-promoter/${user?.userId}`} />
                 <DefaultButton href={`promoters/${user?.userId}/promoter-events`} />
@@ -45,9 +49,11 @@ export default function UserManagement() {
             Array.from(Array(10).keys()).map((user) => (
             <div
               key={user}
-              className="grid grid-cols-[2fr_1fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
+              className="grid grid-cols-[2.5fr_1fr_1.5fr_1.5fr] items-center py-3 px-3 gap-x-2 text-sm"
             >
               <div className="text-start w-20 h-4 rounded animate-pulse bg-inactive"></div>
+              <div className="justify-self-end w-10 h-4 rounded animate-pulse bg-inactive"></div>
+              <div className="justify-self-end w-12 h-4 rounded animate-pulse bg-inactive"></div>
               <div className="justify-self-end w-8 h-8 rounded animate-pulse bg-inactive"></div>
             </div>
             ))

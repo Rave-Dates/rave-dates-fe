@@ -27,6 +27,8 @@ interface IUser {
     fee: number;
     feeType: "fixed" | "percentage";
     events: IPromoterEvent[];
+    totalSales: number;
+    totalTickets: number;
   };
   organizer?: {
     userId: number;

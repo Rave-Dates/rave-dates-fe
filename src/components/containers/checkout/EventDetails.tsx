@@ -28,7 +28,7 @@ export default function EventDetails({className, selectedEvent, eventId}: Props)
             src={servedImageUrl ?? "/images/event-placeholder.png"}
             width={1000}
             height={1000}
-            alt="logo"
+            alt="placeholder"
           />
         }
       </TitleCard>

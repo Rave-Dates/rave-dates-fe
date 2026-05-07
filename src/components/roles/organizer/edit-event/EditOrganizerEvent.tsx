@@ -265,7 +265,7 @@ useEffect(() => {
         >
           <div
             className={`w-5 h-5 rounded-full transition-transform ${
-              watchedIsActive ? "translate-x-6 bg-primary" : "translate-x-0.5 bg-primary"
+              watchedIsActive ? "translate-x-6 bg-green-500" : "translate-x-0.5 bg-primary"
             }`}
           />
         </button>
