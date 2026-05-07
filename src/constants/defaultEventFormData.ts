@@ -19,6 +19,7 @@ export const defaultEventFormData: IEventFormData = {
   ],
   feeRD: undefined,
   feePB: undefined,
+  feeBoldPorcentage: undefined,
   eventCategoryValues: [],
   oldCategories: {},
   transferCost: undefined,

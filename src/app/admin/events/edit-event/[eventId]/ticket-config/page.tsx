@@ -130,6 +130,7 @@ export default function EditTicketConfiguration() {
       piggyBank: data.piggyBank,
       quantityComplimentaryTickets: data.quantityComplimentaryTickets,
       organizerId: data.organizerId,
+      feeBoldPorcentage: data.feeBoldPorcentage,
       formPromoters: eventFormData.formPromoters,
     }
 
@@ -222,10 +223,15 @@ export default function EditTicketConfiguration() {
             <FormInput labelClassname="whitespace-nowrap" title="Costo transferencia de ticket" typeOfValue="$" inputName="transferCost" register={register("transferCost", { 
               setValueAs: (v) => v === "" ? undefined : Number(v), 
             })} />
-            <FormInput title="Descuento" typeOfValue="%" inputName="discount" register={register("discount", { 
-              setValueAs: (v) => v === "" ? undefined : Number(v), 
-              max: 100 
-            })} />
+            <FormInput
+              title="Comisión Pasarela (Bold)"
+              inputName="feeBoldPorcentage"
+              typeOfValue="%"
+              register={register("feeBoldPorcentage", {
+                setValueAs: (v) => v === "" ? undefined : Number(v),
+                max: 100
+              })}
+            />
           </div>
           <div className="flex flex-col xs:flex-row gap-x-5">
             <FormInput labelClassname="whitespace-nowrap" type="number" title="Máx. tickets p/ persona" inputName="maxPurchase" register={register("maxPurchase", { 
@@ -236,7 +242,13 @@ export default function EditTicketConfiguration() {
               setValueAs: (v) => v === "" ? undefined : Number(v) 
             })} />
           </div>
-          <FormInput title="Código de descuento" inputName="discountCode" register={register("discountCode")} />
+          <div className="flex flex-col xs:flex-row gap-x-5">
+            <FormInput title="Código de descuento" inputName="discountCode" register={register("discountCode")} />
+            <FormInput title="Descuento" typeOfValue="%" inputName="discount" register={register("discount", { 
+              setValueAs: (v) => v === "" ? undefined : Number(v), 
+              max: 100 
+            })} />
+          </div>
 
           <div className="flex items-center justify-between mt-5">
             <span className="text-white text-lg">Alcancía</span>

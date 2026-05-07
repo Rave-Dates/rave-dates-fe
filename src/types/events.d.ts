@@ -20,6 +20,7 @@ interface IEvent {
   timeOut: number;
   isActive: boolean;
   labels: IEventLabel[];
+  feeBoldPorcentage: number;
   quantityComplimentaryTickets?: number;
   organizer?: {
     userId: number;

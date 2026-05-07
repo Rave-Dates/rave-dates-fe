@@ -92,6 +92,7 @@ export default function TicketConfiguration() {
       tickets: validTickets,
       quantityComplimentaryTickets: data.quantityComplimentaryTickets,
       organizerId: data.organizerId,
+      feeBoldPorcentage: data.feeBoldPorcentage,
       formPromoters: eventFormData.formPromoters,
     };
 
@@ -244,12 +245,12 @@ export default function TicketConfiguration() {
                 })}
               />
               <FormInput
-                title="Descuento"
-                inputName="discount"
+                title="Comisión Pasarela (Bold)"
+                inputName="feeBoldPorcentage"
                 typeOfValue="%"
-                register={register("discount", { 
-                  setValueAs: (v) => v === "" ? undefined : Number(v), 
-                  max: 100 
+                register={register("feeBoldPorcentage", {
+                  setValueAs: (v) => v === "" ? undefined : Number(v),
+                  max: 100
                 })}
               />
             </div>
@@ -273,11 +274,22 @@ export default function TicketConfiguration() {
                 })}
               />
             </div>
-            <FormInput
-              title="Código de descuento"
-              inputName="discountCode"
-              register={register("discountCode")}
-            />
+            <div className="flex flex-col xs:flex-row gap-x-5">
+              <FormInput
+                title="Código de descuento"
+                inputName="discountCode"
+                register={register("discountCode")}
+              />
+              <FormInput
+                title="Descuento"
+                inputName="discount"
+                typeOfValue="%"
+                register={register("discount", { 
+                  setValueAs: (v) => v === "" ? undefined : Number(v), 
+                  max: 100 
+                })}
+              />
+            </div>
               <div className="flex items-center justify-between mt-5">
                 <span className="text-white text-lg">Alcancía</span>
                 <button
