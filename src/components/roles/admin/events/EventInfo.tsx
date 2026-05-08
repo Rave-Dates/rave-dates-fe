@@ -71,7 +71,7 @@ export default function EventInfo() {
 
   useEffect(() => {
     if (ticketTypes && ticketTypes.length > 0) {
-      setExpandedSections([ticketTypes[0].name]);
+      setExpandedSections([ticketTypes[0].name || ""]);
     }
   }, [ticketTypes]);
   

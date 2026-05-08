@@ -80,8 +80,8 @@ export default function CreateTicketType() {
   const { ticketTypes } = useAdminTicketTypes({ token, eventId: selectedPreviewEvent });
 
   const onSubmit = (data: IEventTicket) => {
-    const trimmedName = data.name.trim();
-    const trimmedMaxDate = data.maxDate.trim();
+    const trimmedName = data.name?.trim() || "";
+    const trimmedMaxDate = data.maxDate?.trim() || "";
 
     const formattedData = {
       ...data,
@@ -146,7 +146,7 @@ export default function CreateTicketType() {
               ticketTypes.map((ticketType: IEventTicket) => (
                 <EditableItem
                   key={ticketType.ticketTypeId}
-                  initialValue={ticketType.name}
+                  initialValue={ticketType.name ?? ""}
                   onSave={(newName) => handleUpdate(ticketType, newName)}
                   onDelete={() => handleDelete(ticketType.ticketTypeId ?? 0)}
                 />
