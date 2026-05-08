@@ -19,9 +19,10 @@ interface DatePickerProps {
   title?: string;
   className?: string;
   wrapperClassname?: string;
+  maxDate?: string; // yyyy-MM-dd
 }
 
-export default function DatePicker({ value, onChange, title = "Fecha*", className, wrapperClassname }: DatePickerProps) {
+export default function DatePicker({ value, onChange, title = "Fecha*", className, wrapperClassname, maxDate }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 
   // Parse the string value into a Date object for the Calendar
@@ -68,6 +69,7 @@ export default function DatePicker({ value, onChange, title = "Fecha*", classNam
             mode="single"
             selected={selectedDate}
             onSelect={handleSelect}
+            disabled={maxDate ? { after: parse(maxDate, "yyyy-MM-dd", new Date()) } : undefined}
             autoFocus
           />
         </PopoverContent>

@@ -17,6 +17,7 @@ interface TicketCardProps {
   onDelete?: () => void,
   register: UseFormRegister<IEventFormData>,
   getValues: UseFormGetValues<IEventFormData>,
+  eventDate?: string,
 }
 
 export function TicketCard({
@@ -27,6 +28,7 @@ export function TicketCard({
   register,
   getValues,
   control,
+  eventDate,
 }: TicketCardProps) {
   const router = useRouter()
   const params = useParams()
@@ -131,6 +133,7 @@ export function TicketCard({
                 title="Fecha máx.*" 
                 className="h-9 bg-cards-container"
                 wrapperClassname="justify-end"
+                maxDate={eventDate}
               />
             )}
           />

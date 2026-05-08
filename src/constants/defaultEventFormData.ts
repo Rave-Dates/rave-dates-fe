@@ -15,7 +15,7 @@ export const defaultEventFormData: IEventFormData = {
   editPlace: "",
   images: [],
   tickets: [
-    { ticketId: 1, ticketTypeId: 1, maxDate: yyyyMmDd, eventId: 1 , name: "Ticket 1", stages: [{ stageId: 1, date: yyyyMmDd, dateMax: yyyyMmDd, price: undefined, quantity: undefined, promoterFee: undefined, feeType: "fixed" }] },
+    { ticketId: 1, ticketTypeId: 1, maxDate: yyyyMmDd, eventId: 1 , name: undefined, stages: [{ stageId: 1, date: yyyyMmDd, dateMax: yyyyMmDd, price: undefined, quantity: undefined, promoterFee: undefined, feeType: "fixed" }] },
   ],
   feeRD: undefined,
   feePB: undefined,

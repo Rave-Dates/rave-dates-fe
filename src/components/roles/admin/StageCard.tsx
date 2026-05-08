@@ -11,6 +11,7 @@ interface StageCardProps {
   onDelete?: () => void,
   register: UseFormRegister<IEventTicket>,
   control: Control<IEventTicket>,
+  eventDate?: string,
 }
 
 export function StageCard({
@@ -18,6 +19,7 @@ export function StageCard({
   onDelete,
   register,
   control,
+  eventDate,
 }: StageCardProps) {
 
   return (
@@ -81,6 +83,7 @@ export function StageCard({
                 onChange={field.onChange} 
                 title="Fecha inicio*" 
                 className="h-13 bg-cards-container"
+                maxDate={eventDate}
               />
             )}
           />
@@ -94,6 +97,7 @@ export function StageCard({
                 onChange={field.onChange} 
                 title="Fecha máx.*" 
                 className="h-13 bg-cards-container"
+                maxDate={eventDate}
               />
             )}
           />

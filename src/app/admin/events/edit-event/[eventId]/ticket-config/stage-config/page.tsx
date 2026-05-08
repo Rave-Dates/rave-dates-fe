@@ -149,6 +149,7 @@ export default function StageConfig() {
                 key={stage.id}
                 index={index}
                 onDelete={() => handleDeleteStage(index)}
+                eventDate={eventFormData.date}
               />
             ))}
           </div>

@@ -203,6 +203,7 @@ export default function EditTicketConfiguration() {
               key={ticket.id}
               ticketNumber={ticket.ticketTypeId}
               onDelete={() => handleDeleteTicket(index)}
+              eventDate={eventFormData.date}
             />
           ))}
         </div>
@@ -257,7 +258,7 @@ export default function EditTicketConfiguration() {
               onClick={() => setValue("piggyBank", !piggyBank)}
               className="w-12 h-6 rounded-full transition-colors pointer-events-auto bg-cards-container"
             >
-              <div className={`w-5 h-5 rounded-full transition-transform ${piggyBank ? "translate-x-6 bg-primary" : "translate-x-0.5 bg-text-inactive"}`} />
+              <div className={`w-5 h-5 rounded-full transition-transform ${piggyBank ? "translate-x-6 bg-green-500" : "translate-x-0.5 bg-text-inactive"}`} />
             </button>
           </div>
 

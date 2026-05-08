@@ -155,7 +155,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
 
       if (!eventInfo) return;
       await generateTicketImage({
-        bgImage: "/images/ticket-bg-ravedates.jpg",
+        bgImage: "/images/Fondo-RV.jpeg",
         qrData: ticket.qr,
         name: eventInfo.title,
         time: `${formatDateToColombiaTime(eventInfo.date).date}, ${

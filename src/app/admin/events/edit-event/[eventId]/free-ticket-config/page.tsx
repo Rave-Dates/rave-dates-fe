@@ -169,6 +169,7 @@ export default function FreeTicketConfiguration() {
                       value={field.value} 
                       onChange={field.onChange} 
                       title="Fecha inicio*" 
+                      maxDate={eventFormData.date}
                     />
                   )}
                 />
@@ -181,6 +182,7 @@ export default function FreeTicketConfiguration() {
                       value={field.value} 
                       onChange={field.onChange} 
                       title="Fecha máx.*" 
+                      maxDate={eventFormData.date}
                     />
                   )}
                 />

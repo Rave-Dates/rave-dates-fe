@@ -105,7 +105,7 @@ interface IEventTicket {
   ticketId?: number; // para uso interno
   ticketTypeId?: number;
   eventId?: number;
-  name: string;
+  name: string | undefined;
   maxDate: string;
   stages: IEventStages[];
   count?: number;

@@ -110,7 +110,7 @@ export const generateTicketImage = async ({
   const ctx = canvas.getContext("2d")
   if (!ctx) return
 
-  const canvasWidth = 738
+  const canvasWidth = 900
   const canvasHeight = 1600
   canvas.width = canvasWidth
   canvas.height = canvasHeight
@@ -144,7 +144,24 @@ export const generateTicketImage = async ({
   ])
 
   // === Dibujar contenido ===
-  ctx.drawImage(bg, 0, 0, canvasWidth, canvasHeight)
+  const bgRatio = bg.width / bg.height
+  const canvasRatio = canvasWidth / canvasHeight
+  let renderWidth = canvasWidth
+  let renderHeight = canvasHeight
+  let bgX = 0
+  let bgY = 0
+
+  if (bgRatio > canvasRatio) {
+    renderHeight = canvasHeight
+    renderWidth = bg.width * (canvasHeight / bg.height)
+    bgX = (canvasWidth - renderWidth) / 2
+  } else {
+    renderWidth = canvasWidth
+    renderHeight = bg.height * (canvasWidth / bg.width)
+    bgY = (canvasHeight - renderHeight) / 2
+  }
+
+  ctx.drawImage(bg, bgX, bgY, renderWidth, renderHeight)
   ctx.fillStyle = "#fff"
   ctx.textAlign = "center"
 
@@ -177,7 +194,10 @@ export const generateTicketImage = async ({
     canvasWidth / 2,
     y,
     ticketWidth,
-    ticketHeight // altura mínima
+    ticketHeight, // altura mínima
+    10,
+    "#050505",
+    "#DB0913"
   )
 
   const eventImgSize = 400

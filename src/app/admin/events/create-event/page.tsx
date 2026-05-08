@@ -103,8 +103,8 @@ export default function Page() {
 
     const eventDate = data.date || "";
     const updatedTickets: IEventTicket[] = (eventFormData.tickets || []).map((ticket, index) => {
-      // Solo actualizamos el primer ticket si tiene los valores por defecto
-      if (index === 0 && ticket.name === "Ticket 1") {
+      // Solo actualizamos el primer ticket si es la creación inicial
+      if (index === 0) {
         return {
           ...ticket,
           maxDate: eventDate,

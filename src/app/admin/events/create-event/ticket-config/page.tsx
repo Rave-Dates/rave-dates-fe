@@ -198,6 +198,7 @@ export default function TicketConfiguration() {
               key={ticket?.ticketId}
               ticketNumber={ticket.ticketId}
               onDelete={() => handleDeleteTicket(index)}
+              eventDate={eventFormData.date}
             />
           ))}
         </div>
@@ -299,7 +300,7 @@ export default function TicketConfiguration() {
                 >
                   <div
                     className={`w-5 h-5 rounded-full transition-transform ${
-                      watchedPiggyBank ? "translate-x-6 bg-primary" : "translate-x-0.5 bg-text-inactive"
+                      watchedPiggyBank ? "translate-x-6 bg-green-500" : "translate-x-0.5 bg-text-inactive"
                     }`}
                   />
                 </button>

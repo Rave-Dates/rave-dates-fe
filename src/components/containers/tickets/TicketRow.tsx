@@ -47,7 +47,7 @@ export function TicketRow({
         try {
           setLoading(true); // empieza el loading
           const dataUrl = await generateTicketImage({
-            bgImage: "/images/ticket-bg-ravedates.jpg",
+            bgImage: "/images/Fondo-RV.jpeg",
             fileName: "ticket.jpg",
             qrData: ticket.qr,
             name: eventInfo.title,
@@ -128,7 +128,7 @@ export function TicketRow({
               return (
                 <div key={action}>
                   <GenerateJPGButton
-                    bgImage="/images/ticket-bg-ravedates.jpg"
+                    bgImage="/images/Fondo-RV.jpeg"
                     qrData={ticket.qr}
                     name={eventInfo.title}
                     eventImage={servedImageUrl ?? "/images/event-placeholder.png"}
@@ -201,25 +201,29 @@ export function TicketRow({
           onClick={() => setShowQR(false)}
         >
           <div
-            className="bg-cards-container mx-2 rounded-lg relative w-fit p-2 max-w-sm flex flex-col items-center"
+            className="bg-cards-container mx-2 rounded-lg relative w-fit p-2 md:p-4 flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="absolute top-4 right-4 text-3xl font-bold"
+              className="absolute top-4 right-4 text-3xl font-bold z-10 bg-black/50 rounded-full p-1"
               onClick={() => setShowQR(false)}
               aria-label="Cerrar"
             >
               <AddSvg className="rotate-45 text-primary-white" />
             </button>
 
-            <div className="max-w-80 overflow-y-scroll h-auto">
+            <div className="rounded-lg overflow-y-auto max-h-[90vh] custom-scrollbar">
               {loading ? (
-                <div className="flex flex-col h-[694px] w-80 items-center justify-center text-center">
+                <div className="flex flex-col h-[70vh] min-h-[400px] w-[80vw] max-w-[400px] items-center justify-center text-center mx-auto">
                   <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent mb-4"></div>
                   <p className="text-sm text-primary">Generando ticket...</p>
                 </div>
               ) : (
-                <img src={ticketCanvas} alt="Ticket" />
+                <img 
+                  src={ticketCanvas} 
+                  alt="Ticket" 
+                  className="w-[calc(85vh*9/16)] min-w-[280px] sm:min-w-[320px] max-w-[85vw] md:max-w-[450px] lg:max-w-[500px] h-auto rounded-lg mx-auto block" 
+                />
               )}
             </div>
           </div>

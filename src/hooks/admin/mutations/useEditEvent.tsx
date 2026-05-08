@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { assignOrganizerToEvent, assignPromoterToEvent, createImage, deleteImage, editEvent, editEventCategories, editTicketTypes, getEventImages } from "../../../services/admin-events";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
@@ -8,6 +8,7 @@ export function useEditEvent(reset: (data: IEventFormData) => void) {
   const { updateEventFormData, setHasLoadedTickets } = useCreateEventStore();
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({formData, isOrganizer = false}: { formData: IEventFormData, isOrganizer?: boolean }) => {
@@ -76,11 +77,17 @@ export function useEditEvent(reset: (data: IEventFormData) => void) {
           .map((img) => createImage(token, { eventId, file: img.file }))
       ]);
       
+      return editedEvent;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["eventTickets"] });
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["selectedEvent"] });
+      queryClient.invalidateQueries({ queryKey: ["eventImages"] });
+
       updateEventFormData(defaultEventFormData); // reset Zustand
       reset(defaultEventFormData); // reset React Hook Form
       setHasLoadedTickets(false);
-   
-      return editedEvent;
     }
   });
 }
