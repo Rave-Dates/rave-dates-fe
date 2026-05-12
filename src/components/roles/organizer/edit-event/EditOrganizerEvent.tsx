@@ -82,7 +82,7 @@ export default function EditOrganizerEvent({ eventId }: { eventId: number }) {
       type: event.type,
       isActive: event.isActive,
       timeOut: event.timeOut,
-      quantityComplimentaryTickets: event.quantityComplimentaryTickets,
+      quantityComplimentaryTickets: 0,
     };
 
     Object.entries(setters).forEach(([key, value]) => {
@@ -229,7 +229,7 @@ useEffect(() => {
       timeOut: data.timeOut,
       labels: data.labels || [],
       tickets: [formattedTickets[0]],
-      quantityComplimentaryTickets: data.quantityComplimentaryTickets,
+      quantityComplimentaryTickets: 0,
     }
 
     notifyPending(
@@ -376,38 +376,53 @@ useEffect(() => {
       <br />
 
        { 
-          categories?.map((category) => (
-            <FormDropDown
-              key={category.categoryId}
-              title={category.name}
-              register={register(`oldCategories.${category.categoryId}`, { required: true })}
-            >
-              {
-                category.values.map((value) => (
-                  <option 
-                    key={value.valueId}   
-                    value={JSON.stringify({
-                      valueId: value.valueId,
-                      categoryId: value.categoryId,
-                      value: value.value
-                    })}
-                  >
-                    {value.value}
-                  </option>
-                ))
-              }
-            </FormDropDown>
-          ))
-        }
+          categories?.map((category) => {
+            const isTipoEvento = category.name.toLowerCase() === 'tipo de evento';
+            if (isTipoEvento) {
+              const clubValue = category.values?.find(v => v.value.toLowerCase() === 'club');
+              const clubStringified = clubValue ? JSON.stringify({
+                valueId: clubValue.valueId,
+                categoryId: clubValue.categoryId,
+                value: clubValue.value
+              }) : "";
+              
+              return (
+                <div key={category.categoryId} className="relative w-full">
+                  <label className="block mb-2 text-xs">
+                    {category.name}
+                  </label>
+                  <div className="w-full mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white relative">
+                    <h2>Club</h2>
+                  </div>
+                  <input type="hidden" value={clubStringified} {...register(`oldCategories.${category.categoryId}`)} />
+                </div>
+              );
+            }
 
-      <FormInput
-        type="number"
-        title="Cortesía cada X ventas" 
-        inputName="quantityComplimentaryTickets"
-        register={register("quantityComplimentaryTickets", {
-          setValueAs: (v) => v === "" || v === undefined ? undefined : Number(v)
-        })}
-      />
+            return (
+              <FormDropDown
+                key={category.categoryId}
+                title={category.name}
+                register={register(`oldCategories.${category.categoryId}`, { required: true })}
+              >
+                {
+                  category.values.map((value) => (
+                    <option 
+                      key={value.valueId}   
+                      value={JSON.stringify({
+                        valueId: value.valueId,
+                        categoryId: value.categoryId,
+                        value: value.value
+                      })}
+                    >
+                      {value.value}
+                    </option>
+                  ))
+                }
+              </FormDropDown>
+            )
+          })
+        }
       <br />
       {
         labelsTypes && watchedLabels &&
