@@ -2,6 +2,7 @@
 
 import EyeSvg from "@/components/svg/EyeSvg";
 import SendSvg from "@/components/svg/SendSvg";
+import UserSvg from "@/components/svg/UserSvg";
 import DefaultTitledButton from "@/components/ui/buttons/DefaultTitledButton";
 import { useParams, usePathname } from 'next/navigation';
 import { formatDateToColombiaTime } from "@/utils/formatDate";
@@ -29,6 +30,7 @@ export function TicketRow({
   isPendingToPay = false,
 }: TicketRowProps) {
   const [showQR, setShowQR] = useState(false);
+  const [showTransferredModal, setShowTransferredModal] = useState(false);
 
   const { getCookie } = useReactiveCookiesNext();
   const pathname = usePathname();
@@ -76,12 +78,14 @@ export function TicketRow({
         return <EyeSvg className="w-6 h-6" />;
       case "resend":
         return <SendSvg className="w-6 h-6" />;
+      case "info":
+        return <UserSvg className="w-6 h-6" />;
       default:
         return null;
     }
   };
 
-  const actions = isTransferred ? ["resend"] : ["send", "download", "view"];
+  const actions = isTransferred ? ["resend", "info"] : ["send", "download", "view"];
 
   return (
     <div className="bg-cards-container flex-wrap rounded-lg py-3 px-4 gap-x-2 sm:gap-x-5 flex items-center justify-between">
@@ -172,11 +176,24 @@ export function TicketRow({
                   </div>
                 );
               }
-              return (
-                <div key={action} className="text-xs py-3 px-4 text-primary/80 italic">
-                  Ticket transferido
-                </div>
+              return null;
+            }
+
+            if (action === "info") {
+              if (isTransferred && clientData && clientData.firstLogin) {
+                return (
+                  <div key={action}>
+                    <DefaultTitledButton
+                      className="block"
+                      handleOnClick={() => setShowTransferredModal(true)}
+                    >
+                      {getActionIcon(action)}
+                      <h2 className="text-[10px]">Ver</h2>
+                    </DefaultTitledButton>
+                  </div>
                 );
+              }
+              return null;
             }
 
             // default: "send"
@@ -226,6 +243,59 @@ export function TicketRow({
                 />
               )}
             </div>
+          </div>
+        </div>
+      )}
+      {showTransferredModal && clientData && (
+        <div
+          className="fixed inset-0 bg-black/70 text-primary-white backdrop-blur-sm z-50 flex items-center justify-center"
+          onClick={() => setShowTransferredModal(false)}
+        >
+          <div
+            className="bg-cards-container mx-4 rounded-lg relative w-full max-w-sm p-6 py-10 flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-3 right-3 text-3xl font-bold z-10"
+              onClick={() => setShowTransferredModal(false)}
+              aria-label="Cerrar"
+            >
+              <AddSvg className="rotate-45 text-primary-white" />
+            </button>
+
+            <h2 className="text-xl text-center font-semibold mb-6 text-primary">Detalles de la transferencia</h2>
+            
+            <div className="w-full space-y-4">
+              <div className="flex flex-col">
+                <span className="text-xs text-primary-white/60">Nombre</span>
+                <span className="text-lg font-medium">{clientData.name}</span>
+              </div>
+              
+              <div className="flex flex-col">
+                <span className="text-xs text-primary-white/60">Correo Electrónico</span>
+                <span className="text-lg font-medium">{clientData.email}</span>
+              </div>
+              
+              <div className="flex flex-col">
+                <span className="text-xs text-primary-white/60">WhatsApp</span>
+                <span className="text-lg font-medium">{clientData.whatsapp}</span>
+              </div>
+
+              {clientData.firstLogin && (
+                <div className="pt-2">
+                  <span className="text-xs px-2 py-1 bg-primary/20 text-primary rounded-full">
+                    Ticket ya reclamado
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={() => setShowTransferredModal(false)}
+              className="mt-8 w-full bg-primary text-primary-white py-3 rounded-lg font-medium hover:opacity-90 transition-opacity"
+            >
+              Cerrar
+            </button>
           </div>
         </div>
       )}
