@@ -150,7 +150,7 @@ const TicketTransferredForm = ({
       />
 
       <p className="text-sm">
-        Te enviaremos los tickets vía email y/o WhatsApp
+        Enviaremos los tickets vía email y/o WhatsApp
       </p>
 
       <button type="submit" className="bg-primary text-primary-white input-button">

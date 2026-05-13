@@ -77,7 +77,6 @@ const TicketTransferForm = ({
 
   return (
     <DefaultForm
-      ticketButtons={!afterCheckout}
       handleSubmit={handleSubmit(onSubmit, onInvalid)}
       title={afterCheckout ? "Ingresa los datos del receptor" : "Tickets propios"}
     >
@@ -149,7 +148,7 @@ const TicketTransferForm = ({
       />
 
       <p className="text-sm">
-        Te enviaremos los tickets vía email y/o WhatsApp
+        Enviaremos los tickets vía email y/o WhatsApp
       </p>
 
       <button type="submit" className="bg-primary text-primary-white input-button">
