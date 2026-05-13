@@ -8,7 +8,7 @@ import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { changeTicketPurchase, initTicketPurchase, partialPurchase } from "@/services/clients-tickets";
+import { changeTicketPurchase, initTicketPurchase, initPromoterTicketPurchase, partialPurchase } from "@/services/clients-tickets";
 import { useMutation } from "@tanstack/react-query";
 import { useTicketStore } from "@/store/useTicketStore";
 import { jwtDecode } from "jwt-decode";
@@ -235,7 +235,12 @@ export default function Checkout() {
   };
 
   const { mutate } = useMutation({
-    mutationFn: initTicketPurchase,
+    mutationFn: (args: { ticketData: IClientPurchaseTicket, clientToken: string | undefined }) => {
+      if (isPromoter) {
+        return initPromoterTicketPurchase(args);
+      }
+      return initTicketPurchase(args);
+    },
     onSuccess: (data) => {
       notifySuccess("Transacción iniciada correctamente");
       console.log("data", data);

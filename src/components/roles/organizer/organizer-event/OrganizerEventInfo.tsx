@@ -571,7 +571,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                         <span> vendidas:</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <span className="text-primary text-sm">{data.quantity} de {data.total} disponibles</span>
+                        <span className="text-primary-white ">{data.quantity}</span>
                       </div>
                     </div>
                   </div>
