@@ -422,7 +422,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
           <>
             {selectedEvent?.isActive &&
               <div className="bg-input mt-2 rounded-lg px-3 py-2">
-                <h1 className="font-medium px-2 mt-2">Link de afiliado</h1>
+                <h1 className="font-medium px-2 mt-2">Link de promotor</h1>
                 <div className="border-t-2 flex flex-col gap-y-3 pt-3 mt-3 px-2 pb-2 border-dashed border-inactive">
                   <div className="flex justify-between items-center">
                     <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/20">
@@ -443,6 +443,17 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                 </div> 
               </div>
             }
+            <div className="bg-input flex flex-col items-center rounded-lg p-4 ps-3 mt-2">
+              Información del evento
+              <div className="flex flex-col text-primary-white/80 gap-x-3 mt-2">
+                <div>
+                  <span className="text-primary">• </span>Cortesía ganada cada <span className="text-primary">{selectedEvent?.quantityComplimentaryTickets}</span> ventas
+                </div>
+                <div>
+                  <span className="text-primary">• </span>Comisión por entrada vendida $<span className="text-primary">{selectedEvent?.quantityComplimentaryTickets?.toLocaleString('es-CO')}</span>
+                </div>
+              </div>
+            </div>
             <div className="bg-input flex flex-col items-center rounded-lg p-4 ps-3 mt-2">
               Entradas de cortesía disponibles:
               <div className="flex gap-x-3">
@@ -466,7 +477,8 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
               </div>
             </div>
             <div className="bg-input mt-2 rounded-lg px-3 py-2">
-              <h1 className="font-medium px-2 mt-2">Canjear entradas de cortesía</h1>
+              <h1 className="font-medium px-2 mt-2">Transferir cortesía</h1>
+              <h3 className="text-sm text-primary-white/80 px-2 mt-2">Tu cliente debe tener cuenta de Rave Dates para recibir la cortesía</h3>
               <div className="border-t-2 flex flex-col gap-y-3 pt-3 mt-3 px-2 pb-2 border-dashed border-inactive">
                 <form onSubmit={handleSubmit(onClientSearch, onInvalid)} className="flex gap-x-4 justify-between items-end">
                   <FormInput 
@@ -480,7 +492,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                     type="submit"
                     className="border border-primary hover:opacity-75 transition-opacity px-[21.5px] py-3.5 font-medium text-primary rounded-lg text-sm"
                   >
-                    Buscar
+                    Validar
                   </button>
                 </form>
                 <form onSubmit={handleSubmit(onComplimentarySubmit, onInvalid)} className="flex gap-x-4 justify-between items-end">
@@ -520,7 +532,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                     type="submit"
                     className="border border-primary hover:opacity-75 transition-opacity px-[21.5px] py-3.5 font-medium text-primary rounded-lg text-sm"
                   >
-                    Buscar
+                    Validar
                   </button>
                 </form>
                 {buyClientId && (

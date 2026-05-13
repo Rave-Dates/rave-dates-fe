@@ -2,7 +2,7 @@
 
 import EditSvg from "@/components/svg/EditSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
-import { useAdminUserById } from "@/hooks/admin/queries/useAdminData";
+import { useAdminBinnacles, useAdminPromoterBinnacles, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { parseISODate } from "@/utils/formatDate";
 import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
@@ -19,6 +19,45 @@ export default function Page() {
   const token = getCookie("token");
 
   const { data } = useAdminUserById({ token, userId });
+
+  const isOrganizer = data?.role.name === "ORGANIZER";
+  const isPromoter = data?.role.name === "PROMOTER";
+
+  const organizerId = data?.organizer?.organizerId;
+  const promoterId = data?.promoter?.promoterId;
+
+  const { organizerBinnacles } = useAdminBinnacles({ organizerId: organizerId ?? 0, token: token?.toString() });
+  const { promoterBinnacles } = useAdminPromoterBinnacles({ promoterId: promoterId ?? 0, token: token?.toString() });
+
+  const getOrganizerTotalAvailable = () => {
+    let pendingPayment = 0;
+    if (organizerBinnacles) {
+      organizerBinnacles.forEach((binnacle: IEventPaymentSummary) => {
+        pendingPayment += Number(binnacle.pendingPayment);
+      });
+    }
+    return pendingPayment.toLocaleString('es-CO');
+  };
+
+  const getOrganizerTotalCommissions = () => {
+    let total = 0;
+    if (organizerBinnacles) {
+      organizerBinnacles.forEach((binnacle: IEventPaymentSummary) => {
+        total += Number(binnacle.total);
+      });
+    }
+    return total.toLocaleString('es-CO');
+  };
+
+  const getOrganizerTotalPaid = () => {
+    let alreadyPaid = 0;
+    if (organizerBinnacles) {
+      organizerBinnacles.forEach((binnacle: IEventPaymentSummary) => {
+        alreadyPaid += Number(binnacle.alreadyPaid);
+      });
+    }
+    return alreadyPaid.toLocaleString('es-CO');
+  };
 
   useEffect(() => {
     if (data?.role.name === "ORGANIZER" && data.organizer) {
@@ -38,6 +77,52 @@ export default function Page() {
         <GoBackButton className="absolute z-30 top-10 lg:top-32 left-5 px-3 py-3 animate-fade-in" />
         <div className="max-w-xl pt-24 mx-auto animate-fade-in">
           <h1 className="text-title font-semibold">Eventos asignados</h1>
+
+          {/* Dinero Section - Organizer */}
+          {isOrganizer && (
+            <div className="bg-cards-container mt-5 rounded-lg px-3 py-2">
+              <h1 className="font-medium px-2 my-2">Dinero</h1>
+              <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
+                <div className="flex text-sm justify-between items-center">
+                  <h2>Disponible</h2>
+                  <h2 className="text-primary-white text-base text-end tabular-nums">COP ${getOrganizerTotalAvailable()}</h2>
+                </div>
+
+                <div className="flex text-sm justify-between items-center">
+                  <h2>Total comisiones</h2>
+                  <h2 className="text-primary-white text-base text-end tabular-nums">COP ${getOrganizerTotalCommissions()}</h2>
+                </div>
+
+                <div className="flex text-sm justify-between items-center">
+                  <h2>Dinero entregado</h2>
+                  <h2 className="text-primary-white text-base text-end tabular-nums">COP ${getOrganizerTotalPaid()}</h2>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Dinero Section - Promoter */}
+          {isPromoter && promoterBinnacles && (
+            <div className="bg-cards-container mt-5 rounded-lg px-3 py-2">
+              <h1 className="font-medium px-2 my-2">Dinero</h1>
+              <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
+                <div className="flex text-sm justify-between items-center">
+                  <h2>Disponible</h2>
+                  <h2 className="text-primary-white text-base text-end tabular-nums">COP ${promoterBinnacles?.pendingPayment?.toLocaleString() ?? 0}</h2>
+                </div>
+
+                <div className="flex text-sm justify-between items-center">
+                  <h2>Total comisiones</h2>
+                  <h2 className="text-primary-white text-base text-end tabular-nums">COP ${Number(promoterBinnacles?.total ?? 0).toLocaleString() ?? 0}</h2>
+                </div>
+
+                <div className="flex text-sm justify-between items-center">
+                  <h2>Dinero entregado</h2>
+                  <h2 className="text-primary-white text-base text-end tabular-nums">COP ${promoterBinnacles?.alreadyPaid.toLocaleString() ?? 0}</h2>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Users Table/List */}
           <div className="rounded-md overflow-hidden mt-5">
