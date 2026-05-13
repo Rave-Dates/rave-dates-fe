@@ -20,6 +20,7 @@ interface TicketRowProps {
   eventInfo: { date: string, title: string };
   isTransferred?: boolean;
   isPendingToPay?: boolean;
+  loggedInClientName?: string;
 }
 
 export function TicketRow({
@@ -28,6 +29,7 @@ export function TicketRow({
   eventInfo,
   isTransferred = false,
   isPendingToPay = false,
+  loggedInClientName = "",
 }: TicketRowProps) {
   const [showQR, setShowQR] = useState(false);
   const [showTransferredModal, setShowTransferredModal] = useState(false);
@@ -58,6 +60,7 @@ export function TicketRow({
             eventImage: servedImageUrl ?? "/images/event-placeholder.png",
             logoRD: "/logo.svg",
             purchaseTicketId: ticket.purchaseTicketId,
+            clientName: isTransferred ? (clientData?.name || "Cliente") : loggedInClientName,
             mode: "return",
           });
           setTicketCanvas(dataUrl);
@@ -140,6 +143,7 @@ export function TicketRow({
                     ticketType={ticket.ticketType.name}
                     logoRD="/logo.svg"
                     purchaseTicketId={ticket.purchaseTicketId}
+                    clientName={loggedInClientName}
                   />
                 </div>
               );

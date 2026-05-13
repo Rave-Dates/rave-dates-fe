@@ -92,6 +92,7 @@ export const generateTicketImage = async ({
   eventImage,
   logoRD,
   purchaseTicketId,
+  clientName,
   fileName,
   mode = "download", // 👈 nuevo parámetro opcional
 }: {
@@ -103,6 +104,7 @@ export const generateTicketImage = async ({
   eventImage: string
   logoRD: string
   purchaseTicketId: string | number
+  clientName: string
   fileName: string
   mode?: "download" | "return"
 }) => {
@@ -167,22 +169,25 @@ export const generateTicketImage = async ({
 
   let y = 150
   ctx.font = "bold 48px GoodTimes";
-  const maxWidthTitle = 600 - 40; // ticketWidth - padding
+  const maxWidthTitle = 800; // Aumentado para evitar saltos innecesarios
   y = wrapTextIfNeeded(ctx, name, canvasWidth / 2, y, maxWidthTitle, 55);
 
   ctx.font = "40px InterCustom"
   ctx.fillText(time, canvasWidth / 2, y)
-  y += 80
+  y += 60
 
   const qrSize = 400
   ctx.drawImage(qrImg, (canvasWidth - qrSize) / 2, y, qrSize, qrSize)
   
-  // Dibujar ID debajo del QR
+  // Dibujar ID y Nombre del cliente debajo del QR
   ctx.font = "bold 28px InterCustom"
   ctx.fillStyle = "rgba(255, 255, 255, 0.9)" // Un poco más opaco también
   ctx.fillText(`ID: ${purchaseTicketId}`, canvasWidth / 2, y + qrSize + 35)
+  
+  ctx.font = "32px InterCustom"
+  ctx.fillText(clientName, canvasWidth / 2, y + qrSize + 75)
 
-  y += qrSize + 80
+  y += qrSize + 110
 
   const ticketHeight = 60
   const ticketWidth = 600

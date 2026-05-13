@@ -33,8 +33,6 @@ const ChangeTicketButtons = ({ ticket, totalQuantity, fixedQuantity, isOldTicket
     return new Date(stage.dateMax).getTime() > now && (stage.quantity ?? 0) > 0;
   });
 
-  console.log("validStage", validStage)
-
   if (typeof ticket.ticketTypeId !== "number") return null;
 
   return (

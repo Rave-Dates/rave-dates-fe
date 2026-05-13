@@ -12,7 +12,7 @@ import {
 } from "@/services/clients-events";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { generateTicketImage } from "./generateTicketImage";
-import { useClientEventTickets, useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
+import { useClientEventTickets, useClientGetById, useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
 import { notifyError } from "@/components/ui/toast-notifications";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useChangeTicketStore } from "@/store/useChangeTicketStore";
@@ -39,6 +39,11 @@ export default function TicketsChanger({ eventInfo }: Props) {
     (token && jwtDecode(token.toString())) || { id: 0 };
   const clientId = Number(decoded?.id);
   const { purchasedTickets } = useClientPurchasedTickets({
+    clientId,
+    clientToken: token,
+  });
+
+  const { clientData: loggedInClient } = useClientGetById({
     clientId,
     clientToken: token,
   });
@@ -166,6 +171,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
           formatDateToColombiaTime(eventInfo.date).time
         }hs`,
         purchaseTicketId: ticket.purchaseTicketId,
+        clientName: loggedInClient?.name || "Cliente",
         ticketType: ticket.ticketType.name,
         eventImage: servedImageUrl,
         logoRD: "/logo.svg",
@@ -232,6 +238,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
                   eventInfo={eventInfo}
                   href="transfer"
                   key={ticket.purchaseTicketId}
+                  loggedInClientName={loggedInClient?.name || ""}
                 />
               )
             )}
@@ -262,6 +269,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
                 eventInfo={eventInfo}
                 href="transferred"
                 key={ticket.purchaseTicketId}
+                loggedInClientName={loggedInClient?.name || ""}
               />
             ))}
           </div>
@@ -285,6 +293,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
                   href="transferred"
                   key={ticket.purchaseTicketId}
                   isPendingToPay={true}
+                  loggedInClientName={loggedInClient?.name || ""}
                 />
               ))}
             </div>
