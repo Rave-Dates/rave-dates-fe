@@ -2,6 +2,7 @@
 
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { useAdminBinnacles, useAdminEvent, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
+import { CircularProgress } from "@/components/roles/organizer/create-event/ProgressCircular";
 import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -54,6 +55,26 @@ export default function EventBalance({eventId}: { eventId: number }) {
         <div className="max-w-xl pt-24 mx-auto animate-fade-in">
           <h1 className="text-title font-semibold">Saldo y movimientos</h1>
           <h2 className="text-xl text-primary">{selectedEvent?.title}</h2>
+
+          {/* Asistentes / Aforo Stats */}
+          <div className="py-4 space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between bg-cards-container rounded-lg py-2 px-4">
+                <div>
+                  <div className="text-text-inactive text-sm">Asistentes / Aforo</div>
+                  <div className="text-primary-white text-xl font-medium">
+                    {ticketMetricsToUse?.ticketsPurchased}/{ticketMetricsToUse?.totalTickets}
+                  </div>
+                </div>
+                {
+                  ticketMetricsToUse?.totalTickets && ticketMetricsToUse?.ticketsPurchased ?
+                  <CircularProgress current={ticketMetricsToUse?.ticketsPurchased} total={ticketMetricsToUse?.totalTickets} />
+                  :
+                  <CircularProgress current={0} total={100} />
+                }
+              </div>
+            </div>
+          </div>
 
           {/* Users Table/List */}
           <div className="rounded-md overflow-hidden mt-5">

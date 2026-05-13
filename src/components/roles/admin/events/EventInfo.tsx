@@ -1,5 +1,6 @@
 "use client"
 
+import { CircularProgress } from "@/components/roles/organizer/create-event/ProgressCircular"
 import { DropdownItem } from "@/components/roles/admin/events/DropDownItem"
 import { StageItem } from "@/components/roles/admin/events/StageItem"
 import UserSvg from "@/components/svg/UserSvg"
@@ -153,6 +154,24 @@ export default function EventInfo() {
         <div className="flex justify-between text-xl font-medium items-center mb-4">
           <h1>Asistentes totales</h1>
           <span>{ticketMetricsToUse?.ticketsPurchased.toLocaleString()}</span>
+        </div>
+
+        {/* Asistentes / Aforo Stats */}
+        <div className="space-y-6 mb-6">
+          <div className="flex items-center justify-between bg-cards-container rounded-lg py-2 px-4">
+            <div>
+              <div className="text-text-inactive text-sm">Asistentes / Aforo</div>
+              <div className="text-primary-white text-xl font-medium">
+                {ticketMetricsToUse?.ticketsPurchased}/{ticketMetricsToUse?.totalTickets}
+              </div>
+            </div>
+            {
+              ticketMetricsToUse?.totalTickets && ticketMetricsToUse?.ticketsPurchased ?
+              <CircularProgress current={ticketMetricsToUse?.ticketsPurchased} total={ticketMetricsToUse?.totalTickets} />
+              :
+              <CircularProgress current={0} total={100} />
+            }
+          </div>
         </div>
 
         {/* Dropdown Sections */}
