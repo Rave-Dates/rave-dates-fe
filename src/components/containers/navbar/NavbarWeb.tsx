@@ -75,12 +75,12 @@ const NavbarWeb: React.FC = () => {
       <div className="h-full flex items-center justify-center gap-8 xl:gap-40">
         <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 xl:gap-12 w-full md:w-[70%] xl:w-[60%]">
           <Link href="/" className='hidden md:block'>
-            <Image className='w-14 h-14' src="/logo.svg" width={1000} height={1000} alt="logo" />
+            <Image className='w-17 h-17' src="/logo-v2.svg" width={1000} height={1000} alt="logo" />
           </Link>
           <div className='flex flex-col sm:flex-row items-center gap-y-3 gap-x-3 w-full sm:w-[85%] lg:w-[70%]'>
             <div className='flex items-center gap-2 w-full'>
               <Link href="/" className='md:hidden block'>
-                <Image className='w-14 h-14' src="/logo.svg" width={1000} height={1000} alt="logo" />
+                <Image className='w-17 h-17' src="/logo-v2.svg" width={1000} height={1000} alt="logo" />
               </Link>
               <SearchInput
                 placeholder="Busca un evento"

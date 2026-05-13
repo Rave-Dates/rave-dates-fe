@@ -36,8 +36,8 @@ export default function Contact() {
       `}>
         <Link href="/">
           <Image 
-            className="w-14"
-            src="/logo.svg"
+            className="w-20"
+            src="/logo-v2.svg"
             width={1000}
             height={1000}
             alt="logo"
