@@ -17,7 +17,8 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
-import { useClientEvent, useClientEventServedOneImage } from "@/hooks/client/queries/useClientData";
+import { useClientEvent, useClientEventServedOneImage, useClientGetById } from "@/hooks/client/queries/useClientData";
+import { jwtDecode } from "jwt-decode";
 
 const TicketTransferForm = ({
   purchaseTicketId,
@@ -34,6 +35,9 @@ const TicketTransferForm = ({
   const { selectedEvent, isEventLoading } = useClientEvent(eventId);
   const { servedImageUrl, isImageLoading } = useClientEventServedOneImage(eventId);
 
+  const decoded: { id: number } | null = clientToken ? jwtDecode(clientToken.toString()) : null;
+  const { clientData } = useClientGetById({ clientId: decoded?.id, clientToken });
+
   const { register, handleSubmit, control } = useForm<ITransferUser>();
 
   const { mutate } = useMutation({
@@ -48,6 +52,17 @@ const TicketTransferForm = ({
   });
 
   const onSubmit = (data: ITransferUser) => {
+    // Prevent self-transfer by email
+    if (clientData?.email && data.email.trim().toLowerCase() === clientData.email.trim().toLowerCase()) {
+      notifyError("No puedes transferir un ticket a tu propio email");
+      return;
+    }
+    // Prevent self-transfer by WhatsApp
+    if (clientData?.whatsapp && data.whatsapp && data.whatsapp.replace(/\D/g, "") === clientData.whatsapp.replace(/\D/g, "")) {
+      notifyError("No puedes transferir un ticket a tu propio WhatsApp");
+      return;
+    }
+
     mutate({
       ticketData: {
         email: data.email,
