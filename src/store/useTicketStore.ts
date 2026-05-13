@@ -3,6 +3,7 @@ import { create } from 'zustand';
 type TicketStore = {
   eventId: number;
   pendingPaymentAmount: number;
+  promoterClientId: number | null;
   selected: Record<string, { quantity: number; stage: TicketStage }>;
   setEventId: (eventId: number) => void;
   add: (ticket: TicketStage) => void;
@@ -11,14 +12,17 @@ type TicketStore = {
   setSelected: (tickets: TicketStage[]) => void;
   replaceSelected: (tickets: TicketStage[]) => void;
   setPendimPaymentAmount: (amount: number) => void;
+  setPromoterClientId: (clientId: number | null) => void;
 };
 
 export const useTicketStore = create<TicketStore>((set, get) => ({
   pendingPaymentAmount: 0,
   selected: {},
   eventId: 0,
+  promoterClientId: null,
   resetSelected: () => set({ selected: {} }),
   setEventId: (eventId) => set({ eventId }),
+  setPromoterClientId: (clientId) => set({ promoterClientId: clientId }),
   add: (stage) => {
     const current = get().selected[stage.ticketTypeId || 0];
     const quantity = current ? current.quantity : 0;

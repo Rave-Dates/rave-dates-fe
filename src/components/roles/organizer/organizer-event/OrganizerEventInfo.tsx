@@ -16,9 +16,11 @@ import { useMutation } from "@tanstack/react-query"
 import { CookieValueTypes } from "cookies-next"
 import { jwtDecode } from "jwt-decode"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import OrganizerEventAttendees from "../create-event/OrganizerEventAttendees"
+import { useTicketStore } from "@/store/useTicketStore"
 
 type Props = {
   eventId: number;
@@ -31,14 +33,22 @@ type Props = {
 export default function OrganizerEventInfo({ eventId, token, isPromoter = false, isPromoterBinnacle, promoterId }: Props) {
   const [expandedSections, setExpandedSections] = useState<string[]>([])
   const [clientId, setClientId] = useState<number | null>(null);
+  const [buyClientId, setBuyClientId] = useState<number | null>(null);
   const [checkerLink, setCheckerLink] = useState<string>()
   const [globalExpandedSections, setGlobalExpandedSections] = useState<string[]>([])
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
+  const router = useRouter();
+  const { setEventId, setSelected, setPromoterClientId } = useTicketStore();
   const { register, handleSubmit, setValue, watch, getValues, reset } = useForm<{
     checkerData: string;
     eventId: number;
     ticketTypeMap: Record<number, string>;
     clientEmail: string;
+  }>();
+
+  const { register: registerBuy, handleSubmit: handleSubmitBuy, getValues: getValuesBuy } = useForm<{
+    buyClientEmail: string;
+    buyTicketTypeId: string;
   }>();
 
   const selectedTickets = watch("ticketTypeMap");
@@ -129,11 +139,52 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
     res.then((client) => {
       if (client.clientId) {
         setClientId(client.clientId);
+        console.log(client)
         notifySuccess("Cliente encontrado");
       }
     }).catch(() => {
       notifyError("No se encontró el cliente");
     });
+  };
+
+  const onBuyClientSearch = (data: { buyClientEmail: string }) => {
+    const res = getClientByEmail({ token, email: data.buyClientEmail });
+    res.then((client) => {
+      if (client.clientId) {
+        setBuyClientId(client.clientId);
+        notifySuccess("Cliente encontrado");
+      }
+    }).catch(() => {
+      notifyError("No se encontró el cliente");
+    });
+  };
+
+  const handleGoToCheckout = () => {
+    const buyTicketTypeId = getValuesBuy("buyTicketTypeId");
+    if (!buyClientId) {
+      notifyError("Primero debes seleccionar un cliente");
+      return;
+    }
+    if (!buyTicketTypeId) {
+      notifyError("Debes seleccionar un tipo de ticket");
+      return;
+    }
+    const selectedTicket = ticketTypes?.find(t => String(t.ticketTypeId) === String(buyTicketTypeId));
+    if (!selectedTicket) {
+      notifyError("Ticket no encontrado");
+      return;
+    }
+    // Prepare the ticket store with the selected event and ticket
+    setEventId(eventId);
+    setPromoterClientId(buyClientId);
+    const stage: TicketStage = {
+      ...selectedTicket.stages[0],
+      ticketTypeId: selectedTicket.ticketTypeId,
+      price: selectedTicket.stages[0]?.price ?? 0,
+      quantity: selectedTicket.stages[0]?.quantity ?? 0,
+    };
+    setSelected([stage]);
+    router.push("/checkout");
   };
 
   const onComplimentarySubmit = () => {
@@ -453,6 +504,50 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                   </button>
                 </form>
               </div> 
+            </div>
+            <div className="bg-input mt-2 rounded-lg px-3 py-2">
+              <h1 className="font-medium px-2 mt-2">Comprar tickets para cliente</h1>
+              <div className="border-t-2 flex flex-col gap-y-3 pt-3 mt-3 px-2 pb-2 border-dashed border-inactive">
+                <form onSubmit={handleSubmitBuy(onBuyClientSearch, onInvalid)} className="flex gap-x-4 justify-between items-end">
+                  <FormInput
+                    title="Email del cliente*"
+                    inputName="buyClientEmail"
+                    type="email"
+                    register={registerBuy("buyClientEmail", { required: "Debes ingresar el email del cliente" })}
+                    placeholder="ejemplo@ejemplo.com"
+                  />
+                  <button
+                    type="submit"
+                    className="border border-primary hover:opacity-75 transition-opacity px-[21.5px] py-3.5 font-medium text-primary rounded-lg text-sm"
+                  >
+                    Buscar
+                  </button>
+                </form>
+                {buyClientId && (
+                  <p className="text-xs text-green-400 px-1">✓ Cliente seleccionado (ID: {buyClientId})</p>
+                )}
+                <div className="flex gap-x-4 justify-between items-end">
+                  <FormDropDown
+                    labelClassname="!mb-0"
+                    title="Tipos de tickets*"
+                    register={registerBuy("buyTicketTypeId")}
+                  >
+                    <option value="" disabled selected>Selecciona un tipo de ticket</option>
+                    {ticketTypes?.map((ticket) => (
+                      <option key={ticket.ticketTypeId} value={ticket.ticketTypeId}>
+                        {ticket.name}
+                      </option>
+                    ))}
+                  </FormDropDown>
+                  <button
+                    type="button"
+                    onClick={handleGoToCheckout}
+                    className="border border-primary hover:opacity-75 transition-opacity px-4 py-3.5 font-medium text-primary rounded-lg text-sm whitespace-nowrap"
+                  >
+                    Ir a compra
+                  </button>
+                </div>
+              </div>
             </div>
             <div className="space-y-2 mt-2 w-full">
               {promoterTicketMetrics?.ticketsTypesMetrics.map((data) => (

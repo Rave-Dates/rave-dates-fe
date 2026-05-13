@@ -24,7 +24,7 @@ export default function Checkout() {
   const [selectedPayment, setSelectedPayment] = useState<"Pago total" | "Abonar a la alcancía">("Pago total");
   const [selectedMethod, setSelectedMethod] = useState<"Nequi" | "Bold" | "Ninguno">("Nequi");
   const [hasDiscountFlag, setHasDiscountFlag] = useState<boolean>(false);
-  const { selected, eventId } = useTicketStore();
+  const { selected, eventId, promoterClientId } = useTicketStore();
   const { eventTickets } = useClientEventTickets(eventId);
   const { 
     oldTickets,
@@ -112,7 +112,6 @@ export default function Checkout() {
   }
 
   const handleContinue = async () => {
-    if (!clientToken && !tempToken) return
 
     if (isChangeTickets && decoded) {
       const formattedOldTickets = []
@@ -202,7 +201,8 @@ export default function Checkout() {
       promoterId: decodedPromoterAffiliate && decodedPromoterAffiliate.promoterId || undefined,
       isPartial: selectedPayment === "Abonar a la alcancía",
       amount: selectedPayment === "Abonar a la alcancía" ? watchedPartialAmount : 0,
-      clientId: (decoded && decoded.id ) || (decodedTemp && decodedTemp.id) || 0,
+      // If a promoter selected a client, use that client's ID; otherwise use the logged-in client's ID
+      clientId: promoterClientId || (decoded && decoded.id) || (decodedTemp && decodedTemp.id) || 0,
       returnUrl: urlToReturn,
       boldMethod: selectedMethod.toUpperCase() === "BOLD" ? ["CREDIT_CARD"] : ["NEQUI"],
       payWithBalance: check,
