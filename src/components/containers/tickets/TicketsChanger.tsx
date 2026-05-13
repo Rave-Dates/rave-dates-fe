@@ -12,7 +12,7 @@ import {
 } from "@/services/clients-events";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { generateTicketImage } from "./generateTicketImage";
-import { useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
+import { useClientEventTickets, useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
 import { notifyError } from "@/components/ui/toast-notifications";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useChangeTicketStore } from "@/store/useChangeTicketStore";
@@ -43,7 +43,6 @@ export default function TicketsChanger({ eventInfo }: Props) {
     clientToken: token,
   });
 
-  console.log("purchasedTickets", purchasedTickets)
   const { setEventId, setPendimPaymentAmount } = useTicketStore();
   const router = useRouter();
   const params = useParams();
@@ -55,6 +54,11 @@ export default function TicketsChanger({ eventInfo }: Props) {
     resetOldTicketsPriceTotal,
     resetSubtracted,
   } = useChangeTicketStore();
+
+  
+  const clientTickets = useClientEventTickets(eventId)
+  const totalClientTickets = clientTickets.eventTickets?.length
+  
 
   // Reinicia todos los stores de tickets al montar para asegurar un estado limpio al volver de los flujos de mejora
   useEffect(() => {
@@ -315,12 +319,15 @@ export default function TicketsChanger({ eventInfo }: Props) {
             </>
           </>
         ) : null}
-        <Link
-          href={`${pathname}/change-tickets`}
-          className="block text-center w-full bg-primary text-primary-white font-medium py-3 rounded-lg mb-3 mt-10 hover:opacity-80 transition-opacity"
-        >
-          Mejorar tickets
-        </Link>
+        {
+          totalClientTickets && totalClientTickets > 1 &&
+          <Link
+            href={`${pathname}/change-tickets`}
+            className="block text-center w-full bg-primary text-primary-white font-medium py-3 rounded-lg mb-3 mt-10 hover:opacity-80 transition-opacity"
+          >
+            Mejorar tickets
+          </Link>
+        }
       </div>
     </div>
   );

@@ -15,7 +15,7 @@ import { useTicketStore } from "@/store/useTicketStore";
 import { useClientGetById, useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
 import { useChangeTicketStore } from "@/store/useChangeTicketStore";
 import ChangeTicketButtons from "@/components/ui/buttons/ChangeTicketButtons";
-import { notifySuccess } from "@/components/ui/toast-notifications";
+import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
 
 const ChangeTicketsView = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,6 +56,14 @@ const ChangeTicketsView = () => {
     },
     enabled: !!clientToken,
   });
+
+  // Guard: redirect back if there is only one ticket type (no upgrade options)
+  useEffect(() => {
+    if (ticketTypes === undefined) return; // still loading
+    if (ticketTypes.length <= 1) {
+      router.back();
+    }
+  }, [ticketTypes]);
 
 
   // Lista memorizada de IDs de compra que contienen tickets elegibles para mejora
