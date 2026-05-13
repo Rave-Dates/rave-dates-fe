@@ -37,14 +37,14 @@ export default function AssignEvent({ isOrganizer = false }: { isOrganizer?: boo
   const assignOrganizerEvent = useMutation<void, Error, {data: {organizerId: number | null | undefined}, eventId: number}>({
     mutationFn: ({data, eventId}) => assignOrganizerToEvent(token, data, eventId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`assignedEvent-${userId}`] });
+      queryClient.invalidateQueries({ queryKey: ["user", userId] });
     },
   });
 
   const assignPromoterEvent = useMutation<void, Error, {data: {promoters: {promoterId: number }[]}, eventId: number}>({
     mutationFn: ({data, eventId}) => assignPromoterToEvent(token, data, eventId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`assignedEvent-${userId}`] });
+      queryClient.invalidateQueries({ queryKey: ["user", userId] });
     },
   });
   

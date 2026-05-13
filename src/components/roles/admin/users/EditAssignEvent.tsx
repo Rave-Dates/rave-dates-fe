@@ -44,14 +44,14 @@ export default function EditAssignEvent({ isOrganizer = false }: { isOrganizer?:
   const deleteOrganizerEventMutation = useMutation<void, Error, {data: {organizerId: number | null | undefined}, eventId: number}>({
     mutationFn: ({data, eventId}) => deleteOrganizerEvent(token, data, eventId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`assignedEvent-${userId}`] });
+      queryClient.invalidateQueries({ queryKey: ["user", userId] });
     },
   });
 
   const deletePromoterEventMutation = useMutation<void, Error, {data: {promoters: {promoterId: number }[]}, eventId: number}>({
     mutationFn: ({data, eventId}) => deletePromoterEvent(token, data, eventId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`assignedEvent-${userId}`] });
+      queryClient.invalidateQueries({ queryKey: ["user", userId] });
     },
   });
   
@@ -62,7 +62,7 @@ export default function EditAssignEvent({ isOrganizer = false }: { isOrganizer?:
   });
 
   const { data: selectedUser } = useQuery<IUser>({
-    queryKey: ["user"],
+    queryKey: ["user", userId],
     queryFn: () => getUserById({ token, id: userId }),
     enabled: !!token, // solo se ejecuta si hay token
   });
@@ -188,6 +188,7 @@ export default function EditAssignEvent({ isOrganizer = false }: { isOrganizer?:
         );
       }
 
+      queryClient.invalidateQueries({ queryKey: ["user", userId] });
       notifySuccess("Asignación actualizada correctamente");
       router.back();
     } catch (err) {

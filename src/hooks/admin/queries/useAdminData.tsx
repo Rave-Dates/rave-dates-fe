@@ -234,7 +234,7 @@ export function useAdminAllPromoters({ token, organizerId }: { token: CookieValu
 
 export function useAdminUserById({ token, userId }: { token: CookieValueTypes, userId: number | undefined | null }) {
   const { data, isPending } = useQuery({
-    queryKey: ["user"],
+    queryKey: ["user", userId],
     queryFn: () => getUserById({ token, id: userId! }),
     enabled: !!token && !!userId,
   });
