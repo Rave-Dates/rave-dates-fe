@@ -5,6 +5,7 @@ import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { parseISODate } from "@/utils/formatDate";
 import { useReactiveCookiesNext } from "cookies-next";
+import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -15,16 +16,24 @@ export default function OrganizerPromoterEvents({ userId }: {userId: number}) {
   const pathname = usePathname();
   
   const token = getCookie("token");
+  const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
+  
 
   const { data } = useAdminUserById({ token, userId });
+  const { data: organizer } = useAdminUserById({ token, userId: decoded?.id ?? 0 });
+
 
   useEffect(() => {
     if (data?.role.name === "ORGANIZER" && data.organizer) {
       setAssignedEvents(data.organizer.events);
     } else if (data?.role.name === "PROMOTER" && data.promoter) {
-      setAssignedEvents(data.promoter.events);
+      const organizerEventIds = new Set(
+        organizer?.organizer?.events.map((e) => e.eventId) ?? []
+      );
+      const filteredEvents = data.promoter.events.filter((event) => organizerEventIds.has(event.eventId));
+      setAssignedEvents(filteredEvents);
     }
-  }, [data]);
+  }, [data, organizer]);
 
   useEffect(() => {
     console.log(assignedEvents)
