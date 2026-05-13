@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { assignOrganizerToEvent, assignPromoterToEvent, createImage, deleteImage, editEvent, editEventCategories, editTicketTypes, getEventImages } from "../../../services/admin-events";
+import { assignOrganizerToEvent, assignPromoterToEvent, createImage, createTicketTypes, deleteImage, editEvent, editEventCategories, editTicketTypes, getEventImages } from "../../../services/admin-events";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
@@ -43,13 +43,18 @@ export function useEditEvent(reset: (data: IEventFormData) => void) {
 
       // console.log("eventId",eventId)
 
-      // 2. Editar los tickets
+      // 2. Editar o crear los tickets
       console.log("tickets desde hook",tickets)
       await Promise.all(
-        tickets.map(({ ticketTypeId, ...rest }) => {
+        tickets.map(({ ticketTypeId, ticketId, ...rest }) => {
           const ticketValues = { ...rest };
-          if (!ticketTypeId) return;
-          return editTicketTypes(token, ticketValues, ticketTypeId);
+          if (ticketTypeId) {
+            // Ticket existente → editar
+            return editTicketTypes(token, ticketValues, ticketTypeId);
+          } else {
+            // Ticket nuevo → crear
+            return createTicketTypes(token, { ...ticketValues, eventId });
+          }
         })
       );
 

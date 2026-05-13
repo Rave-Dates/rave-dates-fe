@@ -16,7 +16,7 @@ export default function StageConfig() {
   const eventId = Number(params.eventId)
 
   const currentTicketIndex = eventFormData.tickets?.findIndex(
-    (t) => t.ticketTypeId === editingTicketId
+    (t) => (t.ticketTypeId ?? t.ticketId) === editingTicketId
   );
 
   const currentStages = eventFormData.tickets?.[currentTicketIndex!]?.stages || [];
@@ -93,7 +93,7 @@ export default function StageConfig() {
     // También actualiza el estado global (Zustand)
     if (!eventFormData.tickets) return
     const updatedTickets = [...eventFormData.tickets];
-    const ticketIndex = updatedTickets.findIndex(t => t.ticketTypeId === editingTicketId);
+    const ticketIndex = updatedTickets.findIndex(t => (t.ticketTypeId ?? t.ticketId) === editingTicketId);
 
     if (ticketIndex !== -1) {
       updatedTickets[ticketIndex] = {
@@ -117,7 +117,7 @@ export default function StageConfig() {
     // 2. Eliminar del estado global (Zustand)
     if (!eventFormData.tickets) return
     const updatedTickets = [...eventFormData.tickets];
-    const ticketIndex = updatedTickets.findIndex(t => t.ticketTypeId === editingTicketId);
+    const ticketIndex = updatedTickets.findIndex(t => (t.ticketTypeId ?? t.ticketId) === editingTicketId);
 
     if (ticketIndex !== -1) {
       // Obtenemos los stages actuales del form (que ya no tienen el eliminado)

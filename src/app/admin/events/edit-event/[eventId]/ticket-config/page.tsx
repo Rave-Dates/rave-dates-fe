@@ -23,7 +23,7 @@ export default function EditTicketConfiguration() {
   const route = useRouter()
   const { mutate: editEvent } = useEditEvent(reset)
 
-  const { fields, remove } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
     name: "tickets",
   })
@@ -168,16 +168,51 @@ export default function EditTicketConfiguration() {
     route.push("/admin/events/assign-promoters");
   }
 
+  const handleAddTicket = () => {
+    const formTickets = getValues("tickets") || [];
+    const today = new Date();
+    const yyyyMmDd = today.toISOString().split('T')[0];
+    const nextDate = eventFormData.date || "";
+    const newId = (formTickets.at(-1)?.ticketId ?? 0) + 1;
+
+    const newTicket: IEventTicket = {
+      ticketId: newId,
+      ticketTypeId: undefined,
+      name: '',
+      maxDate: nextDate,
+      stages: [
+        {
+          stageId: 1,
+          date: yyyyMmDd,
+          dateMax: nextDate,
+          price: undefined,
+          quantity: undefined,
+          promoterFee: undefined,
+          feeType: "percentage",
+        },
+      ],
+    };
+
+    append(newTicket);
+
+    const updatedTickets = [...(eventFormData.tickets || []), newTicket];
+    updateEventFormData({
+      ...eventFormData,
+      tickets: updatedTickets,
+    });
+  };
+
   const handleDeleteTicket = (index: number) => {
     if (fields.length === 1) return
 
     const formTickets = getValues("tickets")
-    const ticketIdToDelete = formTickets?.[index]?.ticketTypeId
+    const ticketToDelete = formTickets?.[index]
+    const ticketIdToDelete = ticketToDelete?.ticketTypeId ?? ticketToDelete?.ticketId
 
     remove(index)
 
     const updatedTickets = eventFormData?.tickets?.filter(
-      (ticket) => ticket.ticketTypeId !== ticketIdToDelete
+      (ticket) => (ticket.ticketTypeId ?? ticket.ticketId) !== ticketIdToDelete
     )
 
     updateEventFormData({
@@ -199,14 +234,22 @@ export default function EditTicketConfiguration() {
               register={register}
               control={control}
               index={index}
-              isEditing={true}
+              isEditing={!!ticket.ticketTypeId}
               key={ticket.id}
-              ticketNumber={ticket.ticketTypeId}
+              ticketNumber={ticket.ticketTypeId ?? ticket.ticketId}
               onDelete={() => handleDeleteTicket(index)}
               eventDate={eventFormData.date}
             />
           ))}
         </div>
+
+        <button
+          type="button"
+          onClick={handleAddTicket}
+          className="w-full bg-primary outline-none text-primary-white font-medium py-3 rounded-lg text-sm flex items-center justify-center gap-2"
+        >
+          + Incorporar ticket
+        </button>
 
         <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4 pt-4">
           {/* Inputs de configuración */}
