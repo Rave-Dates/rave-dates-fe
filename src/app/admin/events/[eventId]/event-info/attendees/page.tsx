@@ -2,7 +2,7 @@
 
 import AddSvg from "@/components/svg/AddSvg";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DefaultButton from "@/components/ui/buttons/DefaultButton";
 import UserSvg from "@/components/svg/UserSvg";
 import { useReactiveCookiesNext } from "cookies-next";
@@ -12,6 +12,8 @@ import SearchInput from "@/components/ui/inputs/search-input/SearchInput";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { exportGuestsToExcel } from "@/utils/exportExcel";
 import { notifyError } from "@/components/ui/toast-notifications";
+import { useDebounce } from "@/hooks/useDebounce";
+import { searchCheckerUser } from "@/services/admin-users";
 
 import DownloadAttendeesCSVButton from "@/components/ui/buttons/DownloadAttendeesCSVButton";
 
@@ -32,20 +34,33 @@ export default function UsersList() {
 
   console.log(ticketMetrics)
 
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  useEffect(() => {
+    const fetchSearch = async () => {
+      if (debouncedSearchTerm.length === 0) {
+        setResults([]);
+        return;
+      }
+
+      try {
+        const user = await searchCheckerUser({ token, eventId, search: debouncedSearchTerm });
+        if (user) {
+          setResults([user]);
+        } else {
+          setResults([]);
+        }
+      } catch (error) {
+        console.error("Search error:", error);
+        setResults([]);
+      }
+    };
+
+    fetchSearch();
+  }, [debouncedSearchTerm, token, eventId]);
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-
-    if (term.length === 0) {
-      setResults([]);
-      return;
-    }
-
-    const filtered = guests?.filter((event) =>
-      event.name.toLowerCase().includes(term.toLowerCase())
-    ) || [];
-
-    setResults(filtered);
+    setSearchTerm(e.target.value);
   };
   
   const ITEMS_PER_PAGE = 10;

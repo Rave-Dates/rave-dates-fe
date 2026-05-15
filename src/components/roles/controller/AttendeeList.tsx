@@ -7,6 +7,8 @@ import SearchInput from "@/components/ui/inputs/search-input/SearchInput";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { notifyError } from "@/components/ui/toast-notifications";
+import { searchCheckerUser } from "@/services/admin-users";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function AttendeeList({ eventId }: { eventId: number }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,21 +34,33 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
     eventId,
   });
 
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  useEffect(() => {
+    const fetchSearch = async () => {
+      if (debouncedSearchTerm.length === 0) {
+        setResults([]);
+        return;
+      }
+
+      try {
+        const user = await searchCheckerUser({ token, eventId, search: debouncedSearchTerm });
+        if (user) {
+          setResults([user]);
+        } else {
+          setResults([]);
+        }
+      } catch (error) {
+        console.error("Search error:", error);
+        setResults([]);
+      }
+    };
+
+    fetchSearch();
+  }, [debouncedSearchTerm, token, eventId]);
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-
-    if (term.length === 0) {
-      setResults([]);
-      return;
-    }
-
-    const filtered =
-      checkerUsers?.filter((user) =>
-        user.name.toLowerCase().includes(term.toLowerCase())
-      ) || [];
-
-    setResults(filtered);
+    setSearchTerm(e.target.value);
   };
 
   const handleClick = () => {

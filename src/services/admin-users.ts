@@ -30,6 +30,18 @@ export const getAllCheckerUsers = async ({token, eventId}: { token: CookieValueT
   return data;
 };
 
+export const searchCheckerUser = async ({token, eventId, search}: { token: CookieValueTypes | Promise<CookieValueTypes>, eventId: number, search: string }) => {
+  const res = await axios.get(`${BASE_URL}/admin/clients/checker-list/${eventId}/findClient?search=${search}`, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  // Si backend devuelve un solo usuario, lo retornamos
+  const data: IGuest = res.data;
+  return data;
+};
+
 export const getAllPromoters = async ({token, organizerId}: { token: CookieValueTypes, organizerId: number }) => {
   const res = await axios.get(`${BASE_URL}/admin/users/promoters?organizerId=${organizerId}`, {
     headers: {
