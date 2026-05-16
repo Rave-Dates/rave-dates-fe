@@ -12,7 +12,7 @@ import {
 } from "@/services/clients-events";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { generateTicketImage } from "./generateTicketImage";
-import { useClientEventTickets, useClientGetById, useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
+import { useClientEvent, useClientEventTickets, useClientGetById, useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
 import { notifyError } from "@/components/ui/toast-notifications";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useChangeTicketStore } from "@/store/useChangeTicketStore";
@@ -61,6 +61,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
   } = useChangeTicketStore();
 
   
+  const { selectedEvent } = useClientEvent(eventId);
   const clientTickets = useClientEventTickets(eventId)
   const totalClientTickets = clientTickets.eventTickets?.length
   
@@ -221,6 +222,12 @@ export default function TicketsChanger({ eventInfo }: Props) {
       <div className="space-y-6">
         {/* My Tickets Section */}
         <div>
+          {selectedEvent?.transferCost && selectedEvent.transferCost > 0 ? (
+            <div className="bg-cards-container rounded-lg p-4 mb-4 text-sm text-primary-white/80">
+              Este evento tiene un costo de transferencia de <span className="text-primary font-bold">${selectedEvent.transferCost.toLocaleString()} COP</span>
+            </div>
+          ):
+          null}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-medium">Mis tickets</h2>
               <button

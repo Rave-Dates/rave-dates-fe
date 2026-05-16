@@ -41,7 +41,7 @@ const TicketTransferForm = ({
 
   const { register, handleSubmit, control } = useForm<ITransferUser>();
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: transferTickets,
     onSuccess: () => {
       notifySuccess("Transferido correctamente");
@@ -87,6 +87,7 @@ const TicketTransferForm = ({
         whatsapp: data.whatsapp,
         idCard: data.idCard,
         name: data.name,
+        method: "BOLD"
       },
       purchaseTicketId: purchaseTicketId,
       clientToken: clientToken,
@@ -169,8 +170,13 @@ const TicketTransferForm = ({
         Enviaremos los tickets vía email y/o WhatsApp
       </p>
 
-      <button type="submit" className="bg-primary text-primary-white input-button">
-        Transferir
+      <button 
+        type="submit" 
+        className="bg-primary text-primary-white input-button flex items-center justify-center gap-x-2 disabled:opacity-70 disabled:pointer-events-none"
+        disabled={isPending}
+      >
+        {isPending && <SpinnerSvg className="fill-primary-white text-inactive w-5 h-5" />}
+        {isPending ? "Transfiriendo..." : "Transferir"}
       </button>
     </DefaultForm>
   );

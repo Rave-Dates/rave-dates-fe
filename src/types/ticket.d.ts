@@ -96,6 +96,7 @@ interface ITransferUser {
   // Nuevos valores, solo cuando la transferencia tiene costo
   boldMethod?: object | string | string[];
   returnUrl?: string;
+  method?: "BOLD" | "NEQUI" | string;
 }
 
 interface IComplimentaryPurchase {
