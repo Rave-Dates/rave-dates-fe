@@ -175,7 +175,7 @@ export default function Checkout() {
       const ticketData = {
         method: "BOLD",
         boldMethod: "CREDIT_CARD",
-        // returnUrl: `${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets/event-ticket/${eventId}`,
+        returnUrl: `${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets/event-ticket/${eventId}`,
       };
 
       notifyPending(
