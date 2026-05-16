@@ -50,7 +50,7 @@ export default function Checkout() {
   const watchedPartialAmount = watch("partialAmount") || 0;
   const watchedDiscountCode = watch("discountCode") || "";
 
-  const { getCookie } = useReactiveCookiesNext();
+  const { getCookie, deleteCookie } = useReactiveCookiesNext();
   const isChangeTickets = searchParams.get("change-tickets");
   const pendingPaymentPurchaseId = searchParams.get("pp");
   const promoterAffiliate = getCookie("promoterAffiliate");
@@ -59,9 +59,10 @@ export default function Checkout() {
   const tempToken = getCookie("tempToken");
   const isPromoter = getCookie("isPromoter");
 
-  const decoded: {id: number} | null = clientToken && jwtDecode(clientToken?.toString()) || null;
+  const decoded: {id: number, promoterId: number} | null = clientToken && jwtDecode(clientToken?.toString()) || null;
   const decodedTemp: {id: number} | null = tempToken && jwtDecode(tempToken?.toString()) || null;
   const decodedPromoterAffiliate: {promoterId: number} | null = promoterAffiliate && jwtDecode(promoterAffiliate?.toString()) || null;
+  const decodedToken: {id: number, promoterId: number} | null = token && jwtDecode(token.toString()) || null;
 
   const { clientData } = useClientGetById({clientId: decoded?.id, clientToken: clientToken});
   const { selectedEvent } = useClientEvent(eventId);
@@ -174,7 +175,7 @@ export default function Checkout() {
       const ticketData = {
         method: "BOLD",
         boldMethod: "CREDIT_CARD",
-        returnUrl: `${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets/event-ticket/${eventId}`,
+        // returnUrl: `${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets/event-ticket/${eventId}`,
       };
 
       notifyPending(
@@ -238,7 +239,7 @@ export default function Checkout() {
         quantity: selected[ticketTypeId].quantity,
         ticketTypeId: Number(ticketTypeId),
       })),
-      promoterId: decodedPromoterAffiliate && decodedPromoterAffiliate.promoterId || undefined,
+      promoterId: decodedPromoterAffiliate ? decodedPromoterAffiliate.promoterId : isPromoter ? decodedToken?.promoterId : promoterClientId ? decoded?.promoterId : undefined,
       isPartial: selectedPayment === "Abonar a la alcancía",
       amount: selectedPayment === "Abonar a la alcancía" ? watchedPartialAmount : 0,
       // If a promoter selected a client, use that client's ID; otherwise use the logged-in client's ID
@@ -288,6 +289,12 @@ export default function Checkout() {
     onSuccess: (data) => {
       notifySuccess("Transacción iniciada correctamente");
       console.log("data", data);
+
+      if (isPromoter || promoterAffiliate) {
+        deleteCookie("isPromoter", { path: "/" });
+        deleteCookie("promoterAffiliate", { path: "/" });
+      }
+
       if (data === "PAY NOT NEEDED") {
         notifySuccess("No se necesita pagar")
         router.push(urlToReturn)

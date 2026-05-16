@@ -27,7 +27,7 @@ const TicketSelector = ({
   eventInfo,
 }: Props) => {
   const { selected } = useTicketStore();
-  const { getCookie } = useReactiveCookiesNext();
+  const { getCookie, deleteCookie } = useReactiveCookiesNext();
   const tempToken = getCookie("tempToken");
   const clientToken = getCookie("clientToken");
   const router = useRouter();
@@ -66,6 +66,7 @@ const TicketSelector = ({
   const { mutate: purchaseFreeTicketMutation } = useMutation({
     mutationFn: purchaseFreeTicket,
     onSuccess: () => {
+      deleteCookie("promoterAffiliate", { path: "/" });
       notifySuccess("Compra gratuita realizada correctamente");
       router.push('/tickets');
     },
