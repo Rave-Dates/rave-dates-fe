@@ -8,9 +8,10 @@ import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { changeTicketPurchase, initTicketPurchase, initPromoterTicketPurchase, partialPurchase } from "@/services/clients-tickets";
+import { changeTicketPurchase, initTicketPurchase, partialPurchase, transferTickets } from "@/services/clients-tickets";
 import { useMutation } from "@tanstack/react-query";
 import { useTicketStore } from "@/store/useTicketStore";
+import { useTransferStore } from "@/store/useTransferStore";
 import { jwtDecode } from "jwt-decode";
 import { notifyError, notifyPending, notifySuccess } from "@/components/ui/toast-notifications";
 import { useClientEvent, useClientEventTickets, useClientGetById } from "@/hooks/client/queries/useClientData";
@@ -19,12 +20,17 @@ import { useForm } from "react-hook-form";
 import { useChangeTicketStore } from "@/store/useChangeTicketStore";
 import { useQuery } from "@tanstack/react-query";
 import { getAdminConfig } from "@/services/admin-parameters";
+import { initPromoterTicketPurchase } from "@/services/admin-payments";
 
 export default function Checkout() {
   const [selectedPayment, setSelectedPayment] = useState<"Pago total" | "Abonar a la alcancía">("Pago total");
   const [selectedMethod, setSelectedMethod] = useState<"Nequi" | "Bold" | "Ninguno">("Nequi");
   const [hasDiscountFlag, setHasDiscountFlag] = useState<boolean>(false);
-  const { selected, eventId, promoterClientId } = useTicketStore();
+  const searchParams = useSearchParams();
+  const isTransfer = searchParams.get("transfer");
+  const { selected, eventId: ticketStoreEventId, promoterClientId } = useTicketStore();
+  const transferStoreEventId = useTransferStore((state) => state.eventId);
+  const eventId = isTransfer ? (transferStoreEventId ?? 0) : ticketStoreEventId;
   const { eventTickets } = useClientEventTickets(eventId);
   const { 
     oldTickets,
@@ -45,11 +51,11 @@ export default function Checkout() {
   const watchedDiscountCode = watch("discountCode") || "";
 
   const { getCookie } = useReactiveCookiesNext();
-  const searchParams = useSearchParams();
   const isChangeTickets = searchParams.get("change-tickets");
   const pendingPaymentPurchaseId = searchParams.get("pp");
   const promoterAffiliate = getCookie("promoterAffiliate");
   const clientToken = getCookie("clientToken");
+  const token = getCookie("token");
   const tempToken = getCookie("tempToken");
   const isPromoter = getCookie("isPromoter");
 
@@ -68,7 +74,7 @@ export default function Checkout() {
 
   const effectiveFeePercentage = selectedEvent?.feeBoldPorcentage ?? adminConfig?.feeBoldPorcentage ?? 0;
   
-  const totalAmount = Object.entries(selected).reduce((acc, [ticketTypeIdStr, selectedData]) => {
+  const totalAmount = searchParams.get("transfer") ? (selectedEvent?.transferCost || 0) : Object.entries(selected).reduce((acc, [ticketTypeIdStr, selectedData]) => {
     const ticketTypeId = Number(ticketTypeIdStr);
     const ticketInfo = eventTickets?.find(t => t.ticketTypeId === ticketTypeId);
     const price = selectedData.stage?.price || ticketInfo?.stages[0].price || 0;
@@ -191,6 +197,40 @@ export default function Checkout() {
       return
     }
 
+    const { transferData, purchaseTicketId: transferPurchaseTicketId } = useTransferStore.getState();
+
+    if (isTransfer && transferData && transferPurchaseTicketId && (clientToken || tempToken)) {
+      const dataToSubmit = {
+        ...transferData,
+        // boldMethod: selectedMethod.toUpperCase() === "BOLD" ? ["CREDIT_CARD"] : ["NEQUI"],
+        boldMethod: "",
+        method: selectedMethod.toUpperCase(),
+        returnUrl: `${process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_FRONT_URL_DEV : process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets/event-ticket/${eventId}`,
+      };
+
+      try {
+        const data = await transferTickets({ 
+          ticketData: dataToSubmit, 
+          purchaseTicketId: transferPurchaseTicketId, 
+          clientToken: (clientToken || tempToken) 
+        });
+
+        if (data && typeof data === 'string' && data.includes('http')) {
+          router.push(data);
+        } else {
+          router.push(`${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets`);
+        }
+      } catch (err: any) {
+        const errorMessage = err?.response?.data?.message || err?.response?.data || err.message || "Error desconocido";
+        console.error("====== TRANSFER ERROR ======");
+        console.error(errorMessage);
+        console.error("Payload:", dataToSubmit);
+        console.error("Full error:", err);
+        notifyError(String(errorMessage), 10000); // 10 seconds so the user can read it
+      }
+      return;
+    }
+
     const formattedTicketData: IClientPurchaseTicket = {
       method: "BOLD",
       eventId,
@@ -216,7 +256,8 @@ export default function Checkout() {
       new Promise((resolve, reject) => {
         mutate({
             ticketData: formattedTicketData,
-            clientToken: clientToken || tempToken
+            clientToken: clientToken || tempToken,
+            token: isPromoter ? token : undefined,
           }, {
           onSuccess: () => {
             resolve("");
@@ -235,9 +276,12 @@ export default function Checkout() {
   };
 
   const { mutate } = useMutation({
-    mutationFn: (args: { ticketData: IClientPurchaseTicket, clientToken: string | undefined }) => {
+    mutationFn: (args: { ticketData: IClientPurchaseTicket, clientToken: string | undefined, token?: string | undefined }) => {
       if (isPromoter) {
-        return initPromoterTicketPurchase(args);
+        return initPromoterTicketPurchase({
+            ticketData: args.ticketData,
+            token: args.token
+          });
       }
       return initTicketPurchase(args);
     },
