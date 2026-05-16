@@ -19,6 +19,7 @@ import Image from "next/image";
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
 import { useClientEvent, useClientEventServedOneImage, useClientGetById } from "@/hooks/client/queries/useClientData";
 import { jwtDecode } from "jwt-decode";
+import { useTransferStore } from "@/store/useTransferStore";
 
 const TicketTransferForm = ({
   purchaseTicketId,
@@ -51,6 +52,8 @@ const TicketTransferForm = ({
     },
   });
 
+  const setTransferData = useTransferStore((state) => state.setTransferData);
+
   const onSubmit = (data: ITransferUser) => {
     // Prevent self-transfer by email
     if (clientData?.email && data.email.trim().toLowerCase() === clientData.email.trim().toLowerCase()) {
@@ -60,6 +63,21 @@ const TicketTransferForm = ({
     // Prevent self-transfer by WhatsApp
     if (clientData?.whatsapp && data.whatsapp && data.whatsapp.replace(/\D/g, "") === clientData.whatsapp.replace(/\D/g, "")) {
       notifyError("No puedes transferir un ticket a tu propio WhatsApp");
+      return;
+    }
+
+    if (selectedEvent && selectedEvent.transferCost && selectedEvent.transferCost > 0) {
+      setTransferData(
+        {
+          email: data.email,
+          whatsapp: data.whatsapp,
+          idCard: data.idCard,
+          name: data.name,
+        },
+        purchaseTicketId,
+        eventId
+      );
+      router.push(`/checkout?transfer=true`);
       return;
     }
 

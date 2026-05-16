@@ -92,6 +92,10 @@ interface ITransferUser {
   email: string;
   whatsapp: string;
   idCard: string;
+
+  // Nuevos valores, solo cuando la transferencia tiene costo
+  boldMethod?: object | string | string[];
+  returnUrl?: string;
 }
 
 interface IComplimentaryPurchase {

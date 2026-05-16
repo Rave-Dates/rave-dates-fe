@@ -52,3 +52,13 @@ export const getAllPayments = async ({token}: { token: CookieValueTypes }) => {
   });
   return res.data;
 };
+
+export const initPromoterTicketPurchase = async ({ticketData, token}: { ticketData: IClientPurchaseTicket, token: CookieValueTypes }) => {
+  const { data } = await axios.post(`${BASE_URL}/admin/tickets/purchase/promoter`, ticketData, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  return data;
+};

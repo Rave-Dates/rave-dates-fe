@@ -48,16 +48,6 @@ export const initTicketPurchase = async ({ticketData, clientToken}: { ticketData
   return data;
 };
 
-export const initPromoterTicketPurchase = async ({ticketData, clientToken}: { ticketData: IClientPurchaseTicket, clientToken: CookieValueTypes }) => {
-  const { data } = await axios.post(`${BASE_URL}/admin/tickets/purchase/promoter`, ticketData, {
-    headers: {
-      "Accept": "application/json",
-      "Authorization": `Bearer ${clientToken}`,
-    },
-  });
-  return data;
-};
-
 export const purchaseFreeTicket = async ({ticketData, clientToken}: { ticketData: IClientPurchaseFreeTicket, clientToken: CookieValueTypes }) => {
   const res = await axios.post(`${BASE_URL}/app/tickets/free`, ticketData, {
     headers: {
