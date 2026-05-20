@@ -21,6 +21,7 @@ import { useChangeTicketStore } from "@/store/useChangeTicketStore";
 import { useQuery } from "@tanstack/react-query";
 import { getAdminConfig } from "@/services/admin-parameters";
 import { initPromoterTicketPurchase } from "@/services/admin-payments";
+import { useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 
 export default function Checkout() {
   const [selectedPayment, setSelectedPayment] = useState<"Pago total" | "Abonar a la alcancía">("Pago total");
@@ -64,6 +65,12 @@ export default function Checkout() {
   const decodedPromoterAffiliate: {promoterId: number} | null = promoterAffiliate && jwtDecode(promoterAffiliate?.toString()) || null;
   const decodedToken: {id: number, promoterId: number} | null = token && jwtDecode(token.toString()) || null;
 
+  const { data: promoterUser } = useAdminUserById({
+    token: isPromoter ? token : undefined,
+    userId: isPromoter && decodedToken ? decodedToken.id : undefined,
+  });
+  const promoterBalance = promoterUser?.promoter?.balance;
+
   const { clientData } = useClientGetById({clientId: decoded?.id, clientToken: clientToken});
   const { selectedEvent } = useClientEvent(eventId);
 
@@ -74,6 +81,8 @@ export default function Checkout() {
   });
 
   const effectiveFeePercentage = selectedEvent?.feeBoldPorcentage ?? adminConfig?.feeBoldPorcentage ?? 0;
+  
+  const effectiveBalance = isPromoter ? (promoterBalance ?? 0) : (clientData?.balance ?? 0);
   
   const totalAmount = searchParams.get("transfer") ? (selectedEvent?.transferCost || 0) : Object.entries(selected).reduce((acc, [ticketTypeIdStr, selectedData]) => {
     const ticketTypeId = Number(ticketTypeIdStr);
@@ -87,16 +96,16 @@ export default function Checkout() {
   const subtotalWithDiscount = totalAmount - actualDiscountValue;
 
   useEffect(() => {
-    if (check && clientData?.balance && clientData.balance >= subtotalWithDiscount) {
+    if (check && effectiveBalance && effectiveBalance >= subtotalWithDiscount) {
       if (selectedMethod !== "Ninguno") {
         setSelectedMethod("Ninguno");
       }
     } else if (selectedMethod === "Ninguno") {
       setSelectedMethod("Nequi");
     }
-  }, [check, clientData?.balance, subtotalWithDiscount, selectedMethod]);
+  }, [check, effectiveBalance, subtotalWithDiscount, selectedMethod]);
 
-  const isBalanceSufficient = Boolean(check && clientData?.balance && clientData.balance >= subtotalWithDiscount);
+  const isBalanceSufficient = Boolean(check && effectiveBalance && effectiveBalance >= subtotalWithDiscount);
 
   if (selectedEvent?.type === "free") {
     router.push("/tickets")
@@ -330,6 +339,7 @@ export default function Checkout() {
             setCheck={setCheck}
             clientData={clientData}
             isPromoter={Boolean(isPromoter)}
+            promoterBalance={promoterBalance}
             isBalanceSufficient={isBalanceSufficient}
           /> 
           {
@@ -353,6 +363,8 @@ export default function Checkout() {
           <PricingDetails 
             check={check} 
             clientData={clientData} 
+            isPromoter={Boolean(isPromoter)}
+            promoterBalance={promoterBalance}
             selectedPayment={selectedPayment} 
             partialAmount={watchedPartialAmount} 
             totalAmount={totalAmount}

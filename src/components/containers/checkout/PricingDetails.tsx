@@ -9,6 +9,8 @@ type Props = {
   check: boolean;
   register: UseFormRegister<{ partialAmount: number, discountCode: string }>
   clientData: IClient | null | undefined;
+  promoterBalance?: number;
+  isPromoter?: boolean;
   selectedPayment: "Pago total" | "Abonar a la alcancía";
   partialAmount: number;
   totalAmount: number;
@@ -21,7 +23,7 @@ type Props = {
   selectedMethod: "Nequi" | "Bold" | "Ninguno";
 };
 
-export default function PricingDetails({check, clientData, selectedPayment, partialAmount, totalAmount, register, eventDiscountCode, watchedDiscountCode, setHasDiscountFlag, hasDiscountFlag, eventDiscountAmount, effectiveFeePercentage, selectedMethod} : Props) {
+export default function PricingDetails({check, clientData, promoterBalance, isPromoter = false, selectedPayment, partialAmount, totalAmount, register, eventDiscountCode, watchedDiscountCode, setHasDiscountFlag, hasDiscountFlag, eventDiscountAmount, effectiveFeePercentage, selectedMethod} : Props) {
   const { selected, eventId, pendingPaymentAmount } = useTicketStore();
   const { eventTickets } = useClientEventTickets(eventId);
   const searchParams = useSearchParams();
@@ -47,11 +49,13 @@ export default function PricingDetails({check, clientData, selectedPayment, part
 
   // const totalAmount = mergedTickets.reduce((acc, t) => acc + t.total, 0);
 
+  const effectiveBalance = isPromoter ? (promoterBalance ?? 0) : (clientData?.balance ?? 0);
+
   let totalWithBalanceDiscount = totalAmount;
 
   // Restar balance si está marcado
-  if (check && clientData?.balance) {
-    totalWithBalanceDiscount -= clientData.balance;
+  if (check && effectiveBalance) {
+    totalWithBalanceDiscount -= effectiveBalance;
   }
 
   // Restar pago parcial si corresponde
@@ -59,8 +63,8 @@ export default function PricingDetails({check, clientData, selectedPayment, part
     totalWithBalanceDiscount = partialAmount;
   }
 
-  if (selectedPayment === "Abonar a la alcancía" && check && clientData?.balance) {
-    totalWithBalanceDiscount = partialAmount - clientData.balance ;
+  if (selectedPayment === "Abonar a la alcancía" && check && effectiveBalance) {
+    totalWithBalanceDiscount = partialAmount - effectiveBalance ;
   }
 
   // No dejar que el total sea negativo
@@ -149,8 +153,8 @@ export default function PricingDetails({check, clientData, selectedPayment, part
                       finalTotal = partialAmount;
                     } else {
                       finalTotal = totalAmount + gatewayFee - actualDiscountValue;
-                      if (check && clientData?.balance) {
-                        finalTotal -= clientData.balance;
+                      if (check && effectiveBalance) {
+                        finalTotal -= effectiveBalance;
                       }
                     }
                   } else {
