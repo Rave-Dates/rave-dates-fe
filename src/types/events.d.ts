@@ -24,6 +24,7 @@ interface IEvent {
   labels: IEventLabel[];
   feeBoldPorcentage: number;
   quantityComplimentaryTickets?: number;
+  minPartialPercentage?: number;
   organizer?: {
     userId: number;
     organizerId: number;

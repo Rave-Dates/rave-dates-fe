@@ -36,4 +36,5 @@ export const defaultEventFormData: IEventFormData = {
   formPromoters: [],
   promoters: [],
   organizerId: undefined,
+  minPartialPercentage: undefined,
 };

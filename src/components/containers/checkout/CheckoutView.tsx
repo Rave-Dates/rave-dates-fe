@@ -356,6 +356,7 @@ export default function Checkout() {
               watchedDiscountCode={selectedEvent?.discount}
               effectiveFeePercentage={effectiveFeePercentage}
               selectedMethod={selectedMethod}
+              minPartialPercentage={selectedEvent?.minPartialPercentage}
             />
           }
         </div>

@@ -93,6 +93,7 @@ export default function TicketConfiguration() {
       quantityComplimentaryTickets: data.quantityComplimentaryTickets,
       organizerId: data.organizerId,
       feeBoldPorcentage: data.feeBoldPorcentage,
+      minPartialPercentage: data.minPartialPercentage,
       formPromoters: eventFormData.formPromoters,
     };
 
@@ -277,9 +278,14 @@ export default function TicketConfiguration() {
             </div>
             <div className="flex flex-col xs:flex-row gap-x-5">
               <FormInput
-                title="Código de descuento"
-                inputName="discountCode"
-                register={register("discountCode")}
+                type="number"
+                title="Mín. parcial (%)"
+                inputName="minPartialPercentage"
+                typeOfValue="%"
+                register={register("minPartialPercentage", {
+                  setValueAs: (v) => v === "" ? undefined : Number(v),
+                  max: 100
+                })}
               />
               <FormInput
                 title="Descuento"
@@ -289,6 +295,13 @@ export default function TicketConfiguration() {
                   setValueAs: (v) => v === "" ? undefined : Number(v), 
                   max: 100 
                 })}
+              />
+            </div>
+            <div className="flex flex-col xs:flex-row gap-x-5">
+              <FormInput
+                title="Código de descuento"
+                inputName="discountCode"
+                register={register("discountCode")}
               />
             </div>
               <div className="flex items-center justify-between mt-5">

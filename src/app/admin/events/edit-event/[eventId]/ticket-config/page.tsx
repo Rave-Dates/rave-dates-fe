@@ -131,6 +131,7 @@ export default function EditTicketConfiguration() {
       quantityComplimentaryTickets: data.quantityComplimentaryTickets,
       organizerId: data.organizerId,
       feeBoldPorcentage: data.feeBoldPorcentage,
+      minPartialPercentage: data.minPartialPercentage,
       formPromoters: eventFormData.formPromoters,
     }
 
@@ -287,11 +288,23 @@ export default function EditTicketConfiguration() {
             })} />
           </div>
           <div className="flex flex-col xs:flex-row gap-x-5">
-            <FormInput title="Código de descuento" inputName="discountCode" register={register("discountCode")} />
+            <FormInput
+              type="number"
+              title="Mín. parcial (%)"
+              inputName="minPartialPercentage"
+              typeOfValue="%"
+              register={register("minPartialPercentage", {
+                setValueAs: (v) => v === "" ? undefined : Number(v),
+                max: 100
+              })}
+            />
             <FormInput title="Descuento" typeOfValue="%" inputName="discount" register={register("discount", { 
               setValueAs: (v) => v === "" ? undefined : Number(v), 
               max: 100 
             })} />
+          </div>
+          <div className="flex flex-col xs:flex-row gap-x-5">
+            <FormInput title="Código de descuento" inputName="discountCode" register={register("discountCode")} />
           </div>
 
           <div className="flex items-center justify-between mt-5">

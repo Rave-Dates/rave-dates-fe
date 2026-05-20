@@ -92,6 +92,7 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       quantityComplimentaryTickets: event.quantityComplimentaryTickets,
       formPromoters: formattedPromoters,
       feeBoldPorcentage: event.feeBoldPorcentage,
+      minPartialPercentage: event.minPartialPercentage,
       externalUrl: event.externalUrl || "",
     };
 

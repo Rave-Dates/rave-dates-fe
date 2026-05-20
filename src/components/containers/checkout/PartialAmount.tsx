@@ -10,11 +10,10 @@ type Props = {
   watchedDiscountCode: number
   effectiveFeePercentage: number
   selectedMethod: "Nequi" | "Bold" | "Ninguno"
+  minPartialPercentage?: number
 };
 
-export default function PartialAmount({ register, totalAmount, partialAmount, eventPBComission, hasDiscountFlag, watchedDiscountCode, effectiveFeePercentage, selectedMethod } : Props) {
-  const MIN_AMOUNT = 1000;
-
+export default function PartialAmount({ register, totalAmount, partialAmount, eventPBComission, hasDiscountFlag, watchedDiscountCode, effectiveFeePercentage, selectedMethod, minPartialPercentage } : Props) {
   console.log("eventPBComission", eventPBComission)
 
   const gatewayFee = selectedMethod === "Bold" ? totalAmount * (effectiveFeePercentage / 100) : 0;
@@ -23,6 +22,10 @@ export default function PartialAmount({ register, totalAmount, partialAmount, ev
   
   const totalToPay = totalAmount + gatewayFee - actualDiscountValue + pbCommissionValue;
   const pendingAmount = Math.max(totalToPay - partialAmount, 0);
+
+  const MIN_AMOUNT = minPartialPercentage
+    ? Math.ceil(totalToPay * (minPartialPercentage / 100))
+    : 1000;
 
   return (
     <div className="bg-cards-container flex flex-col rounded-lg p-4">
@@ -47,7 +50,7 @@ export default function PartialAmount({ register, totalAmount, partialAmount, ev
           }}
         />    
       </div>
-      <h3 className="text-xs text-primary-white/50 pt-2 pb-5">Cantidad mínima inicial: ${MIN_AMOUNT.toLocaleString()} COP</h3>
+      <h3 className="text-xs text-primary-white/50 pt-2 pb-5">Cantidad mínima inicial: ${MIN_AMOUNT.toLocaleString()} COP{minPartialPercentage ? ` (${minPartialPercentage}%)` : ""}</h3>
       <h2 className="pb-1 text-sm">Saldo pendiente a pagar: ${pendingAmount.toLocaleString()} COP <span className="text-xs text-primary-white/50"></span></h2>
       <h3 className="text-xs text-primary-white/50 pb-3">Comisión de alcancía: {eventPBComission}% (${pbCommissionValue.toLocaleString()} COP)</h3>
       <h3 className="text-xs text-primary-white/50 pb-2">Deberás abonar el resto del pago antes del evento a través de &quot;Mis Tickets&quot;</h3>
