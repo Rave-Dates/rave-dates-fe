@@ -187,7 +187,7 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
           )
         : null}
         <button onClick={handleClick} className="bg-primary max-w-xl self-center hover:opacity-80 transition-opacity mt-5 text-primary-white font-medium py-3 w-full rounded-lg flex items-center justify-center text-center">
-          Atras
+          Atrás
         </button>
       </div>
     </div>

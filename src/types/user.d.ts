@@ -23,6 +23,7 @@ interface IUser {
   promoter?: {
     userId: number;
     promoterId?: number;
+    balance: number;
     organizerId: null;
     fee: number;
     feeType: "fixed" | "percentage";

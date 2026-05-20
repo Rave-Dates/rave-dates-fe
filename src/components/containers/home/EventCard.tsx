@@ -19,6 +19,7 @@ const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?:
   subtitle,
   date,
   geo,
+  externalUrl,
   // piggyBank
 }) => {
   const { resetSelected } = useTicketStore();
@@ -53,7 +54,7 @@ const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?:
   });
 
   return (
-    <div className="bg-cards-container rounded-sm overflow-hidden shadow-2xl w-xl h-fit mx-auto mb-5">
+    <div className="bg-cards-container rounded-none sm:rounded-sm overflow-hidden shadow-2xl w-full sm:w-xl h-fit mx-0 sm:mx-auto pb-5 sm:pb-0 sm:mb-5">
       {
         loadingImages ?
         <div className='aspect-[1080/1350] flex items-center justify-center w-full bg-cards-container'>
@@ -106,9 +107,15 @@ const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?:
 
         {/* Buy Button and Price */}
         <div className={`${text === "Finalizado" && "hidden"} flex items-center gap-6 justify-between`}>
-          <Link href={`${href}/${eventId}`} className="bg-primary text-center text-primary-white font-medium text-body py-3 px-8 rounded-md hover:bg-primary/80 transition-all flex-1">
-            {text}
-          </Link>
+          {externalUrl ? (
+            <a href={externalUrl} target="_blank" rel="noopener noreferrer" className="bg-primary text-center text-primary-white font-medium text-body py-3 px-8 rounded-md hover:bg-primary/80 transition-all flex-1">
+              {text}
+            </a>
+          ) : (
+            <Link href={`${href}/${eventId}`} className="bg-primary text-center text-primary-white font-medium text-body py-3 px-8 rounded-md hover:bg-primary/80 transition-all flex-1">
+              {text}
+            </Link>
+          )}
         </div>
       </div>
     </div>

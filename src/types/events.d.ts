@@ -7,7 +7,9 @@ interface IEvent {
   geo: string;
   eventCategoryValues: IEventCategoryValue[];
   description: string;
-  type: 'free' | 'paid';
+  type: 'free' | 'paid' | 'external';
+  externalUrl?: string;
+  isExternal?: boolean;
   feeRD: number;
   transferCost: number;
   feePB: number;

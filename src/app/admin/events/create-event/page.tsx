@@ -16,6 +16,8 @@ import { useReactiveCookiesNext } from "cookies-next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useCreateExternalEvent } from "@/hooks/admin/mutations/useCreateExternalEvent";
+import { notifyPending } from "@/components/ui/toast-notifications";
 
 import { useForm, useWatch, Controller } from "react-hook-form";
 import { InputTime } from "@/components/ui/date-picker/input-time";
@@ -25,9 +27,10 @@ const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/Ge
 export default function Page() {
   const { eventFormData, updateEventFormData, setHasLoadedEvent } = useCreateEventStore();
   const router = useRouter()
-  const { register, handleSubmit, watch, setValue, control } = useForm<IEventFormData>({
+  const { register, handleSubmit, watch, setValue, control, reset } = useForm<IEventFormData>({
     defaultValues: defaultEventFormData
   });
+  const { mutate: createExternalEvent } = useCreateExternalEvent({ reset });
   const { getCookie } = useReactiveCookiesNext();
 
   const token = getCookie("token");
@@ -39,7 +42,7 @@ export default function Page() {
       value && value.length > 0 ? true : "Debes subir al menos una imagen",
   });
   
-  const type = ['free', 'paid'];
+  const type = ['free', 'paid', 'external'];
   
   const { categories } = useAdminAllCategories({ token });
   const { labelsTypes } = useAdminLabelsTypes({ token });
@@ -87,6 +90,23 @@ export default function Page() {
 
   // creamos el evento 
   const onSubmit = (data: IEventFormData) => {
+    if (watch("type") === "external") {
+      notifyPending(
+        new Promise((resolve, reject) => {
+          createExternalEvent(data, {
+            onSuccess: resolve,
+            onError: reject,
+          });
+        }),
+        {
+          loading: "Creando evento externo...",
+          success: "Evento externo creado correctamente",
+          error: "Error al crear el evento externo",
+        }
+      );
+      return;
+    }
+
     const parsedCategories = data.categories?.map((category: string) => JSON.parse(category))
     
     const formattedData = {
@@ -191,19 +211,22 @@ export default function Page() {
         inputName="description"
         register={register("description")}
       />
-      <FormDropDown
-        title="Organizador"
-        register={register("organizerId", {
-          setValueAs: (v) => (v === "" || v === undefined ? undefined : Number(v)),
-        })}
-      >
-        <option value="">Selecciona un organizador</option>
-        {organizers?.map((organizer) => (
-          <option key={organizer.userId} value={organizer.organizer?.organizerId ?? ""}>
-            {organizer.name}
-          </option>
-        ))}
-      </FormDropDown>
+
+      {watch("type") !== "external" && (
+        <FormDropDown
+          title="Organizador"
+          register={register("organizerId", {
+            setValueAs: (v) => (v === "" || v === undefined ? undefined : Number(v)),
+          })}
+        >
+          <option value="">Selecciona un organizador</option>
+          {organizers?.map((organizer) => (
+            <option key={organizer.userId} value={organizer.organizer?.organizerId ?? ""}>
+              {organizer.name}
+            </option>
+          ))}
+        </FormDropDown>
+      )}
 
        { 
         categories?.map((category) => {
@@ -253,7 +276,17 @@ export default function Page() {
         })
         }
 
-      {watch("type") !== "free" && (
+      {watch("type") === "external" && (
+        <FormInput
+          title="Link externo*"
+          inputName="externalUrl"
+          register={register("externalUrl", {
+            required: watch("type") === "external" ? "El link externo es obligatorio" : false,
+          })}
+        />
+      )}
+
+      {watch("type") === "paid" && (
         <FormInput
           type="number"
           title="Cortesía cada X ventas" 
@@ -265,14 +298,17 @@ export default function Page() {
       )}
       <br />
 
-    {labelsTypes && watchedLabels && (
-      <LabelTagButton
-        setValue={setValue}
-        watchedLabels={watchedLabels}
-        labelsTypes={labelsTypes}
-        title="Etiquetas"
-      />
-    )}
+      {watch("type") !== "external" && (
+        labelsTypes && watchedLabels && (
+          <LabelTagButton
+            setValue={setValue}
+            watchedLabels={watchedLabels}
+            labelsTypes={labelsTypes}
+            title="Etiquetas"
+          />
+        )
+      )}
+
       <br />
 
       <div>
@@ -302,7 +338,7 @@ export default function Page() {
                 </div>
               </div>
               <span className="text-primary-white group-hover:text-primary transition-colors">
-                {item === 'free' ? 'Gratuito' : 'Pago'}
+                {item === 'free' ? 'Gratuito' : item === 'paid' ? 'Pago' : 'Externo'}
               </span>
             </label>
           ))}

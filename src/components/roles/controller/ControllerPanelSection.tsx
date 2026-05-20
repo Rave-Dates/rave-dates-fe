@@ -61,7 +61,7 @@ export default function ControllerPanelSection({ token, eventId }: Props) {
           href={`/checker/${eventId}/attendees`}
           className="w-full block text-center bg-primary mt-5 text-primary-white py-4 rounded-lg font-medium hover:opacity-85 transition-opacity"
         >
-          Ver escaneados
+          Lista del evento
         </Link>
       </div>
     </div>

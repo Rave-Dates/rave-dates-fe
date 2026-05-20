@@ -1,6 +1,6 @@
 const EventCardSkeleton = () => {
   return (
-    <div className="bg-cards-container rounded-xs overflow-hidden shadow-2xl max-w-xl mb-5 h-fit mx-auto">
+    <div className="bg-cards-container rounded-none sm:rounded-xs overflow-hidden shadow-2xl w-full sm:max-w-xl h-fit mx-0 sm:mx-auto mb-0 sm:mb-5">
       <div className='h-[36rem] flex items-center justify-center w-full bg-cards-container'>
       </div>
       {/* Event Details */}

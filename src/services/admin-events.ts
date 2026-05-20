@@ -36,6 +36,28 @@ export const createEvent = async (token: CookieValueTypes, data: Partial<IEventF
   return res.data;
 }
 
+export const createExternalEvent = async (token: CookieValueTypes, data: any) => {
+  const res = await axios.post(`${BASE_URL}/admin/events/external`, data, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+  });
+  return res.data;
+}
+
+export const activateExternalEvent = async (token: CookieValueTypes, eventId: number, isActive: boolean) => {
+  const res = await axios.post(`${BASE_URL}/admin/events/external/${eventId}/active`, { isActive }, {
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+  });
+  return res.data;
+}
+
 export const editEvent = async (token: CookieValueTypes, id: number, data: Partial<IEventForUpdate>) => {
   const res = await axios.put(`${BASE_URL}/admin/events/${id}`, data, {
     headers: {

@@ -6,7 +6,7 @@ import DefaultForm from "@/components/ui/forms/DefaultForm";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import FormTextArea from "@/components/ui/inputs/FormTextArea";
-import { notifyError } from "@/components/ui/toast-notifications";
+import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { combineDateAndTimeToISO, formatDateToColombiaTime, parseISODate, validateDateYyyyMmDd } from "@/utils/formatDate";
@@ -21,13 +21,15 @@ import { onInvalid } from "@/utils/onInvalidFunc";
 import { useAdminAllCategories, useAdminAllUsers, useAdminEvent, useAdminEventCategories, useAdminEventImages, useAdminGetOrganizerFromEvent, useAdminImagesData, useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
 import DatePicker from "@/components/ui/date-picker/date-picker";
 import { InputTime } from "@/components/ui/date-picker/input-time";
+import { useEditEventExternal } from "@/hooks/admin/mutations/useEditEventExternal";
 
 export default function EditEvent({ eventId }: { eventId: number }) {
   const { eventFormData, updateEventFormData, setHasLoadedEvent, setHasLoadedTickets } = useCreateEventStore();
   const router = useRouter()
-  const { register, handleSubmit, watch, setValue, control } = useForm<IEventFormData>({
+  const { register, handleSubmit, watch, setValue, control, reset } = useForm<IEventFormData>({
     defaultValues: defaultEventFormData,
   });
+  const { mutate: editEventExternal } = useEditEventExternal(reset);
   const { getCookie } = useReactiveCookiesNext();
 
   register("labels");
@@ -43,7 +45,7 @@ export default function EditEvent({ eventId }: { eventId: number }) {
   
   const token = getCookie("token");
   
-  const type = ['free', 'paid'];
+  const type = ['free', 'paid', 'external'];
 
   const { eventCategories } = useAdminEventCategories({ eventId, token });
   const { categories } = useAdminAllCategories({ token });
@@ -83,13 +85,14 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       description: event.description || "",
       transferCost: event.transferCost,
       feePB: event.feePB,
-      type: event.type,
+      type: event.isExternal ? 'external' : event.type,
       isActive: event.isActive,
       timeOut: event.timeOut,
       piggyBank: event.piggyBank,
       quantityComplimentaryTickets: event.quantityComplimentaryTickets,
       formPromoters: formattedPromoters,
       feeBoldPorcentage: event.feeBoldPorcentage,
+      externalUrl: event.externalUrl || "",
     };
 
     Object.entries(setters).forEach(([key, value]) => {
@@ -188,6 +191,37 @@ useEffect(() => {
       organizerId: data.organizerId
     })
 
+    if (watch("type") === "external") {
+      const cleanedEventData = {
+        ...data,
+        eventId,
+        categoriesToUpdate,
+        isActive: watchedIsActive,
+      };
+
+      notifyPending(
+        new Promise((resolve, reject) => {
+          editEventExternal(cleanedEventData, {
+            onSuccess: () => {
+              resolve("");
+              router.push("/admin/events");
+            },
+            onError: (err) => {
+              console.error(err);
+              reject(err);
+              router.push("/admin/events");
+            },
+          });
+        }),
+        {
+          loading: "Editando evento externo...",
+          success: "Evento externo editado correctamente",
+          error: "Error al editar el evento externo",
+        }
+      );
+      return;
+    }
+
     router.push(
       watch("type") === "free" ? 
       `/admin/events/edit-event/${eventId}/free-ticket-config` 
@@ -269,19 +303,32 @@ useEffect(() => {
         inputName="description"
         register={register("description")}
       />
-      <FormDropDown
-        title="Organizador"
-        register={register("organizerId", {
-          setValueAs: (v) => (v === "" || v === undefined ? undefined : Number(v)),
-        })}
-      >
-        <option value="">Selecciona un organizador</option>
-        {organizers?.map((organizer) => (
-          <option key={organizer.userId} value={organizer.organizer?.organizerId ?? 0}>
-            {organizer.name}
-          </option>
-        ))}
-      </FormDropDown>
+
+      {watch("type") === "external" && (
+        <FormInput
+          title="Link externo*"
+          inputName="externalUrl"
+          register={register("externalUrl", {
+            required: watch("type") === "external" ? "El link externo es obligatorio" : false,
+          })}
+        />
+      )}
+
+      {watch("type") !== "external" && (
+        <FormDropDown
+          title="Organizador"
+          register={register("organizerId", {
+            setValueAs: (v) => (v === "" || v === undefined ? undefined : Number(v)),
+          })}
+        >
+          <option value="">Selecciona un organizador</option>
+          {organizers?.map((organizer) => (
+            <option key={organizer.userId} value={organizer.organizer?.organizerId ?? 0}>
+              {organizer.name}
+            </option>
+          ))}
+        </FormDropDown>
+      )}
 
        { 
           categories?.map((category) => {
@@ -332,7 +379,7 @@ useEffect(() => {
           })
         }
 
-      {watch("type") !== "free" && (
+      {watch("type") === "paid" && (
         <FormInput
           type="number"
           title="Cortesía cada X ventas"
@@ -344,10 +391,10 @@ useEffect(() => {
       )}
       <br />
 
-      {
+      {watch("type") !== "external" && (
         labelsTypes && watchedLabels &&
         <LabelTagButton setValue={setValue} watchedLabels={watchedLabels} labelsTypes={labelsTypes} title="Etiquetas" />
-      }
+      )}
 
       <br />
 
@@ -379,7 +426,7 @@ useEffect(() => {
                 </div>
               </div>
               <span className="text-primary-white group-hover:text-primary transition-colors">
-                {item === 'free' ? 'Gratuito' : 'Pago'}
+                {item === 'free' ? 'Gratuito' : item === 'paid' ? 'Pago' : 'Externo'}
               </span>
             </label>
           ))}
