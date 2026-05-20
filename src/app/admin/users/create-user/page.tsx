@@ -14,8 +14,17 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 
+const generateRandomPassword = (length = 8): string => {
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+};
+
 export default function CreateUser() {
-  const { register, handleSubmit, control } = useForm<ICreateUser>();
+  const { register, handleSubmit, control, setValue } = useForm<ICreateUser>();
   const router = useRouter();
   const { getCookie } = useReactiveCookiesNext();
 
@@ -24,6 +33,9 @@ export default function CreateUser() {
   // obtenemos todos los roles
   const { roles } = useAdminAllRoles({ token });
 
+  React.useEffect(() => {
+    setValue("password", generateRandomPassword());
+  }, [setValue]);
 
   // creamos el usuario 
   const { mutate } = useMutation({
@@ -44,13 +56,16 @@ export default function CreateUser() {
     },
   });
 
-  // creamos el usuario 
   const onSubmit = (data: Partial<ICreateUser>) => {
+    const password = data.password && data.password.trim() !== ""
+      ? data.password
+      : generateRandomPassword();
+
     mutate({
       token,
       formData: {
         name: data.name,
-        password: data.password,
+        password,
         email: data.email,
         phone: data.phone,
         roleId: data.roleId,
@@ -67,9 +82,9 @@ export default function CreateUser() {
         register={register("name", { required: true })}
       />
       <FormInput
-        title="Contraseña*"
+        title="Contraseña"
         inputName="password"
-        register={register("password", { required: true })}
+        register={register("password", { required: false })}
       />
       <PhoneInput
         title="Número de celular*"

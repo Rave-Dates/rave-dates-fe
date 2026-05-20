@@ -19,7 +19,14 @@ export default function PromoterHome() {
 
   const { promoterBinnacles } = useAdminPromoterBinnacles({ promoterId: promoterId ?? 0, token: token?.toString() });
 
-  // const selectedPromoterBinnacle = promoterBinnacles?.find(b => b.eventId === eventId);
+  const externalSalesQty = promoterBinnacles?.externalEvents?.reduce((acc, event) => {
+    const stages = event.stages || [];
+    const eventQty = stages.reduce((stageAcc: number, stageGroup: any[]) => {
+      const groupQty = stageGroup.reduce((itemAcc: number, item: any) => itemAcc + Number(item.quantity || 0), 0);
+      return stageAcc + groupQty;
+    }, 0);
+    return acc + eventQty;
+  }, 0) ?? 0;
 
   return (
     <div className="bg-primary-black pt-14 lg:pt-32 pb-40 text-primary-white min-h-screen p-4">
@@ -68,6 +75,11 @@ export default function PromoterHome() {
             <div className="flex text-sm justify-between items-center">
               <h2>Dinero disponible</h2>
               <h2 className="text-primary-white text-base text-end tabular-nums">COP ${promoterBinnacles?.pendingPayment.toLocaleString()?? 0}</h2>
+            </div>
+
+            <div className="flex text-sm justify-between items-center">
+              <h2>Ventas externas</h2>
+              <h2 className="text-primary-white text-base text-end tabular-nums">{externalSalesQty}</h2>
             </div>
 
             <Link href={`/promoter/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-white bg-primary">
