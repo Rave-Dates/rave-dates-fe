@@ -128,6 +128,8 @@ export default function OtpVerificationView() {
         });
         
         deleteCookie("tempToken")
+        deleteCookie("token")
+        deleteCookie("isPromoter")
         
         if (redirectToCheckout) {
           router.replace("/checkout");

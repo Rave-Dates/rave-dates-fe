@@ -21,7 +21,7 @@ type LoginForm = {
 };
 
 export default function Page() {
-  const { setCookie } = useReactiveCookiesNext();
+  const { setCookie, deleteCookie } = useReactiveCookiesNext();
   const router = useRouter();
 
   const {
@@ -44,9 +44,13 @@ export default function Page() {
         maxAge: decoded.exp - Math.floor(Date.now() / 1000), // en segundos
       });
 
+      deleteCookie("tempToken")
+      deleteCookie("clientToken")
+
       notifySuccess("Logueado correctamente");
-      console.log(decoded);
+
       const role = decoded.role?.toUpperCase();
+
       if (role === "ADMIN") {
         window.location.href = "/admin/users";
         return;

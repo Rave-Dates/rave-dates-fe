@@ -38,6 +38,8 @@ type TicketStage = {
   ticketTypeId: number | undefined;
   price: number;
   quantity: number;
+  promoterFee?: number;
+  feeType?: "fixed" | "percentage";
 };
 
 interface IPurchaseData {

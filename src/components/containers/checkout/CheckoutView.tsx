@@ -125,6 +125,10 @@ export default function Checkout() {
     urlToReturn = `${process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_FRONT_URL_DEV : process.env.NEXT_PUBLIC_FRONT_URL_PROD}/auth?redirect=transfer&eid=${eventId}`
   } else if (!tempToken && clientToken) {
     urlToReturn = `${process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_FRONT_URL_DEV : process.env.NEXT_PUBLIC_FRONT_URL_PROD}/transfer-confirm?eid=${eventId}`
+  } else if (isPromoter) {
+    urlToReturn = `${process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_FRONT_URL_DEV : process.env.NEXT_PUBLIC_FRONT_URL_PROD}/promoter`
+  } else {
+    urlToReturn = `${process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_FRONT_URL_DEV : process.env.NEXT_PUBLIC_FRONT_URL_PROD}/`
   }
 
   const handleContinue = async () => {
@@ -299,8 +303,7 @@ export default function Checkout() {
       notifySuccess("Transacción iniciada correctamente");
       console.log("data", data);
 
-      if (isPromoter || promoterAffiliate) {
-        deleteCookie("isPromoter", { path: "/" });
+      if (promoterAffiliate) {
         deleteCookie("promoterAffiliate", { path: "/" });
       }
 

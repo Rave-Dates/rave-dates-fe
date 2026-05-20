@@ -22,6 +22,16 @@ import { useForm } from "react-hook-form"
 import OrganizerEventAttendees from "../create-event/OrganizerEventAttendees"
 import { useTicketStore } from "@/store/useTicketStore"
 
+const getActiveStage = (stages: any[]) => {
+  const now = new Date();
+
+  return stages.find((stage) => {
+    const dateMax = new Date(stage.dateMax);
+    const date = new Date(stage.date);
+    return dateMax >= now && stage.quantity > 0 && date <= now;
+  });
+};
+
 type Props = {
   eventId: number;
   token: CookieValueTypes;
@@ -174,14 +184,22 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
       notifyError("Ticket no encontrado");
       return;
     }
+
+    const activeStage = getActiveStage(selectedTicket.stages);
+
+    if (!activeStage) {
+      notifyError("No hay etapas activas disponibles para este ticket");
+      return;
+    }
+
     // Prepare the ticket store with the selected event and ticket
     setEventId(eventId);
     setPromoterClientId(buyClientId);
     const stage: TicketStage = {
-      ...selectedTicket.stages[0],
+      ...activeStage,
       ticketTypeId: selectedTicket.ticketTypeId,
-      price: selectedTicket.stages[0]?.price ?? 0,
-      quantity: selectedTicket.stages[0]?.quantity ?? 0,
+      price: activeStage.price ?? 0,
+      quantity: activeStage.quantity ?? 0,
     };
     setSelected([stage]);
     router.push("/checkout");

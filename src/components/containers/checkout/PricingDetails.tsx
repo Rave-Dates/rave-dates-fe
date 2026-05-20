@@ -39,11 +39,21 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
 
     const eventTicket = eventTickets?.find(t => t.ticketTypeId === ticketTypeId);
 
+    let promoterDiscount = 0;
+    if (isPromoter && selectedData.stage.promoterFee) {
+        if (selectedData.stage.feeType === "percentage") {
+             promoterDiscount = (selectedData.stage.price * (selectedData.stage.promoterFee / 100)) * selectedData.quantity;
+        } else {
+             promoterDiscount = selectedData.stage.promoterFee * selectedData.quantity;
+        }
+    }
+
     return {
       name: eventTicket?.name || 'Ticket',
       quantity: selectedData.quantity,
       price: selectedData.stage.price,
       total: selectedData.quantity * selectedData.stage.price,
+      promoterDiscount
     };
   });
 
@@ -79,6 +89,7 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
 
   const gatewayFee = selectedMethod === "Bold" ? totalAmount * (effectiveFeePercentage / 100) : 0;
   const actualDiscountValue = hasDiscountFlag ? totalAmount * ((eventDiscountAmount || 0) / 100) : 0;
+  const totalPromoterDiscount = mergedTickets.reduce((acc, t) => acc + t.promoterDiscount, 0);
 
   // if (!clientData?.balance) return null;
 
@@ -140,6 +151,13 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
           <span className="text-end">- ${actualDiscountValue.toLocaleString()} COP</span>
         </div>
       }
+      {
+        isPromoter && totalPromoterDiscount > 0 &&
+        <div className="flex justify-between">
+          <span className="text-primary-white/50">Comisión promotor</span>
+          <span className="text-end">- ${totalPromoterDiscount.toLocaleString()} COP</span>
+        </div>
+      }
       <div className="flex justify-between text-lg">
         <span className="text-primary-white/50">TOTAL</span>
         {
@@ -150,15 +168,18 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
                   let finalTotal = 0;
                   if (!isChangeTickets) {
                     if (selectedPayment === "Abonar a la alcancía") {
-                      finalTotal = partialAmount;
+                      finalTotal = Number(partialAmount) + gatewayFee;
+                      if (check && effectiveBalance) {
+                        finalTotal -= effectiveBalance;
+                      }
                     } else {
-                      finalTotal = totalAmount + gatewayFee - actualDiscountValue;
+                      finalTotal = totalAmount + gatewayFee - actualDiscountValue - totalPromoterDiscount;
                       if (check && effectiveBalance) {
                         finalTotal -= effectiveBalance;
                       }
                     }
                   } else {
-                    finalTotal = totalAmount - totalSubtracted + gatewayFee;
+                    finalTotal = totalAmount - totalSubtracted + gatewayFee - totalPromoterDiscount;
                   }
                   return Math.max(finalTotal, 0).toLocaleString();
                 })()

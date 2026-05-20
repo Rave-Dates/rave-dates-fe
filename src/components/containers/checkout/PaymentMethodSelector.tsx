@@ -94,10 +94,7 @@ export default function PaymentMethodSelector({ clientData, selected, setSelecte
             <div className="w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors border border-inactive pointer-events-none"></div>
             <label htmlFor="receiveInfo" className="w-full flex items-center justify-between px-4 select-none text-primary-white/60">
               <div className="flex font-light flex-col items-start justify-center">
-                Usar crédito disponible
-                <h3 className="text-sm text-primary-white/45">
-                  No tienes saldo disponible
-                </h3>
+                No tienes saldo disponible
               </div>
             </label>
           </div>
@@ -107,10 +104,7 @@ export default function PaymentMethodSelector({ clientData, selected, setSelecte
           <div className="w-5 h-5 duration-100 rounded-md flex items-center justify-center transition-colors border border-inactive pointer-events-none"></div>
           <label htmlFor="receiveInfo" className="w-full flex items-center justify-between px-4 select-none text-primary-white/60">
             <div className="flex font-light flex-col items-start justify-center">
-              Usar crédito disponible
-              <h3 className="text-sm text-primary-white/45">
-                Verifica tu cuenta para desbloquear esta opción
-              </h3>
+              Verifica tu cuenta para desbloquear esta opción
             </div>
           </label>
         </div>
