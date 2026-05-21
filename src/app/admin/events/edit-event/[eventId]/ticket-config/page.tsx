@@ -118,6 +118,7 @@ export default function EditTicketConfiguration() {
       feeRD: data.feeRD,
       feePB: data.feePB,
       categoriesToUpdate: data.categoriesToUpdate,
+      categoriesToCreate: data.categoriesToCreate,
       transferCost: data.transferCost,
       discountCode: data.discountCode,
       discountType: data.discountType,

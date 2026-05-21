@@ -58,8 +58,9 @@ const CitySelectorModal: React.FC = () => {
       let changed = false;
 
       // Aplicar filtro de ciudad
-      if (filters[locationFilterKey] !== selectedCity) {
-        newFilters[locationFilterKey] = selectedCity;
+      const currentCityFilter = filters[locationFilterKey];
+      if (!Array.isArray(currentCityFilter) || !currentCityFilter.includes(selectedCity)) {
+        newFilters[locationFilterKey] = [selectedCity];
         changed = true;
       }
 
@@ -67,8 +68,8 @@ const CitySelectorModal: React.FC = () => {
       if (typeCategory) {
         const typeFilterKey = `category-${typeCategory.categoryId}`;
         const raveValue = typeCategory.values.find(v => v.value.toLowerCase() === "rave")?.value;
-        if (raveValue && filters[typeFilterKey] !== raveValue) {
-          newFilters[typeFilterKey] = raveValue;
+        if (raveValue && !(filters[typeFilterKey] as string[])?.includes(raveValue)) {
+          newFilters[typeFilterKey] = [raveValue];
           changed = true;
         }
       }
@@ -85,14 +86,14 @@ const CitySelectorModal: React.FC = () => {
     // Actualizar filtros globales al seleccionar una ciudad
     if (locationCategory) {
       const locationFilterKey = `category-${locationCategory.categoryId}`;
-      const newFilters = { ...filters, [locationFilterKey]: city };
+      const newFilters = { ...filters, [locationFilterKey]: [city] };
 
       // Al seleccionar una ciudad, también forzamos el filtro de tipo "Rave"
       if (typeCategory) {
         const typeFilterKey = `category-${typeCategory.categoryId}`;
         const raveValue = typeCategory.values.find(v => v.value.toLowerCase() === "rave")?.value;
         if (raveValue) {
-          newFilters[typeFilterKey] = raveValue;
+          newFilters[typeFilterKey] = [raveValue];
         }
       }
 

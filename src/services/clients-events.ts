@@ -4,9 +4,11 @@ import axios from "axios";
 export const getAllClientEvents = async (
   page: number,
   limit: number,
-  filters?: { [key: string]: string }
+  filters?: { [key: string]: string[] }
 ) => {
-  const filterValues = filters ? Object.values(filters).filter(Boolean) : [];
+  const filterValues = filters 
+    ? Object.values(filters).flat().filter(Boolean) 
+    : [];
   const filterQuery = filterValues.length > 0 ? `&filters=${filterValues.join(",")}` : "";
 
   const res = await axios.get(

@@ -202,10 +202,21 @@ useEffect(() => {
       })
       .filter(Boolean);
 
+    const categoriesToCreate = parsedCategories && parsedCategories
+      .filter((newCat: IEventCategoryValue) => {
+        const oldCat = formattedOldCategories?.find((old) => old.categoryId === newCat.categoryId);
+        return !oldCat;
+      })
+      .map((newCat: IEventCategoryValue) => ({
+        categoryValueId: newCat.valueId,
+      }));
+
     updateEventFormData({
       ...eventFormData,
       ...data,
       tickets: data.tickets,
+      categoriesToUpdate,
+      categoriesToCreate,
     })
 
     const cleanedEventData = {
@@ -220,6 +231,7 @@ useEffect(() => {
       feeRD: data.feeRD,
       feePB: data.feePB,
       categoriesToUpdate: categoriesToUpdate,
+      categoriesToCreate: categoriesToCreate,
       transferCost: data.transferCost,
       discountCode: data.discountCode,
       discountType: data.discountType,

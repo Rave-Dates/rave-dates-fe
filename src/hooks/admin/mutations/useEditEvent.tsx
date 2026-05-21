@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { assignOrganizerToEvent, assignPromoterToEvent, createImage, createTicketTypes, deleteImage, editEvent, editEventCategories, editTicketTypes, getEventImages } from "../../../services/admin-events";
+import { assignOrganizerToEvent, assignPromoterToEvent, createImage, createTicketTypes, deleteImage, editEvent, editEventCategories, editTicketTypes, getEventImages, createEventCategories } from "../../../services/admin-events";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
@@ -12,7 +12,7 @@ export function useEditEvent(reset: (data: IEventFormData) => void) {
 
   return useMutation({
     mutationFn: async ({formData, isOrganizer = false}: { formData: IEventFormData, isOrganizer?: boolean }) => {
-      const { categoriesToUpdate, organizerId, tickets, images, formPromoters, eventId, ...eventData } = formData;
+      const { categoriesToUpdate, categoriesToCreate, organizerId, tickets, images, formPromoters, eventId, ...eventData } = formData;
 
       if (!eventId) return
       
@@ -63,7 +63,20 @@ export function useEditEvent(reset: (data: IEventFormData) => void) {
         await Promise.all(
           categoriesToUpdate.map((category) => {
             if (!category) return;
-            editEventCategories(token, category, eventId)
+            return editEventCategories(token, category, eventId).catch((err) => {
+              console.error("Error en editEventCategories:", err.response?.data || err.message);
+            });
+          })
+        );
+      }
+      
+      if (categoriesToCreate) {
+        await Promise.all(
+          categoriesToCreate.map((category) => {
+            if (!category) return;
+            return createEventCategories(token, category, eventId).catch((err) => {
+              console.error("Error en createEventCategories:", err.response?.data || err.message);
+            });
           })
         );
       }
@@ -89,6 +102,7 @@ export function useEditEvent(reset: (data: IEventFormData) => void) {
       queryClient.invalidateQueries({ queryKey: ["events"] });
       queryClient.invalidateQueries({ queryKey: ["selectedEvent"] });
       queryClient.invalidateQueries({ queryKey: ["eventImages"] });
+      queryClient.invalidateQueries({ queryKey: ["eventCategories"] });
 
       updateEventFormData(defaultEventFormData); // reset Zustand
       reset(defaultEventFormData); // reset React Hook Form

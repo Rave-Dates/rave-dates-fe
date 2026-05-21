@@ -181,6 +181,15 @@ useEffect(() => {
       })
       .filter(Boolean);
 
+    const categoriesToCreate = parsedCategories
+      .filter((newCat: IEventCategoryValue) => {
+        const oldCat = formattedOldCategories?.find((old) => old.categoryId === newCat.categoryId);
+        return !oldCat;
+      })
+      .map((newCat: IEventCategoryValue) => ({
+        categoryValueId: newCat.valueId,
+      }));
+
     const formattedGeo = data.geo ? `${data.geo};${data.place?.trim()}` : data.place?.trim() || "";
     
     updateEventFormData({
@@ -189,6 +198,7 @@ useEffect(() => {
       isActive: watchedIsActive,
       geo: formattedGeo,
       categoriesToUpdate,
+      categoriesToCreate,
       organizerId: data.organizerId
     })
 
@@ -197,6 +207,7 @@ useEffect(() => {
         ...data,
         eventId,
         categoriesToUpdate,
+        categoriesToCreate,
         isActive: watchedIsActive,
       };
 

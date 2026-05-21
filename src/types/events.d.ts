@@ -55,6 +55,7 @@ interface IEventFormData extends Partial<IEvent> {
   time?: string;
   editPlace?: string;
   categoriesToUpdate?: ({ categoryId: number; oldCategoryValueId: number; newCategoryValueId: number } | null)[];
+  categoriesToCreate?: { categoryValueId: number }[];
   place?: string;
   images: IImageData[];
   oldCategories?: {

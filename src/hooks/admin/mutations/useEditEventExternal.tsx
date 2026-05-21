@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { assignOrganizerToEvent, createImage, deleteImage, editEvent, editEventCategories, getEventImages, activateExternalEvent } from "../../../services/admin-events";
+import { assignOrganizerToEvent, createImage, deleteImage, editEvent, editEventCategories, getEventImages, activateExternalEvent, createEventCategories } from "../../../services/admin-events";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
@@ -13,7 +13,7 @@ export function useEditEventExternal(reset: (data: IEventFormData) => void) {
 
   return useMutation({
     mutationFn: async (formData: IEventFormData) => {
-      const { categoriesToUpdate, organizerId, images, eventId, date, time, geo, place, ...eventData } = formData;
+      const { categoriesToUpdate, categoriesToCreate, organizerId, images, eventId, date, time, geo, place, ...eventData } = formData;
 
       if (!eventId) return;
 
@@ -53,7 +53,20 @@ export function useEditEventExternal(reset: (data: IEventFormData) => void) {
         await Promise.all(
           categoriesToUpdate.map((category) => {
             if (!category) return;
-            return editEventCategories(token, category, eventId);
+            return editEventCategories(token, category, eventId).catch((err) => {
+              console.error("Error en editEventCategories:", err.response?.data || err.message);
+            });
+          })
+        );
+      }
+
+      if (categoriesToCreate) {
+        await Promise.all(
+          categoriesToCreate.map((category) => {
+            if (!category) return;
+            return createEventCategories(token, category, eventId).catch((err) => {
+              console.error("Error en createEventCategories:", err.response?.data || err.message);
+            });
           })
         );
       }
@@ -78,6 +91,7 @@ export function useEditEventExternal(reset: (data: IEventFormData) => void) {
       queryClient.invalidateQueries({ queryKey: ["events"] });
       queryClient.invalidateQueries({ queryKey: ["selectedEvent"] });
       queryClient.invalidateQueries({ queryKey: ["eventImages"] });
+      queryClient.invalidateQueries({ queryKey: ["eventCategories"] });
 
       updateEventFormData(defaultEventFormData); // reset Zustand
       reset(defaultEventFormData); // reset React Hook Form

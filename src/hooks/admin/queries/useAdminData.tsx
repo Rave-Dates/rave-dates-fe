@@ -112,7 +112,7 @@ export function useAdminEventCategories({
   token: CookieValueTypes;
 }) {
   const { data: eventCategories } = useQuery<IEventCategoryValue[]>({
-    queryKey: ["eventCategories"],
+    queryKey: ["eventCategories", eventId],
     queryFn: () => getEventCategoriesById(token, eventId),
     enabled: !!token,
   });

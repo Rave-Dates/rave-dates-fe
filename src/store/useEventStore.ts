@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type Filters = { [key: string]: string };
+type Filters = { [key: string]: string[] };
 
 type EventStore = {
   events: IEvent[] | undefined;
