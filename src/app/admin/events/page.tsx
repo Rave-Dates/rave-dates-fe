@@ -148,13 +148,13 @@ export default function Page() {
             {paginatedEvents?.map((data) => (
               <div
                 key={data.eventId}
-                className={`grid grid-cols-[1fr_1fr_1fr_0.1fr_1.2fr] items-center py-3 px-3 gap-x-2 text-xs ${isEventFuture(data.date) ? "text-white" : "text-white/60"}`}
+                className={`grid grid-cols-[1fr_1fr_1fr_0.25fr_1.2fr] items-center py-3 px-3 gap-x-2 text-xs ${isEventFuture(data.date) ? "text-white" : "text-white/60"}`}
               >
                 <div className="text-start flex flex-col">
                   <h3>{formatDateToColombiaTime(data.date).date} {formatDateToColombiaTime(data.date).time}hs</h3>
                 </div>
                 <div className="text-center tabular-nums">{data.title}</div>
-                <div className="text-center tabular-nums">{extractPlaceFromGeo(data.geo) || data.geo}</div>
+                <div className="text-center tabular-nums">{extractPlaceFromGeo(data.geo) || ""}</div>
                 <div className="text-center tabular-nums">
                   {
                     isEventFuture(data.date) ?

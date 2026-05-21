@@ -167,7 +167,7 @@ export default function Checkout() {
           newTickets: formattedNewTickets,
           payWithBalance: check,
           eventId: eventId,
-          method: "BOLD",
+          method: selectedMethod ? selectedMethod === "Bold" ? "BOLD" : selectedMethod === "Nequi" ? "NEQUI" : "BOLD" : "BOLD",
           boldMethod: selectedMethod.toUpperCase() === "BOLD" ? ["CREDIT_CARD"] : ["NEQUI"],
           returnUrl: `${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets`,
         },
@@ -186,7 +186,7 @@ export default function Checkout() {
 
     if (pendingPaymentPurchaseId && (clientToken || tempToken)) {
       const ticketData = {
-        method: "BOLD",
+        method: selectedMethod ? selectedMethod === "Bold" ? "BOLD" : selectedMethod === "Nequi" ? "NEQUI" : "BOLD" : "BOLD",
         boldMethod: "CREDIT_CARD",
         returnUrl: `${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets/event-ticket/${eventId}`,
       };
@@ -218,7 +218,7 @@ export default function Checkout() {
         ...transferData,
         // boldMethod: selectedMethod.toUpperCase() === "BOLD" ? ["CREDIT_CARD"] : ["NEQUI"],
         boldMethod: "",
-        method: selectedMethod.toUpperCase(),
+        method: selectedMethod ? selectedMethod === "Bold" ? "BOLD" : selectedMethod === "Nequi" ? "NEQUI" : "BOLD" : "BOLD",
         returnUrl: `${process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_FRONT_URL_DEV : process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets/event-ticket/${eventId}`,
       };
 
@@ -246,7 +246,7 @@ export default function Checkout() {
     }
 
     const formattedTicketData: IClientPurchaseTicket = {
-      method: "BOLD",
+      method: selectedMethod ? selectedMethod === "Bold" ? "BOLD" : selectedMethod === "Nequi" ? "NEQUI" : "BOLD" : "BOLD",
       eventId,
       tickets: Object.keys(selected).map((ticketTypeId) => ({
         quantity: selected[ticketTypeId].quantity,
