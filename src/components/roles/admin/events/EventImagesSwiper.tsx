@@ -85,7 +85,7 @@ export default function EventImageSwiper({ setImages, images, isLoading, isError
   return (
     <div className="w-full flex flex-col gap-x-4">
       <h1 className="mb-2 text-xs">
-        Imagenes*
+        Imagenes* <span className="text-xxs text-white/50">(Máx 3MB c/u y 10MB por lote)</span>
       </h1>
       <div className="w-full flex gap-x-4">
         <div className="h-40 rounded-lg w-20 text-center text-text-inactive bg-main-container">
