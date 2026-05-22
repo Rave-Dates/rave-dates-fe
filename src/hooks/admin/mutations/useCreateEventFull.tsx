@@ -51,18 +51,16 @@ export function useCreateFullEvent({reset, successHref = "/admin/events", errorH
             const formatData = {
               "categoryValueId": category.valueId,
             }
-            createEventCategories(token, formatData, eventId)
-          }
-          )
+            return createEventCategories(token, formatData, eventId)
+          })
         );
       }
 
       // 3. Crear tickets
       console.log(tickets)
       await Promise.all(
-        tickets.map((ticket) =>{
+        tickets.map((ticket) =>
           createTicketTypes(token, { ...ticket, eventId })
-        }
         )
       );
 

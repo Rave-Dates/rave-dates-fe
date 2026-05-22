@@ -75,6 +75,11 @@ function ClientAuth() {
       return;
     }
 
+    if (whereRedirect === "checkout") {
+      router.push('/otp?redirect=checkout');
+      return;
+    }
+
     router.push('/otp');
   };
 

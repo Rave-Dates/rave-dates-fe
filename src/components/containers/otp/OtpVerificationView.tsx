@@ -131,7 +131,7 @@ export default function OtpVerificationView() {
         deleteCookie("token")
         deleteCookie("isPromoter")
         
-        if (redirectToCheckout) {
+        if (whereRedirect === "checkout") {
           router.replace("/checkout");
         } else if (whereRedirect === "transfer") {
           if (eventId) setEventId(Number(eventId));

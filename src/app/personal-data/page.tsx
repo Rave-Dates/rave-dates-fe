@@ -97,7 +97,7 @@ export default function DataForm() {
       if (error.response.data.message === "Client already exists") {
         notifyError(
           <span>
-            El cliente ya existe, inicie sesión <Link onClick={handleRedirectClick} href="/auth" className="underline decoration-primary underline-offset-2">AQUI</Link>.
+            El cliente ya existe, inicie sesión <Link onClick={handleRedirectClick} href="/auth?redirect=checkout" className="underline decoration-primary underline-offset-2">AQUI</Link>.
           </span>
           ,
           Infinity
