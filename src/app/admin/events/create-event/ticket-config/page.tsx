@@ -90,7 +90,7 @@ export default function TicketConfiguration() {
       timeOut: data.timeOut,
       labels: data.labels || [],
       tickets: validTickets,
-      quantityComplimentaryTickets: data.quantityComplimentaryTickets,
+      quantityComplimentaryTickets: data.quantityComplimentaryTickets || 0,
       organizerId: data.organizerId,
       feeBoldPorcentage: data.feeBoldPorcentage,
       minPartialPercentage: data.minPartialPercentage,

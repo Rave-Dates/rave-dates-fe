@@ -129,7 +129,7 @@ export default function EditTicketConfiguration() {
       labels: data.labels || [],
       tickets: formattedTickets,
       piggyBank: data.piggyBank,
-      quantityComplimentaryTickets: data.quantityComplimentaryTickets,
+      quantityComplimentaryTickets: data.quantityComplimentaryTickets || 0,
       organizerId: data.organizerId,
       feeBoldPorcentage: data.feeBoldPorcentage,
       minPartialPercentage: data.minPartialPercentage,

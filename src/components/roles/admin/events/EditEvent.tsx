@@ -89,7 +89,7 @@ export default function EditEvent({ eventId }: { eventId: number }) {
       isActive: event.isActive,
       timeOut: event.timeOut,
       piggyBank: event.piggyBank,
-      quantityComplimentaryTickets: event.quantityComplimentaryTickets,
+      quantityComplimentaryTickets: event.quantityComplimentaryTickets || 0,
       formPromoters: formattedPromoters,
       feeBoldPorcentage: event.feeBoldPorcentage,
       minPartialPercentage: event.minPartialPercentage,

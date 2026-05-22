@@ -73,7 +73,7 @@ export default function Page() {
       type: eventFormData.type,
       labels: eventFormData.labels || [],
       images: eventFormData.images,
-      quantityComplimentaryTickets: eventFormData.quantityComplimentaryTickets,
+      quantityComplimentaryTickets: eventFormData.quantityComplimentaryTickets || 0,
       organizerId: eventFormData.organizerId,
     };
 
