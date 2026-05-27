@@ -24,12 +24,12 @@ import { initPromoterTicketPurchase } from "@/services/admin-payments";
 import { useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 
 export default function Checkout() {
-  const [selectedPayment, setSelectedPayment] = useState<"Pago total" | "Abonar a la alcancía">("Pago total");
+  const [selectedPayment, setSelectedPayment] = useState<"Pago total" | "Abrir alcancía">("Pago total");
   const [selectedMethod, setSelectedMethod] = useState<"Nequi" | "Bold" | "Ninguno">("Nequi");
   const [hasDiscountFlag, setHasDiscountFlag] = useState<boolean>(false);
   const searchParams = useSearchParams();
   const isTransfer = searchParams.get("transfer");
-  const { selected, eventId: ticketStoreEventId, promoterClientId } = useTicketStore();
+  const { selected, eventId: ticketStoreEventId, promoterClientId, pendingPaymentAmount } = useTicketStore();
   const transferStoreEventId = useTransferStore((state) => state.eventId);
   const eventId = isTransfer ? (transferStoreEventId ?? 0) : ticketStoreEventId;
   const { eventTickets } = useClientEventTickets(eventId);
@@ -84,7 +84,7 @@ export default function Checkout() {
   
   const effectiveBalance = isPromoter ? (promoterBalance ?? 0) : (clientData?.balance ?? 0);
   
-  const totalAmount = searchParams.get("transfer") ? (selectedEvent?.transferCost || 0) : Object.entries(selected).reduce((acc, [ticketTypeIdStr, selectedData]) => {
+  const totalAmount = searchParams.get("transfer") ? (selectedEvent?.transferCost || 0) : pendingPaymentPurchaseId ? pendingPaymentAmount : Object.entries(selected).reduce((acc, [ticketTypeIdStr, selectedData]) => {
     const ticketTypeId = Number(ticketTypeIdStr);
     const ticketInfo = eventTickets?.find(t => t.ticketTypeId === ticketTypeId);
     const price = selectedData.stage?.price || ticketInfo?.stages[0].price || 0;
@@ -189,6 +189,8 @@ export default function Checkout() {
         method: selectedMethod ? selectedMethod === "Bold" ? "BOLD" : selectedMethod === "Nequi" ? "NEQUI" : "BOLD" : "BOLD",
         boldMethod: "CREDIT_CARD",
         returnUrl: `${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets/event-ticket/${eventId}`,
+        isPartial: selectedPayment === "Abrir alcancía",
+        amount: selectedPayment === "Abrir alcancía" ? watchedPartialAmount : 0,
       };
 
       notifyPending(
@@ -253,8 +255,8 @@ export default function Checkout() {
         ticketTypeId: Number(ticketTypeId),
       })),
       promoterId: decodedPromoterAffiliate ? decodedPromoterAffiliate.promoterId : isPromoter ? decodedToken?.promoterId : promoterClientId ? decoded?.promoterId : undefined,
-      isPartial: selectedPayment === "Abonar a la alcancía",
-      amount: selectedPayment === "Abonar a la alcancía" ? watchedPartialAmount : 0,
+      isPartial: selectedPayment === "Abrir alcancía",
+      amount: selectedPayment === "Abrir alcancía" ? watchedPartialAmount : 0,
       // If a promoter selected a client, use that client's ID; otherwise use the logged-in client's ID
       clientId: promoterClientId || (decoded && decoded.id) || (decodedTemp && decodedTemp.id) || 0,
       returnUrl: urlToReturn,
@@ -346,7 +348,7 @@ export default function Checkout() {
             isBalanceSufficient={isBalanceSufficient}
           /> 
           {
-          selectedPayment === "Abonar a la alcancía" && selectedEvent && selectedEvent.piggyBank && !isChangeTickets &&
+          selectedPayment === "Abrir alcancía" && selectedEvent && selectedEvent.piggyBank && !isChangeTickets &&
             <PartialAmount 
               eventPBComission={selectedEvent.feePB}
               register={register}

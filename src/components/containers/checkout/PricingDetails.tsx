@@ -11,7 +11,7 @@ type Props = {
   clientData: IClient | null | undefined;
   promoterBalance?: number;
   isPromoter?: boolean;
-  selectedPayment: "Pago total" | "Abonar a la alcancía";
+  selectedPayment: "Pago total" | "Abrir alcancía";
   partialAmount: number;
   totalAmount: number;
   eventDiscountCode: string | undefined;
@@ -69,11 +69,11 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
   }
 
   // Restar pago parcial si corresponde
-  if (selectedPayment === "Abonar a la alcancía" && !check) {
+  if (selectedPayment === "Abrir alcancía" && !check) {
     totalWithBalanceDiscount = partialAmount;
   }
 
-  if (selectedPayment === "Abonar a la alcancía" && check && effectiveBalance) {
+  if (selectedPayment === "Abrir alcancía" && check && effectiveBalance) {
     totalWithBalanceDiscount = partialAmount - effectiveBalance ;
   }
 
@@ -139,9 +139,9 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
       }
       {
         isPendingPayment &&
-        <div className="flex justify-between">
+        <div className="flex justify-between border-dashed border-inactive border-b-2 pb-3">
           <span className="text-primary-white/50">Pago pendiente</span>
-          <span className="text-end">${pendingPaymentAmount.toLocaleString()} COP</span>
+          <span className="text-end">${(selectedPayment === "Abrir alcancía" ? Number(partialAmount) : pendingPaymentAmount).toLocaleString()} COP</span>
         </div>
       }
       {
@@ -167,7 +167,7 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
                 (() => {
                   let finalTotal = 0;
                   if (!isChangeTickets) {
-                    if (selectedPayment === "Abonar a la alcancía") {
+                    if (selectedPayment === "Abrir alcancía") {
                       finalTotal = Number(partialAmount) + gatewayFee;
                       if (check && effectiveBalance) {
                         finalTotal -= effectiveBalance;
@@ -187,7 +187,16 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
             </span>
             :
             <span className="text-end">
-              ${pendingPaymentAmount.toLocaleString()} COP
+              ${ 
+                (() => {
+                  let finalTotal = selectedPayment === "Abrir alcancía" ? Number(partialAmount) : pendingPaymentAmount;
+                  finalTotal += gatewayFee;
+                  if (check && effectiveBalance) {
+                    finalTotal -= effectiveBalance;
+                  }
+                  return Math.max(finalTotal, 0).toLocaleString();
+                })()
+              } COP
             </span>
 
         }
