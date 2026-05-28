@@ -21,6 +21,7 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import OrganizerEventAttendees from "../create-event/OrganizerEventAttendees"
 import { useTicketStore } from "@/store/useTicketStore"
+import ComplimentaryHistoryModal from "./ComplimentaryHistoryModal"
 
 const getActiveStage = (stages: any[]) => {
   const now = new Date();
@@ -461,38 +462,56 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                 </div> 
               </div>
             }
-            <div className="bg-input flex flex-col items-center rounded-lg p-4 ps-3 mt-2">
-              Información del evento
-              <div className="flex flex-col text-primary-white/80 gap-x-3 mt-2">
+            <div className="bg-input flex flex-col rounded-lg p-4 ps-3 mt-2">
+              <h1 className="text-center font-semibold w-full">Información del evento</h1>
+              <div className="flex flex-col text-primary-white/80 gap-y-3 mt-4 w-full">
                 <div>
-                  <span className="text-primary">• </span>Cortesía ganada cada <span className="text-primary">{selectedEvent?.quantityComplimentaryTickets}</span> ventas
+                  <span className="text-primary">• </span>Entrada de cortesía cada <span className="text-primary">{selectedEvent?.quantityComplimentaryTickets}</span> ventas.
                 </div>
-                <div>
-                  <span className="text-primary">• </span>Comisión por entrada vendida $<span className="text-primary">{selectedEvent?.quantityComplimentaryTickets?.toLocaleString('es-CO')}</span>
+                <div className="w-full">
+                  <span className="text-primary">• </span>Comisiones por entrada vendida:
+                  <div className="flex flex-col gap-y-2 mt-2 w-full">
+                    {ticketTypes?.map((ticket) => (
+                      <div key={ticket.ticketTypeId} className="bg-[#1C1C1E] border border-inactive/20 rounded-lg p-3 w-full">
+                        <span className="font-medium text-primary-white">{ticket.name}</span>
+                        <div className="flex flex-col gap-y-1 mt-2">
+                          {ticket.stages?.map((stage, index) => (
+                            <div key={index} className="flex justify-between text-sm text-primary-white/80 border-b border-primary/20 pb-1 last:border-0 last:pb-0">
+                              <span>Etapa {index + 1}:</span>
+                              <span className="text-white">
+                                ${stage.promoterFee?.toLocaleString('es-CO') || 0}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="bg-input flex flex-col items-center rounded-lg p-4 ps-3 mt-2">
+            <div className="bg-input flex flex-col items-center rounded-lg p-4 pb-1 ps-3 mt-2">
               Entradas de cortesía disponibles:
-              <div className="flex gap-x-3">
-                {complimentaryAvailable?.map((data) => (
-                  <div key={data.ticketTypeId} className="space-y-3 rounded-lg">
+              <div className="flex gap-x-3 mb-4">
+                {complimentaryAvailable?.availableTickets?.map((data, index) => (
+                  <div key={index} className="space-y-3 rounded-lg">
                     <div className="flex justify-between items-center">
                       <div>
-                        <span>{data.ticketTypeId}</span>
+                        <span>{data.ticketName}</span>
                         <span className="text-primary"> x{data.quantity}</span>
                       </div>
                     </div>
                   </div>
                 ))}
                 {
-                  complimentaryAvailable?.length === 0 && (
+                  (!complimentaryAvailable?.availableTickets || complimentaryAvailable.availableTickets.length === 0) && (
                     <div className="text-center pt-4 pb-2 text-neutral-400">
                       No se encontraron entradas de cortesía
                     </div>
                   )
                 }
               </div>
+              <ComplimentaryHistoryModal ticketHistory={complimentaryAvailable?.ticketHistory} />
             </div>
             <div className="bg-input mt-2 rounded-lg px-3 py-2">
               <h1 className="font-medium px-2 mt-2">Transferir cortesía</h1>

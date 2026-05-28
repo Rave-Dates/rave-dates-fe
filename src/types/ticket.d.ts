@@ -109,8 +109,33 @@ interface IComplimentaryPurchase {
 }
 
 interface IComplimentaryAvailable {
-  ticketTypeId: string;
+  ticketName: string;
   quantity: number;
+}
+
+interface IComplimentaryHistoryClient {
+  clientId: number;
+  name: string;
+  email: string;
+  whatsapp: string;
+  idCard: string;
+  balance: number;
+  isEmailVerified: boolean;
+  isWhatsappVerified: boolean;
+  firstlogin: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface IComplimentaryHistory {
+  ticketName: string;
+  quantity: number;
+  client: IComplimentaryHistoryClient;
+}
+
+interface IComplimentaryAvailableResponse {
+  availableTickets: IComplimentaryAvailable[];
+  ticketHistory: IComplimentaryHistory[];
 }
 
 type IChangeTicketsPayload = {

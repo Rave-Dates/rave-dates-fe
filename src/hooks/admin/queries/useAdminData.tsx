@@ -360,7 +360,7 @@ export function useAdminGetCheckerById({ token, userId }: { token: string | null
 }
 
 export function useAdminGetComplimentaryAvailable({ token, eventId, promoterId }: { token: string | null | undefined, eventId: number, promoterId: number }) {
-  const { data: complimentaryAvailable, isLoading } = useQuery<IComplimentaryAvailable[]>({
+  const { data: complimentaryAvailable, isLoading } = useQuery<IComplimentaryAvailableResponse>({
     queryKey: ["complimentaryAvailable"],
     queryFn: () => getComplimentaryAvailable(token!, eventId, promoterId),
     enabled: !!token && !!eventId && !!promoterId,
