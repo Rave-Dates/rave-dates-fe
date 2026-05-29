@@ -44,8 +44,9 @@ export default function PartialAmount({ register, totalAmount, partialAmount, ev
           onInput={(e) => {
             const input = e.currentTarget;
             const value = Number(input.value);
-            if (value > totalToPay) {
-              input.value = totalToPay.toString();
+            const maxAllowed = totalToPay - 1000;
+            if (value > maxAllowed) {
+              input.value = Math.max(0, maxAllowed).toString();
             }
           }}
         />    

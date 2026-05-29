@@ -189,8 +189,7 @@ export default function Checkout() {
         method: selectedMethod ? selectedMethod === "Bold" ? "BOLD" : selectedMethod === "Nequi" ? "NEQUI" : "BOLD" : "BOLD",
         boldMethod: "CREDIT_CARD",
         returnUrl: `${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets/event-ticket/${eventId}`,
-        isPartial: selectedPayment === "Abrir alcancía",
-        amount: selectedPayment === "Abrir alcancía" ? watchedPartialAmount : 0,
+        ...(selectedPayment === "Abrir alcancía" ? { amount: watchedPartialAmount } : {}),
       };
 
       notifyPending(
