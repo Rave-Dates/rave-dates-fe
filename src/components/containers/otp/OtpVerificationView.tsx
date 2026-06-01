@@ -50,10 +50,10 @@ export default function OtpVerificationView() {
   const eventId = searchParams.get('eid')
 
   useEffect(() => {
-    if (clientToken) {
+    if (clientToken && whereRedirect !== 'my-data') {
       router.replace("/");
     }
-  }, [clientToken, router]);
+  }, [clientToken, whereRedirect, router]);
   
   useEffect(() => {
     if (tempToken) {
@@ -136,6 +136,8 @@ export default function OtpVerificationView() {
         } else if (whereRedirect === "transfer") {
           if (eventId) setEventId(Number(eventId));
           router.replace("/transfer-confirm");
+        } else if (whereRedirect === "my-data") {
+          router.replace("/my-data");
         } else {
           router.replace("/tickets");
         }

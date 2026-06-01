@@ -113,11 +113,11 @@ export default function DataForm() {
     // si el email cambió => lo cambiamos y redirigimos
     if (data.email !== client.email) {
       mutate({id: client.clientId, formData: { email: data.email }, token: clientToken});
-      router.push('/otp');
+      router.push('/otp?redirect=my-data');
       return
     }
 
-    router.push('/otp');
+    router.push('/otp?redirect=my-data');
     return
   };
 
@@ -135,11 +135,11 @@ export default function DataForm() {
     // si el email cambió => lo cambiamos y redirigimos
     if (data.whatsapp !== client.whatsapp) {
       mutate({id: client.clientId, formData: { whatsapp: data.whatsapp }, token: clientToken});
-      router.push('/otp');
+      router.push('/otp?redirect=my-data');
       return
     }
 
-    router.push('/otp');
+    router.push('/otp?redirect=my-data');
     return
   };
 
