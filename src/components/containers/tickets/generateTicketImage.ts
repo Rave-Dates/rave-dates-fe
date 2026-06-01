@@ -221,7 +221,23 @@ export const generateTicketImage = async ({
   ctx.quadraticCurveTo(imgX, y, imgX + radius, y)
   ctx.closePath()
   ctx.clip()
-  ctx.drawImage(eventImg, imgX, y, eventImgSize, eventImgSize)
+
+  // Calcular dimensiones para simular object-fit: cover
+  const imgRatio = eventImg.width / eventImg.height;
+  let sWidth = eventImg.width;
+  let sHeight = eventImg.height;
+  let sx = 0;
+  let sy = 0;
+
+  if (imgRatio > 1) {
+    sWidth = eventImg.height;
+    sx = (eventImg.width - sWidth) / 2;
+  } else {
+    sHeight = eventImg.width;
+    sy = (eventImg.height - sHeight) / 2;
+  }
+
+  ctx.drawImage(eventImg, sx, sy, sWidth, sHeight, imgX, y, eventImgSize, eventImgSize)
   ctx.restore()
 
   y += eventImgSize + 60

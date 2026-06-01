@@ -34,9 +34,18 @@ const NavbarWeb: React.FC = () => {
       return;
     }
 
-    const filtered = events?.filter((event) =>
-      event.title.toLowerCase().includes(term.toLowerCase())
-    ) || [];
+    const filtered = events?.filter((event) => {
+      if (!event.date) return false;
+
+      const eventDate = new Date(event.date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const isUpcoming = eventDate.getTime() >= today.getTime();
+      const matchesSearch = event.title.toLowerCase().includes(term.toLowerCase());
+
+      return isUpcoming && matchesSearch;
+    }) || [];
 
     setResults(filtered);
   };

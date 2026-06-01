@@ -231,7 +231,21 @@ const ChangeTicketsView = () => {
     0
   );
 
+  // Verifica si la nueva selección es exactamente igual a los tickets originales
+  const isSameAsOriginal = React.useMemo(() => {
+    const selectedEntries = Object.entries(selected);
+    if (selectedEntries.length !== oldTicketsGrouped.length) return false;
+
+    return selectedEntries.every(([ticketTypeId, val]) => {
+      const original = oldTicketsGrouped.find(
+        (t) => t.ticketTypeId === Number(ticketTypeId)
+      );
+      return original && original.quantity === val.quantity;
+    });
+  }, [selected, oldTicketsGrouped]);
+
   const handleSetActiveTab = (purchaseId: number) => {
+    if (purchaseId === activeTab) return;
     setStorePurchaseId(purchaseId);
     setActiveTab(purchaseId);
     resetStore();
@@ -410,9 +424,9 @@ const ChangeTicketsView = () => {
               !(
                 activeTab &&
                 purchaseIds &&
-                totalPrice !== 0 
-                && totalQuantity === oldTicketsTotal - totalOldTickets
-              )
+                totalPrice !== 0 &&
+                totalQuantity === oldTicketsTotal - totalOldTickets
+              ) || isSameAsOriginal
             }
             className="w-full text-center py-3 rounded-lg transition-colors text-primary-white bg-primary hover:bg-primary/70 disabled:bg-primary/60 disabled:pointer-events-none"
           >
