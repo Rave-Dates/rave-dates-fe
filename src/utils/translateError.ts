@@ -9,6 +9,7 @@ const errorMap: { [key: string]: string } = {
   "Sold out": "Tickets agotados",
   "Event is not active": "El evento no está activo",
   "User already exists": "El usuario ya existe",
+  "Client already exists": "El cliente ya fue registrado",
 };
 
 export const translateError = (message: string): string => {

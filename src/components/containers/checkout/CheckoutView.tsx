@@ -334,6 +334,7 @@ export default function Checkout() {
             selected={selectedPayment} 
             setSelected={setSelectedPayment} 
             isChangeTickets={isChangeTickets}
+            isTransfer={isTransfer}
             isPendingPayment={pendingPaymentPurchaseId}
           />
           <PaymentMethodSelector 
