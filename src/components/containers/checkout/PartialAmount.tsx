@@ -11,20 +11,25 @@ type Props = {
   effectiveFeePercentage: number
   selectedMethod: "Nequi" | "Bold" | "Ninguno"
   minPartialPercentage?: number
+  isPendingPayment?: boolean
 };
 
-export default function PartialAmount({ register, totalAmount, partialAmount, eventPBComission, hasDiscountFlag, watchedDiscountCode, effectiveFeePercentage, selectedMethod, minPartialPercentage } : Props) {
+export default function PartialAmount({ register, totalAmount, partialAmount, eventPBComission, hasDiscountFlag, watchedDiscountCode, effectiveFeePercentage, selectedMethod, minPartialPercentage, isPendingPayment = false } : Props) {
   console.log("eventPBComission", eventPBComission)
 
   const gatewayFee = selectedMethod === "Bold" ? totalAmount * (effectiveFeePercentage / 100) : 0;
   const actualDiscountValue = hasDiscountFlag ? totalAmount * (watchedDiscountCode / 100) : 0;
-  const pbCommissionValue = totalAmount * (eventPBComission / 100);
+  const pbCommissionValue = isPendingPayment ? 0 : totalAmount * (eventPBComission / 100);
   
-  const totalToPay = totalAmount + gatewayFee - actualDiscountValue + pbCommissionValue;
-  const pendingAmount = Math.max(totalToPay - partialAmount, 0);
+  // Total base: sin fee de pasarela (usado para saldo pendiente y mínimo de alcancía)
+  const totalBaseAmount = totalAmount - actualDiscountValue + pbCommissionValue;
+  // Total con fee: usado solo para el tope del input
+  const totalToPay = totalBaseAmount + gatewayFee;
+
+  const pendingAmount = Math.max(totalBaseAmount - partialAmount, 0);
 
   const MIN_AMOUNT = minPartialPercentage
-    ? Math.ceil(totalToPay * (minPartialPercentage / 100))
+    ? Math.ceil(totalBaseAmount * (minPartialPercentage / 100))
     : 1000;
 
   return (
@@ -51,9 +56,13 @@ export default function PartialAmount({ register, totalAmount, partialAmount, ev
           }}
         />    
       </div>
-      <h3 className="text-xs text-primary-white/50 pt-2 pb-5">Cantidad mínima inicial: ${MIN_AMOUNT.toLocaleString()} COP{minPartialPercentage ? ` (${minPartialPercentage}%)` : ""}</h3>
-      <h2 className="pb-1 text-sm">Saldo pendiente a pagar: ${pendingAmount.toLocaleString()} COP <span className="text-xs text-primary-white/50"></span></h2>
-      <h3 className="text-xs text-primary-white/50 pb-3">Comisión de alcancía: {eventPBComission}% (${pbCommissionValue.toLocaleString()} COP)</h3>
+      {!isPendingPayment && (
+        <h3 className="text-xs text-primary-white/50 pt-2 pb-5">Cantidad mínima inicial: ${MIN_AMOUNT.toLocaleString()} COP{minPartialPercentage ? ` (${minPartialPercentage}%)` : ""}</h3>
+      )}
+      <h2 className={`pb-1 ${!isPendingPayment ? "" : "pt-3"} text-sm`}>Saldo pendiente a pagar: ${pendingAmount.toLocaleString()} COP <span className="text-xs text-primary-white/50"></span></h2>
+      {!isPendingPayment && (
+        <h3 className="text-xs text-primary-white/50 pb-3">Comisión de alcancía: {eventPBComission}% (${pbCommissionValue.toLocaleString()} COP)</h3>
+      )}
       <h3 className="text-xs text-primary-white/50 pb-2">Deberás abonar el resto del pago antes del evento a través de &quot;Mis Tickets&quot;</h3>
     </div>
   );

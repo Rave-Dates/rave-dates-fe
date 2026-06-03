@@ -197,7 +197,12 @@ export default function Checkout() {
           partialPurchase({ ticketData, clientToken: (clientToken || tempToken), purchaseId: Number(pendingPaymentPurchaseId) })
             .then((data) => {
               resolve(data);
-              router.push(data);
+              const decoded = typeof data === "string" ? decodeURIComponent(data) : data;
+              if (decoded === "PAY NOT NEEDED") {
+                router.push(`/tickets/event-ticket/${eventId}`);
+              } else {
+                router.push(data);
+              }
             })
             .catch((err) => {
               reject(err);
@@ -359,6 +364,7 @@ export default function Checkout() {
               effectiveFeePercentage={effectiveFeePercentage}
               selectedMethod={selectedMethod}
               minPartialPercentage={selectedEvent?.minPartialPercentage}
+              isPendingPayment={!!pendingPaymentPurchaseId}
             />
           }
         </div>

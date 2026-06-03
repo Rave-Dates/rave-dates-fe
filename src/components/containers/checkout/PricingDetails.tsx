@@ -124,6 +124,13 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
         </div>
       ))}
       {
+        isPendingPayment &&
+        <div className="flex justify-between border-dashed border-inactive border-b-2 pb-3">
+          <span className="text-primary-white/50">Saldo pendiente total</span>
+          <span className="text-end">${pendingPaymentAmount.toLocaleString()} COP</span>
+        </div>
+      }
+      {
         selectedMethod === "Bold" &&
         <div className="flex justify-between">
           <span className="text-primary-white/50">Comisión Bold</span>
@@ -138,10 +145,10 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
         </div>
       }
       {
-        isPendingPayment &&
+        isPendingPayment && selectedPayment === "Abrir alcancía" && Number(partialAmount) > 0 &&
         <div className="flex justify-between border-dashed border-inactive border-b-2 pb-3">
-          <span className="text-primary-white/50">Pago pendiente</span>
-          <span className="text-end">${(selectedPayment === "Abrir alcancía" ? Number(partialAmount) : pendingPaymentAmount).toLocaleString()} COP</span>
+          <span className="text-primary-white/50">Pago a realizar</span>
+          <span className="text-end">${Number(partialAmount).toLocaleString()} COP</span>
         </div>
       }
       {

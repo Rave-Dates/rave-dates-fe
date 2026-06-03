@@ -54,16 +54,24 @@ export const notifyPending = (promise: Promise<unknown>, options?: {  loading?: 
       if (typeof err === "string") {
         rawMessage = err;
       } else if (axios.isAxiosError(err)) {
-        rawMessage = (err as AxiosError<{ message: string }>).response?.data?.message || err.message;
+        const dataMessage = (err as AxiosError<{ message: string | string[] }>).response?.data?.message;
+        if (typeof dataMessage === "string") {
+          rawMessage = dataMessage;
+        } else if (Array.isArray(dataMessage)) {
+          rawMessage = dataMessage.join(", ");
+        } else {
+          rawMessage = err.message;
+        }
       } else if (err instanceof Error) {
         rawMessage = err.message;
       }
 
       const translated = translateError(rawMessage);
       
-      // Si el mensaje fue traducido satisfactoriamente, lo mostramos.
-      // Si no, usamos el mensaje amigable de las opciones (fallback).
-      const displayMessage = (rawMessage && translated !== rawMessage ? translated : options?.error) || "Ocurrió un error";
+      // Si hay traducción → la mostramos.
+      // Si no hay traducción pero sí hay mensaje del backend → lo mostramos tal cual.
+      // Si no hay nada → usamos el fallback de options.error.
+      const displayMessage = (rawMessage && translated !== rawMessage ? translated : rawMessage) || options?.error || "Ocurrió un error";
 
       return (
         <div className="flex items-center gap-2">

@@ -214,7 +214,7 @@ const ChangeTicketsView = () => {
       clientToken: clientToken,
     });
 
-    if (res.data === "PAY NOT NEEDED") {
+    if (decodeURIComponent(res) === "PAY NOT NEEDED") {
       notifySuccess("Cambio realizado correctamente");
       router.push("/tickets");
       return
