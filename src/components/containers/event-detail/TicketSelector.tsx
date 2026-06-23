@@ -6,7 +6,10 @@ import { useTicketStore } from "@/store/useTicketStore";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useMutation } from "@tanstack/react-query";
 import { purchaseFreeTicket } from "@/services/clients-tickets";
-import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
+import {
+  notifyError,
+  notifySuccess,
+} from "@/components/ui/toast-notifications";
 import { useParams, useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { useClientEvent } from "@/hooks/client/queries/useClientData";
@@ -16,7 +19,7 @@ type Props = {
   tickets?: IEventTicket[];
   isLoading?: boolean;
   maxPurchase?: number;
-  eventInfo?: { date: string, title: string };
+  eventInfo?: { date?: string; title?: string; piggyBank?: boolean };
 };
 
 const TicketSelector = ({
@@ -36,6 +39,8 @@ const TicketSelector = ({
   const { selectedEvent } = useClientEvent(eventId);
   const [isVisible, setIsVisible] = React.useState(false);
 
+  console.log("eventInfo", eventInfo);
+
   React.useEffect(() => {
     const handleScroll = () => {
       // Aparecer después de 300px de scroll (pasando el hero y el header)
@@ -49,29 +54,28 @@ const TicketSelector = ({
     window.addEventListener("scroll", handleScroll);
     // Verificar posición inicial
     handleScroll();
-    
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const totalQuantity = Object.values(selected).reduce(
     (acc, curr) => acc + curr.quantity,
-    0
+    0,
   );
   const totalPrice = Object.values(selected).reduce(
     (acc, curr) => acc + curr.quantity * curr.stage.price,
-    0
+    0,
   );
 
-  
   const { mutate: purchaseFreeTicketMutation } = useMutation({
     mutationFn: purchaseFreeTicket,
     onSuccess: () => {
       deleteCookie("promoterAffiliate", { path: "/" });
       notifySuccess("Compra gratuita realizada correctamente");
-      router.push('/tickets');
+      router.push("/tickets");
     },
     onError: (e) => {
-      console.log(e)
+      console.log(e);
       notifyError("Error al realizar la compra gratuita");
     },
   });
@@ -80,10 +84,11 @@ const TicketSelector = ({
     if (selectedEvent?.type === "free") {
       if (!clientToken) {
         router.push("/personal-data");
-        return
+        return;
       }
-      const decoded: {id: number, email: string, iat: number, exp: number} = jwtDecode(clientToken);
-      
+      const decoded: { id: number; email: string; iat: number; exp: number } =
+        jwtDecode(clientToken);
+
       purchaseFreeTicketMutation({
         ticketData: {
           clientId: decoded.id,
@@ -95,24 +100,30 @@ const TicketSelector = ({
         },
         clientToken: clientToken,
       });
-      return
+      return;
     }
     router.push(tempToken || clientToken ? "/checkout" : "/personal-data");
-  }
+  };
 
   return (
     <div>
       <h3
         className={`${
           isTicketList && "hidden"
-        } text-lg font-semibold text-white mb-2`}
+        } ${!eventInfo?.piggyBank && "mb-2"} text-lg font-semibold text-white`}
       >
-        Entradas disponibles <span className="text-sm text-text-inactive">(Máximo {maxPurchase})</span>
+        Entradas{" "}
+        <span className="text-sm text-text-inactive">
+          (Máximo {maxPurchase})
+        </span>
       </h3>
+      {eventInfo?.piggyBank && (
+        <p className="text-sm text-text-inactive mb-2">
+          *Pago con alcancía disponible
+        </p>
+      )}
       {isTicketList ? (
-        <>
-          { eventInfo && <TicketsChanger eventInfo={eventInfo} />}
-        </>
+        <>{eventInfo && <TicketsChanger eventInfo={eventInfo} />}</>
       ) : (
         <>
           {isLoading ? (
@@ -120,7 +131,12 @@ const TicketSelector = ({
           ) : (
             <>
               {tickets?.map((ticket) => (
-                <TicketButtons totalQuantity={totalQuantity} maxPurchase={maxPurchase} key={ticket.ticketTypeId} ticket={ticket} />
+                <TicketButtons
+                  totalQuantity={totalQuantity}
+                  maxPurchase={maxPurchase}
+                  key={ticket.ticketTypeId}
+                  ticket={ticket}
+                />
               ))}
             </>
           )}
@@ -153,16 +169,27 @@ const TicketSelector = ({
           </div>
 
           {/* Total y Botón - Mobile Flotante */}
-          <div className={`md:hidden fixed bottom-[100px] left-0 right-0 px-6 z-30 transition-all duration-500 ease-in-out ${
-            isVisible ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0 pointer-events-none"
-          }`}>
+          <div
+            className={`md:hidden fixed bottom-[100px] left-0 right-0 px-6 z-30 transition-all duration-500 ease-in-out ${
+              isVisible
+                ? "translate-y-0 opacity-100"
+                : "translate-y-20 opacity-0 pointer-events-none"
+            }`}
+          >
             <div className="bg-[#0D0D0D]/90 backdrop-blur-md border border-divider p-4 rounded-2xl shadow-2xl flex flex-col gap-3">
               <div className="flex justify-between items-center text-white font-bold px-1">
                 <span className="text-sm">TOTAL</span>
-                <span className="font-light tabular-nums text-primary text-lg">
-                  {totalQuantity > 0
-                    ? <div><span className="text-primary">$</span><span className="tabular-nums text-primary-white">{totalPrice.toLocaleString()} COP</span></div>
-                    : "0"}
+                <span className="font-light tabular-nums text-lg">
+                  {totalQuantity > 0 ? (
+                    <div>
+                      <span>$</span>
+                      <span className="tabular-nums text-primary-white">
+                        {totalPrice.toLocaleString()} COP
+                      </span>
+                    </div>
+                  ) : (
+                    "0"
+                  )}
                 </span>
               </div>
 

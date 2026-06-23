@@ -314,6 +314,7 @@ useEffect(() => {
         title="Información general"
         inputName="description"
         register={register("description")}
+        watchValue={watch("description")}
       />
 
       {watch("type") === "external" && (

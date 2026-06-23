@@ -13,7 +13,7 @@ import { defaultEventFormData } from "@/constants/defaultEventFormData";
 import { useCreateOrganizerFreeEvent } from "@/hooks/admin/mutations/useCreateOrganizerFreeEvent";
 import { useAdminAllCategories, useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { combineDateAndTimeToISO, formatColombiaTimeToUTC, validateDateYyyyMmDd } from "@/utils/formatDate";
+import { combineDateAndTimeToISO, formatColombiaTimeToUTC, validateDateYyyyMmDd, getTodayLocalStr } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
@@ -27,7 +27,7 @@ const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/Ge
 export default function Page() {
   const { eventFormData, updateEventFormData } = useCreateEventStore();
 
-  const { register, handleSubmit, setValue, control, reset } = useForm<IEventFormData>({
+  const { register, handleSubmit, watch, setValue, control, reset } = useForm<IEventFormData>({
     defaultValues: defaultEventFormData
   });
 
@@ -79,7 +79,7 @@ export default function Page() {
   }, [eventFormData, setValue]);
   
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getTodayLocalStr();
     setValue("tickets.0.stages.0.date", today);
     if (eventFormData.date) {
       setValue("tickets.0.stages.0.dateMax", eventFormData.date);
@@ -227,6 +227,7 @@ export default function Page() {
         title="Información general"
         inputName="description"
         register={register("description")}
+        watchValue={watch("description")}
       />
 
        <h1 className="font-semibold text-3xl mt-8">Configura los tickets</h1> 

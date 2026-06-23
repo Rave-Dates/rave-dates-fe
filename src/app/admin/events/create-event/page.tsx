@@ -8,9 +8,13 @@ import FormDropDown from "@/components/ui/inputs/FormDropDown";
 import FormInput from "@/components/ui/inputs/FormInput";
 import FormTextArea from "@/components/ui/inputs/FormTextArea";
 import { defaultEventFormData } from "@/constants/defaultEventFormData";
-import { useAdminAllCategories, useAdminAllUsers, useAdminLabelsTypes } from "@/hooks/admin/queries/useAdminData";
+import {
+  useAdminAllCategories,
+  useAdminAllUsers,
+  useAdminLabelsTypes,
+} from "@/hooks/admin/queries/useAdminData";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { validateDateYyyyMmDd } from "@/utils/formatDate";
+import { validateDateYyyyMmDd, getTodayLocalStr } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
 import dynamic from "next/dynamic";
@@ -22,35 +26,40 @@ import { notifyPending } from "@/components/ui/toast-notifications";
 import { useForm, useWatch, Controller } from "react-hook-form";
 import { InputTime } from "@/components/ui/date-picker/input-time";
 
-const GeoAutocomplete = dynamic(() => import("@/components/roles/admin/events/GeoAutocomplete"), { ssr: false });
+const GeoAutocomplete = dynamic(
+  () => import("@/components/roles/admin/events/GeoAutocomplete"),
+  { ssr: false },
+);
 
 export default function Page() {
-  const { eventFormData, updateEventFormData, setHasLoadedEvent } = useCreateEventStore();
-  const router = useRouter()
-  const { register, handleSubmit, watch, setValue, control, reset } = useForm<IEventFormData>({
-    defaultValues: defaultEventFormData
-  });
+  const { eventFormData, updateEventFormData, setHasLoadedEvent } =
+    useCreateEventStore();
+  const router = useRouter();
+  const { register, handleSubmit, watch, setValue, control, reset } =
+    useForm<IEventFormData>({
+      defaultValues: defaultEventFormData,
+    });
   const { mutate: createExternalEvent } = useCreateExternalEvent({ reset });
   const { getCookie } = useReactiveCookiesNext();
 
   const token = getCookie("token");
-  
+
   register("labels");
 
   register("images", {
     validate: (value) =>
       value && value.length > 0 ? true : "Debes subir al menos una imagen",
   });
-  
-  const type = ['free', 'paid', 'external'];
-  
+
+  const type = ["free", "paid", "external"];
+
   const { categories } = useAdminAllCategories({ token });
   const { labelsTypes } = useAdminLabelsTypes({ token });
   const { data: allUsers } = useAdminAllUsers({ token });
 
   const organizers = allUsers?.filter((user) => user.role.name === "ORGANIZER");
 
-  console.log("organizers", organizers)
+  console.log("organizers", organizers);
 
   useEffect(() => {
     register("geo");
@@ -73,7 +82,8 @@ export default function Page() {
       type: eventFormData.type,
       labels: eventFormData.labels || [],
       images: eventFormData.images,
-      quantityComplimentaryTickets: eventFormData.quantityComplimentaryTickets || 0,
+      quantityComplimentaryTickets:
+        eventFormData.quantityComplimentaryTickets || 0,
       organizerId: eventFormData.organizerId,
     };
 
@@ -81,14 +91,13 @@ export default function Page() {
       setValue(key as keyof IEventFormData, value);
     });
   }, [eventFormData, setValue]);
-  
-  useEffect(() => {
-  }, [eventFormData]);
-    
+
+  useEffect(() => {}, [eventFormData]);
+
   const watchedLabels = useWatch({ name: "labels", control });
   const watchedImages = useWatch({ name: "images", control });
 
-  // creamos el evento 
+  // creamos el evento
   const onSubmit = (data: IEventFormData) => {
     if (watch("type") === "external") {
       notifyPending(
@@ -102,80 +111,93 @@ export default function Page() {
           loading: "Creando evento externo...",
           success: "Evento externo creado correctamente",
           error: "Error al crear el evento externo",
-        }
+        },
       );
       return;
     }
 
-    const parsedCategories = data.categories?.map((category: string) => JSON.parse(category))
-    
+    const parsedCategories = data.categories?.map((category: string) =>
+      JSON.parse(category),
+    );
+
     const formattedData = {
       ...data,
-      eventCategoryValues: parsedCategories?.map((category: IEventCategoryValue) => ({
-        ...category,
-        valueId: category.valueId,
-        categoryId: category.categoryId,
-        value: category.value,
-      })),
-    }
+      eventCategoryValues: parsedCategories?.map(
+        (category: IEventCategoryValue) => ({
+          ...category,
+          valueId: category.valueId,
+          categoryId: category.categoryId,
+          value: category.value,
+        }),
+      ),
+    };
 
     delete formattedData.categories;
 
     const eventDate = data.date || "";
-    const updatedTickets: IEventTicket[] = (eventFormData.tickets || []).map((ticket, index) => {
-      // Solo actualizamos el primer ticket si es la creación inicial
-      if (index === 0) {
-        return {
-          ...ticket,
-          maxDate: eventDate,
-          stages: ticket.stages.map(stage => ({
-            ...stage,
-            date: new Date().toISOString().split('T')[0],
-            dateMax: eventDate
-          }))
+    const updatedTickets: IEventTicket[] = (eventFormData.tickets || []).map(
+      (ticket, index) => {
+        // Solo actualizamos el primer ticket si es la creación inicial
+        if (index === 0) {
+          return {
+            ...ticket,
+            maxDate: eventDate,
+            stages: ticket.stages.map((stage) => ({
+              ...stage,
+              date: getTodayLocalStr(),
+              dateMax: eventDate,
+            })),
+          };
         }
-      }
-      return ticket;
-    });
+        return ticket;
+      },
+    );
 
     updateEventFormData({
       ...eventFormData,
       ...formattedData,
       tickets: updatedTickets,
-      maxDate: eventDate
-    })
+      maxDate: eventDate,
+    });
 
-    setHasLoadedEvent(true)
+    setHasLoadedEvent(true);
 
     router.push(
-      watch("type") === "free" ? 
-      "/admin/events/create-event/free-ticket-config" 
-      : "/admin/events/create-event/ticket-config"
-    )
+      watch("type") === "free"
+        ? "/admin/events/create-event/free-ticket-config"
+        : "/admin/events/create-event/ticket-config",
+    );
   };
 
   return (
-    <DefaultForm handleSubmit={handleSubmit(onSubmit, onInvalid)} title="Nuevo evento">
+    <DefaultForm
+      handleSubmit={handleSubmit(onSubmit, onInvalid)}
+      title="Nuevo evento"
+    >
       <FormInput
         title="Título del evento*"
         inputName="title"
-        register={register("title", { required: "El titulo es obligatorio"  })}
+        register={register("title", { required: "El titulo es obligatorio" })}
       />
       <FormInput
         title="Subtítulo del evento"
         inputName="subtitle"
         register={register("subtitle")}
+        autoComplete="off"
       />
       <div className="w-full gap-x-3 flex justify-between">
         <Controller
           name="date"
           control={control}
-          rules={{ required: "La fecha es obligatoria", validate: validateDateYyyyMmDd }}
+          rules={{
+            required: "La fecha es obligatoria",
+            validate: validateDateYyyyMmDd,
+          }}
           render={({ field }) => (
-            <DatePicker 
-              value={field.value} 
-              onChange={field.onChange} 
-              title="Fecha*" 
+            <DatePicker
+              value={field.value}
+              onChange={field.onChange}
+              title="Fecha*"
             />
           )}
         />
@@ -185,10 +207,10 @@ export default function Page() {
           control={control}
           rules={{ required: "La hora es obligatoria" }}
           render={({ field }) => (
-            <InputTime 
-              value={field.value} 
-              onChange={field.onChange} 
-              title="Hora (COL)*" 
+            <InputTime
+              value={field.value}
+              onChange={field.onChange}
+              title="Hora (COL)*"
             />
           )}
         />
@@ -196,7 +218,7 @@ export default function Page() {
       <FormInput
         title="Lugar*"
         inputName="place"
-        register={register("place", {required: "El lugar es obligatorio"  })}
+        register={register("place", { required: "El lugar es obligatorio" })}
       />
 
       <GeoAutocomplete
@@ -210,78 +232,94 @@ export default function Page() {
         title="Información general"
         inputName="description"
         register={register("description")}
+        watchValue={watch("description")}
       />
 
       {watch("type") !== "external" && (
         <FormDropDown
           title="Organizador"
           register={register("organizerId", {
-            setValueAs: (v) => (v === "" || v === undefined ? undefined : Number(v)),
+            setValueAs: (v) =>
+              v === "" || v === undefined ? undefined : Number(v),
           })}
         >
           <option value="">Selecciona un organizador</option>
           {organizers?.map((organizer) => (
-            <option key={organizer.userId} value={organizer.organizer?.organizerId ?? ""}>
+            <option
+              key={organizer.userId}
+              value={organizer.organizer?.organizerId ?? ""}
+            >
               {organizer.name}
             </option>
           ))}
         </FormDropDown>
       )}
 
-       { 
-        categories?.map((category) => {
-          const isTipoEvento = category.name.toLowerCase() === 'tipo de evento';
-          if (isTipoEvento && watch("type") === "free") {
-            const clubValue = category.values?.find(v => v.value.toLowerCase() === 'club');
-            const clubStringified = clubValue ? JSON.stringify({
-              valueId: clubValue.valueId,
-              categoryId: clubValue.categoryId,
-              value: clubValue.value
-            }) : "";
-            
-            return (
-              <div key={category.categoryId} className="relative w-full">
-                <label className="block mb-2 text-xs">
-                  {category.name}
-                </label>
-                <div className="w-full mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white relative">
-                  <h2>Club</h2>
-                </div>
-                <input type="hidden" value={clubStringified} {...register(`categories.${category.categoryId}` as "categories")} />
-              </div>
-            );
-          }
+      {categories?.map((category) => {
+        const isTipoEvento = category.name.toLowerCase() === "tipo de evento";
+        if (isTipoEvento && watch("type") === "free") {
+          const clubValue = category.values?.find(
+            (v) => v.value.toLowerCase() === "club",
+          );
+          const clubStringified = clubValue
+            ? JSON.stringify({
+                valueId: clubValue.valueId,
+                categoryId: clubValue.categoryId,
+                value: clubValue.value,
+              })
+            : "";
 
           return (
-            <FormDropDown
-              key={category.categoryId}
-              title={category.name}
-              register={register(`categories.${category.categoryId}` as "categories", { required: true })}
-            >
-              {
-                category.values?.map((value) => (
-                  <option 
-                  key={value.valueId}   
-                  value={JSON.stringify({
-                    valueId: value.valueId,
-                    categoryId: value.categoryId,
-                    value: value.value
-                  })}>
-                    {value.value}
-                  </option>
-                ))
-              }
-            </FormDropDown>
-          )
-        })
+            <div key={category.categoryId} className="relative w-full">
+              <label className="block mb-2 text-xs">{category.name}</label>
+              <div className="w-full mt-2 bg-main-container border outline-none border-main-container rounded-lg py-3 px-4 text-white relative">
+                <h2>Club</h2>
+              </div>
+              <input
+                type="hidden"
+                value={clubStringified}
+                {...register(
+                  `categories.${category.categoryId}` as "categories",
+                )}
+              />
+            </div>
+          );
         }
+
+        return (
+          <FormDropDown
+            key={category.categoryId}
+            title={category.name}
+            register={register(
+              `categories.${category.categoryId}` as "categories",
+              { required: true },
+            )}
+          >
+            {category.values?.map((value) => (
+              <option
+                key={value.valueId}
+                value={JSON.stringify({
+                  valueId: value.valueId,
+                  categoryId: value.categoryId,
+                  value: value.value,
+                })}
+              >
+                {value.value}
+              </option>
+            ))}
+          </FormDropDown>
+        );
+      })}
 
       {watch("type") === "external" && (
         <FormInput
           title="Link externo*"
           inputName="externalUrl"
           register={register("externalUrl", {
-            required: watch("type") === "external" ? "El link externo es obligatorio" : false,
+            required:
+              watch("type") === "external"
+                ? "El link externo es obligatorio"
+                : false,
           })}
         />
       )}
@@ -289,24 +327,23 @@ export default function Page() {
       {watch("type") === "paid" && (
         <FormInput
           type="number"
-          title="Cortesía cada X ventas" 
+          title="Cortesía cada X ventas"
           inputName="quantityComplimentaryTickets"
           register={register("quantityComplimentaryTickets", {
-            setValueAs: (v) => v === "" || v === undefined ? undefined : Number(v)
+            setValueAs: (v) =>
+              v === "" || v === undefined ? undefined : Number(v),
           })}
         />
       )}
       <br />
 
-      {watch("type") !== "external" && (
-        labelsTypes && watchedLabels && (
-          <LabelTagButton
-            setValue={setValue}
-            watchedLabels={watchedLabels}
-            labelsTypes={labelsTypes}
-            title="Etiquetas"
-          />
-        )
+      {watch("type") !== "external" && labelsTypes && watchedLabels && (
+        <LabelTagButton
+          setValue={setValue}
+          watchedLabels={watchedLabels}
+          labelsTypes={labelsTypes}
+          title="Etiquetas"
+        />
       )}
 
       <br />
@@ -338,7 +375,11 @@ export default function Page() {
                 </div>
               </div>
               <span className="text-primary-white group-hover:text-primary transition-colors">
-                {item === 'free' ? 'Gratuito' : item === 'paid' ? 'Pago' : 'Externo'}
+                {item === "free"
+                  ? "Gratuito"
+                  : item === "paid"
+                    ? "Pago"
+                    : "Externo"}
               </span>
             </label>
           ))}

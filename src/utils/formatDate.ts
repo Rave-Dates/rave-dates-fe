@@ -4,6 +4,12 @@ export const formatDate = (value: string | Date | null | undefined) => {
   return date.toISOString().split("T")[0] || "";
 };
 
+export const getTodayLocalStr = (): string => {
+  const today = new Date();
+  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+};
+
+
 export function combineDateAndTimeToISO(date: string, time: string): string {
   const isoString = new Date(`${date}T${time}:00Z`).toISOString();
   return isoString;

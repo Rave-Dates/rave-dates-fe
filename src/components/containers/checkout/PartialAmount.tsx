@@ -1,9 +1,11 @@
 import FormInput from "@/components/ui/inputs/FormInput";
-import { UseFormRegister } from "react-hook-form";
+import { useEffect, useRef } from "react";
+import { UseFormRegister, UseFormSetValue } from "react-hook-form";
 
 type Props = {
   eventPBComission: number
   register: UseFormRegister<{ partialAmount: number, discountCode: string }>
+  setValue: UseFormSetValue<{ partialAmount: number, discountCode: string }>
   totalAmount: number
   partialAmount: number
   hasDiscountFlag: boolean
@@ -14,8 +16,7 @@ type Props = {
   isPendingPayment?: boolean
 };
 
-export default function PartialAmount({ register, totalAmount, partialAmount, eventPBComission, hasDiscountFlag, watchedDiscountCode, effectiveFeePercentage, selectedMethod, minPartialPercentage, isPendingPayment = false } : Props) {
-  console.log("eventPBComission", eventPBComission)
+export default function PartialAmount({ register, setValue, totalAmount, partialAmount, eventPBComission, hasDiscountFlag, watchedDiscountCode, effectiveFeePercentage, selectedMethod, minPartialPercentage, isPendingPayment = false } : Props) {
 
   const gatewayFee = selectedMethod === "Bold" ? totalAmount * (effectiveFeePercentage / 100) : 0;
   const actualDiscountValue = hasDiscountFlag ? totalAmount * (watchedDiscountCode / 100) : 0;
@@ -32,6 +33,16 @@ export default function PartialAmount({ register, totalAmount, partialAmount, ev
     ? Math.ceil(totalBaseAmount * (minPartialPercentage / 100))
     : 1000;
 
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    // Si el usuario aún no ha cambiado el valor y no se ha inicializado
+    if (!initialized.current && partialAmount === 0 && MIN_AMOUNT > 0) {
+      setValue("partialAmount", MIN_AMOUNT);
+      initialized.current = true;
+    }
+  }, [MIN_AMOUNT, partialAmount, setValue]);
+
   return (
     <div className="bg-cards-container flex flex-col rounded-lg p-4">
       <div className="flex flex-col items-start">
@@ -45,6 +56,7 @@ export default function PartialAmount({ register, totalAmount, partialAmount, ev
             setValueAs: (v) => v === "" ? undefined : Number(v),
             required: "La cantidad parcial es obligatoria",
             min: MIN_AMOUNT,
+            value: MIN_AMOUNT,
           })}
           onInput={(e) => {
             const input = e.currentTarget;
@@ -63,7 +75,7 @@ export default function PartialAmount({ register, totalAmount, partialAmount, ev
       {!isPendingPayment && (
         <h3 className="text-xs text-primary-white/50 pb-3">Comisión de alcancía: {eventPBComission}% (${pbCommissionValue.toLocaleString()} COP)</h3>
       )}
-      <h3 className="text-xs text-primary-white/50 pb-2">Deberás abonar el resto del pago antes del evento a través de &quot;Mis Tickets&quot;</h3>
+      <h3 className="text-xs text-primary-white/50 pb-2">Desde “Mis Tickets” puedes realizar varios abonos a tu alcancía hasta completar el total. Realiza el pago pendiente antes del evento</h3>
     </div>
   );
 }

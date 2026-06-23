@@ -26,7 +26,7 @@ import { InputTime } from "@/components/ui/date-picker/input-time";
 export default function EditOrganizerEvent({ eventId }: { eventId: number }) {
   const { eventFormData, updateEventFormData, setHasLoadedEvent, setHasLoadedTickets, hasLoadedTickets, hasLoadedEvent } = useCreateEventStore();
   const router = useRouter()
-  const { register, handleSubmit, setValue, control, reset } = useForm<IEventFormData>({
+  const { register, handleSubmit, watch, setValue, control, reset } = useForm<IEventFormData>({
     defaultValues: defaultEventFormData,
   });
   const { getCookie } = useReactiveCookiesNext();
@@ -339,6 +339,7 @@ useEffect(() => {
         title="Información general"
         inputName="description"
         register={register("description")}
+        watchValue={watch("description")}
       />
 
        <h1 className="font-semibold text-3xl mt-8">Configura los tickets</h1> 

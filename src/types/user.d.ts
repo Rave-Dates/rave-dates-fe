@@ -8,7 +8,7 @@ interface IUser {
   roleId: number;
   role: {
     roleId: number;
-    name: "ADMIN" | "ORGANIZER" | "PROMOTER";
+    name: "ADMIN" | "ORGANIZER" | "PROMOTER" | "CHECKER";
     createdAt: string;
     updatedAt: string;
   };

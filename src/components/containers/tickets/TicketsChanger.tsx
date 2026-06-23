@@ -12,13 +12,18 @@ import {
 } from "@/services/clients-events";
 import { formatDateToColombiaTime } from "@/utils/formatDate";
 import { generateTicketImage } from "./generateTicketImage";
-import { useClientEvent, useClientEventTickets, useClientGetById, useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
+import {
+  useClientEvent,
+  useClientEventTickets,
+  useClientGetById,
+  useClientPurchasedTickets,
+} from "@/hooks/client/queries/useClientData";
 import { notifyError } from "@/components/ui/toast-notifications";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useChangeTicketStore } from "@/store/useChangeTicketStore";
 
 type Props = {
-  eventInfo: { date: string; title: string };
+  eventInfo: { date?: string; title?: string; piggyBank?: boolean };
 };
 
 interface PendingPurchases {
@@ -35,8 +40,9 @@ export default function TicketsChanger({ eventInfo }: Props) {
   const { getCookie } = useReactiveCookiesNext();
   const pathname = usePathname();
   const token = getCookie("clientToken");
-  const decoded: { id: number } =
-    (token && jwtDecode(token.toString())) || { id: 0 };
+  const decoded: { id: number } = (token && jwtDecode(token.toString())) || {
+    id: 0,
+  };
   const clientId = Number(decoded?.id);
   const { purchasedTickets } = useClientPurchasedTickets({
     clientId,
@@ -60,11 +66,9 @@ export default function TicketsChanger({ eventInfo }: Props) {
     resetSubtracted,
   } = useChangeTicketStore();
 
-  
   const { selectedEvent } = useClientEvent(eventId);
-  const clientTickets = useClientEventTickets(eventId)
-  const totalClientTickets = clientTickets.eventTickets?.length
-  
+  const clientTickets = useClientEventTickets(eventId);
+  const totalClientTickets = clientTickets.eventTickets?.length;
 
   // Reinicia todos los stores de tickets al montar para asegurar un estado limpio al volver de los flujos de mejora
   useEffect(() => {
@@ -87,22 +91,27 @@ export default function TicketsChanger({ eventInfo }: Props) {
       ticket.transferredClientId !== null &&
       ticket.transferredClientId !== clientId &&
       ticket.purchase.paymentStatus !== "PARTIAL" &&
-      ticket.ticketType.eventId === eventId
+      ticket.ticketType.eventId === eventId,
   );
 
   // Filtro: Tickets que actualmente posee el usuario (originales o recibidos por transferencia)
   const nonTransferredTickets = purchasedTickets?.filter(
     (ticket) =>
-      ((!ticket.isTransferred && ticket.purchase?.paymentStatus === "PAID") &&
-        ticket.transferredClientId === null ||
+      ((!ticket.isTransferred &&
+        ticket.purchase?.paymentStatus === "PAID" &&
+        ticket.transferredClientId === null) ||
         ticket.transferredClientId === clientId) &&
-      ticket.ticketType.eventId === eventId
+      ticket.ticketType.eventId === eventId,
   );
 
   // Filtro: Tickets de compras con pagos pendientes (PiggyBank/Parcial)
   const pendingTickets = purchasedTickets
     ?.map((t) => t)
-    .filter((t) => t.purchase?.paymentStatus === "PARTIAL" && t.ticketType.eventId === eventId);
+    .filter(
+      (t) =>
+        t.purchase?.paymentStatus === "PARTIAL" &&
+        t.ticketType.eventId === eventId,
+    );
 
   // Agrupa los tickets pendientes por ID de compra para mostrar los montos restantes totales
   const groupedPendingPurchases: {
@@ -133,26 +142,30 @@ export default function TicketsChanger({ eventInfo }: Props) {
     ([purchaseId, data]) => ({
       purchaseId: Number(purchaseId),
       ...data,
-    })
+    }),
   );
 
-  if (pendingTickets?.length === 0 && nonTransferredTickets?.length === 0 && transferredTickets?.length === 0) {
-    notifyError("No se encontraron tickets")
-    router.replace("/")
-    return
+  if (
+    pendingTickets?.length === 0 &&
+    nonTransferredTickets?.length === 0 &&
+    transferredTickets?.length === 0
+  ) {
+    notifyError("No se encontraron tickets");
+    router.replace("/");
+    return;
   }
 
   // Navega al checkout para completar un pago parcial (Piggy Bank)
   const handleCompletePiggyBank = async (purchase: PendingPurchases) => {
     setEventId(eventId);
-    setPendimPaymentAmount(purchase.remainingAmount)
-    router.push(`/checkout?pp=${purchase.purchaseId}`)
+    setPendimPaymentAmount(purchase.remainingAmount);
+    router.push(`/checkout?pp=${purchase.purchaseId}`);
   };
 
   // Genera y descarga imágenes para todos los tickets válidos (excluyendo tickets ya usados/READ)
   const handleDownloadAll = async () => {
     const downloadableTickets = nonTransferredTickets?.filter(
-      (ticket) => ticket.status !== "READ"
+      (ticket) => ticket.status !== "READ",
     );
 
     if (!downloadableTickets?.length) return;
@@ -167,9 +180,9 @@ export default function TicketsChanger({ eventInfo }: Props) {
       await generateTicketImage({
         bgImage: "/images/Fondo-RV.jpeg",
         qrData: ticket.qr,
-        name: eventInfo.title,
-        time: `${formatDateToColombiaTime(eventInfo.date).date}, ${
-          formatDateToColombiaTime(eventInfo.date).time
+        name: eventInfo.title || "",
+        time: `${formatDateToColombiaTime(eventInfo.date || "").date}, ${
+          formatDateToColombiaTime(eventInfo.date || "").time
         }hs`,
         purchaseTicketId: ticket.purchaseTicketId,
         clientName: loggedInClient?.name || "Cliente",
@@ -188,7 +201,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
   const renderPagination = (
     total: number,
     page: number,
-    setPage: React.Dispatch<React.SetStateAction<number>>
+    setPage: React.Dispatch<React.SetStateAction<number>>,
   ) => {
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
     if (totalPages <= 1) return null;
@@ -216,7 +229,6 @@ export default function TicketsChanger({ eventInfo }: Props) {
     );
   };
 
-
   return (
     <div className="w-full mb-6">
       <div className="space-y-6">
@@ -224,19 +236,21 @@ export default function TicketsChanger({ eventInfo }: Props) {
         <div>
           {selectedEvent?.transferCost && selectedEvent.transferCost > 0 ? (
             <div className="bg-cards-container rounded-lg p-4 mb-4 text-sm text-primary-white/80">
-              Este evento tiene un costo de transferencia de <span className="text-primary font-bold">${selectedEvent.transferCost.toLocaleString()} COP</span>
+              Este evento tiene un costo de transferencia de{" "}
+              <span className="text-primary font-bold">
+                ${selectedEvent.transferCost.toLocaleString()} COP
+              </span>
             </div>
-          ):
-          null}
+          ) : null}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-medium">Mis tickets</h2>
-              <button
-                onClick={handleDownloadAll}
-                className="text-primary text-sm hover:underline"
-              >
-                Descargar todos
-              </button>
-            </div>
+            <button
+              onClick={handleDownloadAll}
+              className="text-primary text-sm hover:underline"
+            >
+              Descargar todos
+            </button>
+          </div>
           <div className="space-y-3">
             {paginate(nonTransferredTickets, pageNonTransferred)?.map(
               (ticket) => (
@@ -247,7 +261,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
                   key={ticket.purchaseTicketId}
                   loggedInClientName={loggedInClient?.name || ""}
                 />
-              )
+              ),
             )}
             {nonTransferredTickets?.length === 0 && (
               <div className="text-center pb-4 text-neutral-400">
@@ -259,7 +273,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
             renderPagination(
               nonTransferredTickets.length,
               pageNonTransferred,
-              setPageNonTransferred
+              setPageNonTransferred,
             )}
         </div>
 
@@ -284,7 +298,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
             renderPagination(
               transferredTickets.length,
               pageTransferred,
-              setPageTransferred
+              setPageTransferred,
             )}
         </div>
 
@@ -307,7 +321,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
             {renderPagination(
               pendingTickets.length,
               pagePending,
-              setPagePending
+              setPagePending,
             )}
           </div>
         ) : null}
@@ -317,7 +331,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
           <>
             <h2 className="text-lg font-medium mb-4">Saldo pendiente</h2>
             <div className="bg-cards-container rounded-lg p-4 mb-3 gap-x-5 text-sm flex items-center justify-between">
-              Tienes hasta el {formatDateToColombiaTime(eventInfo.date).date}{" "}
+              Tienes hasta el {formatDateToColombiaTime(eventInfo.date || "").date}{" "}
               para pagar el saldo pendiente
             </div>
             <>
@@ -334,15 +348,14 @@ export default function TicketsChanger({ eventInfo }: Props) {
             </>
           </>
         ) : null}
-        {
-          totalClientTickets && totalClientTickets > 1 &&
+        {totalClientTickets && totalClientTickets > 1 && (
           <Link
             href={`${pathname}/change-tickets`}
             className="block text-center w-full bg-primary text-primary-white font-medium py-3 rounded-lg mb-3 mt-10 hover:opacity-80 transition-opacity"
           >
             Mejorar tickets
           </Link>
-        }
+        )}
       </div>
     </div>
   );

@@ -147,13 +147,14 @@ const EditUser = ({ userId } : { userId: number }) => {
           }
         </FormDropDown>
         {
-          userById?.role.name !== "ADMIN" &&
-          <Link
-            href={`${pathname}/user-events`}
-            className="text-primary-white mb-0 py-5 text-center w-full block"
-          >
-            Ver eventos asignados
-          </Link>
+          userById?.role.name !== "ADMIN" && userById?.role.name !== "CHECKER" && (
+            <Link
+              href={`${pathname}/user-events`}
+              className="text-primary-white mb-0 py-5 text-center w-full block"
+            >
+              Ver eventos asignados
+            </Link>
+          )
         }
         <button
           type="submit"

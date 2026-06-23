@@ -17,7 +17,7 @@ import { generateTicketImage } from "./generateTicketImage";
 interface TicketRowProps {
   href: string;
   ticket: IPurchaseTicket;
-  eventInfo: { date: string, title: string };
+  eventInfo: { date?: string, title?: string, piggyBank?: boolean };
   isTransferred?: boolean;
   isPendingToPay?: boolean;
   loggedInClientName?: string;
@@ -54,8 +54,8 @@ export function TicketRow({
             bgImage: "/images/Fondo-RV.jpeg",
             fileName: "ticket.jpg",
             qrData: ticket.qr,
-            name: eventInfo.title,
-            time: `${formatDateToColombiaTime(eventInfo.date).formatted} ${formatDateToColombiaTime(eventInfo.date).time}hs`,
+            name: eventInfo.title || "",
+            time: `${formatDateToColombiaTime(eventInfo.date || "").formatted} ${formatDateToColombiaTime(eventInfo.date || "").time}hs`,
             ticketType: ticket.ticketType.name,
             eventImage: servedImageUrl ?? "/images/event-placeholder.png",
             logoRD: "/logo.svg",
@@ -137,9 +137,9 @@ export function TicketRow({
                   <GenerateJPGButton
                     bgImage="/images/Fondo-RV.jpeg"
                     qrData={ticket.qr}
-                    name={eventInfo.title}
+                    name={eventInfo.title || ""}
                     eventImage={servedImageUrl ?? "/images/event-placeholder.png"}
-                    time={`${formatDateToColombiaTime(eventInfo.date).date}, ${formatDateToColombiaTime(eventInfo.date).time}hs`}
+                    time={`${formatDateToColombiaTime(eventInfo.date || "").date}, ${formatDateToColombiaTime(eventInfo.date || "").time}hs`}
                     ticketType={ticket.ticketType.name}
                     logoRD="/logo.svg"
                     purchaseTicketId={ticket.purchaseTicketId}

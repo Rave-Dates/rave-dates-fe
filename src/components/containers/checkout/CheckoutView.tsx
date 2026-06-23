@@ -43,8 +43,7 @@ export default function Checkout() {
 
   const [check, setCheck] = useState(false);
   const router = useRouter();
-  
-  const { register, watch } = useForm<{ partialAmount: number, discountCode: string }>({
+  const { register, watch, setValue } = useForm<{ partialAmount: number, discountCode: string }>({
     defaultValues: { partialAmount: 0, discountCode: "" }
   });
 
@@ -357,6 +356,7 @@ export default function Checkout() {
             <PartialAmount 
               eventPBComission={selectedEvent.feePB}
               register={register}
+              setValue={setValue}
               totalAmount={totalAmount}
               partialAmount={watchedPartialAmount}
               hasDiscountFlag={hasDiscountFlag}
@@ -367,7 +367,7 @@ export default function Checkout() {
               isPendingPayment={!!pendingPaymentPurchaseId}
             />
           }
-        </div>
+            </div>
 
         {/* Right Side */}
         <div className="space-y-4 order-first">

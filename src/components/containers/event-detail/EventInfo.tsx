@@ -32,7 +32,7 @@ const EventInfo= ({ labels, eventCategoryValues, isLoading, description, organiz
           {/* About Event */}
           <div>
             <h2 className="text-small-title font-bold text-white mb-3">Acerca del evento</h2>
-            <p className="text-text-inactive text-body">
+            <p className="text-text-inactive text-body whitespace-pre-wrap">
               {description}
             </p>
           </div>

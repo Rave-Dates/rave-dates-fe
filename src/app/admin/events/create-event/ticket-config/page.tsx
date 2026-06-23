@@ -6,7 +6,7 @@ import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyError, notifyPending } from "@/components/ui/toast-notifications";
 import { useCreateFullEvent } from "@/hooks/admin/mutations/useCreateEventFull";
 import { useCreateEventStore } from "@/store/createEventStore";
-import { combineDateAndTimeToISO, formatColombiaTimeToUTC } from "@/utils/formatDate";
+import { combineDateAndTimeToISO, formatColombiaTimeToUTC, getTodayLocalStr } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -123,8 +123,7 @@ export default function TicketConfiguration() {
 
   const handleAddTicket = () => {
     const formTickets = getValues("tickets") || [];
-    const today = new Date();
-    const yyyyMmDd = today.toISOString().split('T')[0];
+    const yyyyMmDd = getTodayLocalStr();
 
     const nextDate = eventFormData.date || "";
 

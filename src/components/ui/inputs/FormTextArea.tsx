@@ -10,6 +10,7 @@ type FormTextAreaProps = {
   placeholder?: string;
   register: UseFormRegisterReturn;
   disabled?: boolean;
+  watchValue?: any;
 };
 
 const FormTextArea = ({
@@ -20,6 +21,7 @@ const FormTextArea = ({
   placeholder,
   register,
   disabled = false,
+  watchValue,
 }: FormTextAreaProps) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -35,7 +37,7 @@ const FormTextArea = ({
 
   useEffect(() => {
     adjustHeight();
-  }, []);
+  }, [watchValue]);
 
   return (
     <div className="w-full">

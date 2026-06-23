@@ -1,5 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Control, Controller, FieldValues, Path, UseControllerProps } from "react-hook-form";
+import {
+  Control,
+  Controller,
+  FieldValues,
+  Path,
+  UseControllerProps,
+} from "react-hook-form";
 import ArrowDownSvg from "../../svg/ArrowDown";
 
 import countryCodesList from "country-codes-list";
@@ -14,10 +20,11 @@ type PhoneInputProps<T extends FieldValues> = {
   title: string;
   name: Path<T>;
   control: Control<T>;
-  rules?: UseControllerProps<T, Path<T>>['rules'];
+  rules?: UseControllerProps<T, Path<T>>["rules"];
   className?: string;
   labelClassname?: string;
   placeholder?: string;
+  autoComplete?: "off" | "on" | "new-password";
 };
 
 export default function PhoneInput<T extends FieldValues>({
@@ -28,13 +35,17 @@ export default function PhoneInput<T extends FieldValues>({
   className = "",
   labelClassname = "",
   placeholder = "Número",
+  autoComplete,
 }: PhoneInputProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -70,17 +81,24 @@ export default function PhoneInput<T extends FieldValues>({
             onChange(`${newCode}${phoneNumber}`);
           };
 
-          const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+          const handleNumberChange = (
+            e: React.ChangeEvent<HTMLInputElement>,
+          ) => {
             const newNumber = e.target.value.replace(/\D/g, ""); // Solo números
             onChange(`${selectedCode}${newNumber}`);
           };
 
-          const selectedCountry = countryCodes.find((c) => c.code === selectedCode);
+          const selectedCountry = countryCodes.find(
+            (c) => c.code === selectedCode,
+          );
 
           return (
             <div className="flex relative items-center w-full mt-2">
               {/* Dropdown personalizado */}
-              <div className="relative w-28 shrink-0 h-[46px]" ref={dropdownRef}>
+              <div
+                className="relative w-28 shrink-0 h-[46px]"
+                ref={dropdownRef}
+              >
                 <button
                   type="button"
                   onClick={() => setIsOpen(!isOpen)}
@@ -103,7 +121,10 @@ export default function PhoneInput<T extends FieldValues>({
                 {isOpen && (
                   <div
                     className="absolute top-full left-0 mt-2 w-40 bg-cards-container border border-main-container rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto"
-                    style={{ scrollbarWidth: "thin", scrollbarColor: "#555 transparent" }}
+                    style={{
+                      scrollbarWidth: "thin",
+                      scrollbarColor: "#555 transparent",
+                    }}
                   >
                     {countryCodes.map((c) => (
                       <button
@@ -129,7 +150,7 @@ export default function PhoneInput<T extends FieldValues>({
                   </div>
                 )}
               </div>
-              
+
               {/* Input de texto */}
               <input
                 id={name}
@@ -139,6 +160,7 @@ export default function PhoneInput<T extends FieldValues>({
                 value={phoneNumber}
                 onChange={handleNumberChange}
                 onBlur={onBlur}
+                autoComplete={autoComplete}
                 className={`${className} w-full bg-main-container border outline-none border-main-container rounded-r-lg py-3 pr-4 pl-2 text-white`}
               />
             </div>
