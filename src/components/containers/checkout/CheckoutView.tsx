@@ -123,7 +123,7 @@ export default function Checkout() {
   if (tempToken && !clientToken) {
     urlToReturn = `${process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_FRONT_URL_DEV : process.env.NEXT_PUBLIC_FRONT_URL_PROD}/auth?redirect=transfer&eid=${eventId}`
   } else if (!tempToken && clientToken) {
-    urlToReturn = `${process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_FRONT_URL_DEV : process.env.NEXT_PUBLIC_FRONT_URL_PROD}/transfer-confirm?eid=${eventId}`
+    urlToReturn = `${process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_FRONT_URL_DEV : process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets`
   } else if (isPromoter) {
     urlToReturn = `${process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_FRONT_URL_DEV : process.env.NEXT_PUBLIC_FRONT_URL_PROD}/promoter`
   } else {

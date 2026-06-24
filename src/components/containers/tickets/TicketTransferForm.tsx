@@ -60,8 +60,11 @@ const TicketTransferForm = ({
       notifyError("No puedes transferir un ticket a tu propio email");
       return;
     }
-    // Prevent self-transfer by WhatsApp
-    if (clientData?.whatsapp && data.whatsapp && data.whatsapp.replace(/\D/g, "") === clientData.whatsapp.replace(/\D/g, "")) {
+    
+    // Prevent self-transfer by WhatsApp (only if it's a real number, not just the country code)
+    const senderWpp = clientData?.whatsapp?.replace(/\D/g, "");
+    const receiverWpp = data.whatsapp?.replace(/\D/g, "");
+    if (senderWpp && receiverWpp && senderWpp.length > 4 && senderWpp === receiverWpp) {
       notifyError("No puedes transferir un ticket a tu propio WhatsApp");
       return;
     }

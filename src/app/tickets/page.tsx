@@ -72,7 +72,7 @@ const TicketsEventList: React.FC = () => {
   }, [isUpcoming]);
 
   return (
-    <div className="py-8 pb-32 min-h-screen flex flex-col sm:pb-42 lg:pt-[7.5rem] text-primary-white bg-primary-black px-6">
+    <div className="py-8 pb-32 min-h-screen flex flex-col sm:pb-42 lg:pt-[7.5rem] text-primary-white bg-primary-black sm:px-6">
       <div className="w-full sm:w-xl flex items-center justify-center mt-4 gap-1 relative bg-main-container mx-auto rounded-md px-2 py-1">
         <div
           className={`absolute bg-primary z-10 w-[47%] sm:w-1/2 h-10 pointer-events-auto rounded-md transition-all duration-300 ${
@@ -105,7 +105,7 @@ const TicketsEventList: React.FC = () => {
           </div>
         )}
         {!isTicketsLoading && !isTicketsError && currentView === "upcoming" ? (
-          <div className="space-y-4 animate-fade-in">
+          <div className="animate-fade-in">
             {activeEvents?.map((event) => (
               <div key={event.eventId} className="flex justify-center">
                 <EventCard isTicketList={true} text="Detalles" href="/tickets/event-ticket" {...event} />
@@ -118,7 +118,7 @@ const TicketsEventList: React.FC = () => {
             )}
           </div>
         ) : (
-          <div className="space-y-4 animate-fade-in">
+          <div className="animate-fade-in">
             {finishedEvents?.map((event) => (
               <div key={event.eventId} className="flex justify-center">
                 <EventCard isTicketList={true} text="Finalizado" href="/tickets/event-ticket" {...event} />

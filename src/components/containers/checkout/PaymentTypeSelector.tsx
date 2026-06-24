@@ -15,7 +15,7 @@ export default function PaymentTypeSelector({ selected, setSelected, isPromoter 
   const paymentsToShow = !havePiggyBank || !!isChangeTickets || !!isTransfer ? promoterPayments : payments;
 
   return (
-    <div className={`${!havePiggyBank && "hidden" } ${ isPromoter && "hidden"} bg-cards-container rounded-lg p-4 pb-1`}>
+    <div className={`${!havePiggyBank && "hidden" } ${ isPromoter && "hidden"} ${ isTransfer && "hidden"} bg-cards-container rounded-lg p-4 pb-1`}>
       <div className="flex flex-col items-start pb-4 border-b border-inactive">
         <div className="text-sm text-primary-white/45">Tipo de pago</div>
         <span>{selected}</span>

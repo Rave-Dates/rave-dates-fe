@@ -56,13 +56,13 @@ export default function OtpVerificationView() {
   }, [clientToken, whereRedirect, router]);
   
   useEffect(() => {
-    if (tempToken) {
-      const decoded: { id: number; email: string, whatsapp: string; exp: number; iat: number } = jwtDecode(tempToken.toString());
-      setValue("emailOrWhatsapp", decoded.email);
-    } else if (emailOrWhatsapp) {
+    if (emailOrWhatsapp) {
       setValue("emailOrWhatsapp", emailOrWhatsapp);
+    } else if (tempToken) {
+      const decoded: { id: number; email: string, whatsapp: string; exp: number; iat: number } = jwtDecode(tempToken.toString());
+      setValue("emailOrWhatsapp", isEmailOrWhatsapp === "Email" ? decoded.email : decoded.whatsapp);
     }
-  }, [tempToken, emailOrWhatsapp]);
+  }, [tempToken, emailOrWhatsapp, isEmailOrWhatsapp, setValue]);
 
 
   const handleInputChange = (index: number, value: string) => {
@@ -135,7 +135,7 @@ export default function OtpVerificationView() {
           router.replace("/checkout");
         } else if (whereRedirect === "transfer") {
           if (eventId) setEventId(Number(eventId));
-          router.replace("/transfer-confirm");
+          router.replace("/tickets");
         } else if (whereRedirect === "my-data") {
           router.replace("/my-data");
         } else {

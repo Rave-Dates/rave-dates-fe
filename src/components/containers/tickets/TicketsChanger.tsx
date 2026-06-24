@@ -155,6 +155,8 @@ export default function TicketsChanger({ eventInfo }: Props) {
     return;
   }
 
+
+  console.log("pendingPurchases", pendingPurchases)
   // Navega al checkout para completar un pago parcial (Piggy Bank)
   const handleCompletePiggyBank = async (purchase: PendingPurchases) => {
     setEventId(eventId);
@@ -236,7 +238,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
         <div>
           {selectedEvent?.transferCost && selectedEvent.transferCost > 0 ? (
             <div className="bg-cards-container rounded-lg p-4 mb-4 text-sm text-primary-white/80">
-              Este evento tiene un costo de transferencia de{" "}
+              Este evento tiene un costo de transferencia de ticket de{" "}
               <span className="text-primary font-bold">
                 ${selectedEvent.transferCost.toLocaleString()} COP
               </span>
@@ -255,6 +257,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
             {paginate(nonTransferredTickets, pageNonTransferred)?.map(
               (ticket) => (
                 <TicketRow
+                  className="w-full"
                   ticket={ticket}
                   eventInfo={eventInfo}
                   href="transfer"
@@ -282,7 +285,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
           {transferredTickets?.length !== 0 && (
             <h2 className="text-lg font-medium mb-4">Tickets transferidos</h2>
           )}
-          <div className="space-y-3">
+          <div className="space-y- flex flex-wrap gap-3 items-center justify-center">
             {paginate(transferredTickets, pageTransferred)?.map((ticket) => (
               <TicketRow
                 isTransferred={true}
@@ -305,8 +308,8 @@ export default function TicketsChanger({ eventInfo }: Props) {
         {/* Pending Tickets Section */}
         {pendingTickets?.length && pendingTickets?.length > 0 ? (
           <div>
-            <h2 className="text-lg font-medium mb-4">Tickets pendientes</h2>
-            <div className="space-y-3">
+            <h2 className="text-lg font-medium mb-4">Alcancías</h2>
+            <div className="space-y- flex flex-wrap gap-3 items-center justify-center">
               {paginate(pendingTickets, pagePending)?.map((ticket) => (
                 <TicketRow
                   ticket={ticket}
@@ -339,9 +342,9 @@ export default function TicketsChanger({ eventInfo }: Props) {
                 <button
                   key={purchase.purchaseId}
                   onClick={() => handleCompletePiggyBank(purchase)}
-                  className="block text-center w-full text-red-400 border border-primary font-medium py-3 rounded-lg mb-3 hover:opacity-80 transition-opacity"
+                  className="block text-sm px-2 sm:text-base text-center w-full text-red-400 border border-primary font-medium py-3 rounded-lg mb-3 hover:opacity-80 transition-opacity"
                 >
-                  Completar pago de compra N°{purchase.purchaseId} ($
+                  Abonar/Completar alcancía N°{purchase.purchaseId} ($
                   {purchase.remainingAmount.toLocaleString()} COP)
                 </button>
               ))}

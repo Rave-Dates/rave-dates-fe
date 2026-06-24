@@ -112,9 +112,6 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
     }
   }
 
-  console.log("pp", isPendingPayment)
-  console.log("isChangeTickets", isChangeTickets)
-
   return (
     <div className="bg-cards-container rounded-lg p-4 space-y-3">
       {mergedTickets.map((ticket, index) => (

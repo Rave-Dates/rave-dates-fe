@@ -21,6 +21,7 @@ interface TicketRowProps {
   isTransferred?: boolean;
   isPendingToPay?: boolean;
   loggedInClientName?: string;
+  className?: string;
 }
 
 export function TicketRow({
@@ -30,6 +31,7 @@ export function TicketRow({
   isTransferred = false,
   isPendingToPay = false,
   loggedInClientName = "",
+  className,
 }: TicketRowProps) {
   const [showQR, setShowQR] = useState(false);
   const [showTransferredModal, setShowTransferredModal] = useState(false);
@@ -91,41 +93,41 @@ export function TicketRow({
   const actions = isTransferred ? ["resend", "info"] : ["send", "download", "view"];
 
   return (
-    <div className="bg-cards-container flex-wrap rounded-lg py-3 px-4 gap-x-2 sm:gap-x-5 flex items-center justify-between">
-      <div className="flex flex-wrap items-center justify-start font-medium mb-1 gap-x-2">
+    <div className={`${className} bg-cards-container w-fit min-w-36 sm:w-full rounded-lg py-3 pb-4 sm:pb-3 px-4 gap-y-3 sm:gap-y-0 gap-x-5 flex flex-col sm:flex-row items-center justify-center sm:justify-between`}>
+      <div className="flex flex-wrap items-center justify-center sm:justify-start font-medium gap-x-2 gap-y-1 sm:gap-y-0 text-center sm:text-left">
         <div>
           {ticket.ticketType.name}  
           <span className="text-[#bc5d5e] text-xs">
             {" "} #
           </span>
           <span className="text-sm font-thin text-primary-white/70">
-            {ticket.purchaseTicketId}
+            {isPendingToPay ? ticket.purchaseId : ticket.purchaseTicketId}
           </span>
         </div>
         {
           ticket.isTransferred && !isTransferred &&
-          <div className="text-xs text-primary/70 mt-1 italic">
+          <div className="text-xs text-primary/70 mt-1 sm:mt-0 italic">
             Recibido
           </div>
         }
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-row flex-wrap gap-2 items-center justify-center w-full sm:w-auto">
         {
           ticket.status === "READ" &&
-          <div className="flex h-[47px] items-center text-primary justify-center text-sm gap-x-2">
+          <div className="flex sm:h-[47px] items-center text-primary justify-center text-sm gap-x-2">
             <h2>Ticket usado</h2>
             <CheckSvg className="text-primary" />
           </div>
         }
         {
           ticket.status === "DEFEATED" &&
-          <div className="flex h-[47px] items-center text-primary justify-center text-sm gap-x-2">
+          <div className="flex sm:h-[47px] items-center text-primary justify-center text-sm gap-x-2">
             <h2>Ticket vencido</h2>
           </div>
         }
         {
           isPendingToPay &&
-          <div className="flex h-[47px] items-center text-primary justify-center text-sm gap-x-2">
+          <div className="flex sm:h-[47px] items-center text-primary justify-center text-sm gap-x-2">
             <h2>Ticket pendiente</h2>
           </div>
         }

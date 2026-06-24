@@ -150,6 +150,7 @@ export default function DataForm() {
         onClick={() => {
           deleteCookie("tempToken")
           deleteCookie("clientToken")
+          setClientAuthData({ emailOrWhatsapp: "" })
           router.push('/')
         }}
         className="border z-20 absolute w-36 top-10 md:top-32 right-5 lg:right-52 border-primary text-primary py-2.5 rounded-lg"

@@ -207,40 +207,29 @@ export const generateTicketImage = async ({
 
   const eventImgSize = 400
   const imgX = (canvasWidth - eventImgSize) / 2
+  const imgRatio = eventImg.width / eventImg.height;
+  const drawWidth = eventImgSize;
+  const drawHeight = eventImgSize / imgRatio;
+
   const radius = 40
   ctx.save()
   ctx.beginPath()
   ctx.moveTo(imgX + radius, y)
-  ctx.lineTo(imgX + eventImgSize - radius, y)
-  ctx.quadraticCurveTo(imgX + eventImgSize, y, imgX + eventImgSize, y + radius)
-  ctx.lineTo(imgX + eventImgSize, y + eventImgSize - radius)
-  ctx.quadraticCurveTo(imgX + eventImgSize, y + eventImgSize, imgX + eventImgSize - radius, y + eventImgSize)
-  ctx.lineTo(imgX + radius, y + eventImgSize)
-  ctx.quadraticCurveTo(imgX, y + eventImgSize, imgX, y + eventImgSize - radius)
+  ctx.lineTo(imgX + drawWidth - radius, y)
+  ctx.quadraticCurveTo(imgX + drawWidth, y, imgX + drawWidth, y + radius)
+  ctx.lineTo(imgX + drawWidth, y + drawHeight - radius)
+  ctx.quadraticCurveTo(imgX + drawWidth, y + drawHeight, imgX + drawWidth - radius, y + drawHeight)
+  ctx.lineTo(imgX + radius, y + drawHeight)
+  ctx.quadraticCurveTo(imgX, y + drawHeight, imgX, y + drawHeight - radius)
   ctx.lineTo(imgX, y + radius)
   ctx.quadraticCurveTo(imgX, y, imgX + radius, y)
   ctx.closePath()
   ctx.clip()
 
-  // Calcular dimensiones para simular object-fit: cover
-  const imgRatio = eventImg.width / eventImg.height;
-  let sWidth = eventImg.width;
-  let sHeight = eventImg.height;
-  let sx = 0;
-  let sy = 0;
-
-  if (imgRatio > 1) {
-    sWidth = eventImg.height;
-    sx = (eventImg.width - sWidth) / 2;
-  } else {
-    sHeight = eventImg.width;
-    sy = (eventImg.height - sHeight) / 2;
-  }
-
-  ctx.drawImage(eventImg, sx, sy, sWidth, sHeight, imgX, y, eventImgSize, eventImgSize)
+  ctx.drawImage(eventImg, imgX, y, drawWidth, drawHeight)
   ctx.restore()
 
-  y += eventImgSize + 60
+  y += drawHeight + 60
 
   const logoWidth = 140
   const logoHeight = (logo.height / logo.width) * logoWidth
