@@ -16,6 +16,7 @@ import {
   useAdminEvent,
   useAdminEventBinnacles,
   useAdminGetCheckers,
+  useAdminGetGuests,
   useAdminGetOrganizerFromEvent,
   useAdminPromoterBinnacles,
   useAdminPromoterTicketMetrics,
@@ -93,6 +94,8 @@ export default function EventInfo() {
   const selectedEventBinnacle = eventBinnacles?.find(
     (b) => b.eventId === eventId,
   );
+
+  const { guests } = useAdminGetGuests({ token, eventId });
 
   const binnacleToUse =
     user?.role.name === "ORGANIZER" ? selectedBinnacle : selectedEventBinnacle;
@@ -234,6 +237,7 @@ export default function EventInfo() {
             <>
               {user?.role.name !== "PROMOTER"
                 ? binnacleToUse?.stages?.map((stageGroup, groupIndex) => (
+                  
                     <DropdownItem
                       key={`${groupIndex}-${groupIndex}`}
                       title={stageGroup[0].ticketType}
@@ -243,6 +247,14 @@ export default function EventInfo() {
                       onToggle={() => toggleSection(stageGroup[0].ticketType)}
                     >
                       <div className="space-y-2 bg-main-container px-4 pb-3 rounded-b-lg">
+                        <div className="flex justify-between px-2 text-primary-white">
+                          <h2 className="text-sm pb-2">Invitados</h2>
+                          <h2 className="text-sm pb-2">
+                            {guests?.flatMap((g) => g.purchaseTickets ?? []).filter(
+                              (pt) => pt?.ticketType?.name === stageGroup[0].ticketType
+                            ).length ?? 0}
+                          </h2>
+                        </div>
                         {stageGroup.map((stage, stageIndex) => (
                           <StageItem
                             key={stageIndex}

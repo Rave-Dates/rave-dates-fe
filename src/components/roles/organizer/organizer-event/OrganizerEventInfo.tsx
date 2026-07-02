@@ -7,7 +7,7 @@ import EyeSvg from "@/components/svg/EyeSvg"
 import FormDropDown from "@/components/ui/inputs/FormDropDown"
 import FormInput from "@/components/ui/inputs/FormInput"
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications"
-import { useAdminBinnacles, useAdminEvent, useAdminGetCheckers, useAdminGetComplimentaryAvailable, useAdminGetPromoterLink, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData"
+import { useAdminBinnacles, useAdminEvent, useAdminGetCheckers, useAdminGetComplimentaryAvailable, useAdminGetGuests, useAdminGetPromoterLink, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData"
 import { purchaseComplimentaryTicket } from "@/services/admin-events"
 import { generateCheckerLink, updateCheckerTicketTypes } from "@/services/admin-qr"
 import { getClientByEmail } from "@/services/admin-users"
@@ -22,6 +22,7 @@ import { useForm } from "react-hook-form"
 import OrganizerEventAttendees from "../create-event/OrganizerEventAttendees"
 import { useTicketStore } from "@/store/useTicketStore"
 import ComplimentaryHistoryModal from "./ComplimentaryHistoryModal"
+import AttendeeList from "../../controller/AttendeeList"
 
 const getActiveStage = (stages: any[]) => {
   const now = new Date();
@@ -71,6 +72,8 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
   const { ticketTypes } = useAdminTicketTypes({ token, eventId });
   const { allCheckers } = useAdminGetCheckers({ token });
   const { complimentaryAvailable } = useAdminGetComplimentaryAvailable({ token, eventId, promoterId: decoded?.promoterId ?? 0 });
+  const { guests } = useAdminGetGuests({ token, eventId });
+
 
   const { organizerBinnacles } = useAdminBinnacles({
     organizerId: decoded?.organizerId ?? 0,
@@ -251,7 +254,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
     setValue("ticketTypeMap", updatedMap, { shouldValidate: true, shouldDirty: true });
   };
 
-  const types = ["Asistentes y aforo", "Cantidad vendida", "Dinero", "Promotores", "Link Escáner QRs"]
+  const types = ["Asistentes y aforo", "Cantidad vendida", "Dinero", "Promotores", "Link Escáner QRs", "Lista de invitados"]
 
   console.log(selectedEvent)
 
@@ -259,181 +262,222 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
     <div className="rounded-lg text-white w-full flex items-start justify-center mb-44 h-full">
       <div className="w-full">
         {
-          !isPromoter && !isPromoterBinnacle && types.map((type) => (
-            <DropdownItem
-              key={type}
-              title={type}
-              className="!bg-input mt-2"
-              isExpanded={globalExpandedSections.includes(type)}
-              onToggle={() => toggleGlobalSection(type)}
-            >
-              <div className="bg-input px-2 py-1 rounded-b-lg">
-                {
-                  type === "Asistentes y aforo" &&
-                  <OrganizerEventAttendees eventId={eventId} disableHeader />
-                }
-                {
-                  type === "Cantidad vendida" && 
-                  <div className="mb-2">
-                    <div className="flex bg-main-container justify-between p-3 rounded-lg items-center">
-                      <h1>Total vendido:</h1>
-                      <span className="text-primary-white">
-                        {ticketMetrics?.ticketsPurchased}
-                      </span>
-                    </div>
+          !isPromoter && !isPromoterBinnacle && types.map((type) => {
+            if (type === "Lista de invitados") return
+            return (
+              <> 
+                <DropdownItem
+                  key={type}
+                  title={type}
+                  className="!bg-input mt-2"
+                  isExpanded={globalExpandedSections.includes(type)}
+                  onToggle={() => toggleGlobalSection(type)}
+                >
+                  <div className="bg-input px-2 py-1 rounded-b-lg">
                     {
-                      selectedBinnacle?.stages?.map((stageGroup, groupIndex) => (
+                      type === "Asistentes y aforo" &&
+                      <OrganizerEventAttendees eventId={eventId} disableHeader />
+                    }
+                    {
+                      type === "Cantidad vendida" && 
+                      <div className="mb-2">
+                        <div className="flex bg-main-container justify-between p-3 rounded-lg items-center">
+                          <h1>Total vendido:</h1>
+                          <span className="text-primary-white">
+                            {ticketMetrics?.ticketsPurchased}
+                          </span>
+                        </div>
+                        {
+                          selectedBinnacle?.stages?.map((stageGroup, groupIndex) => (
+                            <DropdownItem
+                              key={`${groupIndex}-${groupIndex}`}
+                              title={stageGroup[0].ticketType}
+                              isExpanded={expandedSections.includes(stageGroup[0].ticketType)}
+                              onToggle={() => toggleSection(stageGroup[0].ticketType)}
+                            >
+                              <div className="space-y-2 bg-main-container px-4 pb-3 rounded-b-lg">
+                                <div className="flex justify-between px-2 text-primary-white">
+                                  <h2 className="text-sm pb-2">Invitados</h2>
+                                  <h2 className="text-sm pb-2">
+                                    {guests?.flatMap((g) => g.purchaseTickets ?? []).filter(
+                                      (pt) => pt?.ticketType?.name === stageGroup[0].ticketType
+                                    ).length ?? 0}
+                                  </h2>
+                                </div>
+                                {
+                                  stageGroup.map((stage, stageIndex) => (
+                                    <StageItem
+                                      key={stageIndex}
+                                      stage={stage}
+                                      quantity={stage.quantity}
+                                      index={stageIndex}
+                                    />
+                                  ))
+                                }
+                              </div>
+                            </DropdownItem>
+                        ))}
+                      </div>
+                    }
+                    {
+                      type === "Dinero" && 
+                      <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
+                        <div className="flex text-sm justify-between items-center">
+                          <h2>Total vendido</h2>
+                          <h2 className="text-primary-white text-base text-end tabular-nums">COP ${Number(selectedBinnacle?.total?? "0").toLocaleString()}</h2>
+                        </div>
+
+                        <div className="flex text-sm justify-between items-center">
+                          <h2>Dinero entregado</h2>
+                          <h2 className="text-primary-white text-base text-end tabular-nums">COP ${selectedBinnacle?.alreadyPaid.toLocaleString()?? 0}</h2>
+                        </div>
+                            
+                        <div className="flex text-sm justify-between items-center">
+                          <h2>Comisión Rave Dates</h2>
+                          <h2 className="text-primary text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feeRD?? "0").toLocaleString()}</h2>
+                        </div>
+
+                        <div className="flex text-sm justify-between items-center">
+                          <h2>Comisión Promotores</h2>
+                          <h2 className="text-primary text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feePromoter?? "0").toLocaleString()}</h2>
+                        </div>
+
+                        <div className="flex text-sm justify-between items-center">
+                          <h2>Dinero disponible</h2>
+                          <h2 className="text-primary-white text-base text-end tabular-nums">COP ${selectedBinnacle?.pendingPayment.toLocaleString()?? 0}</h2>
+                        </div>
+
+                        <Link href={`/organizer/event/${eventId}/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-white bg-primary">
+                          Ver dinero retirado
+                        </Link>
+                      </div>
+                    }
+                    {
+                      type === "Promotores" && 
+                      <div className="space-y-2 rounded-lg px-2 pb-2">
+                        {
+                          selectedEvent?.promoters?.map((promoter) => (
+                            <div key={promoter.userId} className="flex justify-between items-center">
+                              <h2 className="text-sm">{promoter.user.name}</h2>
+                              <div className="flex items-center gap-x-2">
+                                <Link href={`/organizer/promoters/edit-promoter/${promoter.userId}`} className="border border-primary rounded-lg text-primary p-1 text-xl"><EditSvg /></Link>
+                                <Link href={`/organizer/event/${eventId}/promoter-binnacles/${promoter.promoterId}`} className="bg-primary p-1 text-xl text-primary-black rounded-lg"><EyeSvg /></Link>
+                              </div>
+                            </div>
+                          ))
+                        }
+                        {
+                          selectedEvent?.promoters?.length === 0 &&
+                          <div className="text-center pt-2 pb-6 text-text-inactive">
+                            No se encontraron promotores
+                          </div>
+                        }
+                      </div>
+                    }
+                    {
+                      type === "Link Escáner QRs" && 
+                        <div className="bg-input rounded-lg px-5 py-2">
+                          <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="flex flex-col gap-y-3 justify-between items-center">
+                            <div className="flex w-full gap-x-3 items-center justify-between">
+                              <FormDropDown
+                                labelClassname="!mb-0"
+                                title="Elegir controlador*"
+                                register={register("checkerData")}
+                              >
+                                <option value="" disabled selected>Controlador</option>
+                                {allCheckers?.map((checker) => (
+                                  <option key={checker.userId} value={JSON.stringify({ email: checker.email, id: checker.checker?.checkerId })}>
+                                    {checker.name}
+                                  </option>
+                                ))}
+                              </FormDropDown>
+                              <FormDropDown
+                                labelClassname="!mb-0"
+                                title="Tipos de tickets*"
+                                register={register("ticketTypeMap")}
+                                onChange={handleTicketTypeChange}
+                              >
+                                <option value="" disabled selected>Selecciona un tipo de ticket</option>
+                                {ticketTypes?.map((ticket) => (
+                                  <option key={ticket.ticketTypeId} value={ticket.ticketTypeId}>
+                                    {ticket.name}
+                                  </option>
+                                ))}
+                              </FormDropDown>
+                            </div>
+                            <div className="text-sm flex flex-wrap justify-start w-full min-h-7 items-center gap-x-1 gap-y-1">
+                              <h2>Tickets seleccionados:</h2>
+                              {selectedTickets &&
+                                Object.entries(selectedTickets).map(([id, name]) => (
+                                  <span key={id} className="bg-inactive flex items-center gap-x-1 px-2 py-1 rounded">
+                                    {name}
+                                    <button 
+                                      type="button" 
+                                      onClick={() => handleRemoveTicketType(id)} 
+                                      className="text-primary-white hover:text-red-400 font-bold ml-1"
+                                    >
+                                      ✕
+                                    </button>
+                                  </span>
+                                ))}
+                            </div>
+                            <button type="submit" className="bg-primary rounded-lg py-2.5 mt-3 w-3/4 sm:w-1/2 font-medium text-sm">
+                              Generar link
+                            </button>
+                          </form>
+                          <div className="flex w-full gap-x-1 mt-3 justify-between py-2 items-center">
+                            <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/50">
+                              {checkerLink ? checkerLink : "Aqui aparecerá el link ..."}
+                            </h2>                  
+                            <button
+                              type="button"
+                              disabled={!checkerLink}
+                              onClick={() => {
+                                if (checkerLink) {
+                                  navigator.clipboard.writeText(checkerLink);
+                                  notifySuccess("Link copiado al portapapeles");
+                                }
+                              }}
+                              className="border border-primary disabled:opacity-60 disabled:pointer-events-none hover:opacity-75 transition-opacity px-4 py-1.5 font-medium text-primary-white rounded-lg text-sm"
+                            >
+                              Copiar
+                            </button>
+                          </div>
+                        </div>
+                    }
+                  </div>
+                </DropdownItem>
+                  {
+                    type === "Lista de invitados" &&
+                      <div className="bg-input px-2 py-1 rounded-b-lg">
                         <DropdownItem
-                          key={`${groupIndex}-${groupIndex}`}
-                          title={stageGroup[0].ticketType}
-                          isExpanded={expandedSections.includes(stageGroup[0].ticketType)}
-                          onToggle={() => toggleSection(stageGroup[0].ticketType)}
+                          title="Lista de Asistentes"
+                          className="mt-2"
+                          isExpanded={expandedSections.includes("Lista de Asistentes")}
+                          onToggle={() => toggleSection("Lista de Asistentes")}
                         >
-                          <div className="space-y-2 bg-main-container px-4 pb-3 rounded-b-lg">
-                            {
-                              stageGroup.map((stage, stageIndex) => (
-                                <StageItem
-                                  key={stageIndex}
-                                  stage={stage}
-                                  quantity={stage.quantity}
-                                  index={stageIndex}
-                                />
-                              ))
-                            }
+                          <div className="bg-main-container rounded-b-lg overflow-hidden">
+                            <AttendeeList eventId={eventId} isEmbedded={true} />
                           </div>
                         </DropdownItem>
-                    ))}
-                  </div>
-                }
-                {
-                  type === "Dinero" && 
-                  <div className="border-t-2 flex flex-col gap-y-3 pt-5 mt-3 px-2 pb-2 text-text-inactive border-dashed border-inactive">
-                    <div className="flex text-sm justify-between items-center">
-                      <h2>Total vendido</h2>
-                      <h2 className="text-primary-white text-base text-end tabular-nums">COP ${Number(selectedBinnacle?.total?? "0").toLocaleString()}</h2>
-                    </div>
-
-                    <div className="flex text-sm justify-between items-center">
-                      <h2>Dinero entregado</h2>
-                      <h2 className="text-primary-white text-base text-end tabular-nums">COP ${selectedBinnacle?.alreadyPaid.toLocaleString()?? 0}</h2>
-                    </div>
-                        
-                    <div className="flex text-sm justify-between items-center">
-                      <h2>Comisión Rave Dates</h2>
-                      <h2 className="text-primary text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feeRD?? "0").toLocaleString()}</h2>
-                    </div>
-
-                    <div className="flex text-sm justify-between items-center">
-                      <h2>Comisión Promotores</h2>
-                      <h2 className="text-primary text-base text-end tabular-nums">COP -${Number(selectedBinnacle?.feePromoter?? "0").toLocaleString()}</h2>
-                    </div>
-
-                    <div className="flex text-sm justify-between items-center">
-                      <h2>Dinero disponible</h2>
-                      <h2 className="text-primary-white text-base text-end tabular-nums">COP ${selectedBinnacle?.pendingPayment.toLocaleString()?? 0}</h2>
-                    </div>
-
-                    <Link href={`/organizer/event/${eventId}/money-withdrawn`} className="input-button block text-center text-sm py-3 text-primary-white bg-primary">
-                      Ver dinero retirado
-                    </Link>
-                  </div>
-                }
-                {
-                  type === "Promotores" && 
-                  <div className="space-y-2 rounded-lg px-2 pb-2">
-                    {
-                       selectedEvent?.promoters?.map((promoter) => (
-                        <div key={promoter.userId} className="flex justify-between items-center">
-                          <h2 className="text-sm">{promoter.user.name}</h2>
-                          <div className="flex items-center gap-x-2">
-                            <Link href={`/organizer/promoters/edit-promoter/${promoter.userId}`} className="border border-primary rounded-lg text-primary p-1 text-xl"><EditSvg /></Link>
-                            <Link href={`/organizer/event/${eventId}/promoter-binnacles/${promoter.promoterId}`} className="bg-primary p-1 text-xl text-primary-black rounded-lg"><EyeSvg /></Link>
-                          </div>
-                        </div>
-                      ))
-                    }
-                    {
-                      selectedEvent?.promoters?.length === 0 &&
-                      <div className="text-center pt-2 pb-6 text-text-inactive">
-                        No se encontraron promotores
                       </div>
-                    }
-                  </div>
-                }
-                {
-                  type === "Link Escáner QRs" && 
-                    <div className="bg-input rounded-lg px-5 py-2">
-                      <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="flex flex-col gap-y-3 justify-between items-center">
-                        <div className="flex w-full gap-x-3 items-center justify-between">
-                          <FormDropDown
-                            labelClassname="!mb-0"
-                            title="Elegir controlador*"
-                            register={register("checkerData")}
-                          >
-                            <option value="" disabled selected>Controlador</option>
-                            {allCheckers?.map((checker) => (
-                              <option key={checker.userId} value={JSON.stringify({ email: checker.email, id: checker.checker?.checkerId })}>
-                                {checker.name}
-                              </option>
-                            ))}
-                          </FormDropDown>
-                          <FormDropDown
-                            labelClassname="!mb-0"
-                            title="Tipos de tickets*"
-                            register={register("ticketTypeMap")}
-                            onChange={handleTicketTypeChange}
-                          >
-                            <option value="" disabled selected>Selecciona un tipo de ticket</option>
-                            {ticketTypes?.map((ticket) => (
-                              <option key={ticket.ticketTypeId} value={ticket.ticketTypeId}>
-                                {ticket.name}
-                              </option>
-                            ))}
-                          </FormDropDown>
-                        </div>
-                        <div className="text-sm flex flex-wrap justify-start w-full min-h-7 items-center gap-x-1 gap-y-1">
-                          <h2>Tickets seleccionados:</h2>
-                          {selectedTickets &&
-                            Object.entries(selectedTickets).map(([id, name]) => (
-                              <span key={id} className="bg-inactive flex items-center gap-x-1 px-2 py-1 rounded">
-                                {name}
-                                <button 
-                                  type="button" 
-                                  onClick={() => handleRemoveTicketType(id)} 
-                                  className="text-primary-white hover:text-red-400 font-bold ml-1"
-                                >
-                                  ✕
-                                </button>
-                              </span>
-                            ))}
-                        </div>
-                        <button type="submit" className="bg-primary rounded-lg py-2.5 mt-3 w-3/4 sm:w-1/2 font-medium text-sm">
-                          Generar link
-                        </button>
-                      </form>
-                      <div className="flex w-full gap-x-1 mt-3 justify-between py-2 items-center">
-                        <h2 className="truncate max-w-2/3 text-primary-white/75 underline underline-offset-4 decoration-primary/50">
-                          {checkerLink ? checkerLink : "Aqui aparecerá el link ..."}
-                        </h2>                  
-                        <button
-                          type="button"
-                          disabled={!checkerLink}
-                          onClick={() => {
-                            if (checkerLink) {
-                              navigator.clipboard.writeText(checkerLink);
-                              notifySuccess("Link copiado al portapapeles");
-                            }
-                          }}
-                          className="border border-primary disabled:opacity-60 disabled:pointer-events-none hover:opacity-75 transition-opacity px-4 py-1.5 font-medium text-primary-white rounded-lg text-sm"
-                        >
-                          Copiar
-                        </button>
-                      </div>
-                    </div>
-                }
+                  }
+              </>
+          )})
+        }
+
+        {
+          !isPromoter &&
+            <DropdownItem
+              title="Lista de Asistentes"
+              className="mt-2 bg-input!"
+              isExpanded={expandedSections.includes("Lista de Asistentes")}
+              onToggle={() => toggleSection("Lista de Asistentes")}
+            >
+              <div className="bg-main-container pt-2 rounded-b-lg overflow-hidden">
+                <AttendeeList eventId={eventId} isEmbedded={true} />
               </div>
             </DropdownItem>
-          ))
         }
 
         {
