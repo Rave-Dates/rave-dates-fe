@@ -6,6 +6,6 @@ export default async function Page({
   params: Promise<{ eventId: string }>
 }) {
   const { eventId } = await params
-  const eventIdNumber = Number(eventId);
+  const eventIdNumber = parseInt(eventId, 10);
   return <EventDetails eventId={eventIdNumber} />
 }

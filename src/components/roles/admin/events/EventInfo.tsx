@@ -3,6 +3,7 @@
 import { CircularProgress } from "@/components/roles/organizer/create-event/ProgressCircular";
 import { DropdownItem } from "@/components/roles/admin/events/DropDownItem";
 import { StageItem } from "@/components/roles/admin/events/StageItem";
+import AttendeeList from "@/components/roles/controller/AttendeeList";
 import UserSvg from "@/components/svg/UserSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
@@ -191,7 +192,7 @@ export default function EventInfo() {
       >
         <UserSvg stroke={1.7} className="text-2xl" />
       </Link>
-      <div className="w-full pt-24">
+      <div className="w-full pt-24 max-w-xl">
         {/* Header */}
         <h1 className="text-2xl mb-7 text-center font-semibold">
           {selectedEvent?.title}
@@ -379,6 +380,16 @@ export default function EventInfo() {
                   Copiar
                 </button>
               </div>
+            </div>
+          </DropdownItem>
+          <DropdownItem
+            title="Lista de Asistentes"
+            className="mt-2"
+            isExpanded={expandedSections.includes("Lista de Asistentes")}
+            onToggle={() => toggleSection("Lista de Asistentes")}
+          >
+            <div className="bg-main-container rounded-b-lg overflow-hidden">
+              <AttendeeList eventId={eventId} isEmbedded={true} />
             </div>
           </DropdownItem>
         </div>

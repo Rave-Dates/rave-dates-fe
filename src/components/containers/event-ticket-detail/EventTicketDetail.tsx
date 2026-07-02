@@ -36,6 +36,8 @@ const EventTicketDetails = ({ eventId }: { eventId: number }) => {
           {/* Left Column */}
           <div className="space-y-8">
             <EventHero
+              eventId={eventId}
+              eventTitle={selectedEvent?.title}
               isImagesLoading={isImagesLoading}
               eventImages={servedImages}
             />
@@ -69,6 +71,8 @@ const EventTicketDetails = ({ eventId }: { eventId: number }) => {
         <div className="grid md:hidden grid-cols-1 gap-x-8 relative">
           <GoBackButton className="absolute z-30 top-20 left-5 px-2 py-2" />
           <EventHero
+            eventId={eventId}
+            eventTitle={selectedEvent?.title}
             isImagesLoading={isImagesLoading}
             eventImages={servedImages}
           />

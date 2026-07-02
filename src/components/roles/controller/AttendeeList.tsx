@@ -10,7 +10,7 @@ import { notifyError } from "@/components/ui/toast-notifications";
 import { searchCheckerUser } from "@/services/admin-users";
 import { useDebounce } from "@/hooks/useDebounce";
 
-export default function AttendeeList({ eventId }: { eventId: number }) {
+export default function AttendeeList({ eventId, isEmbedded }: { eventId: number, isEmbedded?: boolean }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<IGuest[]>([]);
 
@@ -68,7 +68,7 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
   };
 
   useEffect(() => {
-    if (router && decoded && (decoded.eventId !== eventId || decoded.role !== "CHECKER")) {
+    if (!isEmbedded && router && decoded && (decoded.eventId !== eventId || decoded.role !== "CHECKER")) {
       notifyError("No tienes permisos para acceder a esta página");
       router.push("/");
       return
@@ -77,7 +77,7 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
       router.push("/");
       return
     } else return
-  }, [router, decoded, eventId]);
+  }, [router, decoded, eventId, isEmbedded]);
 
   // Calcular índices de paginación
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -89,7 +89,7 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
   const totalPages = checkerUsers && Math.ceil(checkerUsers.length / itemsPerPage);
 
   return (
-    <div className="w-full bg-primary-black flex flex-col justify-between text-primary-white min-h-screen p-4 pb-20 lg:pt-32">
+    <div className={`w-full flex flex-col justify-between text-primary-white ${isEmbedded ? 'pb-8 bg-main-container p-2' : 'bg-primary-black min-h-screen p-4 pb-20 lg:pt-32'}`}>
       <div className="max-w-xl w-full mx-auto animate-fade-in">
         {/* Search and Add User Section */}
         <div className="flex items-center gap-2 mb-4">
@@ -107,7 +107,7 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
         </div>
 
         {/* Users Table/List */}
-        <div className="rounded-md overflow-hidden min-h-[615px]">
+        <div className={`rounded-md overflow-hidden ${isEmbedded ? "" : "min-h-[615px]"}`}>
           {/* Table Body */}
           <div className="divide-y bg-input divide-divider w-full">
             {currentItems?.map((user) => (
@@ -186,9 +186,11 @@ export default function AttendeeList({ eventId }: { eventId: number }) {
             </div>
           )
         : null}
-        <button onClick={handleClick} className="bg-primary max-w-xl self-center hover:opacity-80 transition-opacity mt-5 text-primary-white font-medium py-3 w-full rounded-lg flex items-center justify-center text-center">
-          Atrás
-        </button>
+        {!isEmbedded && (
+          <button onClick={handleClick} className="bg-primary max-w-xl self-center hover:opacity-80 transition-opacity mt-5 text-primary-white font-medium py-3 w-full rounded-lg flex items-center justify-center text-center">
+            Atrás
+          </button>
+        )}
       </div>
     </div>
   );

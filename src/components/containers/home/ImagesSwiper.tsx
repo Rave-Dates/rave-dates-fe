@@ -5,12 +5,13 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import Image from 'next/image';
 
+import Link from 'next/link';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import ArrowSvg from '@/components/svg/ArrowSvg';
 
-export default function ImagesSwiper({ images, className }: { images: { id: string, url: string }[] | undefined, className?: string }) {
+export default function ImagesSwiper({ images, className, href }: { images: { id: string, url: string }[] | undefined, className?: string, href?: string }) {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
   if (!images) return
@@ -54,13 +55,25 @@ export default function ImagesSwiper({ images, className }: { images: { id: stri
           {
             images.map((image) => (
               <SwiperSlide key={image.id}>
-                <Image
-                  width={1000}
-                  height={1000}
-                  src={image.url}
-                  alt={`event ${image.id}`}
-                  className={className}
-                />
+                {href ? (
+                  <Link href={href}>
+                    <Image
+                      width={1000}
+                      height={1000}
+                      src={image.url}
+                      alt={`event ${image.id}`}
+                      className={className}
+                    />
+                  </Link>
+                ) : (
+                  <Image
+                    width={1000}
+                    height={1000}
+                    src={image.url}
+                    alt={`event ${image.id}`}
+                    className={className}
+                  />
+                )}
               </SwiperSlide>
             ))
           }
@@ -69,21 +82,45 @@ export default function ImagesSwiper({ images, className }: { images: { id: stri
         <>
           {
             images && images.length === 0 ?
-            <Image
-              width={1000}
-              height={1000}
-              src="/images/event-placeholder.png"
-              alt="Sin imagen"
-              className={className}
-            /> 
+            (href ? (
+              <Link href={href}>
+                <Image
+                  width={1000}
+                  height={1000}
+                  src="/images/event-placeholder.png"
+                  alt="Sin imagen"
+                  className={className}
+                />
+              </Link>
+            ) : (
+              <Image
+                width={1000}
+                height={1000}
+                src="/images/event-placeholder.png"
+                alt="Sin imagen"
+                className={className}
+              /> 
+            ))
             :
-            <Image
-              width={1000}
-              height={1000}
-              src={images[0].url}
-              alt={`event ${images[0].id}`}
-              className={className}
-            />
+            (href ? (
+              <Link href={href}>
+                <Image
+                  width={1000}
+                  height={1000}
+                  src={images[0].url}
+                  alt={`event ${images[0].id}`}
+                  className={className}
+                />
+              </Link>
+            ) : (
+              <Image
+                width={1000}
+                height={1000}
+                src={images[0].url}
+                alt={`event ${images[0].id}`}
+                className={className}
+              />
+            ))
           }
         </>
       )}

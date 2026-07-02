@@ -8,6 +8,7 @@ import { getClientEventImagesById, getClientImageById } from '@/services/clients
 import SpinnerSvg from '@/components/svg/SpinnerSvg';
 import { formatDateToColombiaTime } from '@/utils/formatDate';
 import { extractPlaceFromGeo } from '@/utils/formatGeo';
+import { slugify } from '@/utils/formatText';
 import { useTicketStore } from '@/store/useTicketStore';
 
 const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?: boolean}> = ({
@@ -61,7 +62,7 @@ const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?:
           <SpinnerSvg className='fill-primary w-10 sm:w-14' />
         </div>
         :
-        <ImagesSwiper images={servedImages} className='w-full h-auto' />
+        <ImagesSwiper href={externalUrl ? externalUrl : (href === 'event' || href === '/event' ? `/event/${eventId}-${slugify(title)}` : `${href}/${eventId}`)} images={servedImages} className='w-full h-auto' />
       }
 
       {/* Event Details */}
@@ -112,7 +113,7 @@ const EventCard: React.FC<IEvent & { href: string, text?: string, isTicketList?:
               {text}
             </a>
           ) : (
-            <Link href={`${href}/${eventId}`} className="bg-primary text-center text-primary-white font-medium text-body py-3 px-8 rounded-md hover:bg-primary/80 transition-all flex-1">
+            <Link href={href === 'event' || href === '/event' ? `/event/${eventId}-${slugify(title)}` : `${href}/${eventId}`} className="bg-primary text-center text-primary-white font-medium text-body py-3 px-8 rounded-md hover:bg-primary/80 transition-all flex-1">
               {text}
             </Link>
           )}

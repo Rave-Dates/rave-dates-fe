@@ -21,6 +21,7 @@ import {
 import { notifyError } from "@/components/ui/toast-notifications";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useChangeTicketStore } from "@/store/useChangeTicketStore";
+import { generateTicketCode } from "@/utils/formatText";
 
 type Props = {
   eventInfo: { date?: string; title?: string; piggyBank?: boolean };
@@ -186,7 +187,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
         time: `${formatDateToColombiaTime(eventInfo.date || "").date}, ${
           formatDateToColombiaTime(eventInfo.date || "").time
         }hs`,
-        purchaseTicketId: ticket.purchaseTicketId,
+        purchaseTicketId: `${generateTicketCode(ticket.purchaseTicketId)}-${i + 1}`,
         clientName: loggedInClient?.name || "Cliente",
         ticketType: ticket.ticketType.name,
         eventImage: servedImageUrl,
@@ -255,8 +256,9 @@ export default function TicketsChanger({ eventInfo }: Props) {
           </div>
           <div className="space-y-3">
             {paginate(nonTransferredTickets, pageNonTransferred)?.map(
-              (ticket) => (
+              (ticket, i) => (
                 <TicketRow
+                  ticketIndex={(pageNonTransferred - 1) * ITEMS_PER_PAGE + i + 1}
                   className="w-full"
                   ticket={ticket}
                   eventInfo={eventInfo}
@@ -286,8 +288,9 @@ export default function TicketsChanger({ eventInfo }: Props) {
             <h2 className="text-lg font-medium mb-4">Tickets transferidos</h2>
           )}
           <div className="space-y- flex flex-wrap gap-3 items-center justify-center">
-            {paginate(transferredTickets, pageTransferred)?.map((ticket) => (
+            {paginate(transferredTickets, pageTransferred)?.map((ticket, i) => (
               <TicketRow
+                ticketIndex={(pageTransferred - 1) * ITEMS_PER_PAGE + i + 1}
                 isTransferred={true}
                 ticket={ticket}
                 eventInfo={eventInfo}
@@ -305,13 +308,23 @@ export default function TicketsChanger({ eventInfo }: Props) {
             )}
         </div>
 
+        {totalClientTickets && totalClientTickets > 1 && (
+          <Link
+            href={`${pathname}/change-tickets`}
+            className="block text-center w-full bg-primary text-primary-white font-medium py-3 rounded-lg mb-3 mb-10 hover:opacity-80 transition-opacity"
+          >
+            Mejorar tickets
+          </Link>
+        )}
+
         {/* Pending Tickets Section */}
         {pendingTickets?.length && pendingTickets?.length > 0 ? (
           <div>
             <h2 className="text-lg font-medium mb-4">Alcancías</h2>
             <div className="space-y- flex flex-wrap gap-3 items-center justify-center">
-              {paginate(pendingTickets, pagePending)?.map((ticket) => (
+              {paginate(pendingTickets, pagePending)?.map((ticket, i) => (
                 <TicketRow
+                  ticketIndex={(pagePending - 1) * ITEMS_PER_PAGE + i + 1}
                   ticket={ticket}
                   eventInfo={eventInfo}
                   href="transferred"
@@ -351,14 +364,6 @@ export default function TicketsChanger({ eventInfo }: Props) {
             </>
           </>
         ) : null}
-        {totalClientTickets && totalClientTickets > 1 && (
-          <Link
-            href={`${pathname}/change-tickets`}
-            className="block text-center w-full bg-primary text-primary-white font-medium py-3 rounded-lg mb-3 mt-10 hover:opacity-80 transition-opacity"
-          >
-            Mejorar tickets
-          </Link>
-        )}
       </div>
     </div>
   );

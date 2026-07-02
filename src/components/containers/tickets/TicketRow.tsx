@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import AddSvg from "@/components/svg/AddSvg";
 import { useClientEventServedOneImage, useClientGetById } from "@/hooks/client/queries/useClientData";
 import { generateTicketImage } from "./generateTicketImage";
+import { generateTicketCode } from "@/utils/formatText";
 
 interface TicketRowProps {
   href: string;
@@ -22,6 +23,7 @@ interface TicketRowProps {
   isPendingToPay?: boolean;
   loggedInClientName?: string;
   className?: string;
+  ticketIndex?: number;
 }
 
 export function TicketRow({
@@ -32,9 +34,12 @@ export function TicketRow({
   isPendingToPay = false,
   loggedInClientName = "",
   className,
+  ticketIndex,
 }: TicketRowProps) {
   const [showQR, setShowQR] = useState(false);
   const [showTransferredModal, setShowTransferredModal] = useState(false);
+
+  const displayTicketId = `${generateTicketCode(isPendingToPay ? ticket.purchaseId : ticket.purchaseTicketId)}-${ticketIndex || 1}`;
 
   const { getCookie } = useReactiveCookiesNext();
   const pathname = usePathname();
@@ -61,7 +66,7 @@ export function TicketRow({
             ticketType: ticket.ticketType.name,
             eventImage: servedImageUrl ?? "/images/event-placeholder.png",
             logoRD: "/logo.svg",
-            purchaseTicketId: ticket.purchaseTicketId,
+            purchaseTicketId: displayTicketId,
             clientName: isTransferred ? (clientData?.name || "Cliente") : loggedInClientName,
             mode: "return",
           });
@@ -101,7 +106,7 @@ export function TicketRow({
             {" "} #
           </span>
           <span className="text-sm font-thin text-primary-white/70">
-            {isPendingToPay ? ticket.purchaseId : ticket.purchaseTicketId}
+            {displayTicketId}
           </span>
         </div>
         {
@@ -144,7 +149,7 @@ export function TicketRow({
                     time={`${formatDateToColombiaTime(eventInfo.date || "").date}, ${formatDateToColombiaTime(eventInfo.date || "").time}hs`}
                     ticketType={ticket.ticketType.name}
                     logoRD="/logo.svg"
-                    purchaseTicketId={ticket.purchaseTicketId}
+                    purchaseTicketId={displayTicketId}
                     clientName={loggedInClientName}
                   />
                 </div>

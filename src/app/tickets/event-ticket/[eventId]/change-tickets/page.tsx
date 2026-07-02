@@ -2,11 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   changeTicketPurchase,
   getClientTicketTypesByEventId,
-  getTicketsByPurchaseId,
 } from "@/services/clients-tickets";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
@@ -15,7 +14,7 @@ import { useTicketStore } from "@/store/useTicketStore";
 import { useClientGetById, useClientPurchasedTickets } from "@/hooks/client/queries/useClientData";
 import { useChangeTicketStore } from "@/store/useChangeTicketStore";
 import ChangeTicketButtons from "@/components/ui/buttons/ChangeTicketButtons";
-import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
+import { notifySuccess } from "@/components/ui/toast-notifications";
 
 const ChangeTicketsView = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -231,6 +230,28 @@ const ChangeTicketsView = () => {
     0
   );
 
+  const isUpgradingToSameType = React.useMemo(() => {
+    return Object.entries(selected).some(([ticketTypeId, val]) => {
+      const isGivingUp = oldSubtracted[Number(ticketTypeId)]?.currentSubtracted > 0;
+      return val.quantity > 0 && isGivingUp;
+    });
+  }, [selected, oldSubtracted]);
+
+  // Verifica si hay al menos un ticket disponible (con stock) al cual se pueda mejorar
+  const hasAvailableTicketsToUpgrade = React.useMemo(() => {
+    if (!ticketTypes || oldTicketsGrouped.length === 0) return true; 
+
+    return ticketTypes.some((ticket) => {
+      const isAlreadyOwned = oldTicketsGrouped.some(old => old.ticketTypeId === ticket.ticketTypeId);
+      if (isAlreadyOwned) return false;
+
+      return ticket.stages.some((stage) => {
+        const now = Date.now();
+        return new Date(stage.dateMax).getTime() > now && (stage.quantity ?? 0) > 0;
+      });
+    });
+  }, [ticketTypes, oldTicketsGrouped]);
+
   // Verifica si la nueva selección es exactamente igual a los tickets originales
   const isSameAsOriginal = React.useMemo(() => {
     const selectedEntries = Object.entries(selected);
@@ -357,7 +378,8 @@ const ChangeTicketsView = () => {
             }
           </div>
 
-          <h1 className="mb-2">Tus entradas</h1>
+          <h1 className="mb-1">Tus entradas</h1>
+          <h1 className="mb-2 text-sm text-[#838383]">Elimina la cantidad de boletas que deseas mejorar</h1>
           
           {activeTab !== null && (
             <div className="space-y-4 mb-10">
@@ -394,7 +416,7 @@ const ChangeTicketsView = () => {
             </div>
           )}
           
-          <h1 className="text-sm text-text-inactive mb-2">Tus nuevos tickets no pueden superar la cantidad de los antiguos.</h1>
+          <h1 className="text-sm text-[#838383] mb-2">Agrega la misma cantidad de tickets en la nueva localidad deseada</h1>
           {activeTab !== null && (
             <div className="space-y-4">
               {ticketTypes?.map((ticket) => {
@@ -418,20 +440,34 @@ const ChangeTicketsView = () => {
             </div>
           </div>
 
-          <button
-            onClick={handleConfirm}
-            disabled={
-              !(
-                activeTab &&
-                purchaseIds &&
-                totalPrice !== 0 &&
-                totalQuantity === oldTicketsTotal - totalOldTickets
-              ) || isSameAsOriginal
-            }
-            className="w-full text-center py-3 rounded-lg transition-colors text-primary-white bg-primary hover:bg-primary/70 disabled:bg-primary/60 disabled:pointer-events-none"
-          >
-            Confirmar pedido
-          </button>
+          {hasAvailableTicketsToUpgrade ? (
+            <>
+              <button
+                onClick={handleConfirm}
+                disabled={
+                  !(
+                    activeTab &&
+                    purchaseIds &&
+                    totalPrice !== 0 &&
+                    totalQuantity === oldTicketsTotal - totalOldTickets
+                  ) || isSameAsOriginal || isUpgradingToSameType
+                }
+                className="w-full text-center py-3 rounded-lg transition-colors text-primary-white bg-primary hover:bg-primary/70 disabled:bg-primary/60 disabled:pointer-events-none"
+              >
+                Confirmar pedido
+              </button>
+
+              {isUpgradingToSameType && (
+                <span className="text-primary text-sm text-center w-full mt-2">
+                  No puedes cambiar un ticket por otro del mismo tipo.
+                </span>
+              )}
+            </>
+          ) : (
+            <div className="w-full text-center py-3 rounded-lg text-primary-white bg-inactive">
+              No hay tickets disponibles para mejorar
+            </div>
+          )}
 
           <h1 className="sm:block hidden text-start w-full text-primary mt-6">
             Crédito disponible ${clientData?.balance.toLocaleString()} COP
