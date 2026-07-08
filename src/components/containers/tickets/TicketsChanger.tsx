@@ -58,7 +58,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
   const { setEventId, setPendimPaymentAmount } = useTicketStore();
   const router = useRouter();
   const params = useParams();
-  const eventId = Number(params.eventId);
+  const eventId = parseInt(params.eventId as string, 10);
   const { resetSelected } = useTicketStore();
   const {
     resetStore,

@@ -16,7 +16,7 @@ const ChangeTicketButtons = ({ ticket, totalQuantity, fixedQuantity, isOldTicket
   const { subtractOldTicket, oldTickets, getTotalOldTickets, oldTicketsTotal, addSubtractedOldTicket } = useChangeTicketStore();
   const { add, subtract, selected, setEventId } = useTicketStore();
   const params = useParams();
-  const eventId = Number(params.eventId);
+  const eventId = parseInt(params.eventId as string, 10);
   
   const currentQuantity = fixedQuantity ?? selected[ticket.ticketTypeId || 0]?.quantity ?? 0;
   const totalOldTickets = getTotalOldTickets();

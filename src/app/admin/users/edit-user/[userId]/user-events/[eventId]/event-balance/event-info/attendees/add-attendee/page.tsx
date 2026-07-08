@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form";
 export default function AddAttendee() {
   const { register, handleSubmit, control } = useForm<IFormGuest>();
   const params = useParams();
-  const eventId = Number(params.eventId);
+  const eventId = parseInt(params.eventId as string, 10);
   const { getCookie } = useReactiveCookiesNext();
   const { mutate: createGuestMutation } = useCreateGuest();
 

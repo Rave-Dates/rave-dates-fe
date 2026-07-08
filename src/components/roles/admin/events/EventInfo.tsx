@@ -44,7 +44,7 @@ export default function EventInfo() {
   const params = useParams();
   const searchParams = useSearchParams();
   const userId = Number(params.userId);
-  const eventId = Number(params.eventId);
+  const eventId = parseInt(params.eventId as string, 10);
   const organizerId = Number(searchParams.get("organizerId"));
 
   const [checkerLink, setCheckerLink] = useState<string>();

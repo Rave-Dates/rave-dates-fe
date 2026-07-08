@@ -14,7 +14,7 @@ export default function WithdrawInfo({ paymentId }: { paymentId: number }) {
   const eventIdFromQuery = Number(searchParams.get("e"));
   const organizerIdFromQuery = Number(searchParams.get("oid"));
 
-  const eventId = Number(params.eventId) || eventIdFromQuery;
+  const eventId = parseInt(params.eventId as string, 10) || eventIdFromQuery;
   
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");

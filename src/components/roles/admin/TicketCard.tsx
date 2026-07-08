@@ -49,7 +49,7 @@ export function TicketCard({
   const onEditStages = () => {
     const formValues = getValues(); // obtiene todos los datos del formulario
     const formTickets = formValues.tickets;
-    const eventId = Number(params.eventId)
+    const eventId = parseInt(params.eventId as string, 10)
 
     const normalizedTickets = formTickets.map((ticket) => ({
       ...ticket,

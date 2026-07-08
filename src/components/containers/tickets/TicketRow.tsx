@@ -44,7 +44,7 @@ export function TicketRow({
   const { getCookie } = useReactiveCookiesNext();
   const pathname = usePathname();
   const params = useParams();
-  const eventId = Number(params.eventId);
+  const eventId = parseInt(params.eventId as string, 10);
   const clientToken = getCookie("clientToken");
   const { servedImageUrl } = useClientEventServedOneImage(eventId);
   const { clientData } = useClientGetById({clientId: ticket.transferredClientId, clientToken});

@@ -73,6 +73,10 @@ export default function Checkout() {
   const { clientData } = useClientGetById({clientId: decoded?.id, clientToken: clientToken});
   const { selectedEvent } = useClientEvent(eventId);
 
+  console.log("EVENT ID : ", eventId)
+
+  console.log("selectedevent", selectedEvent)
+
   const { data: adminConfig } = useQuery({
     queryKey: ["adminConfig"],
     queryFn: () => getAdminConfig({ token: clientToken || tempToken }),
@@ -115,7 +119,7 @@ export default function Checkout() {
       notifyError("Por favor vuelva a seleccionar los tickets")
       router.replace('/')
     }
-  }, [selectedMethod, eventId]);
+  }, [selectedMethod, eventId, router]);
 
 
   let urlToReturn = ""

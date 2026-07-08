@@ -24,7 +24,7 @@ export default function UsersList() {
   const token = getCookie("token");
 
   const params = useParams();
-  const eventId = Number(params.eventId);
+  const eventId = parseInt(params.eventId as string, 10);
 
   const { selectedEvent } = useAdminEvent({ token, eventId });
   const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });

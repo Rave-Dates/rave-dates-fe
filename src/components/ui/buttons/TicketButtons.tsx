@@ -13,7 +13,7 @@ type Props = {
 const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
   const { add, subtract, selected, setEventId } = useTicketStore();
   const params = useParams();
-  const eventId = Number(params.eventId);
+  const eventId = parseInt(params.eventId as string, 10);
   
   let controlledMaxPurchase = maxPurchase ?? 1;
   const currentQuantity = selected[ticket.ticketTypeId || 0]?.quantity ?? 0;
@@ -22,7 +22,7 @@ const TicketButtons = ({ ticket, maxPurchase, totalQuantity }: Props) => {
     if (eventId) {
       setEventId(eventId);
     }
-  }, [eventId]);
+  }, [eventId, setEventId]);
 
   const validStage = ticket.stages.find((stage) => {
     const today = new Date();

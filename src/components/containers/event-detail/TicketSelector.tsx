@@ -35,7 +35,7 @@ const TicketSelector = ({
   const clientToken = getCookie("clientToken");
   const router = useRouter();
   const params = useParams();
-  const eventId = Number(params.eventId);
+  const eventId = parseInt(params.eventId as string, 10);
   const { selectedEvent } = useClientEvent(eventId);
   const [isVisible, setIsVisible] = React.useState(false);
 

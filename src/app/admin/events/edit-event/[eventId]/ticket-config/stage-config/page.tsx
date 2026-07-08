@@ -13,7 +13,7 @@ export default function StageConfig() {
 
   const router = useRouter()
   const params = useParams()
-  const eventId = Number(params.eventId)
+  const eventId = parseInt(params.eventId as string, 10)
 
   const currentTicketIndex = eventFormData.tickets?.findIndex(
     (t) => (t.ticketTypeId ?? t.ticketId) === editingTicketId

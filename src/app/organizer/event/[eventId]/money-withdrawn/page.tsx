@@ -10,7 +10,7 @@ import { useParams, usePathname } from "next/navigation";
 
 export default function MoneyWithdrawn() {
   const params = useParams();
-  const eventId = Number(params.eventId);
+  const eventId = parseInt(params.eventId as string, 10);
 
   const pathname = usePathname();
   const { getCookie } = useReactiveCookiesNext();

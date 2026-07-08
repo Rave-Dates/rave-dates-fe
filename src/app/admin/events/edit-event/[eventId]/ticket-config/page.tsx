@@ -32,7 +32,7 @@ export default function EditTicketConfiguration() {
   const { getCookie } = useReactiveCookiesNext()
   const token = getCookie("token")
   const params = useParams()
-  const eventId = Number(params.eventId)
+  const eventId = parseInt(params.eventId as string, 10)
 
   // 🟢 Traemos tickets del evento
   const { data: ticketsData } = useQuery<IEventTicket[]>({

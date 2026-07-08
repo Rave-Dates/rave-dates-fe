@@ -31,7 +31,7 @@ const TicketTransferredForm = ({
   const router = useRouter();
   const clientToken = getCookie("clientToken");
   const params = useParams();
-  const eventId = Number(params.eventId);
+  const eventId = parseInt(params.eventId as string, 10);
 
   const { purchasedTicket } = useClientPurchasedOneTicket({pruchaseTicketId: purchaseTicketId, clientToken});
   const { clientData } = useClientGetById({clientId: purchasedTicket?.transferredClientId, clientToken}); 

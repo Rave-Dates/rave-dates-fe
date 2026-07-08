@@ -23,7 +23,7 @@ export default function FreeTicketConfiguration() {
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const params = useParams();
-  const eventId = Number(params.eventId)
+  const eventId = parseInt(params.eventId as string, 10)
   const router = useRouter()
 
   const { ticketTypes } = useAdminTicketTypes({ token, eventId });

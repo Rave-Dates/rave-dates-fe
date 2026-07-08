@@ -32,7 +32,7 @@ const TicketTransferForm = ({
   const router = useRouter();
   const clientToken = getCookie("clientToken");
   const params = useParams();
-  const eventId = Number(params.eventId);
+  const eventId = parseInt(params.eventId as string, 10);
   const { selectedEvent, isEventLoading } = useClientEvent(eventId);
   const { servedImageUrl, isImageLoading } = useClientEventServedOneImage(eventId);
 

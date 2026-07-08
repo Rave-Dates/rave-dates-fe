@@ -16,7 +16,7 @@ import { useForm } from "react-hook-form";
 export default function EditGuest({ clientId }: {clientId: number}) {
   const { register, handleSubmit, reset, control } = useForm<IFormGuest>();
   const params = useParams();
-  const eventId = Number(params.eventId);
+  const eventId = parseInt(params.eventId as string, 10);
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const router = useRouter();

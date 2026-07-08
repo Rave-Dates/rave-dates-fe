@@ -26,7 +26,7 @@ const ChangeTicketsView = () => {
   const clientToken = getCookie("clientToken");
   const decoded: { id: number } = (clientToken && jwtDecode(clientToken.toString())) || { id: 0 };
   const clientId = Number(decoded?.id);
-  const eventId = Number(params.eventId);
+  const eventId = parseInt(params.eventId as string, 10);
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const { purchasedTickets } = useClientPurchasedTickets({clientId, clientToken: clientToken});
   const { clientData } = useClientGetById({clientId, clientToken: clientToken});
