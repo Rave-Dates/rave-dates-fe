@@ -64,21 +64,11 @@ const CitySelectorModal: React.FC = () => {
         changed = true;
       }
 
-      // Si existe la categoría "Tipo de evento", forzar el filtro "Rave" automáticamente
-      if (typeCategory) {
-        const typeFilterKey = `category-${typeCategory.categoryId}`;
-        const raveValue = typeCategory.values.find(v => v.value.toLowerCase() === "rave")?.value;
-        if (raveValue && !(filters[typeFilterKey] as string[])?.includes(raveValue)) {
-          newFilters[typeFilterKey] = [raveValue];
-          changed = true;
-        }
-      }
-
       if (changed) {
         setFilters(newFilters);
       }
     }
-  }, [locationCategory, typeCategory, selectedCity, filters, setFilters]);
+  }, [locationCategory, selectedCity, filters, setFilters]);
 
   const handleCitySelect = (city: string) => {
     setSelectedCity(city);
