@@ -5,6 +5,11 @@ import { useState } from "react";
 import DefaultButton from "@/components/ui/buttons/DefaultButton";
 import { useReactiveCookiesNext } from "cookies-next";
 import { useAdminAllUsers } from "@/hooks/admin/queries/useAdminData";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { editUserById } from "@/services/admin-users";
+import { jwtDecode } from "jwt-decode";
+import { notifyError, notifySuccess } from "@/components/ui/toast-notifications";
+import ConfirmationModal from "@/components/ui/modals/ConfirmationModal";
 
 export default function UserManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,7 +22,28 @@ export default function UserManagement() {
 
   const token = getCookie("token");
 
+  const queryClient = useQueryClient();
+
   const { data, isLoading, isError } = useAdminAllUsers({ token });
+
+  const { mutate } = useMutation({
+    mutationFn: editUserById,
+    onSuccess: () => {
+      const decoded: IUserLogin = jwtDecode(`${token}`);
+
+      if (decoded.role !== 'ADMIN') {
+        notifyError("No tienes permiso para editar un usuario.");
+        return
+      }
+      notifySuccess('Usuario editado correctamente');
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (error) => {
+      console.log(error)
+      notifyError("Credenciales incorrectas.");
+    },
+  });
+
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
@@ -34,6 +60,10 @@ export default function UserManagement() {
 
     setResults(filtered);
   };
+
+  const handleActivateUser = (id: IUser["userId"]) => {
+    mutate({ token, id, formData: { isActive: true } });
+  }
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -65,12 +95,31 @@ export default function UserManagement() {
             {currentItems?.map((user) => (
               <div
                 key={user?.userId}
-                className="grid grid-cols-[2fr_1fr_1fr] w-full items-center py-3 px-3 gap-x-2 text-sm"
+                className={`grid grid-cols-[2fr_1fr_1fr] w-full items-center py-3 px-3 gap-x-2 text-sm ${user?.isActive ? "" : "text-neutral-500"}`}
               >
                 <div className="text-start">{user?.name}</div>
                 <div className="text-center">{user?.role?.name}</div>
                 <div className="flex justify-end">
-                  <DefaultButton href={`users/edit-user/${user?.userId}`} />
+                  {
+                    user?.isActive ? (
+                      <DefaultButton href={`users/edit-user/${user?.userId}`} />
+                    ) : (
+                      <ConfirmationModal
+                        trigger={
+                          <button
+                            className="bg-primary text-xs text-primary-white p-1.5 rounded-md flex items-center justify-center"
+                          >
+                            Activar
+                          </button>
+                        }
+                        title="Activar Usuario"
+                        description={`¿Estás seguro de que deseas activar el usuario ${user?.name}?`}
+                        confirmText="Activar"
+                        variant="primary"
+                        onConfirm={() => handleActivateUser(user?.userId)}
+                      />
+                    )
+                  }
                 </div>
               </div>
             ))}

@@ -58,16 +58,15 @@ function DeleteUserModal({ userId } : { userId: IUser["userId"] }) {
   return (
     <>
       <button 
-        className="bg-primary text-primary-white active:bg-primary/70 transition-all p-3 rounded-xl"
+        className="bg-primary text-primary-white active:bg-primary/70 transition-all p-3 text-2xl rounded-xl"
         onClick={() => setIsModalOpen(true)}
       >
         <TrashSvg />
       </button>
       {isModalOpen && (
         <div onClick={() => setIsModalOpen(false)} className="animate-fade-in fixed inset-0 bg-black/60 bg-opacity-75 flex items-center justify-center md:py-8 z-50">
-          <div onClick={(e) => e.stopPropagation()} className="bg-cards-container mx-4 pt-5 text-primary-white flex flex-col justify-center items-center rounded-2xl w-sm overflow-hidden ">
-            <h1>Va a eliminar este usuario</h1>
-            <h1 className='mb-5'>¿está seguro?</h1>
+          <div onClick={(e) => e.stopPropagation()} className="bg-cards-container text-center mx-4 pt-5 text-primary-white flex flex-col justify-center items-center rounded-2xl w-sm overflow-hidden ">
+            <h1 className="mb-4">¿Estás seguro que quieres desactivar este usuario?</h1>
             <div className='border-t border-divider w-full flex items-center justify-center'> 
               <button
                 onClick={() => setIsModalOpen(false)}
