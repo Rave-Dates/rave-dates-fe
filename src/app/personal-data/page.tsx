@@ -11,12 +11,14 @@ import { purchaseFreeTicket } from "@/services/clients-tickets";
 import { useClientAuthStore } from "@/store/useClientAuthStore";
 import { useTicketStore } from "@/store/useTicketStore";
 import { onInvalid } from "@/utils/onInvalidFunc";
+import { suggestEmail } from "@/utils/emailSuggestion";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useMutation } from "@tanstack/react-query";
 import { useReactiveCookiesNext } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 interface ClientForm extends Partial<IClient> {
@@ -51,9 +53,25 @@ export default function DataForm() {
     register,
     handleSubmit,
     control,
+    setValue,
   } = useForm<ClientForm>();
   
   const receiveInfo = watch("receiveInfo", false);
+  const emailValue = watch("email", "");
+
+  // Debounce email input to avoid running suggestion on every keystroke
+  const debouncedEmail = useDebounce(emailValue ?? "", 600);
+  const [emailSuggestion, setEmailSuggestion] = useState<string | null>(null);
+
+  useEffect(() => {
+    setEmailSuggestion(suggestEmail(debouncedEmail));
+  }, [debouncedEmail]);
+
+  const applySuggestion = () => {
+    if (!emailSuggestion) return;
+    setValue("email", emailSuggestion, { shouldValidate: true });
+    setEmailSuggestion(null);
+  };
 
   const handleRedirectClick = () => {
     if (selectedEvent?.type !== "free") {
@@ -152,6 +170,25 @@ export default function DataForm() {
         inputName="email"
         register={register("email", { required: "El email es obligatorio"  })}
       />
+      {emailSuggestion && (
+        <button
+          type="button"
+          onClick={applySuggestion}
+          className="-mt-1 flex items-center gap-1.5 w-fit text-xs text-primary-white/60 hover:text-primary-white transition-colors group"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary flex-shrink-0">
+            <polyline points="9 11 12 14 22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          </svg>
+          <span>
+            ¿Quisiste decir{" "}
+            <span className="text-primary font-medium group-hover:underline underline-offset-2">
+              {emailSuggestion}
+            </span>
+            ?
+          </span>
+        </button>
+      )}
       <PhoneInput
         title="Celular con WhatsApp*"
         name="whatsapp"
