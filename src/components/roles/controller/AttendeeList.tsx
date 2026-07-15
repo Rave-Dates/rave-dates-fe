@@ -9,10 +9,12 @@ import { jwtDecode } from "jwt-decode";
 import { notifyError } from "@/components/ui/toast-notifications";
 import { searchCheckerUser } from "@/services/admin-users";
 import { useDebounce } from "@/hooks/useDebounce";
+import GuestDetailModal from "@/components/ui/modals/GuestDetailModal";
 
 export default function AttendeeList({ eventId, isEmbedded }: { eventId: number, isEmbedded?: boolean }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<IGuest[]>([]);
+  const [selectedGuest, setSelectedGuest] = useState<IGuest | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8; // cantidad de usuarios por página
@@ -89,6 +91,7 @@ export default function AttendeeList({ eventId, isEmbedded }: { eventId: number,
   const totalPages = checkerUsers && Math.ceil(checkerUsers.length / itemsPerPage);
 
   return (
+    <>
     <div className={`w-full flex flex-col justify-between text-primary-white ${isEmbedded ? 'pb-8 bg-main-container p-2' : 'bg-primary-black min-h-screen p-4 pb-20 lg:pt-32'}`}>
       <div className="max-w-xl w-full mx-auto animate-fade-in">
         {/* Search and Add User Section */}
@@ -113,21 +116,34 @@ export default function AttendeeList({ eventId, isEmbedded }: { eventId: number,
             {currentItems?.map((user) => (
               <div
                 key={user?.clientId}
-                className="flex flex-col text-start items-start py-4 px-4 gap-x-2"
+                className="flex items-center justify-between text-start py-4 px-4 gap-x-2"
               >
-                <div className="text-base">{user?.name}</div>
-                <div className="text-sm text-primary-white/50">
-                  {Object.entries(
-                    user?.purchaseTickets.reduce((acc, ticket) => {
-                      const name = ticket?.ticketType?.name;
-                      if (!name) return acc;
-                      acc[name] = (acc[name] || 0) + 1;
-                      return acc;
-                    }, {} as Record<string, number>)
-                  )
-                    .map(([name, count]) => `${name} x${count}`)
-                    .join(", ")}
+                <div className="flex flex-col flex-1 min-w-0">
+                  <div className="text-base truncate">{user?.name}</div>
+                  <div className="text-sm text-primary-white/50 truncate">
+                    {Object.entries(
+                      user?.purchaseTickets.reduce((acc, ticket) => {
+                        const name = ticket?.ticketType?.name;
+                        if (!name) return acc;
+                        acc[name] = (acc[name] || 0) + 1;
+                        return acc;
+                      }, {} as Record<string, number>)
+                    )
+                      .map(([name, count]) => `${name} x${count}`)
+                      .join(", ")}
+                  </div>
                 </div>
+                <button
+                  onClick={() => setSelectedGuest(user)}
+                  className="ml-3 flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-md bg-primary hover:bg-primary/70 text-primary-white transition-colors"
+                  aria-label="Ver detalles"
+                >
+                  <svg className="rotate-180" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                </button>
               </div>
             ))}
 
@@ -193,5 +209,11 @@ export default function AttendeeList({ eventId, isEmbedded }: { eventId: number,
         )}
       </div>
     </div>
+
+      <GuestDetailModal
+        guest={selectedGuest}
+        onClose={() => setSelectedGuest(null)}
+      />
+    </>
   );
 }

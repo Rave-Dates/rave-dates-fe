@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { CookieValueTypes } from "cookies-next";
 import { getAllEvents, getCheckerTicketMetrics, getComplimentaryAvailable, getEventById, getEventCategoriesById, getOrganizerByEventId, getPromoterTicketMetrics, getTicketMetrics, getTicketTypesById } from "@/services/admin-events";
-import { getAllBinnaclesFromOrganizer, getAllBinnaclesFromPromoter, getAllBinnaclesFromEvent } from "@/services/admin-binnacles";
+import { getAllBinnaclesFromOrganizer, getAllBinnaclesFromPromoter, getAllBinnaclesFromEvent, getBinnacleReportsFromEvent } from "@/services/admin-binnacles";
 import { getEventImages, getImageById } from "@/services/admin-events";
 import { getAllCategories } from "@/services/admin-categories";
 import { getAllLabels } from "@/services/admin-labels";
@@ -82,6 +82,30 @@ export function useAdminBinnacles({
   });
 
   return { organizerBinnacles, isBinnaclesLoading };
+}
+
+export function useAdminEventReportBinnacles({
+  eventId,
+  token,
+  userId,
+  role,
+}: {
+  eventId: number | undefined;
+  token: string | undefined;
+  userId?: number;
+  role?: "promoter" | "organizer";
+}) {
+  const { data: eventReportBinnacles, isLoading: isBinnaclesLoading } = useQuery({
+    queryKey: [`eventReportBinnacles-${eventId}`],
+    queryFn: async () => {
+      if (!token || !eventId) throw new Error("Token or eventId missing");
+      const binnacles = await getBinnacleReportsFromEvent({ token, eventId, userId, role });
+      return binnacles;
+    },
+    enabled: !!eventId && !!token,
+  });
+
+  return { eventReportBinnacles, isBinnaclesLoading };
 }
 
 export function useAdminEventBinnacles({

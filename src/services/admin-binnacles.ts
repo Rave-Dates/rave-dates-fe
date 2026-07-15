@@ -31,3 +31,13 @@ export const getAllBinnaclesFromEvent = async ({token, eventId}: { token: Cookie
   const data: IEventPaymentSummary[] = res.data;
   return data;
 };
+
+export const getBinnacleReportsFromEvent = async ({token, eventId, role, userId}: { token: CookieValueTypes, eventId: number, role: "promoter" | "organizer" | undefined, userId?: number }) => {
+  const res = await axios.get(`${BASE_URL}/admin/binnacles/admin-binnacle?eventId=${eventId}&${role === "organizer" && `organizerId=${userId}` || role === "promoter" && `promoterId=${userId}` }`, {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  const data: IEventReportBinnacle = res.data;
+  return data;
+};

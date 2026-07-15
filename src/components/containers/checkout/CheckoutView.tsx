@@ -231,26 +231,36 @@ export default function Checkout() {
         returnUrl: `${process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_FRONT_URL_DEV : process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets/event-ticket/${eventId}`,
       };
 
-      try {
-        const data = await transferTickets({ 
-          ticketData: dataToSubmit, 
-          purchaseTicketId: transferPurchaseTicketId, 
-          clientToken: (clientToken || tempToken) 
-        });
-
-        if (data && typeof data === 'string' && data.includes('http')) {
-          router.push(data);
-        } else {
-          router.push(`${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets`);
+      notifyPending(
+        new Promise((resolve, reject) => {
+          transferTickets({ 
+            ticketData: dataToSubmit, 
+            purchaseTicketId: transferPurchaseTicketId, 
+            clientToken: (clientToken || tempToken) 
+          })
+            .then((data) => {
+              resolve(data);
+              if (data && typeof data === 'string' && data.includes('http')) {
+                router.push(data);
+              } else {
+                router.push(`${process.env.NEXT_PUBLIC_FRONT_URL_PROD}/tickets`);
+              }
+            })
+            .catch((err: any) => {
+              const errorMessage = err?.response?.data?.message || err?.response?.data || err.message || "Error desconocido";
+              console.error("====== TRANSFER ERROR ======");
+              console.error(errorMessage);
+              console.error("Payload:", dataToSubmit);
+              console.error("Full error:", err);
+              reject(errorMessage);
+            });
+        }),
+        {
+          loading: "Procesando transferencia...",
+          success: "Transferencia iniciada correctamente",
+          error: "Error al procesar transferencia",
         }
-      } catch (err: any) {
-        const errorMessage = err?.response?.data?.message || err?.response?.data || err.message || "Error desconocido";
-        console.error("====== TRANSFER ERROR ======");
-        console.error(errorMessage);
-        console.error("Payload:", dataToSubmit);
-        console.error("Full error:", err);
-        notifyError(String(errorMessage), 10000); // 10 seconds so the user can read it
-      }
+      );
       return;
     }
 
