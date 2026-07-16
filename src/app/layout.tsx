@@ -62,7 +62,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="robots" content="index, follow" />
         <meta name="theme-color" content="#050505" />
-        <link rel="icon" href="/logo.svg" sizes="any" />
+        <link rel="icon" href="/favicon.svg" sizes="any" />
         
         <Script
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
