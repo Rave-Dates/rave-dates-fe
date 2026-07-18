@@ -10,6 +10,17 @@ interface IEventPaymentSummary {
   movements: IPaymentMovement[];
 }
 
+interface IEventReportBinnacle {
+  totalRD: number,
+  totalBold: number,
+  totalPromoter: number,
+  totalOrganizer: number,
+  totalTransfersCount: number,
+  totalTransfersAmount: number,
+  totalPurchasesCount: number,
+  totalPurchasesAmount: number
+}
+
 interface IPromoterEventPaymentSummary {
   eventId: number;
   total: string;

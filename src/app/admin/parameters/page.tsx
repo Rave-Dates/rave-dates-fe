@@ -19,7 +19,7 @@ export default function Parameters() {
         <CreateCategoryValues />
         <FeeBoldPorcentage />
         <MinFeeRdPlain />
-        <ErrorStrings />
+        {/* <ErrorStrings /> */}
       </div>
     </div>
   );

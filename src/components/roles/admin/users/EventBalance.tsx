@@ -1,7 +1,7 @@
 "use client"
 
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
-import { useAdminBinnacles, useAdminEvent, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
+import { useAdminBinnacles, useAdminEvent, useAdminEventReportBinnacles, useAdminPromoterBinnacles, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminUserById } from "@/hooks/admin/queries/useAdminData";
 import { CircularProgress } from "@/components/roles/organizer/create-event/ProgressCircular";
 import { useReactiveCookiesNext } from "cookies-next";
 import Link from "next/link";
@@ -25,6 +25,13 @@ export default function EventBalance({eventId}: { eventId: number }) {
   const { promoterBinnacles } = useAdminPromoterBinnacles({
     promoterId: user?.promoter?.promoterId ?? 0,
     token: token?.toString() ?? "",
+  });
+
+  const { eventReportBinnacles } = useAdminEventReportBinnacles({
+    eventId: user?.promoter?.promoterId ?? 0,
+    token: token?.toString() ?? "",
+    userId: user?.role.name === "PROMOTER" ? user?.promoter?.promoterId : user?.organizer?.organizerId || 0,
+    role: user?.role.name === "PROMOTER" ? "promoter" : "organizer",
   });
 
   const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });
@@ -122,6 +129,25 @@ export default function EventBalance({eventId}: { eventId: number }) {
             ${Number(binnacleToUse?.feeRD?? "0").toLocaleString()}
           </div>
         </div>
+        <div className="flex h-[44px] justify-between items-center text-sm gap-y-2 py-3 px-3">
+          <div className="text-text-inactive">
+            Comisiones por pago Bold
+          </div>
+          <div className="tabular-nums flex items-center justify-center">
+            <span className="text-primary text-2xl">-</span>
+            ${Number(eventReportBinnacles?.totalBold?? "0").toLocaleString()}
+          </div>
+        </div>
+        <div className="flex h-[44px] justify-between items-center text-sm gap-y-2 py-3 px-3">
+          <div className="text-text-inactive">
+            Comisión transferencia de tickets
+          </div>
+          <div className="tabular-nums flex items-center justify-center">
+            <span className="text-primary text-2xl">-</span>
+            ${Number(eventReportBinnacles?.totalTransfersAmount?? "0").toLocaleString()}
+          </div>
+        </div>
+
         {
           user?.role.name === "ORGANIZER" &&
           <div className="flex h-[44px] justify-between items-center text-sm gap-y-2 py-3 px-3">

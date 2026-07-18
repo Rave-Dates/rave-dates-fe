@@ -358,7 +358,8 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                         {
                           selectedEvent?.promoters?.map((promoter) => (
                             <div key={promoter.userId} className="flex justify-between items-center">
-                              <h2 className="text-sm">{promoter.user.name}</h2>
+                              <h2 className="text-sm">{promoter.user?.name}</h2>
+                              {/* <h2 className="text-sm">{promoter.}</h2> */}
                               <div className="flex items-center gap-x-2">
                                 <Link href={`/organizer/promoters/edit-promoter/${promoter.userId}`} className="border border-primary rounded-lg text-primary p-1 text-xl"><EditSvg /></Link>
                                 <Link href={`/organizer/event/${eventId}/promoter-binnacles/${promoter.promoterId}`} className="bg-primary p-1 text-xl text-primary-black rounded-lg"><EyeSvg /></Link>
