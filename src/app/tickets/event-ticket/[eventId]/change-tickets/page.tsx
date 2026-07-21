@@ -78,7 +78,6 @@ const ChangeTicketsView = () => {
       if (
         ticket.ticketType.eventId === eventId &&
         isMine &&
-        !ticket.purchase?.meta?.changeTickets && // Excluye tickets que ya han sido mejorados
         ticket.status === "PENDING" // Solo los tickets pendientes (sin usar) pueden ser mejorados
       ) {
         ids.add(ticket.purchaseId);
@@ -106,7 +105,6 @@ const ChangeTicketsView = () => {
           ticket.ticketType.eventId === eventId &&
           ticket.purchaseId === activeTab &&
           isMine &&
-          !ticket.purchase?.meta?.changeTickets &&
           ticket.status === "PENDING"
         );
       })
@@ -237,19 +235,24 @@ const ChangeTicketsView = () => {
     });
   }, [selected, oldSubtracted]);
 
-  // Verifica si hay al menos un ticket disponible (con stock) al cual se pueda mejorar
   const hasAvailableTicketsToUpgrade = React.useMemo(() => {
     if (!ticketTypes || oldTicketsGrouped.length === 0) return true; 
 
-    return ticketTypes.some((ticket) => {
-      const isAlreadyOwned = oldTicketsGrouped.some(old => old.ticketTypeId === ticket.ticketTypeId);
-      if (isAlreadyOwned) return false;
-
-      return ticket.stages.some((stage) => {
+    const availableTypes = ticketTypes.filter((ticket) => 
+      ticket.stages.some((stage) => {
         const now = Date.now();
         return new Date(stage.dateMax).getTime() > now && (stage.quantity ?? 0) > 0;
-      });
-    });
+      })
+    );
+
+    if (availableTypes.length === 0) return false;
+
+    if (availableTypes.length === 1) {
+      const availableId = availableTypes[0].ticketTypeId;
+      return oldTicketsGrouped.some(old => old.ticketTypeId !== availableId);
+    }
+
+    return true;
   }, [ticketTypes, oldTicketsGrouped]);
 
   // Verifica si la nueva selección es exactamente igual a los tickets originales
