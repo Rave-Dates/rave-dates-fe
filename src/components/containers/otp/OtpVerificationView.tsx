@@ -29,6 +29,7 @@ export default function OtpVerificationView() {
   const { setEventId } = useTicketStore();
   const router = useRouter();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const isLoggingIn = useRef(false);
   const {
     register,
     handleSubmit,
@@ -50,10 +51,19 @@ export default function OtpVerificationView() {
   const eventId = searchParams.get('eid')
 
   useEffect(() => {
-    if (clientToken && whereRedirect !== 'my-data') {
-      router.replace("/");
+    if (clientToken && !isLoggingIn.current) {
+      if (whereRedirect === "checkout") {
+        router.replace("/checkout");
+      } else if (whereRedirect === "transfer") {
+        if (eventId) setEventId(Number(eventId));
+        router.replace("/tickets");
+      } else if (whereRedirect === "my-data") {
+        router.replace("/my-data");
+      } else {
+        router.replace("/");
+      }
     }
-  }, [clientToken, whereRedirect, router]);
+  }, [clientToken, whereRedirect, router, eventId, setEventId]);
   
   useEffect(() => {
     if (emailOrWhatsapp) {
@@ -113,6 +123,7 @@ export default function OtpVerificationView() {
   };
 
   const onSubmit = (data: { code: string[]; emailOrWhatsapp: string }) => {
+    isLoggingIn.current = true;
     const pin = data.code.join("");
     setLoadingValidate(true);
 
