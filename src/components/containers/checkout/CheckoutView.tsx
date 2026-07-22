@@ -364,6 +364,7 @@ export default function Checkout() {
             isPromoter={Boolean(isPromoter)}
             promoterBalance={promoterBalance}
             isBalanceSufficient={isBalanceSufficient}
+            isPendingPayment={!!pendingPaymentPurchaseId}
           /> 
           {
           selectedPayment === "Abrir alcancía" && selectedEvent && selectedEvent.piggyBank && !isChangeTickets &&

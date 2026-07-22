@@ -11,9 +11,10 @@ type Props = {
   setSelected: React.Dispatch<SetStateAction<"Nequi" | "Bold" | "Ninguno">>;
   setCheck: (value: boolean) => void;
   isBalanceSufficient: boolean;
+  isPendingPayment?: boolean;
 };
 
-export default function PaymentMethodSelector({ clientData, selected, setSelected, check, setCheck, isPromoter = false, promoterBalance, isBalanceSufficient }: Props) {
+export default function PaymentMethodSelector({ clientData, selected, setSelected, check, setCheck, isPromoter = false, promoterBalance, isBalanceSufficient, isPendingPayment = false }: Props) {
   const methods: ["Nequi", "Bold"] = ["Nequi", "Bold"];
 
   return (
@@ -62,7 +63,7 @@ export default function PaymentMethodSelector({ clientData, selected, setSelecte
         </label>
       ))}
 
-      {isPromoter ? (
+      {isPendingPayment ? null : isPromoter ? (
         promoterBalance && promoterBalance > 0 ? (
           <div className="flex items-center pt-3 pb-1 select-none">
             <input
