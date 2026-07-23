@@ -13,6 +13,7 @@ interface Ticket {
 interface IPurchaseTicket {
   purchaseTicketId: number;
   purchaseId: number;
+  isInvite: boolean;
   ticketTypeId: number;
   status: 'PENDING' | 'READ' | 'DEFEATED';
   checkerId: number | null;

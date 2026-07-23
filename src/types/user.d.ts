@@ -68,7 +68,7 @@ interface IClient {
 }
 
 interface IGuest extends IClient {
-  purchaseTickets: Partial<IPurchaseTicket[]>;
+  purchaseTickets: Partial<IPurchaseTicket>[];
   clientId: number;
 }
 
