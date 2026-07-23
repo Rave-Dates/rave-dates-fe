@@ -161,7 +161,7 @@ export default function GuestDetailModal({ guest, onClose }: GuestDetailModalPro
               <div className="space-y-2">
                 {guest.purchaseTickets.map((ticket, idx) => {
                   if (!ticket) return null;
-                  const status = statusConfig[ticket.status] ?? statusConfig.PENDING;
+                  const status = ticket.status ? (statusConfig[ticket.status] ?? statusConfig.PENDING) : statusConfig.PENDING;
                   return (
                     <div
                       key={ticket.purchaseTicketId ?? idx}
