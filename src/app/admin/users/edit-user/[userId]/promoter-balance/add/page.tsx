@@ -43,12 +43,16 @@ export default function Page() {
       notifyError("Debes agregar una imagen");
       return;
     }
+    const selectedEvent = selectedUser.promoter.events?.find(
+      (e) => e.eventId === Number(data.eventId)
+    );
     const formattedData = {
       image: data.image,
       paymentAmount: Number(data.paymentAmount),
       eventId: Number(data.eventId),
       promoterId: selectedUser.promoter.promoterId || 0,
       organizerId: selectedUser.promoter.organizerId || 0,
+      reference: selectedEvent?.title || "",
     };
 
     // Ejemplo de envío

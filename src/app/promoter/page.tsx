@@ -13,7 +13,7 @@ export default function PromoterHome() {
   const token = getCookie("token");
   const decoded: { id: number } = (token && jwtDecode(token.toString())) || {id: 0};
   
-  const { data: user, isPending: isUserLoading } = useAdminUserById({ token, userId: decoded.id }); 
+  const { data: user } = useAdminUserById({ token, userId: decoded.id }); 
   
   const promoterId = user?.promoter?.promoterId;
 

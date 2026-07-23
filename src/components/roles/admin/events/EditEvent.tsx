@@ -68,7 +68,11 @@ export default function EditEvent({ eventId }: { eventId: number }) {
     const validDate = combineDateAndTimeToISO(result.date, result.time)
     const formattedTimeZone = formatDateToColombiaTime(validDate)
 
-    const formattedPromoters = event.promoters?.map((p) => ({ promoterId: p.promoterId })) || [];
+    const formattedPromoters = (event.promoters || [])
+      .map((p: any) => ({
+        promoterId: p.promoter?.promoterId ?? p.promoterId
+      }))
+      .filter((p: any) => p.promoterId != null);
 
     // Seteamos todo al formulario
     const setters = {

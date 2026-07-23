@@ -42,6 +42,7 @@ interface IEvent {
   promoters?: {
     promoterId?: number;
     user: IUser;
+    name: string;
     userId: number;
     organizerId: null;
     fee: number;

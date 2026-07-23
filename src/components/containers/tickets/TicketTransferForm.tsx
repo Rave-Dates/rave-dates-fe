@@ -2,8 +2,11 @@
 
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import type React from "react";
+import { useState, useEffect } from "react";
 import TitleCard from "../../common/TitleCard";
 import { useForm } from "react-hook-form";
+import { suggestEmail } from "@/utils/emailSuggestion";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useMutation } from "@tanstack/react-query";
 import FormInput from "@/components/ui/inputs/FormInput";
 import PhoneInput from "@/components/ui/inputs/PhoneInput";
@@ -39,7 +42,7 @@ const TicketTransferForm = ({
   const decoded: { id: number } | null = clientToken ? jwtDecode(clientToken.toString()) : null;
   const { clientData } = useClientGetById({ clientId: decoded?.id, clientToken });
 
-  const { register, handleSubmit, control } = useForm<ITransferUser>();
+  const { register, handleSubmit, control, watch, setValue } = useForm<ITransferUser>();
 
   const { mutate, isPending } = useMutation({
     mutationFn: transferTickets,
@@ -53,6 +56,20 @@ const TicketTransferForm = ({
   });
 
   const setTransferData = useTransferStore((state) => state.setTransferData);
+
+  const emailValue = watch("email", "");
+  const debouncedEmail = useDebounce(emailValue ?? "", 600);
+  const [emailSuggestion, setEmailSuggestion] = useState<string | null>(null);
+
+  useEffect(() => {
+    setEmailSuggestion(suggestEmail(debouncedEmail));
+  }, [debouncedEmail]);
+
+  const applySuggestion = () => {
+    if (!emailSuggestion) return;
+    setValue("email", emailSuggestion, { shouldValidate: true });
+    setEmailSuggestion(null);
+  };
 
   const onSubmit = (data: ITransferUser) => {
     // Prevent self-transfer by email
@@ -162,6 +179,25 @@ const TicketTransferForm = ({
         inputName="email"
         register={register("email", { required: "El email es obligatorio" })}
       />
+      {emailSuggestion && (
+        <button
+          type="button"
+          onClick={applySuggestion}
+          className="-mt-1 flex items-center gap-1.5 w-fit text-xs text-primary-white/60 hover:text-primary-white transition-colors group"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary flex-shrink-0">
+            <polyline points="9 11 12 14 22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          </svg>
+          <span>
+            ¿Quisiste decir{" "}
+            <span className="text-primary font-medium group-hover:underline underline-offset-2">
+              {emailSuggestion}
+            </span>
+            ?
+          </span>
+        </button>
+      )}
       <PhoneInput
         title="Celular con WhatsApp*"
         name="whatsapp"

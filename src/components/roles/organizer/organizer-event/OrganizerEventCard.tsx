@@ -27,7 +27,7 @@ export function OrganizerEventCard({event, href = "organizer/event", totalSold, 
   const { ticketMetrics } = useAdminTicketMetrics({ token, eventId, isPromoter: !!promoterId });
   const { promoterTicketMetrics } = useAdminPromoterTicketMetrics({ token, eventId, promoterId });
 
-  const metricsToUse = ticketMetrics || promoterTicketMetrics;
+  const metricsToUse = promoterId ? promoterTicketMetrics : ticketMetrics;
 
   return (
     <Link href={`${href}/${eventId}`} className="bg-cards-container rounded-lg p-4 flex items-center gap-3">
@@ -68,8 +68,11 @@ export function OrganizerEventCard({event, href = "organizer/event", totalSold, 
           {date && formatDateToColombiaTime(date).date} - {geo && extractPlaceFromGeo(geo)}
         </p>
         <p className="text-xs">
-          {/* {amountSold} vendidos - {price} */}
-          {metricsToUse?.ticketsPurchased ?? 0} Total vendido - {event.type === "free" ? "Gratis" : `COP ${totalSold?.toLocaleString() ?? 0}`}
+          {promoterId ? (
+            `${metricsToUse?.ticketsPurchased ?? 0} Vendidos`
+          ) : (
+            `${metricsToUse?.ticketsPurchased ?? 0} Total vendido - ${event.type === "free" ? "Gratis" : `COP ${totalSold?.toLocaleString() ?? 0}`}`
+          )}
         </p>
       </div>
     </Link>

@@ -10,6 +10,7 @@ type BaseProps = {
   placeholder: string;
   isLink?: boolean;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  searchClassname?: string;
 };
 
 type GuestProps = BaseProps & {
@@ -37,6 +38,7 @@ const SearchInput = ({
   type,
   isLink,
   setSearchTerm,
+  searchClassname,
 }: Props) => {
   const [isFocused, setIsFocused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -70,7 +72,7 @@ const SearchInput = ({
         onFocus={() => setIsFocused(true)}
         type="text"
         placeholder={placeholder}
-        className="w-full bg-input placeholder:text-inactive outline-none text-body pl-4 pr-4 py-3.5 rounded-2xl"
+        className={`w-full bg-input placeholder:text-inactive outline-none text-body pl-4 pr-4 py-3.5 rounded-2xl ${searchClassname}`}
       />
 
       {isFocused && results.length > 0 && (

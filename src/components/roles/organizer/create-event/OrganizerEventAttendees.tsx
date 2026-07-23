@@ -125,6 +125,7 @@ export default function OrganizerEventAttendees({eventId, disableHeader = false}
             results={results}
             type="guest"
             setSearchTerm={setSearchTerm}
+            searchClassname={disableHeader ? "bg-main-container!" : ""}
           />
           <Link href={`${eventId}/attendees/add-guest`} className="border-primary flex justify-center items-center border text-primary text-2xl px-3 rounded-xl">
             <AddSvg />

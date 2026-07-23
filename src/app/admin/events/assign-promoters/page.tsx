@@ -56,7 +56,7 @@ export default function AdminAssignPromoters() {
   }
 
   return (
-    <div className="rounded-md pt-5 md:pt-32 bg-primary-black min-h-screen overflow-hidden text-primary-white px-4">
+    <div className="rounded-md pt-5 pb-32 md:pt-32 bg-primary-black min-h-screen overflow-hidden text-primary-white px-4">
       <div className="flex justify-start items-center gap-x-3 pt-8">
         <GoBackButton className="z-30 top-10 left-5 px-3 py-3" />
         <h1 className="text-3xl font-medium">{eventFormData.title || "Nuevo evento"}</h1>
