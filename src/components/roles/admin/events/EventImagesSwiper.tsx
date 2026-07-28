@@ -45,8 +45,8 @@ export default function EventImageSwiper({ setImages, images, isLoading, isError
     Array.from(files).forEach((file) => {
       const fileSizeMB = file.size / (1024 * 1024) // convertir bytes a MB
 
-      if (!file.type.startsWith("image/")) {
-        notifyError(`El archivo "${file.name}" no es una imagen válida.`)
+      if (file.type !== "image/jpeg" && file.type !== "image/png" && file.type !== "image/jpg") {
+        notifyError(`El archivo "${file.name}" no es válido. Solo se permiten JPG y PNG.`)
         return
       }
 
@@ -102,7 +102,7 @@ export default function EventImageSwiper({ setImages, images, isLoading, isError
             ref={fileInputRef}
             type="file"
             multiple
-            accept="image/*"
+            accept="image/jpeg, image/png"
             onChange={handleFileUpload}
             className="hidden"
           />
