@@ -7,7 +7,7 @@ import EyeSvg from "@/components/svg/EyeSvg"
 import FormDropDown from "@/components/ui/inputs/FormDropDown"
 import FormInput from "@/components/ui/inputs/FormInput"
 import { notifyError, notifySuccess } from "@/components/ui/toast-notifications"
-import { useAdminBinnacles, useAdminEvent, useAdminGetCheckers, useAdminGetComplimentaryAvailable, useAdminGetGuests, useAdminGetPromoterLink, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData"
+import { useAdminBinnacles, useAdminCheckerTicketMetrics, useAdminEvent, useAdminGetCheckers, useAdminGetComplimentaryAvailable, useAdminGetGuests, useAdminGetPromoterLink, useAdminPromoterTicketMetrics, useAdminTicketMetrics, useAdminTicketTypes } from "@/hooks/admin/queries/useAdminData"
 import { purchaseComplimentaryTicket } from "@/services/admin-events"
 import { generateCheckerLink, updateCheckerTicketTypes } from "@/services/admin-qr"
 import { getClientByEmail } from "@/services/admin-users"
@@ -23,6 +23,8 @@ import OrganizerEventAttendees from "../create-event/OrganizerEventAttendees"
 import { useTicketStore } from "@/store/useTicketStore"
 import ComplimentaryHistoryModal from "./ComplimentaryHistoryModal"
 import AttendeeList from "../../controller/AttendeeList"
+import { ProgressBar } from "../create-event/ProgressBar";
+import { CircularProgress } from "../create-event/ProgressCircular"
 
 const getActiveStage = (stages: any[]) => {
   const now = new Date();
@@ -73,6 +75,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
   const { allCheckers } = useAdminGetCheckers({ token });
   const { complimentaryAvailable } = useAdminGetComplimentaryAvailable({ token, eventId, promoterId: decoded?.promoterId ?? 0 });
   const { guests } = useAdminGetGuests({ token, eventId });
+  const { checkerTicketMetrics } = useAdminCheckerTicketMetrics({ token, eventId });
 
 
   const { organizerBinnacles } = useAdminBinnacles({
@@ -254,7 +257,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
     setValue("ticketTypeMap", updatedMap, { shouldValidate: true, shouldDirty: true });
   };
 
-  const types = ["Asistentes y aforo", "Cantidad vendida", "Dinero", "Promotores", "Link Escáner QRs", "Lista de invitados"]
+  const types = ["Asistentes y aforo", "Cantidad vendida", "Dinero", "Promotores", "Link Escáner QRs", "Lista de invitados", "Tickets escaneados"]
 
   console.log(selectedEvent)
 
@@ -465,6 +468,45 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                           </div>
                         </div>
                     }
+                    {
+                      type === "Tickets escaneados" &&
+                      <div className="px-2 pb-2 space-y-3">
+                        <div className="bg-black/20 h-[80px] flex px-5 justify-between items-center py-1 rounded-lg">
+                          <div>
+                            <h3 className="text-sm text-primary-white/50">Total leídos</h3>
+                            <h3 className="text-lg">{checkerTicketMetrics?.totalRead}/{checkerTicketMetrics?.ticketsPurchased}</h3>
+                          </div>
+                          {
+                            checkerTicketMetrics &&
+                            <CircularProgress current={checkerTicketMetrics.totalRead ?? 0} total={checkerTicketMetrics.ticketsPurchased ?? 0} />
+                          }
+                        </div>
+                        <div className="bg-black/20 rounded-lg pt-3 pb-5 px-4 space-y-4">
+                          {
+                            checkerTicketMetrics?.ticketsTypesMetrics.map((ticketType) => {
+                              const percentage = ticketType.quantity > 0 ? Math.round((ticketType.read / ticketType.quantity) * 100) : 0;
+                              return (
+                                <div key={ticketType.name} className="flex items-end justify-between gap-x-4">
+                                  <div className="flex-1">
+                                    <h2 className="text-text-inactive mb-1">{ticketType.name}</h2>
+                                    <ProgressBar current={ticketType.read} total={ticketType.quantity} />
+                                  </div>
+                                  <div className="flex-shrink-0 mt-6 text-primary-white font-bold">
+                                    {percentage}%
+                                  </div>
+                                </div>
+                              );
+                            })
+                          }
+                          {
+                            checkerTicketMetrics?.ticketsTypesMetrics.length === 0 &&
+                            <div className="text-center pt-2 text-text-inactive">
+                              No hay compras
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
                   </div>
                 </DropdownItem>
                   {
@@ -637,7 +679,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                   </button>
                 </form>
                 {buyClientId && (
-                  <p className="text-xs text-green-400 px-1">✓ Cliente seleccionado (ID: {buyClientId})</p>
+                  <p className="text-xs text-green-400 px-1">✓ Cliente validado</p>
                 )}
                 <div className="flex gap-x-4 justify-between items-end">
                   <FormDropDown

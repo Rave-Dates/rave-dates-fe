@@ -4,6 +4,7 @@ import { CircularProgress } from "@/components/roles/organizer/create-event/Prog
 import { DropdownItem } from "@/components/roles/admin/events/DropDownItem";
 import { StageItem } from "@/components/roles/admin/events/StageItem";
 import AttendeeList from "@/components/roles/controller/AttendeeList";
+import { ProgressBar } from "@/components/roles/organizer/create-event/ProgressBar";
 import UserSvg from "@/components/svg/UserSvg";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
 import FormDropDown from "@/components/ui/inputs/FormDropDown";
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/toast-notifications";
 import {
   useAdminBinnacles,
+  useAdminCheckerTicketMetrics,
   useAdminEvent,
   useAdminEventBinnacles,
   useAdminGetCheckers,
@@ -96,6 +98,7 @@ export default function EventInfo() {
   );
 
   const { guests } = useAdminGetGuests({ token, eventId });
+  const { checkerTicketMetrics } = useAdminCheckerTicketMetrics({ token, eventId });
 
   const binnacleToUse =
     user?.role.name === "ORGANIZER" ? selectedBinnacle : selectedEventBinnacle;
@@ -391,6 +394,49 @@ export default function EventInfo() {
                 >
                   Copiar
                 </button>
+              </div>
+            </div>
+          </DropdownItem>
+          <DropdownItem
+            title="Tickets escaneados"
+            className="mt-2"
+            isExpanded={expandedSections.includes("Tickets escaneados")}
+            onToggle={() => toggleSection("Tickets escaneados")}
+          >
+            <div className="bg-main-container px-5 py-3 rounded-b-lg space-y-3">
+              <div className="bg-black/20 h-[80px] flex px-5 justify-between items-center py-1 rounded-lg">
+                <div>
+                  <h3 className="text-sm text-primary-white/50">Total leídos</h3>
+                  <h3 className="text-lg">{checkerTicketMetrics?.totalRead}/{checkerTicketMetrics?.ticketsPurchased}</h3>
+                </div>
+                {
+                  checkerTicketMetrics &&
+                  <CircularProgress current={checkerTicketMetrics.totalRead ?? 0} total={checkerTicketMetrics.ticketsPurchased ?? 0} />
+                }
+              </div>
+              <div className="bg-black/20 rounded-lg pt-3 pb-5 px-4 space-y-4">
+                {
+                  checkerTicketMetrics?.ticketsTypesMetrics.map((ticketType) => {
+                    const percentage = ticketType.quantity > 0 ? Math.round((ticketType.read / ticketType.quantity) * 100) : 0;
+                    return (
+                      <div key={ticketType.name} className="flex items-end justify-between gap-x-4">
+                        <div className="flex-1">
+                          <h2 className="text-text-inactive mb-1">{ticketType.name}</h2>
+                          <ProgressBar current={ticketType.read} total={ticketType.quantity} />
+                        </div>
+                        <div className="flex-shrink-0 mt-6 text-primary-white font-bold">
+                          {percentage}%
+                        </div>
+                      </div>
+                    );
+                  })
+                }
+                {
+                  checkerTicketMetrics?.ticketsTypesMetrics.length === 0 &&
+                  <div className="text-center pt-2 text-text-inactive">
+                    No hay compras
+                  </div>
+                }
               </div>
             </div>
           </DropdownItem>

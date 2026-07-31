@@ -79,13 +79,7 @@ const CitySelectorModal: React.FC = () => {
       const newFilters = { ...filters, [locationFilterKey]: [city] };
 
       // Al seleccionar una ciudad, también forzamos el filtro de tipo "Rave"
-      if (typeCategory) {
-        const typeFilterKey = `category-${typeCategory.categoryId}`;
-        const raveValue = typeCategory.values.find(v => v.value.toLowerCase() === "rave")?.value;
-        if (raveValue) {
-          newFilters[typeFilterKey] = [raveValue];
-        }
-      }
+      // (Eliminado para que solo sea al inicio y no sobreescriba la elección del usuario)
 
       setFilters(newFilters);
     }
@@ -101,10 +95,7 @@ const CitySelectorModal: React.FC = () => {
       delete newFilters[locationFilterKey];
 
       // Al limpiar la ciudad, también removemos el filtro forzado de "Rave"
-      if (typeCategory) {
-        const typeFilterKey = `category-${typeCategory.categoryId}`;
-        delete newFilters[typeFilterKey];
-      }
+      // (Eliminado para que mantenga la elección de filtros actual del usuario)
 
       setFilters(newFilters);
     }

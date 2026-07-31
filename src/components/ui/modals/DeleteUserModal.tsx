@@ -78,7 +78,7 @@ function DeleteUserModal({ userId } : { userId: IUser["userId"] }) {
                 onClick={() => handleDeleteUser()}
                 className="text-primary w-1/2 py-4 active:opacity-60"
               >
-                Eliminar
+                Desactivar
               </button>
             </div>
           </div>

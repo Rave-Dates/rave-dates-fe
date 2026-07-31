@@ -3,13 +3,14 @@
 import React, { useEffect, useState } from "react";
 import EventCard from "./EventCard";
 import EventCardSkeleton from "@/utils/skeletons/event-skeletons/EventCardSkeleton";
-import { useClientAllEvents } from "@/hooks/client/queries/useClientData";
+import { useClientAllEvents, useClientAllCategories } from "@/hooks/client/queries/useClientData";
 import { useEventStore } from "@/store/useEventStore";
 import { useCityStore } from "@/store/useCityStore";
 
 const EventCardList: React.FC = () => {
-  const { setEvents } = useEventStore();
+  const { filters, setFilters, initialRaveFilterApplied, setInitialRaveFilterApplied, setEvents } = useEventStore();
   const { selectedCity } = useCityStore();
+  const { clientCategories } = useClientAllCategories();
 
   const [page, setPage] = useState(1);
   const limit = 10;
@@ -41,6 +42,26 @@ const EventCardList: React.FC = () => {
       setEvents({ events: data });
     }
   }, [data, setEvents]);
+
+  // Apply initial Rave filter
+  useEffect(() => {
+    if (!initialRaveFilterApplied && clientCategories && clientCategories.length > 0) {
+      const typeCategory = clientCategories.find(c => 
+        c.name.toLowerCase().includes("tipo de evento")
+      );
+      if (typeCategory) {
+        const raveValue = typeCategory.values.find(v => v.value.toLowerCase() === "rave")?.value;
+        if (raveValue) {
+          const typeFilterKey = `category-${typeCategory.categoryId}`;
+          setFilters({ ...filters, [typeFilterKey]: [raveValue] });
+          setInitialRaveFilterApplied(true);
+        }
+      } else {
+        // If no type category found, mark as applied so we don't keep trying
+        setInitialRaveFilterApplied(true);
+      }
+    }
+  }, [clientCategories, initialRaveFilterApplied, filters, setFilters, setInitialRaveFilterApplied]);
 
   // Paginado desde el cliente
   const totalPages = Math.ceil((upcomingEvents?.length || 0) / limit);

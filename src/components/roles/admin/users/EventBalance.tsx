@@ -131,7 +131,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
         </div>
         <div className="flex h-[44px] justify-between items-center text-sm gap-y-2 py-3 px-3">
           <div className="text-text-inactive">
-            Comisiones por pago Bold
+            Comisión pago por Bold
           </div>
           <div className="tabular-nums flex items-center justify-center">
             <span className="text-primary text-2xl">-</span>
@@ -164,7 +164,8 @@ export default function EventBalance({eventId}: { eventId: number }) {
           <div className="text-text-inactive">
             Retirado
           </div>
-          <div className="tabular-nums">
+          <div className="tabular-nums flex items-center justify-center">
+            <span className="text-primary text-2xl">-</span>
             ${Number(binnacleToUse?.alreadyPaid?? "0").toLocaleString()}
           </div>
         </div>
