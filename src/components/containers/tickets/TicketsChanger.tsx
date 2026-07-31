@@ -84,6 +84,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
   const [pageNonTransferred, setPageNonTransferred] = useState(1);
   const [pageTransferred, setPageTransferred] = useState(1);
   const [pagePending, setPagePending] = useState(1);
+  const [isDownloadingAll, setIsDownloadingAll] = useState(false);
 
   // Filtro: Tickets que han sido transferidos A otra persona
   const transferredTickets = purchasedTickets?.filter(
@@ -167,13 +168,16 @@ export default function TicketsChanger({ eventInfo }: Props) {
 
   // Genera y descarga imágenes para todos los tickets válidos (excluyendo tickets ya usados/READ)
   const handleDownloadAll = async () => {
+    if (isDownloadingAll) return;
     const downloadableTickets = nonTransferredTickets?.filter(
       (ticket) => ticket.status !== "READ",
     );
 
     if (!downloadableTickets?.length) return;
 
-    for (const [i, ticket] of downloadableTickets.entries()) {
+    setIsDownloadingAll(true);
+    try {
+      for (const [i, ticket] of downloadableTickets.entries()) {
       const eventId = ticket.ticketType.eventId;
       const images = await getClientEventImagesById(eventId);
       const blob = await getClientImageById(Number(images[0].imageId));
@@ -194,6 +198,9 @@ export default function TicketsChanger({ eventInfo }: Props) {
         logoRD: "/logo.svg",
         fileName: `ticket-${ticket.ticketType.name}-${i + 1}.jpg`,
       });
+    }
+    } finally {
+      setIsDownloadingAll(false);
     }
   };
 
@@ -249,9 +256,10 @@ export default function TicketsChanger({ eventInfo }: Props) {
             <h2 className="text-lg font-medium">Mis tickets</h2>
             <button
               onClick={handleDownloadAll}
-              className="text-primary text-sm hover:underline"
+              disabled={isDownloadingAll}
+              className="text-primary text-sm hover:underline disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline"
             >
-              Descargar todos
+              {isDownloadingAll ? "Descargando..." : "Descargar todos"}
             </button>
           </div>
           <div className="space-y-3">
