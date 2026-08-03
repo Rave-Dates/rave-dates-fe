@@ -1,6 +1,7 @@
 'use client';
 
 import AddSvg from '@/components/svg/AddSvg';
+import CameraSvg from '@/components/svg/CameraSvg';
 import { notifyError } from '@/components/ui/toast-notifications';
 import { useAdminGetCheckerById } from '@/hooks/admin/queries/useAdminData';
 import { readQr } from '@/services/admin-qr';
@@ -16,6 +17,7 @@ export default function ScanQRPage() {
   const [cameras, setCameras] = useState<CameraDevice[]>([]);
   const [currentCameraId, setCurrentCameraId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [permissionDenied, setPermissionDenied] = useState(false);
   const [scanResult, setScanResult] = useState<{ 
     success: boolean; 
     text: string; 
@@ -67,11 +69,22 @@ export default function ScanQRPage() {
   useEffect(() => {
     let mounted = true;
 
-    Html5Qrcode.getCameras()
-      .then((devices) => {
+    const initCameras = async () => {
+      try {
+        // Verificar el estado del permiso antes de llamar a getCameras
+        if (navigator.permissions) {
+          const status = await navigator.permissions.query({ name: 'camera' as PermissionName });
+          if (status.state === 'denied') {
+            if (mounted) setPermissionDenied(true);
+            return;
+          }
+        }
+
+        const devices = await Html5Qrcode.getCameras();
         if (mounted && devices.length) {
+          setPermissionDenied(false);
           setCameras(devices);
-          
+
           // Buscar cámara trasera por el label
           const backCamera = devices.find((cam) => {
             const label = cam.label.toLowerCase();
@@ -80,12 +93,21 @@ export default function ScanQRPage() {
 
           setCurrentCameraId(backCamera ? backCamera.id : devices[0].id);
         }
-      })
-      .catch((err) => {
-        console.error('No se pudo acceder a las cámaras:', err);
-      });
+      } catch (err: any) {
+        const isPermissionError =
+          err?.name === 'NotAllowedError' ||
+          err?.message?.toLowerCase().includes('permission') ||
+          err?.message?.toLowerCase().includes('denied');
+        if (mounted && isPermissionError) {
+          setPermissionDenied(true);
+        } else {
+          console.error('No se pudo acceder a las cámaras:', err);
+        }
+      }
+    };
 
     scannerRef.current = new Html5Qrcode(qrCodeRegionId);
+    initCameras();
 
     return () => {
       mounted = false;
@@ -174,8 +196,16 @@ export default function ScanQRPage() {
         );
 
         setIsScanning(true);
-      } catch (err) {
-        console.error('Error al iniciar escaneo:', err);
+      } catch (err: any) {
+        const isPermissionError =
+          err?.name === 'NotAllowedError' ||
+          err?.message?.toLowerCase().includes('permission') ||
+          err?.message?.toLowerCase().includes('denied');
+        if (isPermissionError) {
+          setPermissionDenied(true);
+        } else {
+          console.error('Error al iniciar escaneo:', err);
+        }
       }
     };
 
@@ -185,6 +215,30 @@ export default function ScanQRPage() {
   const handleCameraChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setCurrentCameraId(event.target.value);
   };
+
+  if (permissionDenied) {
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 text-center gap-6">
+        <div className="text-5xl text-primary"><CameraSvg /></div>
+        <h1 className="text-2xl font-bold">Denegaste el acceso a la cámara</h1>
+        <p className="text-white/60 max-w-xs text-sm leading-relaxed">
+          Para escanear QRs necesitás habilitar el permiso de cámara en tu navegador.
+          Seguí estos pasos:
+        </p>
+        <ol className="text-left text-white/70 text-sm space-y-2 max-w-xs list-decimal list-inside">
+          <li>Tocá el ícono de candado o cámara en la barra de dirección de tu navegador.</li>
+          <li>Buscá la opción <strong>&quot;Cámara&quot;</strong> y cambiala a <strong>&quot;Permitir&quot;</strong>.</li>
+          <li>Recargá la página o presioná el botón de abajo.</li>
+        </ol>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-2 bg-primary text-primary-white font-semibold px-6 py-3 rounded-lg"
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white p-4 flex flex-col items-center justify-start pt-10 lg:pt-32 pb-32 relative">

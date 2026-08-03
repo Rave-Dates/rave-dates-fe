@@ -101,9 +101,12 @@ export default function AssignEvent({ isOrganizer = false }: { isOrganizer?: boo
     } else if (selectedUser.role.name === "PROMOTER") {
       if (!selectedUser.promoter?.promoterId || !eventById) return;
 
-      const prevPromoters = eventById.promoters?.map((promoter) => ({
-        promoterId: promoter.promoterId!,
-      })) || [];
+      const prevPromoters = eventById.promoters
+        ?.map((promoter) => {
+          const id = promoter.promoterId ?? promoter.promoter?.promoterId;
+          return { promoterId: id! };
+        })
+        .filter((p) => p.promoterId != null) || [];
 
       const formattedData = {
         promoters: [

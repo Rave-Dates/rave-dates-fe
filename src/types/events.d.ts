@@ -45,6 +45,7 @@ interface IEvent {
     name: string;
     promoter?: {
       totalTickets: number;
+      promoterId?: number;
     }
     userId: number;
     organizerId: null;

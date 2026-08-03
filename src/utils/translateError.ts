@@ -10,6 +10,7 @@ const errorMap: { [key: string]: string } = {
   "Event is not active": "El evento no está activo",
   "User already exists": "El usuario ya existe",
   "Client already exists": "El cliente ya fue registrado",
+  "Email not valid": "El correo electrónico no es válido",
 };
 
 export const translateError = (message: string): string => {
