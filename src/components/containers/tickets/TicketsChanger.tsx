@@ -21,7 +21,6 @@ import {
 import { notifyError } from "@/components/ui/toast-notifications";
 import { useTicketStore } from "@/store/useTicketStore";
 import { useChangeTicketStore } from "@/store/useChangeTicketStore";
-import { generateTicketCode } from "@/utils/formatText";
 
 type Props = {
   eventInfo: { date?: string; title?: string; piggyBank?: boolean };
@@ -121,6 +120,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
       tickets: IPurchaseTicket[];
       partialAmount: number;
       totalAmount: number;
+      customId: string | undefined;
       remainingAmount: number;
     };
   } = {};
@@ -134,6 +134,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
         tickets: [],
         partialAmount,
         totalAmount,
+        customId: ticket.customId,
         remainingAmount: totalAmount - partialAmount,
       };
     }
@@ -191,7 +192,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
         time: `${formatDateToColombiaTime(eventInfo.date || "").date}, ${
           formatDateToColombiaTime(eventInfo.date || "").time
         }hs`,
-        purchaseTicketId: `${generateTicketCode(ticket.purchaseTicketId)}-${i + 1}`,
+        purchaseTicketId: ticket.customId,
         clientName: loggedInClient?.name || "Cliente",
         ticketType: ticket.ticketType.name,
         eventImage: servedImageUrl,
@@ -365,7 +366,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
                   onClick={() => handleCompletePiggyBank(purchase)}
                   className="block text-sm px-2 sm:text-base text-center w-full text-red-400 border border-primary font-medium py-3 rounded-lg mb-3 hover:opacity-80 transition-opacity"
                 >
-                  Abonar/Completar alcancía N°{purchase.purchaseId} ($
+                  Abonar/Completar alcancía N°{purchase.tickets.map(ticket => ticket.customId).join(", ")} ($
                   {purchase.remainingAmount.toLocaleString()} COP)
                 </button>
               ))}

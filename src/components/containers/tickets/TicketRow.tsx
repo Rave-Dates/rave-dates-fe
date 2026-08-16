@@ -13,7 +13,6 @@ import { useEffect, useState } from "react";
 import AddSvg from "@/components/svg/AddSvg";
 import { useClientEventServedOneImage, useClientGetById } from "@/hooks/client/queries/useClientData";
 import { generateTicketImage } from "./generateTicketImage";
-import { generateTicketCode } from "@/utils/formatText";
 
 interface TicketRowProps {
   href: string;
@@ -34,12 +33,9 @@ export function TicketRow({
   isPendingToPay = false,
   loggedInClientName = "",
   className,
-  ticketIndex,
 }: TicketRowProps) {
   const [showQR, setShowQR] = useState(false);
   const [showTransferredModal, setShowTransferredModal] = useState(false);
-
-  const displayTicketId = `${generateTicketCode(isPendingToPay ? ticket.purchaseId : ticket.purchaseTicketId)}-${ticketIndex || 1}`;
 
   const { getCookie } = useReactiveCookiesNext();
   const pathname = usePathname();
@@ -66,7 +62,7 @@ export function TicketRow({
             ticketType: ticket.ticketType.name,
             eventImage: servedImageUrl ?? "/images/event-placeholder.png",
             logoRD: "/logo.svg",
-            purchaseTicketId: displayTicketId,
+            purchaseTicketId: ticket.customId,
             clientName: isTransferred ? (clientData?.name || "Cliente") : loggedInClientName,
             mode: "return",
           });
@@ -106,7 +102,7 @@ export function TicketRow({
             {" "} #
           </span>
           <span className="text-sm font-thin text-primary-white/70">
-            {displayTicketId}
+            {ticket.customId}
           </span>
         </div>
         {
@@ -149,7 +145,7 @@ export function TicketRow({
                     time={`${formatDateToColombiaTime(eventInfo.date || "").date}, ${formatDateToColombiaTime(eventInfo.date || "").time}hs`}
                     ticketType={ticket.ticketType.name}
                     logoRD="/logo.svg"
-                    purchaseTicketId={displayTicketId}
+                    purchaseTicketId={ticket.customId}
                     clientName={loggedInClientName}
                   />
                 </div>

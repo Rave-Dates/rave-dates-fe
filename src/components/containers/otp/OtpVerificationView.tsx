@@ -103,15 +103,15 @@ export default function OtpVerificationView() {
   };
 
   const handleSendCode = () => {
-    const emailOrWhatsapp = getValues("emailOrWhatsapp");
+    const emailOrWhatsappValue = getValues("emailOrWhatsapp");
     const method: "EMAIL" | "WHATSAPP" = isEmailOrWhatsapp === "Email" ? "EMAIL" : "WHATSAPP";
     setLoadingSend(true);
 
-    console.log("objeto de send code",{emailOrWhatsapp, method})
+    console.log("objeto de send code",{emailOrWhatsapp: emailOrWhatsappValue, method})
 
-    sendCode({email: emailOrWhatsapp, method})
+    sendCode({email: emailOrWhatsappValue, method})
       .catch((err) => {
-        if (err.response.data.message === "Client not found") {
+        if (err.response?.data?.message === "Client not found") {
           notifyError("Cliente no registrado, verifique su email o WhatsApp");
           return
         }
@@ -121,6 +121,17 @@ export default function OtpVerificationView() {
         inputRefs.current[0]?.focus();
       });
   };
+
+  const watchedEmailOrWhatsapp = watch("emailOrWhatsapp");
+  const hasSentCode = useRef(false);
+
+  useEffect(() => {
+    if (watchedEmailOrWhatsapp && !hasSentCode.current) {
+      hasSentCode.current = true;
+      handleSendCode();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedEmailOrWhatsapp]);
 
   const onSubmit = (data: { code: string[]; emailOrWhatsapp: string }) => {
     isLoggingIn.current = true;

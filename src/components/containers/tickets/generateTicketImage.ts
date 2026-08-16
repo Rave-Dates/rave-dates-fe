@@ -103,7 +103,7 @@ export const generateTicketImage = async ({
   ticketType: string
   eventImage: string
   logoRD: string
-  purchaseTicketId: string | number
+  purchaseTicketId: string | undefined
   clientName: string
   fileName: string
   mode?: "download" | "return"

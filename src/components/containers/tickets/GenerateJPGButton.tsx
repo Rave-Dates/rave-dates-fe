@@ -12,7 +12,7 @@ interface Props {
   ticketType: string;
   eventImage: string;
   logoRD: string;
-  purchaseTicketId: string | number;
+  purchaseTicketId: string | undefined;
   clientName: string;
 }
 

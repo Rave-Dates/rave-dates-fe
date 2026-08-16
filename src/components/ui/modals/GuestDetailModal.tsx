@@ -7,10 +7,17 @@ interface GuestDetailModalProps {
   onClose: () => void;
 }
 
-const statusConfig = {
-  PENDING: { label: "Pendiente", className: "bg-orange-500/20 text-orange-400 border-orange-500/30" },
+const statusConfig: Record<string, { label: string, className: string }> = {
+  PENDING: { label: "No leído", className: "bg-orange-500/20 text-orange-400 border-orange-500/30" },
   READ: { label: "Leído", className: "bg-green-500/20 text-green-400 border-green-500/30" },
   DEFEATED: { label: "Vencido", className: "bg-red-500/20 text-red-400 border-red-500/30" },
+};
+
+const paymentStatusConfig: Record<string, { label: string, className: string }> = {
+  PAID: { label: "Pago", className: "bg-green-500/20 text-green-400 border-green-500/30" },
+  PARTIAL: { label: "Alcancía", className: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
+  FAILED: { label: "Fallido", className: "bg-red-500/20 text-red-400 border-red-500/30" },
+  PENDING: { label: "Pendiente", className: "bg-orange-500/20 text-orange-400 border-orange-500/30" }
 };
 
 export default function GuestDetailModal({ guest, onClose }: GuestDetailModalProps) {
@@ -173,15 +180,27 @@ export default function GuestDetailModal({ guest, onClose }: GuestDetailModalPro
                             {ticket.ticketType?.name ?? "Entrada"}
                           </p>
                           <p className="text-[11px] text-primary-white/40 mt-0.5">
-                            #{ticket.purchaseTicketId}
+                            #{ticket?.customId}
                             {ticket.isTransferred && (
                               <span className="ml-2 text-blue-400">· Transferida</span>
                             )}
                           </p>
                         </div>
-                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border flex-shrink-0 ${status.className}`}>
-                          {status.label}
-                        </span>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          {ticket.isInvite && (
+                            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full border bg-purple-500/20 text-purple-400 border-purple-500/30">
+                              Invitación
+                            </span>
+                          )}
+                          {ticket.purchase?.paymentStatus && (
+                            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${paymentStatusConfig[ticket.purchase.paymentStatus]?.className || paymentStatusConfig.PENDING.className}`}>
+                              {paymentStatusConfig[ticket.purchase.paymentStatus]?.label || ticket.purchase.paymentStatus}
+                            </span>
+                          )}
+                          <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${status.className}`}>
+                            {status.label}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Método de pago si existe */}
@@ -191,11 +210,6 @@ export default function GuestDetailModal({ guest, onClose }: GuestDetailModalPro
                           <span className="text-[11px] text-primary-white/70 font-medium">
                             {ticket.purchase.paymentMethod}
                           </span>
-                          {ticket.purchase.paymentStatus && (
-                            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${ticket.purchase.paymentStatus === "PAID" ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"}`}>
-                              {ticket.purchase.paymentStatus === "PAID" ? "Pagado" : ticket.purchase.paymentStatus}
-                            </span>
-                          )}
                         </div>
                       )}
                     </div>

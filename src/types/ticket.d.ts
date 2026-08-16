@@ -13,6 +13,7 @@ interface Ticket {
 interface IPurchaseTicket {
   purchaseTicketId: number;
   purchaseId: number;
+  customId?: string;
   isInvite: boolean;
   ticketTypeId: number;
   status: 'PENDING' | 'READ' | 'DEFEATED';
@@ -46,6 +47,7 @@ type TicketStage = {
 interface IPurchaseData {
   purchaseId: number;
   clientId: number;
+  customId?: string;
   promoterId: number | null;
   transferredClientId: number | null;
   paymentMethod: 'BOLD' | 'NEQUI' | string;

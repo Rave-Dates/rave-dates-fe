@@ -16,6 +16,7 @@ type BaseProps = {
 type GuestProps = BaseProps & {
   type: "guest";
   results: IGuest[];
+  onGuestSelect?: (guest: IGuest) => void;
 };
 
 type EventProps = BaseProps & {
@@ -30,16 +31,17 @@ type UserProps = BaseProps & {
 
 type Props = GuestProps | EventProps | UserProps;
 
-const SearchInput = ({
-  handleFunc,
-  value,
-  placeholder,
-  results,
-  type,
-  isLink,
-  setSearchTerm,
-  searchClassname,
-}: Props) => {
+const SearchInput = (props: Props) => {
+  const {
+    handleFunc,
+    value,
+    placeholder,
+    results,
+    type,
+    isLink,
+    setSearchTerm,
+    searchClassname,
+  } = props;
   const [isFocused, setIsFocused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -93,6 +95,7 @@ const SearchInput = ({
                 key={guest.clientId}
                 guest={guest}
                 onClick={handleSearchClick}
+                onGuestSelect={props.type === "guest" ? props.onGuestSelect : undefined}
               />
             ))}
 
