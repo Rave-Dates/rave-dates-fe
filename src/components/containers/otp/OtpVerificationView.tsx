@@ -52,13 +52,15 @@ export default function OtpVerificationView() {
 
   useEffect(() => {
     if (clientToken && !isLoggingIn.current) {
+      if (whereRedirect === "my-data") {
+        // Evitar redirección automática si el usuario está verificando datos nuevos desde mi-cuenta
+        return;
+      }
       if (whereRedirect === "checkout") {
         router.replace("/checkout");
       } else if (whereRedirect === "transfer") {
         if (eventId) setEventId(Number(eventId));
         router.replace("/tickets");
-      } else if (whereRedirect === "my-data") {
-        router.replace("/my-data");
       } else {
         router.replace("/");
       }

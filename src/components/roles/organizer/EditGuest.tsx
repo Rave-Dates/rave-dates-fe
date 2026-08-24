@@ -97,6 +97,7 @@ export default function EditGuest({ clientId }: {clientId: number}) {
           register={register("email", { required: true })}
         />
         <FormInput
+          type="text"
           title="Cédula o Pasaporte*"
           inputName="idCard"
           register={register("idCard", { required: true })}

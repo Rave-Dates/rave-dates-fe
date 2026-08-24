@@ -87,7 +87,7 @@ export default function ImagesSwiper({ images, className, href }: { images: { id
                 <Image
                   width={1000}
                   height={1000}
-                  src="/images/event-placeholder.png"
+                  src="/images/event-placeholder.jpg"
                   alt="Sin imagen"
                   className={className}
                 />
@@ -96,7 +96,7 @@ export default function ImagesSwiper({ images, className, href }: { images: { id
               <Image
                 width={1000}
                 height={1000}
-                src="/images/event-placeholder.png"
+                src="/images/event-placeholder.jpg"
                 alt="Sin imagen"
                 className={className}
               /> 

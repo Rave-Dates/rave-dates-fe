@@ -42,7 +42,7 @@ export function OrganizerEventCard({event, href = "organizer/event", totalSold, 
           </div>
           :
           <Image className="w-full h-full rounded-full" 
-            src={servedImageUrl ?? "/images/event-placeholder.png"} 
+            src={servedImageUrl ?? "/images/event-placeholder.jpg"} 
             width={1000} 
             height={1000} 
             alt="placeholder" 

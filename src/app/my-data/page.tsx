@@ -165,7 +165,7 @@ export default function DataForm() {
           register={register("name", { required: "El nombre es obligatorio"  })}
         />
         <FormInput
-          type="number"
+          type="text"
           title="Cédula o Pasaporte*"
           inputName="idCard"
           register={register("idCard", { required: "La cédula es obligatoria"  })}

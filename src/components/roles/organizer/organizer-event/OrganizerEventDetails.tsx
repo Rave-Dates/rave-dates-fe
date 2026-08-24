@@ -45,7 +45,7 @@ export function OrganizerEventDetails({ eventId, isPromoter, isPromoterBinnacle,
                 </div>
                 :
                 <Image className="w-15 h-15 rounded-full" 
-                  src={servedImageUrl ?? "/images/event-placeholder.png"} 
+                  src={servedImageUrl ?? "/images/event-placeholder.jpg"} 
                   width={60} 
                   height={60} 
                   alt="placeholder" 

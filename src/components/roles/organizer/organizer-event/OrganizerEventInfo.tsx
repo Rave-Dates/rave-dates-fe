@@ -27,12 +27,17 @@ import { ProgressBar } from "../create-event/ProgressBar";
 import { CircularProgress } from "../create-event/ProgressCircular"
 
 const getActiveStage = (stages: any[]) => {
-  const now = new Date();
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
   return stages.find((stage) => {
-    const dateMax = new Date(stage.dateMax);
-    const date = new Date(stage.date);
-    return dateMax >= now && stage.quantity > 0 && date <= now;
+    const stageDateMaxStr = stage.dateMax.split('T')[0];
+    // Some places also check if stage start date has passed, if so we could do:
+    // const stageDateStr = stage.date ? stage.date.split('T')[0] : "";
+    // return stageDateMaxStr >= todayStr && stageDateStr <= todayStr && (stage.quantity ?? 0) > 0;
+    
+    // For now, mirroring TicketButtons.tsx logic:
+    return stageDateMaxStr >= todayStr && (stage.quantity ?? 0) > 0;
   });
 };
 

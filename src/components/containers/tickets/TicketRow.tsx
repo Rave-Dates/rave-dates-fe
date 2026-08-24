@@ -60,7 +60,7 @@ export function TicketRow({
             name: eventInfo.title || "",
             time: `${formatDateToColombiaTime(eventInfo.date || "").formatted} ${formatDateToColombiaTime(eventInfo.date || "").time}hs`,
             ticketType: ticket.ticketType.name,
-            eventImage: servedImageUrl ?? "/images/event-placeholder.png",
+            eventImage: servedImageUrl ?? "/images/event-placeholder.jpg",
             logoRD: "/logo.svg",
             purchaseTicketId: ticket.customId,
             clientName: isTransferred ? (clientData?.name || "Cliente") : loggedInClientName,
@@ -141,7 +141,7 @@ export function TicketRow({
                     bgImage="/images/Fondo-RV.jpeg"
                     qrData={ticket.qr}
                     name={eventInfo.title || ""}
-                    eventImage={servedImageUrl ?? "/images/event-placeholder.png"}
+                    eventImage={servedImageUrl ?? "/images/event-placeholder.jpg"}
                     time={`${formatDateToColombiaTime(eventInfo.date || "").date}, ${formatDateToColombiaTime(eventInfo.date || "").time}hs`}
                     ticketType={ticket.ticketType.name}
                     logoRD="/logo.svg"

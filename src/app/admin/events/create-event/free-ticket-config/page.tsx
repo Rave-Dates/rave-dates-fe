@@ -5,14 +5,20 @@ import DatePicker from "@/components/ui/date-picker/date-picker";
 import FormInput from "@/components/ui/inputs/FormInput";
 import { notifyPending } from "@/components/ui/toast-notifications";
 import { useCreateFullEvent } from "@/hooks/admin/mutations/useCreateEventFull";
+import { getAllCategories } from "@/services/admin-categories";
 import { useCreateEventStore } from "@/store/createEventStore";
 import { combineDateAndTimeToISO, formatColombiaTimeToUTC, validateDateYyyyMmDd } from "@/utils/formatDate";
 import { onInvalid } from "@/utils/onInvalidFunc";
+import { useReactiveCookiesNext } from "cookies-next";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 export default function FreeTicketConfiguration() {
   const { eventFormData, updateEventFormData } = useCreateEventStore();
+  const { getCookie } = useReactiveCookiesNext();
+
+  const token = getCookie("token")
+
   const { register, handleSubmit, reset, control, setValue } = useForm<IEventFormData>({
     defaultValues: eventFormData
   });
@@ -26,7 +32,7 @@ export default function FreeTicketConfiguration() {
     }
   }, [setValue, eventFormData.date]);
 
-  const onSubmit = (data: IEventFormData) => {
+  const onSubmit = async (data: IEventFormData) => {
     const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
       console.log(ticketId, ticketTypeId)
       if (rest.stages.length === 1) return { ...rest, maxDate: rest.stages[0].dateMax };
@@ -48,8 +54,26 @@ export default function FreeTicketConfiguration() {
     if (!data.date || !data.time) return
     const validDate = combineDateAndTimeToISO(data.date, data.time)
 
+    let categorieClub: any = null;
+    await getAllCategories({
+      token
+    }).then((res) => {
+      // Find the category value with name "Club" inside the values array of each category
+      for (const cat of res) {
+        const foundVal = cat.values?.find((v: any) => v.value === "Club");
+        if (foundVal) {
+          categorieClub = {
+            valueId: foundVal.valueId,
+            categoryId: foundVal.categoryId,
+            value: foundVal.value,
+          };
+          break;
+        }
+      }
+    });
+
     const cleanedEventData = {
-      eventCategoryValues: data.eventCategoryValues,
+      eventCategoryValues: categorieClub ? [categorieClub] : [],
       title: data.title,
       subtitle: data.subtitle,
       date: formatColombiaTimeToUTC(validDate),

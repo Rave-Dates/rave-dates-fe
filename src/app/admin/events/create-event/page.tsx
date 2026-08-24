@@ -160,6 +160,8 @@ export default function Page() {
       maxDate: eventDate,
     });
 
+    console.log("eventFormData", eventFormData)
+
     setHasLoadedEvent(true);
 
     router.push(

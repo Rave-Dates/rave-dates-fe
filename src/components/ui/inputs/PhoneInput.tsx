@@ -25,6 +25,7 @@ type PhoneInputProps<T extends FieldValues> = {
   labelClassname?: string;
   placeholder?: string;
   autoComplete?: "off" | "on" | "new-password";
+  disabled?: boolean;
 };
 
 export default function PhoneInput<T extends FieldValues>({
@@ -36,6 +37,7 @@ export default function PhoneInput<T extends FieldValues>({
   labelClassname = "",
   placeholder = "Número",
   autoComplete,
+  disabled = false,
 }: PhoneInputProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -101,8 +103,9 @@ export default function PhoneInput<T extends FieldValues>({
               >
                 <button
                   type="button"
+                  disabled={disabled}
                   onClick={() => setIsOpen(!isOpen)}
-                  className="w-full h-full flex items-center justify-between bg-main-container border-y border-l outline-none border-main-container rounded-l-lg py-3 px-3 text-white text-sm"
+                  className="w-full h-full flex items-center justify-between bg-main-container border-y border-l outline-none border-main-container rounded-l-lg py-3 px-3 text-white text-sm disabled:opacity-80 disabled:cursor-not-allowed disabled:select-none"
                 >
                   <div className="flex items-center gap-x-2">
                     {selectedCountry && (
@@ -156,12 +159,13 @@ export default function PhoneInput<T extends FieldValues>({
                 id={name}
                 ref={ref}
                 type="tel"
+                disabled={disabled}
                 placeholder={placeholder}
                 value={phoneNumber}
                 onChange={handleNumberChange}
                 onBlur={onBlur}
                 autoComplete={autoComplete}
-                className={`${className} w-full bg-main-container border outline-none border-main-container rounded-r-lg py-3 pr-4 pl-2 text-white`}
+                className={`${className} w-full bg-main-container border outline-none border-main-container rounded-r-lg py-3 pr-4 pl-2 text-white disabled:opacity-80 disabled:cursor-not-allowed disabled:select-none`}
               />
             </div>
           );

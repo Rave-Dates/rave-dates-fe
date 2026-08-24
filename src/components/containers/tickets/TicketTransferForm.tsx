@@ -143,7 +143,7 @@ const TicketTransferForm = ({
                   ) : (
                     <Image
                       className="w-14 h-14 rounded"
-                      src={servedImageUrl ?? "/images/event-placeholder.png"}
+                      src={servedImageUrl ?? "/images/event-placeholder.jpg"}
                       width={1000}
                       height={1000}
                       alt="placeholder"
@@ -167,6 +167,7 @@ const TicketTransferForm = ({
         register={register("name", { required: "El nombre es obligatorio" })}
       />
       <FormInput
+        type="text"
         title="Cédula o Pasaporte*"
         inputName="idCard"
         register={register("idCard", {

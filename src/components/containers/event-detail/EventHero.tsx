@@ -25,7 +25,7 @@ const EventHero = ({ eventImages, isImagesLoading, eventId, eventTitle } : { eve
                 <Image
                   width={1000}
                   height={1000}
-                  src="/images/event-placeholder.png"
+                  src="/images/event-placeholder.jpg"
                   alt="Sin imagen"
                   className="w-full h-auto"
                 /> 
@@ -34,7 +34,7 @@ const EventHero = ({ eventImages, isImagesLoading, eventId, eventTitle } : { eve
               <Image
                 width={1000}
                 height={1000}
-                src="/images/event-placeholder.png"
+                src="/images/event-placeholder.jpg"
                 alt="Sin imagen"
                 className="w-full h-auto"
               /> 

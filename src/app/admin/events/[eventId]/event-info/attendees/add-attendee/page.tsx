@@ -101,6 +101,7 @@ export default function AddAttendee() {
         </button>
       )}
       <FormInput
+        type="text"
         title="Cédula o Pasaporte*"
         inputName="idCard"
         register={register("idCard", { required: true })}

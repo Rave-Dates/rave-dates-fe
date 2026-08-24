@@ -4,6 +4,7 @@ import VerificationTypeSelector from "@/components/containers/otp/VerificationTy
 import DefaultForm from "@/components/ui/forms/DefaultForm";
 import CheckFormInput from "@/components/ui/inputs/CheckFormInput";
 import FormInput from "@/components/ui/inputs/FormInput";
+import PhoneInput from "@/components/ui/inputs/PhoneInput";
 import { useClientAuthStore } from "@/store/useClientAuthStore";
 import { onInvalid } from "@/utils/onInvalidFunc";
 import { useReactiveCookiesNext } from "cookies-next";
@@ -53,7 +54,8 @@ function ClientAuth() {
     watch,
     register,
     handleSubmit,
-    setValue
+    setValue,
+    control,
   } = useForm<ClientForm>();
 
   useEffect(() => {
@@ -154,12 +156,12 @@ function ClientAuth() {
           register={register("emailOrWhatsapp", { required: "El email es obligatorio"  })}
         />
         :
-        <FormInput
+        <PhoneInput
           title="WhatsApp*"
-          type="tel"
-          inputName="emailOrWhatsapp"
+          name="emailOrWhatsapp"
+          control={control}
           disabled={!isEditing}
-          register={register("emailOrWhatsapp", { required: "El WhatsApp es obligatorio"  })}
+          rules={{ required: "El WhatsApp es obligatorio" }}
         />
       }
       {tempToken && (

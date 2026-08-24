@@ -25,7 +25,7 @@ export default function EventDetails({className, selectedEvent, eventId}: Props)
           :
           <Image
             className="w-14 h-14 rounded"
-            src={servedImageUrl ?? "/images/event-placeholder.png"}
+            src={servedImageUrl ?? "/images/event-placeholder.jpg"}
             width={1000}
             height={1000}
             alt="placeholder"

@@ -441,10 +441,10 @@ export default function EventInfo() {
             </div>
           </DropdownItem>
           <DropdownItem
-            title="Lista de Asistentes"
+            title="Lista del evento"
             className="mt-2"
-            isExpanded={expandedSections.includes("Lista de Asistentes")}
-            onToggle={() => toggleSection("Lista de Asistentes")}
+            isExpanded={expandedSections.includes("Lista del evento")}
+            onToggle={() => toggleSection("Lista del evento")}
           >
             <div className="bg-main-container rounded-b-lg overflow-hidden">
               <AttendeeList eventId={eventId} isEmbedded={true} />
