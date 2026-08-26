@@ -43,7 +43,7 @@ export default function Page() {
     let total = 0;
     if (organizerBinnacles) {
       organizerBinnacles.forEach((binnacle: IEventPaymentSummary) => {
-        total += Number(binnacle.total);
+        total += Number(binnacle.feeOrganizer);
       });
     }
     return total.toLocaleString('es-CO');
