@@ -195,6 +195,9 @@ export default function DataForm() {
         control={control}
         rules={{ required: "El WhatsApp es obligatorio" }}
       />
+      <p className="text-xs text-text-inactive">
+        Al realizar esta compra, aceptas el <Link href="/politicas" className="underline decoration-text-inactive underline-offset-2">“Tratamiento de datos y Condiciones de compra"</Link>
+      </p>
 
        <CheckFormInput
         name="receiveInfo"
