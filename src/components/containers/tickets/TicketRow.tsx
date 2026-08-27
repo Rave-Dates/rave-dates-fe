@@ -91,7 +91,7 @@ export function TicketRow({
     }
   };
 
-  const actions = isTransferred ? ["send", "info"] : ["send", "download", "view"];
+  const actions = isTransferred ? ["resend", "info"] : ["send", "download", "view"];
 
   return (
     <div className={`${className} bg-cards-container w-fit min-w-36 sm:w-full rounded-lg py-3 pb-4 sm:pb-3 px-4 gap-y-3 sm:gap-y-0 gap-x-5 flex flex-col sm:flex-row items-center justify-center sm:justify-between`}>
@@ -169,10 +169,25 @@ export function TicketRow({
               );
             }
 
-
+            if (action === "resend") {
+              if (isTransferred && clientData && !clientData.firstLogin) {
+                return (
+                  <div key={action}>
+                    <DefaultTitledButton
+                      className="block"
+                      href={`${pathname}/${href}/${ticket.purchaseTicketId}`}
+                    >
+                      {getActionIcon(action)}
+                      <h2 className="text-[10px]">Reenviar</h2>
+                    </DefaultTitledButton>
+                  </div>
+                );
+              }
+              return null;
+            }
 
             if (action === "info") {
-              if (isTransferred && clientData) {
+              if (isTransferred && clientData && clientData.firstLogin) {
                 return (
                   <div key={action}>
                     <DefaultTitledButton
@@ -193,7 +208,7 @@ export function TicketRow({
               return (
                 <div key={action}>
                   <DefaultTitledButton
-                    href={`${pathname}/transfer/${ticket.purchaseTicketId}`}
+                    href={`${pathname}/${href}/${ticket.purchaseTicketId}`}
                   >
                     {getActionIcon(action)}
                     <h2 className="text-[10px]">Transferir</h2>

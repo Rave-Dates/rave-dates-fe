@@ -91,7 +91,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
       ticket.isTransferred &&
       ticket.transferredClientId !== null &&
       ticket.transferredClientId !== clientId &&
-      ticket.purchase.paymentStatus !== "PARTIAL" &&
+      ticket.purchase?.paymentStatus !== "PARTIAL" &&
       ticket.ticketType.eventId === eventId,
   );
 
@@ -99,7 +99,7 @@ export default function TicketsChanger({ eventInfo }: Props) {
   const nonTransferredTickets = purchasedTickets?.filter(
     (ticket) =>
       ((!ticket.isTransferred &&
-        ticket.purchase?.paymentStatus === "PAID" &&
+        (ticket.purchase?.paymentStatus === "PAID" || ticket.isInvite) &&
         ticket.transferredClientId === null) ||
         ticket.transferredClientId === clientId) &&
       ticket.ticketType.eventId === eventId,
