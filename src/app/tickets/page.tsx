@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import EventCard from '@/components/containers/home/EventCard';
 import { useReactiveCookiesNext } from 'cookies-next';
 import { jwtDecode } from 'jwt-decode';
@@ -9,15 +10,28 @@ import { getClientEventById } from '@/services/clients-events';
 import { useClientPurchasedTickets } from '@/hooks/client/queries/useClientData';
 
 const TicketsEventList: React.FC = () => {
+  const router = useRouter();
   const [isUpcoming, setIsUpcoming] = useState(true);
   const [currentView, setCurrentView] = useState("upcoming");
   const [fade, setFade] = useState(false);
   const [events, setEvents] = useState<IEvent[]>([]);
+  const [hasMounted, setHasMounted] = useState(false);
   
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("clientToken");
   const decoded: { id: number } = (token && jwtDecode(token.toString())) || { id: 0 };
   const clientId = Number(decoded?.id);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasMounted) return;
+    if (!token) {
+      router.replace("/auth");
+    }
+  }, [token, router, hasMounted]);
 
   
   const { purchasedTickets, isTicketsLoading, isTicketsError } = useClientPurchasedTickets({clientId, clientToken: token});
