@@ -28,7 +28,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
   });
 
   const { eventReportBinnacles } = useAdminEventReportBinnacles({
-    eventId: user?.promoter?.promoterId ?? 0,
+    eventId: eventId,
     token: token?.toString() ?? "",
     userId: user?.role.name === "PROMOTER" ? user?.promoter?.promoterId : user?.organizer?.organizerId || 0,
     role: user?.role.name === "PROMOTER" ? "promoter" : "organizer",
@@ -42,6 +42,9 @@ export default function EventBalance({eventId}: { eventId: number }) {
 
   const binnacleToUse = user?.role.name === "PROMOTER" ? selectedPromoterBinnacle : selectedBinnacle;
   const ticketMetricsToUse = user?.role.name === "PROMOTER" ? promoterTicketMetrics : ticketMetrics;
+
+  console.log("eventReportBinnacles", eventReportBinnacles)
+  // console.log(user?.promoter?.promoterId, token?.toString(), user?.role.name === "PROMOTER" ? user?.promoter?.promoterId : user?.organizer?.organizerId || 0, user?.role.name === "PROMOTER" ? "promoter" : "organizer")
 
   return (
     <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 lg:pt-32">
@@ -135,7 +138,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
           </div>
           <div className="tabular-nums flex items-center justify-center">
             <span className="text-primary text-2xl">-</span>
-            ${Number(eventReportBinnacles?.feeBold?? "0").toLocaleString()}
+            ${Number(eventReportBinnacles?.totalBold?? "0").toLocaleString()}
           </div>
         </div>
 

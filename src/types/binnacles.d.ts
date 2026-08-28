@@ -12,7 +12,7 @@ interface IEventPaymentSummary {
 
 interface IEventReportBinnacle {
   totalRD: number,
-  feeBold: number,
+  totalBold: number,
   totalPromoter: number,
   totalOrganizer: number,
   totalTransfersCount: number,
