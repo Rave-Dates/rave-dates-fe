@@ -21,7 +21,7 @@ export default function WithdrawInfo({ paymentId }: { paymentId: number }) {
   const decoded: IUserLogin | null = token ? jwtDecode(token.toString()) : null;
 
   const { organizerBinnacles } = useAdminBinnacles({
-    organizerId: decoded?.organizerId ?? organizerIdFromQuery,
+    organizerId: decoded?.role === "ADMIN"? decoded.id : decoded?.organizerId ?? organizerIdFromQuery,
     token: token?.toString() ?? "",
   });
 
@@ -30,8 +30,6 @@ export default function WithdrawInfo({ paymentId }: { paymentId: number }) {
   const selectedBinnacle = organizerBinnacles?.find(b => b.eventId === eventId);
 
   const selectedMovement = selectedBinnacle?.movements.find(m => m.paymentId === paymentId);
-
-  console.log(selectedMovement)
 
   const { movementImage, isErrorMovementImage, isLoadingMovementImage } = useServeMovementImage({ token, url: selectedMovement?.imageUrl });
 
