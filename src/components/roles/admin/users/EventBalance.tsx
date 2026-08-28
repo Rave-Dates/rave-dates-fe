@@ -135,16 +135,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
           </div>
           <div className="tabular-nums flex items-center justify-center">
             <span className="text-primary text-2xl">-</span>
-            ${Number(eventReportBinnacles?.totalBold?? "0").toLocaleString()}
-          </div>
-        </div>
-        <div className="flex h-[44px] justify-between items-center text-sm gap-y-2 py-3 px-3">
-          <div className="text-text-inactive">
-            Comisión transferencia de tickets
-          </div>
-          <div className="tabular-nums flex items-center justify-center">
-            <span className="text-primary text-2xl">-</span>
-            ${Number(eventReportBinnacles?.totalTransfersAmount?? "0").toLocaleString()}
+            ${Number(eventReportBinnacles?.feeBold?? "0").toLocaleString()}
           </div>
         </div>
 
