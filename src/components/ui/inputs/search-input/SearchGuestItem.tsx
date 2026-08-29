@@ -18,7 +18,7 @@ const SearchGuestItem = ({ guest, onClick, isLink = true, onGuestSelect }: { gue
                 <div key={ticket.purchaseTicketId} className="flex items-center gap-2 bg-primary-black/30 px-2 py-1 rounded-md border border-white/5">
                   <span className="text-[11px] font-medium text-primary-white/80">{ticket.ticketType?.name}</span>
                   <span className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded ${ticket.status === 'READ' ? 'bg-system-success/20 text-system-success' : 'bg-orange-500/20 text-orange-400'}`}>
-                    {ticket.status === 'READ' ? 'Leído' : 'Pendiente'}
+                    {ticket.status === 'READ' ? 'Leído' : 'No leído'}
                   </span>
                 </div>
               ))}
@@ -38,7 +38,7 @@ const SearchGuestItem = ({ guest, onClick, isLink = true, onGuestSelect }: { gue
                   <div key={ticket.purchaseTicketId} className="flex items-center gap-2 bg-primary-black/30 px-2 py-1 rounded-md border border-white/5">
                     <span className="text-[11px] font-medium text-primary-white/80">{ticket.ticketType?.name}</span>
                     <span className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded ${ticket.status === 'READ' ? 'bg-system-success/20 text-system-success' : 'bg-orange-500/20 text-orange-400'}`}>
-                      {ticket.status === 'READ' ? 'Leído' : 'Pendiente'}
+                      {ticket.status === 'READ' ? 'Leído' : 'No leído'}
                     </span>
                   </div>
                 ))}

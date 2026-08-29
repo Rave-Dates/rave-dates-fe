@@ -144,7 +144,7 @@ export default function GuestDetailModal({ guest, onClose }: GuestDetailModalPro
                       )}
                       {counts.pending > 0 && (
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                          {counts.pending} pendiente{counts.pending !== 1 ? "s" : ""}
+                          {counts.pending} no leído{counts.pending !== 1 ? "s" : ""}
                         </span>
                       )}
                       {counts.defeated > 0 && (
