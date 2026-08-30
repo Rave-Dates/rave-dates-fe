@@ -264,7 +264,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
 
   const types = ["Asistentes y aforo", "Cantidad vendida", "Dinero", "Promotores", "Link Escáner QRs", "Lista de invitados", "Tickets escaneados"]
 
-  console.log(selectedEvent)
+  console.log("selectedEvent", selectedEvent?.promoters?.map((promoter) => promoter.promoter.promoterId))
 
   return (
     <div className="rounded-lg text-white w-full flex items-start justify-center mb-44 h-full">
@@ -384,7 +384,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
                                   <td className="py-2.5 px-1">
                                     <div className="flex items-center justify-end gap-x-2">
                                       <Link href={`/organizer/promoters/edit-promoter/${promoter.userId}`} className="border border-primary rounded-lg text-primary p-1 text-xl"><EditSvg /></Link>
-                                      <Link href={`/organizer/event/${eventId}/promoter-binnacles/${promoter.promoterId}`} className="bg-primary p-1 text-xl text-primary-black rounded-lg"><EyeSvg /></Link>
+                                      <Link href={`/organizer/event/${eventId}/promoter-binnacles/${promoter?.promoter?.promoterId}`} className="bg-primary p-1 text-xl text-primary-black rounded-lg"><EyeSvg /></Link>
                                     </div>
                                   </td>
                                 </tr>
@@ -534,7 +534,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
         }
 
         {
-          !isPromoter &&
+          !isPromoter && !isPromoterBinnacle &&
             <DropdownItem
               title="Lista de Asistentes"
               className="mt-2 bg-input!"
