@@ -264,8 +264,6 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
 
   const types = ["Asistentes y aforo", "Cantidad vendida", "Dinero", "Promotores", "Link Escáner QRs", "Lista de invitados", "Tickets escaneados"]
 
-  console.log("selectedEvent", selectedEvent?.promoters?.map((promoter) => promoter.promoter.promoterId))
-
   return (
     <div className="rounded-lg text-white w-full flex items-start justify-center mb-44 h-full">
       <div className="w-full">
