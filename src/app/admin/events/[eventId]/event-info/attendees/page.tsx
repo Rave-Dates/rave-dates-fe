@@ -32,8 +32,6 @@ export default function UsersList() {
   const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });
   const { guests } = useAdminGetGuests({ token, eventId });
 
-  console.log(ticketMetrics)
-
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   useEffect(() => {

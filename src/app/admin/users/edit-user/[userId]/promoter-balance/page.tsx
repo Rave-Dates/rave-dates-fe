@@ -27,7 +27,6 @@ export default function Balance() {
       payment.promoterId === user?.promoter?.promoterId
   );
 
-  console.log(payments)
   const eventMap = new Map(allEvents?.map(event => [event.eventId, event.title]));
 
   return (

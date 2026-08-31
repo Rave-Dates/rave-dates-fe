@@ -73,10 +73,6 @@ export default function Checkout() {
   const { clientData } = useClientGetById({clientId: decoded?.id, clientToken: clientToken});
   const { selectedEvent } = useClientEvent(eventId);
 
-  console.log("EVENT ID : ", eventId)
-
-  console.log("selectedevent", selectedEvent)
-
   const { data: adminConfig } = useQuery({
     queryKey: ["adminConfig"],
     queryFn: () => getAdminConfig({ token: clientToken || tempToken }),
@@ -151,8 +147,6 @@ export default function Checkout() {
       const formattedNewTickets = []
 
       for (const [key, value] of Object.entries(selected)) {
-        console.log("oldTickets", oldTickets)
-        console.log("oldSubtracted", oldSubtracted)
         formattedNewTickets.push({
           ticketTypeId: Number(key),
           quantity: value.quantity,
@@ -160,9 +154,6 @@ export default function Checkout() {
         });
       }
 
-      console.log("formattedOldTickets", formattedOldTickets)
-      console.log("formattedNewTickets", formattedNewTickets)
-    
       const data = await changeTicketPurchase({
         ticketData: {
           clientId: decoded.id,
@@ -282,9 +273,6 @@ export default function Checkout() {
       discountCode: watchedDiscountCode,
     };
 
-    console.log(formattedTicketData)
-    console.log("check",check)
-
     notifyPending(
       new Promise((resolve, reject) => {
         mutate({
@@ -320,7 +308,6 @@ export default function Checkout() {
     },
     onSuccess: (data) => {
       notifySuccess("Transacción iniciada correctamente");
-      console.log("data", data);
 
       if (promoterAffiliate) {
         deleteCookie("promoterAffiliate", { path: "/" });

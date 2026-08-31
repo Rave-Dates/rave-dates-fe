@@ -109,8 +109,6 @@ export default function OtpVerificationView() {
     const method: "EMAIL" | "WHATSAPP" = isEmailOrWhatsapp === "Email" ? "EMAIL" : "WHATSAPP";
     setLoadingSend(true);
 
-    console.log("objeto de send code",{emailOrWhatsapp: emailOrWhatsappValue, method})
-
     sendCode({email: emailOrWhatsappValue, method})
       .catch((err) => {
         if (err.response?.data?.message === "Client not found") {

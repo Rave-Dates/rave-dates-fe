@@ -12,11 +12,9 @@ export function useCreatePayment() {
     mutationFn: async (formData: IPaymentForm) => {
       const { image, eventId, ...paymentData } = formData;
 
-      console.log("form data desde hook",formData)
 
       if (!image) return;
       const urlImage = await createPaymentImage(token, { file: image });
-      console.log("urlImage", urlImage)
 
       const formattedData = {
         ...paymentData,
@@ -24,11 +22,8 @@ export function useCreatePayment() {
         eventId: Number(eventId),
       };
 
-      console.log("formattedData", formattedData)
       const createdPayment = await createPayment(token, formattedData);
 
-      console.log("createdPayment", createdPayment)
-   
       return createdPayment;
     },
     onSuccess: () => {

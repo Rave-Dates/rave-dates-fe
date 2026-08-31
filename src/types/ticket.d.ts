@@ -24,6 +24,15 @@ interface IPurchaseTicket {
   updatedAt: string;
   purchase: IPurchaseData;
   qr: string;
+  meta?: {
+    changeTickets?: {
+      newTickets: {
+        price: number;
+        quantity: number;
+        ticketTypeId: number;
+      }[]
+    }[];
+  };
   transferredClientId: number | null;
   ticketType: {
     count: number;

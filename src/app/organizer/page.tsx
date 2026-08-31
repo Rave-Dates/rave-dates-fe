@@ -30,7 +30,6 @@ export default function OrganizerHome() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    console.log("campos resetados")
     updateEventFormData(defaultEventFormData);
   }, []);
 

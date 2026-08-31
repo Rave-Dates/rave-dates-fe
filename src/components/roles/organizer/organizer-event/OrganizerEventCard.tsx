@@ -18,7 +18,6 @@ type Props = {
 }
 
 export function OrganizerEventCard({event, href = "organizer/event", totalSold, promoterId}: Props) {
-  console.log("totalSold", totalSold)
   const { getCookie } = useReactiveCookiesNext();
   const token = getCookie("token");
   const { eventId, title, subtitle, date, geo } = event;

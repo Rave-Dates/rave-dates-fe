@@ -96,8 +96,6 @@ export default function ControllerEventDetails() {
     token: validToken ?? undefined,
   });
 
-console.log(checker)
-
   if (loadingAuth) {
     return (
       <div className="bg-primary-black min-h-screen flex flex-col text-primary-white pt-10 rounded-lg p-4 items-center">

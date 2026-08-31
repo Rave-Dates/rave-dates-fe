@@ -3,7 +3,6 @@ import axios from "axios";
 import { CookieValueTypes } from "cookies-next";
 
 export const loginAdmin = async (data: { email: string; password: string }) => {
-  console.log(data)
   const res = await axios.post(`${BASE_URL}/admin/login`, data);
   return res.data.accessToken;
 };
@@ -87,7 +86,6 @@ export const editUserById = async ({token, id, formData}: { token: CookieValueTy
 };
 
 export const deleteUserById = async ({token, id}: { token: CookieValueTypes, id: IUser["userId"] }) => {
-  console.log(id)
   const res = await axios.delete(`${BASE_URL}/admin/users/${id}`, {
     headers: {
       "Accept": "application/json",

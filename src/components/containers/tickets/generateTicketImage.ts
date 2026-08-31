@@ -11,8 +11,6 @@ function wrapTextIfNeeded(
   // Medimos de nuevo para seguridad
   const textWidth = ctx.measureText(text).width;
 
-  console.log(textWidth, maxWidth)
-
   // Si cabe, dibujamos en una línea
   if (textWidth <= maxWidth) {
     ctx.fillText(text, x, y);

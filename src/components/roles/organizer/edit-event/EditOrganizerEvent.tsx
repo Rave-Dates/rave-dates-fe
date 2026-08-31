@@ -100,7 +100,6 @@ export default function EditOrganizerEvent({ eventId }: { eventId: number }) {
 
   useEffect(() => {
     if (ticketTypes?.length && ticketTypes?.length > 0 && !hasLoadedTickets) {
-      console.log("ticketTypes",ticketTypes)
       const formattedTickets = ticketTypes.map((ticket) => ({
         ...ticket,
         maxDate: formatDate(ticket.maxDate),

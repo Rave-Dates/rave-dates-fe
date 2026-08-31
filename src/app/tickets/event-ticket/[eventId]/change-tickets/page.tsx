@@ -58,6 +58,7 @@ const ChangeTicketsView = () => {
 
   // Guard: redirect back if there is only one ticket type (no upgrade options)
   useEffect(() => {
+    console.log("SkFWSSBDSFVQQU1FIEJJRU4gTEEgUElKQUFBQUFBQUFBLiBBTExBIEVTVEFOIEhBQ0lFTkRPIExBIEZBU0UgMg==")
     if (ticketTypes === undefined) return; // still loading
     if (ticketTypes.length <= 1) {
       router.back();
@@ -110,10 +111,30 @@ const ChangeTicketsView = () => {
       })
       .forEach((t) => {
         if (!grouped[t.ticketTypeId]) {
+          let price = Number(t.ticketType.stages?.[0]?.price || 0);
+
+          const meta = (t.purchase?.meta || t.meta) as any;
+
+          if (meta?.changeTickets?.newTickets) {
+            const newTicket = meta.changeTickets.newTickets.find(
+              (nt: any) => nt.ticketTypeId === t.ticketTypeId
+            );
+            if (newTicket?.price !== undefined) {
+              price = Number(newTicket.price);
+            }
+          } else if (meta?.total?.activeStage) {
+            const activeStageObj = meta.total.activeStage.find(
+              (as: any) => as.ticketTypeId === t.ticketTypeId
+            );
+            if (activeStageObj?.activeStage?.price !== undefined) {
+              price = Number(activeStageObj.activeStage.price);
+            }
+          }
+
           grouped[t.ticketTypeId] = {
             ticketType: t.ticketType.name,
             ticketTypeId: t.ticketTypeId,
-            price: Number(t.ticketType.stages[0].price),
+            price: price,
             quantity: 0,
           };
         }

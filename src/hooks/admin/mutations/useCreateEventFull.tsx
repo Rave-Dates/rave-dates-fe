@@ -21,12 +21,9 @@ export function useCreateFullEvent({reset, successHref = "/admin/events", errorH
         ...eventData,
         labels: validLabels,
       };
-      console.log("cleandedEvent desde el hook",cleanedEvent)
       const createdEvent = await createEvent(token, cleanedEvent);
       const eventId = createdEvent.eventId;
 
-      console.log("eventId",eventId)
-      
       if (organizerId) {
         await assignOrganizerToEvent(token, { organizerId: organizerId }, eventId);
       }
@@ -44,7 +41,6 @@ export function useCreateFullEvent({reset, successHref = "/admin/events", errorH
       }
 
       // 2. Crear categorías
-      console.log(eventCategoryValues)
       if (eventCategoryValues) {
         await Promise.all(
           eventCategoryValues.map((category) => {
@@ -57,7 +53,6 @@ export function useCreateFullEvent({reset, successHref = "/admin/events", errorH
       }
 
       // 3. Crear tickets
-      console.log(tickets)
       await Promise.all(
         tickets.map((ticket) =>
           createTicketTypes(token, { ...ticket, eventId })
@@ -65,7 +60,6 @@ export function useCreateFullEvent({reset, successHref = "/admin/events", errorH
       );
 
       // // 3. Subir imágenes
-      console.log("iamges",images)
       await Promise.all(
         images
           .filter((img): img is { id: string; url: string; file: File } => 'file' in img && !!img.file)

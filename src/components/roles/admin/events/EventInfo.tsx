@@ -106,9 +106,6 @@ export default function EventInfo() {
   const ticketMetricsToUse =
     user?.role.name === "PROMOTER" ? promoterTicketMetrics : ticketMetrics;
 
-  console.log(allCheckers);
-  console.log(ticketTypes);
-
   useEffect(() => {
     if (ticketTypes && ticketTypes.length > 0) {
       setExpandedSections([ticketTypes[0].name || ""]);

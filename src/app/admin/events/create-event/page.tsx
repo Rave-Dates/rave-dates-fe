@@ -59,8 +59,6 @@ export default function Page() {
 
   const organizers = allUsers?.filter((user) => user.role.name === "ORGANIZER");
 
-  console.log("organizers", organizers);
-
   useEffect(() => {
     register("geo");
 
@@ -159,8 +157,6 @@ export default function Page() {
       tickets: updatedTickets,
       maxDate: eventDate,
     });
-
-    console.log("eventFormData", eventFormData)
 
     setHasLoadedEvent(true);
 

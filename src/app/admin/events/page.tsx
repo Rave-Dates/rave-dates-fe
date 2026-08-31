@@ -43,7 +43,6 @@ export default function Page() {
   };
 
   useEffect(() => {
-    console.log("campos resetados")
     updateEventFormData(defaultEventFormData);
   }, []);
 

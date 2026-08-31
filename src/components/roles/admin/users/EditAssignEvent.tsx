@@ -203,7 +203,7 @@ export default function EditAssignEvent({ isOrganizer = false }: { isOrganizer?:
       const formattedData = {
         organizerId: selectedUser.organizer?.organizerId,
       }
-      console.log("ORGANIZER formattedData",formattedData)
+
       if (!formattedData.organizerId) return
       deleteOrganizerEventMutation.mutate(
         {

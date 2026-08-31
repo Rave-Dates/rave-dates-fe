@@ -227,9 +227,6 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
       return;
     }
 
-    console.log(getValues("ticketTypeMap"))
-    console.log(clientId)
-
     complimentaryTicketMutation({
       ticketData: {
         promoterId: decoded?.promoterId ?? 0,

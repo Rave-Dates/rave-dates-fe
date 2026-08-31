@@ -27,10 +27,7 @@ export default function UsersList() {
   const eventId = parseInt(params.eventId as string, 10);
 
   const { selectedEvent } = useAdminEvent({ token, eventId });
-  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });
   const { guests } = useAdminGetGuests({ token, eventId });
-
-  console.log(ticketMetrics)
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;

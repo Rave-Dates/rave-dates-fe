@@ -39,8 +39,6 @@ const TicketSelector = ({
   const { selectedEvent } = useClientEvent(eventId);
   const [isVisible, setIsVisible] = React.useState(false);
 
-  console.log("eventInfo", eventInfo);
-
   React.useEffect(() => {
     const handleScroll = () => {
       // Aparecer después de 300px de scroll (pasando el hero y el header)

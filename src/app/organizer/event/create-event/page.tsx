@@ -99,7 +99,6 @@ export default function Page() {
   // creamos el evento 
   const onSubmit = (data: IEventFormData) => {
     const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
-      console.log(ticketId, ticketTypeId)
       if (rest.stages.length === 1) return { ...rest, maxDate: rest.stages[0].dateMax };
       const lastStageMaxDate = rest.stages.at(-1)?.dateMax || "";
       return {

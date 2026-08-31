@@ -68,7 +68,6 @@ export function TicketCard({
           ],
     }));
 
-    console.log("normalizedTickets",normalizedTickets)
     // Guardar todos los datos del form, no solo los tickets
     updateEventFormData({
       ...eventFormData,

@@ -17,7 +17,6 @@ import { useForm, useWatch } from "react-hook-form";
 export default function Page() {
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const { mutate: createPaymentMutation } = useCreatePayment();
-  console.log(selectedEventId)
 
   const params = useParams();
   const userId = Number(params.userId)
@@ -32,8 +31,6 @@ export default function Page() {
   });
   
   const { data: selectedUser } = useAdminUserById({ token, userId });
-
-  console.log(selectedUser)
 
   const watchedImage = useWatch({ name: "image", control });
 
@@ -55,8 +52,6 @@ export default function Page() {
       reference: selectedEvent?.title || "",
     };
 
-    // Ejemplo de envío
-    console.log(formattedData)
     notifyPending(
       new Promise((resolve, reject) => {
         createPaymentMutation(formattedData, {

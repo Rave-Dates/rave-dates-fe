@@ -43,7 +43,6 @@ export default function EditTicketConfiguration() {
 
   useEffect(() => {
     if (!hasLoadedEvent) {
-      console.log(hasLoadedEvent)
       notifyError("Por favor vuelva a seleccionar un ticket")
       route.push(`/admin/events/edit-event/${eventId}`)
     }
@@ -135,8 +134,6 @@ export default function EditTicketConfiguration() {
       minPartialPercentage: data.minPartialPercentage,
       formPromoters: eventFormData.formPromoters,
     }
-
-    console.log("cleanedEventData",cleanedEventData)
 
     // funcion para editar evento
     notifyPending(

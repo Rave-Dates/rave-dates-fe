@@ -51,7 +51,6 @@ export default function StageConfig() {
       ...updatedTickets[currentTicketIndex!],
       stages: data.stages
     };
-    console.log("updated tickets",updatedTickets)
     
     updateEventFormData({
       ...eventFormData, // ← esto mantiene title, images, etc.

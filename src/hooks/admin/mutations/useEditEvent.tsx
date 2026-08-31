@@ -29,7 +29,6 @@ export function useEditEvent(reset: (data: IEventFormData) => void) {
           ,
         };
         
-        console.log("formattedData", formattedData)
         await assignPromoterToEvent(token, formattedData, eventId);
       }
 
@@ -41,10 +40,7 @@ export function useEditEvent(reset: (data: IEventFormData) => void) {
       };
       const editedEvent = await editEvent(token, eventId, cleanedEvent);
 
-      // console.log("eventId",eventId)
-
       // 2. Editar o crear los tickets
-      console.log("tickets desde hook",tickets)
       await Promise.all(
         tickets.map(({ ticketTypeId, ticketId, ...rest }) => {
           const ticketValues = { ...rest };

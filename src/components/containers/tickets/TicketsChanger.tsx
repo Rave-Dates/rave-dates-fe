@@ -158,8 +158,6 @@ export default function TicketsChanger({ eventInfo }: Props) {
     return;
   }
 
-
-  console.log("pendingPurchases", pendingPurchases)
   // Navega al checkout para completar un pago parcial (Piggy Bank)
   const handleCompletePiggyBank = async (purchase: PendingPurchases) => {
     setEventId(eventId);

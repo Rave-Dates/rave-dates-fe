@@ -35,7 +35,6 @@ const TicketsEventList: React.FC = () => {
 
   
   const { purchasedTickets, isTicketsLoading, isTicketsError } = useClientPurchasedTickets({clientId, clientToken: token});
-  console.log(purchasedTickets)
 
   // Obtener los eventos asociados a los eventId de los tickets
   useEffect(() => {

@@ -16,7 +16,6 @@ import { useForm, useWatch } from "react-hook-form";
 export default function Page() {
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const { mutate: createPaymentMutation } = useCreatePayment();
-  console.log(selectedEventId)
 
   const params = useParams();
   const userId = Number(params.userId)
@@ -45,7 +44,6 @@ export default function Page() {
     };
 
     // Ejemplo de envío
-    console.log(formattedData)
     notifyPending(
       new Promise((resolve, reject) => {
         createPaymentMutation(formattedData, {

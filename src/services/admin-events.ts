@@ -25,7 +25,6 @@ export const getEventById = async ({token, id}: { token: CookieValueTypes, id: I
 
 
 export const createEvent = async (token: CookieValueTypes, data: Partial<IEventForUpdate>) => {
-  console.log(data)
   const res = await axios.post(`${BASE_URL}/admin/events`, data, {
     headers: {
       "Accept": "application/json",
@@ -81,9 +80,6 @@ export const createTicketTypes = async (token: CookieValueTypes ,ticket: IEventT
 }
 
 export const editTicketTypes = async (token: CookieValueTypes ,ticket: IEventTicket, id: number) => {
-  console.log("ticket",ticket)
-  console.log("id",id)
-  console.log("token",token)
   const res = await axios.put(`${BASE_URL}/admin/ticket-types/${id}`, ticket, {
     headers: {
       "Accept": "application/json",

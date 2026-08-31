@@ -86,7 +86,6 @@ export default function DataForm() {
 
     // si el email no cambió => lo eliminamos
     if (data.email === client.email) {
-      console.log("email igual")
       delete formattedData.email;
     }
 

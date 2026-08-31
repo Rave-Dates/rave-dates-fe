@@ -26,8 +26,6 @@ export default function WithdrawPromoterInfo({ paymentId }: { paymentId: number 
 
   const selectedMovement = promoterBinnacles?.movements.find(m => m.paymentId === paymentId);
 
-  console.log(promoterBinnacles)
-
   const { movementImage, isErrorMovementImage, isLoadingMovementImage } = useServeMovementImage({ token, url: selectedMovement?.imageUrl });
 
   return (

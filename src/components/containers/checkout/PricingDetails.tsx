@@ -83,7 +83,6 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
   let totalSubtracted = 0;
 
   for (const [key, value] of Object.entries(oldSubtracted)) {
-    console.log(key)
     totalSubtracted += value.currentSubtracted * value.price;
   }
 
