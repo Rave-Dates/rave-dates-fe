@@ -157,7 +157,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
           </div>
           <div className="tabular-nums flex items-center justify-center">
             <span className="text-primary text-2xl">-</span>
-            ${Number(binnacleToUse?.alreadyPaid?? "0").toLocaleString()}
+              ${Number(binnacleToUse?.alreadyPaid ?? "0").toLocaleString()}
           </div>
         </div>
         <div className="flex justify-between text-sm gap-y-2 py-3 px-3">
@@ -169,7 +169,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
               user?.role.name === "ORGANIZER" ?
               `$${Number(binnacleToUse?.pendingPayment?? "0").toLocaleString()}`
               :
-              `$${Number(binnacleToUse?.feePromoter?? "0").toLocaleString()}`
+              `$${Number(selectedPromoterBinnacle?.feePromoter?? "0").toLocaleString()}`
             }
           </div>
         </div>
