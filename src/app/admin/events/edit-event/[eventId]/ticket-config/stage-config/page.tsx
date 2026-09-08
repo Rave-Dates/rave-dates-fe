@@ -68,17 +68,19 @@ export default function StageConfig() {
     const yyyyMmDd = today.toISOString().split('T')[0];
 
     const lastStageDate = currentStages.at(-1)?.dateMax;
-    let nextStartDate = eventFormData.date || yyyyMmDd;
+    let nextStartDate = eventFormData.date ? eventFormData.date.split('T')[0] : yyyyMmDd;
 
     if (lastStageDate) {
       const d = new Date(lastStageDate);
-      d.setDate(d.getDate() + 1);
-      nextStartDate = d.toISOString().split('T')[0];
+      if (!isNaN(d.getTime())) {
+        d.setDate(d.getDate() + 1);
+        nextStartDate = d.toISOString().split('T')[0];
+      }
     }
 
     const newStage: IEventStages = {
       stageId: newId,
-      dateMax: eventFormData.date || nextStartDate, // Siempre la fecha del evento
+      dateMax: eventFormData.date ? eventFormData.date.split('T')[0] : nextStartDate, // Siempre la fecha del evento
       price: undefined,
       quantity: undefined,
       date: nextStartDate, // Inicio anterior + 1 día

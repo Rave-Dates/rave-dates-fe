@@ -41,20 +41,32 @@ const GeoAutocomplete = ({
   
   useEffect(() => {
     if (defaultGeo && isEditing) {
-      const [lat, lng] = defaultGeo.split(";");
-      if (lat && lng) {
-        getGeocode({ location: { lat: parseFloat(lat), lng: parseFloat(lng) } })
-        .then((results) => {
-            setValue("geo", `${lat};${lng}`);
-            const placeName = results[0]?.formatted_address;
+      const parts = defaultGeo.split(";");
+      const latStr = parts[0];
+      const lngStr = parts[1];
+      const lat = parseFloat(latStr);
+      const lng = parseFloat(lngStr);
+
+      if (!isNaN(lat) && !isNaN(lng)) {
+        getGeocode({ location: { lat, lng } })
+          .then((results) => {
+            setValue("geo", defaultGeo);
+            const placeName = results[0]?.formatted_address || parts[2] || "";
             if (placeName) setInputValue(placeName);
           })
           .catch((err) => {
+            if (parts[2]) {
+              setInputValue(parts[2]);
+            }
             console.error("Error al obtener dirección a partir de coordenadas:", err);
           });
+      } else {
+        // Fallback if the geo is just a string without valid coordinates
+        setInputValue(defaultGeo);
+        setValue("geo", defaultGeo);
       }
     }
-  }, [defaultGeo]);
+  }, [defaultGeo, isEditing, setInputValue, setValue]);
 
   const handleSelect = async (description: string) => {
     setInputValue(description, false);

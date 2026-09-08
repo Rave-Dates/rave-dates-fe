@@ -10,9 +10,22 @@ export function extractPlaceFromGeo(geoString: string): string {
 export function extractLatAndLng(geoString: string): string {
   if (!geoString) return "";
   const parts = geoString.split(";").map(part => part.trim());
-  if (parts.length === 3 && parts[0] && parts[1]) {
-    return `${parts[0]},${parts[1]}`;
+  
+  if (parts.length >= 2 && parts[0] && parts[1]) {
+    // If it is 'lat,lng', convert it just in case, otherwise use as is
+    const lat = parts[0].replace(',', '.');
+    const lng = parts[1].replace(',', '.');
+    return `${lat};${lng}`;
   }
+  
+  // Backwards compatibility if it was somehow saved as "lat,lng" without semicolons
+  if (parts.length === 1 && geoString.includes(",")) {
+    const commaParts = geoString.split(",").map(p => p.trim());
+    if (commaParts.length === 2 && commaParts[0] && commaParts[1]) {
+      return `${commaParts[0]};${commaParts[1]}`;
+    }
+  }
+
   return "";
 }
 
