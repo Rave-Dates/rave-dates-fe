@@ -6,6 +6,7 @@ import EventCardSkeleton from "@/utils/skeletons/event-skeletons/EventCardSkelet
 import { useClientAllEvents, useClientAllCategories } from "@/hooks/client/queries/useClientData";
 import { useEventStore } from "@/store/useEventStore";
 import { useCityStore } from "@/store/useCityStore";
+import { formatDateToColombiaTime } from "@/utils/formatDate";
 
 const EventCardList: React.FC = () => {
   const { filters, setFilters, initialRaveFilterApplied, setInitialRaveFilterApplied, setEvents } = useEventStore();
@@ -29,11 +30,9 @@ const EventCardList: React.FC = () => {
     .filter((event) => {
       if (!event.date) return false;
 
-      const eventDate = new Date(event.date);
-      const today = new Date();
-      // Reiniciar la hora de "today" para que los eventos de hoy sigan viéndose
-      today.setHours(0, 0, 0, 0);
-      return eventDate.getTime() >= today.getTime();
+      const eventDateStr = formatDateToColombiaTime(event.date).date;
+      const todayStr = formatDateToColombiaTime(new Date()).date;
+      return eventDateStr >= todayStr;
     })
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 

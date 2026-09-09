@@ -197,6 +197,10 @@ export default function TicketsChanger({ eventInfo }: Props) {
         logoRD: "/logo.svg",
         fileName: `ticket-${ticket.ticketType.name}-${i + 1}.jpg`,
       });
+
+      if (i < downloadableTickets.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
     }
     } finally {
       setIsDownloadingAll(false);

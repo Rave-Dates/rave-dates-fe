@@ -13,6 +13,7 @@ import { useClientAllRawEvents } from '@/hooks/client/queries/useClientData';
 import { useReactiveCookiesNext } from 'cookies-next';
 import { useCityStore } from '@/store/useCityStore';
 import LocationSvg from '@/components/svg/LocationSvg';
+import { formatDateToColombiaTime } from '@/utils/formatDate';
 
 const NavbarWeb: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,14 +35,13 @@ const NavbarWeb: React.FC = () => {
       return;
     }
 
+    const todayStr = formatDateToColombiaTime(new Date()).date;
+
     const filtered = events?.filter((event) => {
       if (!event.date) return false;
 
-      const eventDate = new Date(event.date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const isUpcoming = eventDate.getTime() >= today.getTime();
+      const eventDateStr = formatDateToColombiaTime(event.date).date;
+      const isUpcoming = eventDateStr >= todayStr;
       const matchesSearch = event.title.toLowerCase().includes(term.toLowerCase());
 
       return isUpcoming && matchesSearch;

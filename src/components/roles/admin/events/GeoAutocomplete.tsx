@@ -48,13 +48,17 @@ const GeoAutocomplete = ({
       const lng = parseFloat(lngStr);
 
       if (!isNaN(lat) && !isNaN(lng)) {
+        // Only store the lat;lng portion — place name is handled by the separate "place" field
+        const geoCoords = `${latStr};${lngStr}`;
         getGeocode({ location: { lat, lng } })
           .then((results) => {
-            setValue("geo", defaultGeo);
+            setValue("geo", geoCoords);
             const placeName = results[0]?.formatted_address || parts[2] || "";
             if (placeName) setInputValue(placeName);
           })
           .catch((err) => {
+            // Even on error, still set the coords correctly
+            setValue("geo", geoCoords);
             if (parts[2]) {
               setInputValue(parts[2]);
             }

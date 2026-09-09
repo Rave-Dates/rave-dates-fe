@@ -235,10 +235,28 @@ export const generateTicketImage = async ({
 
   // === Dependiendo del modo ===
   if (mode === "download") {
-    const link = document.createElement("a")
-    link.download = fileName
-    link.href = canvas.toDataURL("image/jpeg", 0.95)
-    link.click()
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob((b) => resolve(b), "image/jpeg", 0.95)
+    );
+
+    if (blob) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    } else {
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   } else {
     // return canvas o dataURL para usarlo en otro lado
     return canvas.toDataURL("image/jpeg", 0.95)

@@ -136,7 +136,7 @@ export default function TicketConfiguration() {
           price: undefined,
           quantity: undefined,
           promoterFee: undefined,
-          feeType: "percentage",
+          feeType: "fixed",
         },
       ],
     };

@@ -187,7 +187,7 @@ export default function EditTicketConfiguration() {
           price: undefined,
           quantity: undefined,
           promoterFee: undefined,
-          feeType: "percentage",
+          feeType: "fixed",
         },
       ],
     };

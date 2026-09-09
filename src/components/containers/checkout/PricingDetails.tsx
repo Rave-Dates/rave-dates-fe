@@ -41,7 +41,9 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
 
     let promoterDiscount = 0;
     if (isPromoter && selectedData.stage.promoterFee) {
-        if (selectedData.stage.feeType === "percentage") {
+        // If feeType is "percentage" but the fee is suspiciously large (> 100), it's likely a fixed amount (COP)
+        // saved incorrectly due to a default feeType="percentage" on single-stage tickets.
+        if (selectedData.stage.feeType === "percentage" && selectedData.stage.promoterFee <= 100) {
              promoterDiscount = (selectedData.stage.price * (selectedData.stage.promoterFee / 100)) * selectedData.quantity;
         } else {
              promoterDiscount = selectedData.stage.promoterFee * selectedData.quantity;
@@ -89,6 +91,10 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
   const gatewayFee = selectedMethod === "Bold" ? totalAmount * (effectiveFeePercentage / 100) : 0;
   const actualDiscountValue = hasDiscountFlag ? totalAmount * ((eventDiscountAmount || 0) / 100) : 0;
   const totalPromoterDiscount = mergedTickets.reduce((acc, t) => acc + t.promoterDiscount, 0);
+
+  console.log("totalPromoterDiscount", totalPromoterDiscount)
+  console.log("mergedTickets", mergedTickets)
+  console.log("selected", selected)
 
   // if (!clientData?.balance) return null;
 

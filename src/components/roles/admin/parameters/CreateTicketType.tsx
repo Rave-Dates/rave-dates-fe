@@ -20,7 +20,7 @@ export default function CreateTicketType() {
       eventId: 1,
       name: "",
       maxDate: "",
-      stages: [{ stageId: 1, date: "2025-10-10", dateMax: "2025-10-10", price: 0, quantity: 0, promoterFee: 0, feeType: "percentage" }],
+      stages: [{ stageId: 1, date: "2025-10-10", dateMax: "2025-10-10", price: 0, quantity: 0, promoterFee: 0, feeType: "fixed" }],
     },
   });
   const { getCookie } = useReactiveCookiesNext();
