@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import AddSvg from "@/components/svg/AddSvg";
 import { useClientEventServedOneImage, useClientGetById } from "@/hooks/client/queries/useClientData";
 import { generateTicketImage } from "./generateTicketImage";
+import { jwtDecode } from "jwt-decode";
 
 interface TicketRowProps {
   href: string;
@@ -42,8 +43,30 @@ export function TicketRow({
   const params = useParams();
   const eventId = parseInt(params.eventId as string, 10);
   const clientToken = getCookie("clientToken");
+  const decoded: { id: number } = (clientToken && jwtDecode(clientToken.toString())) || { id: 0 };
+  const currentClientId = Number(decoded?.id);
+
+  const getTargetClientId = (): number | null | undefined => {
+    const ids = ticket.transferredClientIds;
+    if (ids && ids.length > 0) {
+      if (ids.length === 1) {
+        return ids[0];
+      }
+      const myIndex = ids.indexOf(currentClientId);
+      if (myIndex !== -1 && myIndex + 1 < ids.length) {
+        return ids[myIndex + 1];
+      }
+      if (myIndex === -1) {
+        return ids[0];
+      }
+      return ids[ids.length - 1];
+    }
+    return ticket.transferredClientId;
+  };
+
+  const targetClientId = getTargetClientId();
   const { servedImageUrl } = useClientEventServedOneImage(eventId);
-  const { clientData } = useClientGetById({clientId: ticket.transferredClientId, clientToken});
+  const { clientData } = useClientGetById({clientId: targetClientId, clientToken});
 
   const [ticketCanvas, setTicketCanvas] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);

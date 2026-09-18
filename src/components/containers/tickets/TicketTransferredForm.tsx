@@ -19,6 +19,7 @@ import Image from "next/image";
 import SpinnerSvg from "@/components/svg/SpinnerSvg";
 import { useEffect } from "react";
 import { useClientEvent, useClientEventServedOneImage, useClientGetById, useClientPurchasedOneTicket } from "@/hooks/client/queries/useClientData";
+import { jwtDecode } from "jwt-decode";
 
 const TicketTransferredForm = ({
   purchaseTicketId,
@@ -32,9 +33,31 @@ const TicketTransferredForm = ({
   const clientToken = getCookie("clientToken");
   const params = useParams();
   const eventId = parseInt(params.eventId as string, 10);
+  const decoded: { id: number } = (clientToken && jwtDecode(clientToken.toString())) || { id: 0 };
+  const currentClientId = Number(decoded?.id);
 
   const { purchasedTicket } = useClientPurchasedOneTicket({pruchaseTicketId: purchaseTicketId, clientToken});
-  const { clientData } = useClientGetById({clientId: purchasedTicket?.transferredClientId, clientToken}); 
+
+  const getTargetClientId = (): number | null | undefined => {
+    const ids = purchasedTicket?.transferredClientIds;
+    if (ids && ids.length > 0) {
+      if (ids.length === 1) {
+        return ids[0];
+      }
+      const myIndex = ids.indexOf(currentClientId);
+      if (myIndex !== -1 && myIndex + 1 < ids.length) {
+        return ids[myIndex + 1];
+      }
+      if (myIndex === -1) {
+        return ids[0];
+      }
+      return ids[ids.length - 1];
+    }
+    return purchasedTicket?.transferredClientId;
+  };
+
+  const targetClientId = getTargetClientId();
+  const { clientData } = useClientGetById({clientId: targetClientId, clientToken}); 
   const { selectedEvent, isEventLoading } = useClientEvent(eventId);
   const { servedImageUrl, isImageLoading } = useClientEventServedOneImage(eventId);
 

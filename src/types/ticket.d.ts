@@ -34,6 +34,7 @@ interface IPurchaseTicket {
     }[];
   };
   transferredClientId: number | null;
+  transferredClientIds?: number[];
   ticketType: {
     count: number;
     ticketTypeId: number;
