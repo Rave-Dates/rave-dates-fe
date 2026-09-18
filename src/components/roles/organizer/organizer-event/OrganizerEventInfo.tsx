@@ -332,7 +332,7 @@ export default function OrganizerEventInfo({ eventId, token, isPromoter = false,
 
                         <div className="flex text-sm justify-between items-center">
                           <h2>Dinero entregado</h2>
-                          <h2 className="text-primary-white text-base text-end tabular-nums">COP ${selectedBinnacle?.alreadyPaid.toLocaleString()?? 0}</h2>
+                          <h2 className="text-primary text-base text-end tabular-nums">COP -${selectedBinnacle?.alreadyPaid.toLocaleString()?? 0}</h2>
                         </div>
                             
                         <div className="flex text-sm justify-between items-center">

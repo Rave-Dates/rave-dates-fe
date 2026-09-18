@@ -99,10 +99,10 @@ export default function OrganizerEventAttendees({eventId, disableHeader = false}
                 : 0;
               return (
                 <div key={ticketType.name}>
-                  <p className="flex justify-between">
+                  <div className="flex justify-between">
                     <h2 className="text-text-inactive">{ticketType.name}</h2>
                     <h3 className="text-primary-white">{percentage}%</h3>
-                  </p>
+                  </div>
                   <ProgressBar current={ticketType.quantity} total={ticketType.total} />
                 </div>
               );

@@ -88,7 +88,8 @@ export default function PricingDetails({check, clientData, promoterBalance, isPr
     totalSubtracted += value.currentSubtracted * value.price;
   }
 
-  const gatewayFee = selectedMethod === "Bold" ? totalAmount * (effectiveFeePercentage / 100) : 0;
+  const baseAmountForFee = selectedPayment === "Abrir alcancía" ? (Number(partialAmount) || 0) : totalAmount;
+  const gatewayFee = selectedMethod === "Bold" ? baseAmountForFee * (effectiveFeePercentage / 100) : 0;
   const actualDiscountValue = hasDiscountFlag ? totalAmount * ((eventDiscountAmount || 0) / 100) : 0;
   const totalPromoterDiscount = mergedTickets.reduce((acc, t) => acc + t.promoterDiscount, 0);
 
