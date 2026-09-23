@@ -43,6 +43,8 @@ export default function EventBalance({eventId}: { eventId: number }) {
   const binnacleToUse = user?.role.name === "PROMOTER" ? selectedPromoterBinnacle : selectedBinnacle;
   const ticketMetricsToUse = user?.role.name === "PROMOTER" ? promoterTicketMetrics : ticketMetrics;
 
+  const totalWithoutBold = binnacleToUse?.total && eventReportBinnacles?.totalBold ? Number(binnacleToUse.total) - Number(eventReportBinnacles.totalBold) : 0;
+
   return (
     <div className="w-full flex flex-col justify-between bg-primary-black text-primary-white min-h-screen p-4 pb-40 lg:pt-32">
       <div>
@@ -117,9 +119,17 @@ export default function EventBalance({eventId}: { eventId: number }) {
             Total
           </div>
           <div className="tabular-nums">
-            ${Number(binnacleToUse?.total?? "0").toLocaleString()}
+            $
+            {
+              user?.role.name === "PROMOTER" ?
+                Number(selectedPromoterBinnacle?.feePromoter?? "0").toLocaleString()
+                :
+                Number(totalWithoutBold?? "0").toLocaleString()
+            }
           </div>
         </div>
+        {
+          user?.role.name === "ORGANIZER" &&
         <div className="flex h-[44px] justify-between items-center text-sm gap-y-2 py-3 px-3">
           <div className="text-text-inactive">
             Comisión de Rave Dates
@@ -129,15 +139,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
             ${Number(binnacleToUse?.feeRD?? "0").toLocaleString()}
           </div>
         </div>
-        <div className="flex h-[44px] justify-between items-center text-sm gap-y-2 py-3 px-3">
-          <div className="text-text-inactive">
-            Comisión pago por Bold
-          </div>
-          <div className="tabular-nums flex items-center justify-center">
-            <span className="text-primary text-2xl">-</span>
-            ${Number(eventReportBinnacles?.totalBold?? "0").toLocaleString()}
-          </div>
-        </div>
+        }
 
         {
           user?.role.name === "ORGANIZER" &&
@@ -169,10 +171,49 @@ export default function EventBalance({eventId}: { eventId: number }) {
               user?.role.name === "ORGANIZER" ?
               `$${Number(binnacleToUse?.pendingPayment?? "0").toLocaleString()}`
               :
-              `$${Number(selectedPromoterBinnacle?.feePromoter?? "0").toLocaleString()}`
+              `$${Number(selectedPromoterBinnacle?.feePromoter && selectedPromoterBinnacle?.alreadyPaid ? Number(selectedPromoterBinnacle.feePromoter) - selectedPromoterBinnacle.alreadyPaid : 0).toLocaleString()}`
             }
           </div>
         </div>
+
+            {
+              user?.role.name === "ORGANIZER" && 
+            <>
+              <div className="flex justify-between border-t border-neutral-700 text-sm gap-y-2 py-3 px-3">
+                <div className="text-text-inactive">
+                  Transferencias ({eventReportBinnacles?.totalTransfersCount})
+                </div>
+                <div className="tabular-nums">
+                  $
+                  {
+                    eventReportBinnacles?.totalTransfersAmount.toLocaleString()
+                  }
+                </div>
+              </div>
+              <div className="flex justify-between text-sm gap-y-2 py-3 px-3">
+                <div className="text-text-inactive">
+                  Alcancias ({eventReportBinnacles?.totalPiggyBankCount})
+                </div>
+                <div className="tabular-nums">
+                  $
+                  {
+                    eventReportBinnacles?.totalPiggyBankAmount?.toLocaleString()
+                  }
+                </div>
+              </div>
+              <div className="flex justify-between text-sm gap-y-2 py-3 px-3">
+                <div className="text-text-inactive">
+                  Pago con Bold
+                </div>
+                <div className="tabular-nums">
+                  $
+                  {
+                    eventReportBinnacles?.totalBold?.toLocaleString()
+                  }
+                </div>
+              </div>
+            </>
+            }
       </div>
     </div>
   );

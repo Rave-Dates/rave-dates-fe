@@ -19,6 +19,8 @@ interface IEventReportBinnacle {
   totalTransfersAmount: number,
   totalPurchasesCount: number,
   totalPurchasesAmount: number
+  totalPiggyBankCount: number,
+  totalPiggyBankAmount: number,
 }
 
 interface IPromoterEventPaymentSummary {
