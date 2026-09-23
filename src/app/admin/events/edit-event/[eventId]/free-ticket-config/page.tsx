@@ -45,6 +45,7 @@ export default function FreeTicketConfiguration() {
           ...stage,
           date: formatDate(stage.date),
           dateMax: formatDate(stage.dateMax),
+          limitStage: stage.limitStage ?? stage.quantity,
         })),
       }));
 
@@ -68,7 +69,8 @@ export default function FreeTicketConfiguration() {
       stages: ticket.stages.map((stage) => ({
         date: formatDate(stage.date),
         dateMax: formatDate(stage.dateMax),
-        quantity: stage.quantity,
+        quantity: stage.quantity ?? stage.limitStage,
+        limitStage: stage.limitStage ?? stage.quantity,
         price: stage.price,
         promoterFee: stage.promoterFee,
         feeType: stage.feeType,
@@ -152,7 +154,7 @@ export default function FreeTicketConfiguration() {
               <FormInput
                 title="Cantidad"
                 inputName="quantity"
-                register={register("tickets.0.stages.0.quantity", { 
+                register={register("tickets.0.stages.0.limitStage", { 
                   required: true, 
                   setValueAs: (v) => v === "" ? undefined : Number(v) 
                 })}

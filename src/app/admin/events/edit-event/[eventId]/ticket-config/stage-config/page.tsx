@@ -19,25 +19,34 @@ export default function StageConfig() {
     (t) => (t.ticketTypeId ?? t.ticketId) === editingTicketId
   );
 
-  const currentStages = eventFormData.tickets?.[currentTicketIndex!]?.stages || [];
+  const rawStages = eventFormData.tickets?.[currentTicketIndex!]?.stages;
   
   const { control, register, handleSubmit, getValues, reset } = useForm<IEventTicket>({
-    defaultValues: { stages: currentStages }
+    defaultValues: {
+      stages: (rawStages || []).map((stage) => ({
+        ...stage,
+        limitStage: stage.limitStage ?? stage.quantity,
+      })),
+    },
   });
 
-  
   useEffect(() => {
-    if (currentStages.length) {
-        reset({ stages: currentStages });
-      }
-    }, [currentStages]);
+    if (rawStages && rawStages.length) {
+      reset({
+        stages: rawStages.map((stage) => ({
+          ...stage,
+          limitStage: stage.limitStage ?? stage.quantity,
+        })),
+      });
+    }
+  }, [rawStages, reset]);
 
   useEffect(() => {
     if (!hasLoadedEvent) {
-      notifyError("Por favor vuelva a seleccionar un ticket")
-      router.push(`/admin/events/edit-event/${eventId}`)
+      notifyError("Por favor vuelva a seleccionar un ticket");
+      router.push(`/admin/events/edit-event/${eventId}`);
     }
-  });
+  }, [hasLoadedEvent, eventId, router]);
       
   const { fields, append, remove } = useFieldArray({
     control,
@@ -46,10 +55,15 @@ export default function StageConfig() {
   
   const onSubmit = (data: IEventTicket) => {
     if (!eventFormData.tickets) return
+    const updatedStages = data.stages.map((stage) => ({
+      ...stage,
+      limitStage: stage.limitStage ?? stage.quantity,
+      quantity: stage.quantity ?? stage.limitStage,
+    }));
     const updatedTickets = [...eventFormData.tickets];
     updatedTickets[currentTicketIndex!] = {
       ...updatedTickets[currentTicketIndex!],
-      stages: data.stages
+      stages: updatedStages,
     };
     
     updateEventFormData({
@@ -149,6 +163,7 @@ export default function StageConfig() {
                 register={register}
                 key={stage.id}
                 index={index}
+                isEditing={true}
                 onDelete={() => handleDeleteStage(index)}
                 eventDate={eventFormData.date}
               />

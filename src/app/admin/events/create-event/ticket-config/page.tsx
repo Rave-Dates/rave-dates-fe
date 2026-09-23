@@ -45,12 +45,17 @@ export default function TicketConfiguration() {
 
   const onSubmit = (data: IEventFormData) => {
     const validTickets = data.tickets.map(({ ticketId, ticketTypeId, ...rest }) => {
-      if (rest.stages.length === 1) return { ...rest, maxDate: rest.stages[0].dateMax };
-      const lastStageMaxDate = rest.stages.at(-1)?.dateMax || "";
+      const updatedStages = rest.stages.map((s) => ({
+        ...s,
+        limitStage: s.limitStage ?? s.quantity,
+      }));
+      if (updatedStages.length === 1) return { ...rest, stages: updatedStages, maxDate: updatedStages[0].dateMax };
+      const lastStageMaxDate = updatedStages.at(-1)?.dateMax || "";
       return {
         ...rest,
+        stages: updatedStages,
         maxDate: lastStageMaxDate,
-      }
+      };
     });
 
     const formattedGeo = data.geo ? `${data.geo};${data.place?.trim()}` : data.place?.trim() || "";

@@ -63,6 +63,7 @@ export function TicketCard({
               dateMax: "",
               price: ticket.stages?.[0]?.price ?? undefined,
               quantity: ticket.stages?.[0]?.quantity ?? undefined,
+              limitStage: ticket.stages?.[0]?.limitStage ?? ticket.stages?.[0]?.quantity ?? undefined,
               promoterFee: ticket.stages?.[0]?.promoterFee ?? undefined,
             },
           ],
@@ -104,7 +105,7 @@ export function TicketCard({
           className="bg-cards-container! py-1!"
           title="Cantidad"
           inputName="quantity"
-          register={register(`tickets.${index}.stages.0.quantity`, { 
+          register={register(isEditing ? `tickets.${index}.stages.0.limitStage` : `tickets.${index}.stages.0.quantity`, { 
             required: "La cantidad es obligatoria", 
             setValueAs: (v) => v === "" ? undefined : Number(v) 
           })}

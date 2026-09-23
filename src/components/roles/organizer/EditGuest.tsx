@@ -54,6 +54,15 @@ export default function EditGuest({ clientId }: {clientId: number}) {
     reset(guest);
   }, [guests, clientId, reset]);
 
+  const guest = guests?.find(g => g.clientId === clientId);
+  const purchaseTickets = guest?.purchaseTickets || [];
+
+  const statusConfig: Record<string, { label: string; className: string }> = {
+    PENDING: { label: "No leído", className: "bg-orange-500/20 text-orange-400 border-orange-500/30" },
+    READ: { label: "Leído", className: "bg-green-500/20 text-green-400 border-green-500/30" },
+    DEFEATED: { label: "Vencido", className: "bg-red-500/20 text-red-400 border-red-500/30" },
+  };
+
   const onSubmit = (data: Partial<IFormGuest>) => {
     console.log(data)
     if(!data.name || !data.email || !data.whatsapp || !data.idCard) return;
@@ -123,6 +132,45 @@ export default function EditGuest({ clientId }: {clientId: number}) {
         </FormDropDown> */}
 
       </DefaultForm>
+
+      <div className="max-w-2xl w-full mx-auto pt-10">
+        <h3 className="text-lg font-medium text-primary-white mb-4">Invitaciones</h3>
+        {purchaseTickets.length > 0 ? (
+          <div className="space-y-3">
+            {purchaseTickets.map((ticket, idx) => {
+              const status = ticket?.status ? (statusConfig[ticket.status] ?? statusConfig.PENDING) : statusConfig.PENDING;
+              return (
+                <div
+                  key={ticket?.purchaseTicketId ?? idx}
+                  className="bg-main-container rounded-xl p-3 border border-divider flex items-center justify-between gap-3"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-primary-white font-medium text-sm sm:text-base truncate">
+                      {ticket?.ticketType?.name ?? "Entrada"}
+                    </p>
+                    {ticket?.customId && (
+                      <p className="text-xs text-text-inactive mt-0.5">
+                        #{ticket.customId}
+                        {ticket.isTransferred && (
+                          <span className="ml-2 text-blue-400">· Transferida</span>
+                        )}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className={`text-sm font-medium px-2.5 py-0.5 rounded-full border ${status.className}`}>
+                      {status.label}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-text-inactive text-sm">No tiene tickets registrados</p>
+        )}
+      </div>
+
       <div className="flex pt-10 max-w-2xl w-full mx-auto flex-col items-center justify-center w-full px-6 gap-y-5">
         <button
           onClick={handleResendTicket}

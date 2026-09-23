@@ -62,6 +62,7 @@ export default function EditTicketConfiguration() {
           ...stage,
           date: formatDate(stage.date),
           dateMax: formatDate(stage.dateMax),
+          limitStage: stage.limitStage ?? stage.quantity,
         })),
       }));
 
@@ -88,7 +89,8 @@ export default function EditTicketConfiguration() {
       stages: ticket.stages.map((stage) => ({
         date: formatDate(stage.date),
         dateMax: formatDate(stage.dateMax),
-        quantity: stage.quantity,
+        quantity: stage.quantity ?? stage.limitStage,
+        limitStage: stage.limitStage ?? stage.quantity,
         price: stage.price,
         promoterFee: stage.promoterFee,
         feeType: stage.feeType,
@@ -233,7 +235,7 @@ export default function EditTicketConfiguration() {
               register={register}
               control={control}
               index={index}
-              isEditing={!!ticket.ticketTypeId}
+              isEditing={true}
               key={ticket.id}
               ticketNumber={ticket.ticketTypeId ?? ticket.ticketId}
               onDelete={() => handleDeleteTicket(index)}

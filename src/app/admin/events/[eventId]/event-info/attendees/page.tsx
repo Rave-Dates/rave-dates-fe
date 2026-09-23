@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import DefaultButton from "@/components/ui/buttons/DefaultButton";
 import UserSvg from "@/components/svg/UserSvg";
 import { useReactiveCookiesNext } from "cookies-next";
-import { useAdminEvent, useAdminGetGuests, useAdminTicketMetrics } from "@/hooks/admin/queries/useAdminData";
+import { useAdminEvent, useAdminGetGuests } from "@/hooks/admin/queries/useAdminData";
 import { useParams } from "next/navigation";
 import SearchInput from "@/components/ui/inputs/search-input/SearchInput";
 import GoBackButton from "@/components/ui/buttons/GoBackButton";
@@ -29,7 +29,6 @@ export default function UsersList() {
   const eventId = parseInt(params.eventId as string, 10);
 
   const { selectedEvent } = useAdminEvent({ token, eventId });
-  const { ticketMetrics } = useAdminTicketMetrics({ token, eventId });
   const { guests } = useAdminGetGuests({ token, eventId });
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -107,7 +106,7 @@ export default function UsersList() {
                 key={user.clientId}
                 className="grid grid-cols-[2fr_1fr] items-center py-3 px-3 gap-x-2 text-sm"
               >
-                <div className="text-start">{user.name}</div>
+                <div className="text-start">{user.name} <span className="opacity-50">({user.purchaseTickets.length})</span></div>
                 <div className="flex justify-end">
                   <DefaultButton className="text-xl !bg-transparent border border-primary !text-primary" icon={<UserSvg stroke={1.5} />} href={`attendees/${user.clientId}/edit-attendee`} /> 
                 </div>

@@ -214,7 +214,7 @@ export default function EventInfo() {
                 Asistentes / Aforo
               </div>
               <div className="text-primary-white text-xl font-medium">
-                {ticketMetricsToUse?.ticketsPurchased}/
+                {ticketMetricsToUse?.ticketsPurchased && ticketMetricsToUse.ticketsPurchased + ticketMetricsToUse.invites}/
                 {ticketMetricsToUse?.totalTickets}
               </div>
             </div>

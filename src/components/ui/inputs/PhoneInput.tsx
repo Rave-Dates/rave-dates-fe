@@ -98,7 +98,7 @@ export default function PhoneInput<T extends FieldValues>({
             <div className="flex relative items-center w-full mt-2">
               {/* Dropdown personalizado */}
               <div
-                className="relative w-28 shrink-0 h-[46px]"
+                className="relative w-28 shrink-0"
                 ref={dropdownRef}
               >
                 <button

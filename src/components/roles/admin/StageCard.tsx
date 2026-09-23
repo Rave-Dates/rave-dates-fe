@@ -12,6 +12,7 @@ interface StageCardProps {
   register: UseFormRegister<IEventTicket>,
   control: Control<IEventTicket>,
   eventDate?: string,
+  isEditing?: boolean,
 }
 
 export function StageCard({
@@ -20,6 +21,7 @@ export function StageCard({
   register,
   control,
   eventDate,
+  isEditing = false,
 }: StageCardProps) {
 
   return (
@@ -41,7 +43,7 @@ export function StageCard({
             title="Cantidad"
             inputName="quantity"
             labelClassname="block h-8 sm:h-auto"
-            register={register(`stages.${index}.quantity`, { 
+            register={register(isEditing ? `stages.${index}.limitStage` : `stages.${index}.quantity`, { 
               required: true, 
               setValueAs: (v) => v === "" ? undefined : Number(v) 
             })}

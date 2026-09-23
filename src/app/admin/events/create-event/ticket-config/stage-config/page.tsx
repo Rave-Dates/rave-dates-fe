@@ -17,17 +17,17 @@ export default function StageConfig() {
     (t) => t.ticketId === editingTicketId
   );
 
-  const currentStages = eventFormData.tickets?.[currentTicketIndex!]?.stages || [];
+  const currentStages = eventFormData.tickets?.[currentTicketIndex!]?.stages;
 
   const { control, register, handleSubmit, getValues, reset } = useForm<IEventTicket>({
-    defaultValues: { stages: currentStages }
+    defaultValues: { stages: currentStages || [] }
   });
 
   useEffect(() => {
-  if (currentStages.length) {
-    reset({ stages: currentStages });
-  }
-}, [currentStages]);
+    if (currentStages && currentStages.length) {
+      reset({ stages: currentStages });
+    }
+  }, [currentStages, reset]);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -36,10 +36,14 @@ export default function StageConfig() {
 
   const onSubmit = (data: IEventTicket) => {
     if (!eventFormData.tickets) return
+    const updatedStages = data.stages.map((stage) => ({
+      ...stage,
+      limitStage: stage.limitStage ?? stage.quantity,
+    }));
     const updatedTickets = [...eventFormData.tickets];
     updatedTickets[currentTicketIndex!] = {
       ...updatedTickets[currentTicketIndex!],
-      stages: data.stages
+      stages: updatedStages,
     };
 
     updateEventFormData({

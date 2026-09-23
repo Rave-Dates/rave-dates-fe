@@ -124,6 +124,7 @@ interface IEventTicket {
 interface IEventTicketMetrics {
   totalTickets: number;
   ticketsPurchased: number;
+  invites: number;
   ticketsTypesMetrics: {
     name: string;
     quantity: number;
@@ -147,6 +148,7 @@ interface IEventStages {
   dateMax: string;
   price: number | undefined;
   quantity: number | undefined;
+  limitStage?: number | undefined;
   promoterFee: number | undefined;
   feeType?: "percentage" | "fixed";
 }
