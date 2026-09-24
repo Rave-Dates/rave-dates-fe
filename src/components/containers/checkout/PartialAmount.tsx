@@ -30,8 +30,9 @@ export default function PartialAmount({ register, setValue, totalAmount, partial
   const pendingAmount = Math.max(totalBaseAmount - partialAmount, 0);
 
   const MIN_AMOUNT = minPartialPercentage
-    ? Math.ceil(totalBaseAmount * (minPartialPercentage / 100))
+    ? Math.ceil(totalAmount * (minPartialPercentage / 100))
     : 1000;
+
 
   const initialized = useRef(false);
 
