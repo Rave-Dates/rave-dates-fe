@@ -160,7 +160,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
               "Retirado por organizador" :
               user?.role.name === "PROMOTER" ?
               "Retirado por promotor" :
-              ""
+              "Retirado"
             }
           </div>
           <div className="tabular-nums flex items-center justify-center">
@@ -175,7 +175,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
               "DISPONIBLE para organizador" :
               user?.role.name === "PROMOTER" ?
               "DISPONIBLE para promotor" :
-              ""
+              "DISPONIBLE"
             }
           </div>
           <div className="tabular-nums">
