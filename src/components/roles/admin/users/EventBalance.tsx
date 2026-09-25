@@ -116,7 +116,7 @@ export default function EventBalance({eventId}: { eventId: number }) {
       <div className="mt-20 max-w-xl self-center w-full animate-fade-in">
         <div className="flex justify-between text-sm gap-y-2 py-3 px-3">
           <div className="text-text-inactive">
-            Total
+            Total (Boletas pagas)
           </div>
           <div className="tabular-nums">
             $
@@ -155,7 +155,13 @@ export default function EventBalance({eventId}: { eventId: number }) {
         }
         <div className="flex justify-between text-sm gap-y-2 py-3 px-3">
           <div className="text-text-inactive">
-            Retirado
+            {
+              user?.role.name === "ORGANIZER" ?
+              "Retirado por organizador" :
+              user?.role.name === "PROMOTER" ?
+              "Retirado por promotor" :
+              ""
+            }
           </div>
           <div className="tabular-nums flex items-center justify-center">
             <span className="text-primary text-2xl">-</span>
@@ -164,7 +170,13 @@ export default function EventBalance({eventId}: { eventId: number }) {
         </div>
         <div className="flex justify-between text-sm gap-y-2 py-3 px-3">
           <div className="text-text-inactive">
-            DISPONIBLE
+              {
+              user?.role.name === "ORGANIZER" ?
+              "DISPONIBLE para organizador" :
+              user?.role.name === "PROMOTER" ?
+              "DISPONIBLE para promotor" :
+              ""
+            }
           </div>
           <div className="tabular-nums">
             {
